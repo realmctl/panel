@@ -6,9 +6,30 @@ on:
       - "realm/develop"
 
 jobs:
-  tests:
-    name: Tests
+  lint:
+    name: Lint
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          tools: composer:v2, cs2pr
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-lint-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-lint-
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: vendor/bin/php-cs-fixer fix --dry-run --diff --format=checkstyle | cs2pr
+
+  tests:
+    name: Tests (PHP ${{ matrix.php }}, ${{ matrix.database }})
+    runs-on: ubuntu-24.04
+    needs: lint
     permissions:
       contents: read
     strategy:
@@ -18,10 +39,8 @@ jobs:
           - 8.2
           - 8.3
         database:
-          - mariadb:10
           - mariadb:11
           - mysql:8
-          - mysql:9
     services:
       database:
         image: ${{ matrix.database }}
@@ -30,30 +49,32 @@ jobs:
           MYSQL_DATABASE: testing
         ports:
           - 3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v4
-      - id: composer-cache
-        run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-${{ matrix.php }}-
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: bcmath, cli, curl, gd, mbstring, mysql, openssl, pdo, tokenizer, xml, zip
+          extensions: bcmath, gd, mbstring, mysql, pdo, tokenizer, xml, zip
           tools: composer:v2
           coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.php }}-
       - run: cp .env.ci .env
-      - run: composer install --no-interaction --no-progress --no-suggest --prefer-dist
-      - run: vendor/bin/php-cs-fixer fix --dry-run --diff
-      - run: vendor/bin/phpunit --bootstrap vendor/autoload.php tests/Unit
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Unit Tests
+        run: vendor/bin/phpunit --bootstrap vendor/autoload.php tests/Unit
         env:
           DB_HOST: UNIT_NO_DB
-      - run: vendor/bin/phpunit tests/Integration
+      - name: Integration Tests
+        run: vendor/bin/phpunit tests/Integration
         env:
           DB_PORT: ${{ job.services.database.ports[3306] }}
           DB_USERNAME: root
