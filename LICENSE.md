@@ -1,9 +1,13 @@
 # The MIT License (MIT)
 
 ```
-Pterodactyl®
-Copyright © Dane Everitt <dane@daneeveritt.com> and contributors
+Realm® Open Source
+Copyright © 2026 Stijn, Lil Pieter and contributors
 
+Based on Pterodactyl®
+Copyright © Dane Everitt and contributors
+
+Licensed under the MIT License
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
