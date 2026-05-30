@@ -155,6 +155,13 @@ class NodeResource extends Resource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            NodeResource\RelationManagers\AllocationsRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
