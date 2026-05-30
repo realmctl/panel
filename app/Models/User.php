@@ -22,6 +22,8 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Pterodactyl\Notifications\SendPasswordReset as ResetPasswordNotification;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
 /**
  * Pterodactyl\Models\User.
@@ -86,7 +88,8 @@ class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract,
-    Identifiable
+    Identifiable,
+    FilamentUser
 {
     use Authenticatable;
     use Authorizable;
@@ -232,6 +235,14 @@ class User extends Model implements
     public function getNameAttribute(): string
     {
         return trim($this->name_first . ' ' . $this->name_last);
+    }
+
+    /**
+     * Determine if the user can access the Filament admin panel.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->root_admin;
     }
 
     /**
