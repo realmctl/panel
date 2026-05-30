@@ -28,7 +28,7 @@ class Settings extends Page implements Forms\Contracts\HasForms
 
     protected static ?int $navigationSort = 99;
 
-    protected static string $view = 'filament.pages.settings-page';
+    protected string $view = 'filament.pages.settings-page';
 
     public ?array $data = [];
 

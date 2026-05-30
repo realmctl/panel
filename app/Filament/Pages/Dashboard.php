@@ -16,7 +16,7 @@ class Dashboard extends Page
 
     protected static ?int $navigationSort = -2;
 
-    protected static string $view = 'filament.pages.overview';
+    protected string $view = 'filament.pages.overview';
 
     public function getHeaderWidgets(): array
     {
