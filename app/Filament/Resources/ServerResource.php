@@ -34,7 +34,9 @@ class ServerResource extends Resource
                     ->preload()
                     ->required(),
                 Forms\Components\Textarea::make('description')
-                    ->maxLength(191),
+                    ->maxLength(191)
+                    ->default('')
+                    ->dehydrateStateUsing(fn ($state) => $state ?? ''),
                 Forms\Components\TextInput::make('external_id')
                     ->label('External ID')
                     ->maxLength(191),
