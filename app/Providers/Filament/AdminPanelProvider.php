@@ -54,7 +54,6 @@ class AdminPanelProvider extends PanelProvider
                 'Server Management',
                 'User Management',
                 'Infrastructure',
-                'Configuration',
             ]);
     }
 }
