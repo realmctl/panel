@@ -21,7 +21,8 @@ class EmailSettingsCommand extends Command
                             {--port=}
                             {--endpoint=}
                             {--username=}
-                            {--password=}';
+                            {--password=}
+                            {--resend-key= : API key for Resend mail transport.}';
 
     protected array $variables = [];
 
@@ -48,6 +49,7 @@ class EmailSettingsCommand extends Command
                 'mailgun' => 'Mailgun Transactional Email',
                 'mandrill' => 'Mandrill Transactional Email',
                 'postmark' => 'Postmark Transactional Email',
+                'resend' => 'Resend Transactional Email',
             ],
             $this->config->get('mail.default', 'smtp')
         );
@@ -61,6 +63,12 @@ class EmailSettingsCommand extends Command
             trans('command/messages.environment.mail.ask_mail_from'),
             $this->config->get('mail.from.address')
         );
+
+        if (empty($this->variables['MAIL_FROM_ADDRESS'])) {
+            $this->output->error('A from address is required for sending emails.');
+
+            return 1;
+        }
 
         $this->variables['MAIL_FROM_NAME'] = $this->option('from') ?? $this->ask(
             trans('command/messages.environment.mail.ask_mail_name'),
@@ -148,5 +156,23 @@ class EmailSettingsCommand extends Command
             trans('command/messages.environment.mail.ask_postmark_username'),
             $this->config->get('mail.username')
         );
+    }
+
+    /**
+     * Handle variables for resend driver.
+     */
+    private function setupResendDriverVariables()
+    {
+        $this->variables['MAIL_DRIVER'] = 'resend';
+
+        $this->variables['RESEND_KEY'] = $this->option('resend-key') ?? $this->ask(
+            trans('command/messages.environment.mail.ask_resend_key'),
+            $this->config->get('services.resend.key')
+        );
+
+        if (empty($this->variables['RESEND_KEY'])) {
+            $this->output->error('A Resend API key is required when using the Resend mail driver.');
+            $this->output->comment('You can obtain an API key at https://resend.com/api-keys');
+        }
     }
 }

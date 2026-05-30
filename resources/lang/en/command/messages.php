@@ -57,6 +57,7 @@ return [
             'ask_mailgun_secret' => 'Mailgun Secret',
             'ask_mandrill_secret' => 'Mandrill Secret',
             'ask_postmark_username' => 'Postmark API Key',
+            'ask_resend_key' => 'Resend API Key',
             'ask_driver' => 'Which driver should be used for sending emails?',
             'ask_mail_from' => 'Email address emails should originate from',
             'ask_mail_name' => 'Name that emails should appear from',
