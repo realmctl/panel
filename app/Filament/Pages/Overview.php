@@ -2,7 +2,6 @@
 
 namespace Pterodactyl\Filament\Pages;
 
-use BackedEnum;
 use Filament\Pages\Page;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Models\User;
@@ -12,7 +11,7 @@ use Pterodactyl\Services\Helpers\SoftwareVersionService;
 
 class Overview extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-home';
+    protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'Overview';
 
