@@ -24,131 +24,128 @@ class Settings extends Page implements Forms\Contracts\HasForms
 
     protected static ?int $navigationSort = 99;
 
-    protected static string $view = 'filament.pages.settings-tabs';
+    protected static string $view = 'filament.pages.settings-page';
 
-    public ?array $generalData = [];
-    public ?array $mailData = [];
-    public ?array $securityData = [];
-    public string $activeTab = 'general';
+    public ?array $data = [];
 
     public function mount(): void
     {
-        $this->generalForm->fill([
+        $driver = config('mail.default');
+
+        $this->form->fill([
+            // General
             'app_name' => config('app.name'),
             'app_locale' => config('app.locale'),
             'pterodactyl_guzzle_timeout' => config('pterodactyl.guzzle.timeout'),
             'pterodactyl_guzzle_connect_timeout' => config('pterodactyl.guzzle.connect_timeout'),
-        ]);
-
-        $this->mailForm->fill([
-            'driver' => config('mail.default'),
+            // Mail
+            'mail_driver' => $driver,
             'smtp_host' => config('mail.mailers.smtp.host'),
             'smtp_port' => config('mail.mailers.smtp.port'),
             'smtp_encryption' => config('mail.mailers.smtp.encryption'),
             'smtp_username' => config('mail.mailers.smtp.username'),
             'from_address' => config('mail.from.address'),
             'from_name' => config('mail.from.name'),
-        ]);
-
-        $this->securityForm->fill([
+            // Security
             'captcha_provider' => config('captcha.provider', 'recaptcha'),
-            'recaptcha_secret_key' => config('captcha.recaptcha.secret_key'),
             'recaptcha_website_key' => config('captcha.recaptcha.website_key'),
-            'turnstile_secret_key' => config('captcha.turnstile.secret_key'),
+            'recaptcha_secret_key' => '',
             'turnstile_website_key' => config('captcha.turnstile.website_key'),
-            'require_2fa' => config('pterodactyl.auth.2fa_required'),
+            'turnstile_secret_key' => '',
+            'require_2fa' => (string) config('pterodactyl.auth.2fa_required', '0'),
         ]);
     }
 
-    protected function getForms(): array
-    {
-        return [
-            'generalForm',
-            'mailForm',
-            'securityForm',
-        ];
-    }
-
-    public function generalForm(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('app_name')->label('Panel Name')->required(),
-            Forms\Components\Select::make('app_locale')->label('Language')
-                ->options(['en' => 'English', 'nl' => 'Dutch', 'de' => 'German', 'fr' => 'French', 'es' => 'Spanish'])
-                ->required(),
-            Forms\Components\TextInput::make('pterodactyl_guzzle_timeout')->label('Request Timeout (s)')->numeric()->required(),
-            Forms\Components\TextInput::make('pterodactyl_guzzle_connect_timeout')->label('Connect Timeout (s)')->numeric()->required(),
-        ])->columns(2)->statePath('generalData');
+            Forms\Components\Tabs::make('Settings')
+                ->tabs([
+                    Forms\Components\Tabs\Tab::make('General')
+                        ->icon('heroicon-o-cog-6-tooth')
+                        ->schema([
+                            Forms\Components\TextInput::make('app_name')->label('Panel Name')->required()->columnSpan(1),
+                            Forms\Components\Select::make('app_locale')->label('Language')
+                                ->options(['en' => 'English', 'nl' => 'Dutch', 'de' => 'German', 'fr' => 'French', 'es' => 'Spanish'])
+                                ->required()->columnSpan(1),
+                            Forms\Components\TextInput::make('pterodactyl_guzzle_timeout')->label('Request Timeout (s)')->numeric()->required()->columnSpan(1),
+                            Forms\Components\TextInput::make('pterodactyl_guzzle_connect_timeout')->label('Connect Timeout (s)')->numeric()->required()->columnSpan(1),
+                        ])->columns(2),
+
+                    Forms\Components\Tabs\Tab::make('Mail')
+                        ->icon('heroicon-o-envelope')
+                        ->schema([
+                            Forms\Components\Select::make('mail_driver')->label('Mail Driver')
+                                ->options([
+                                    'smtp' => 'SMTP',
+                                    'resend' => 'Resend',
+                                    'sendmail' => 'Sendmail',
+                                    'mailgun' => 'Mailgun',
+                                    'postmark' => 'Postmark',
+                                ])
+                                ->required()
+                                ->reactive()
+                                ->columnSpan(2),
+                            Forms\Components\TextInput::make('smtp_host')->label('SMTP Host')->required()
+                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                            Forms\Components\TextInput::make('smtp_port')->label('SMTP Port')->numeric()->required()
+                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                            Forms\Components\Select::make('smtp_encryption')->label('Encryption')
+                                ->options(['' => 'None', 'tls' => 'TLS', 'ssl' => 'SSL'])
+                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                            Forms\Components\TextInput::make('smtp_username')->label('Username')
+                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                            Forms\Components\TextInput::make('smtp_password')->label('Password')->password()
+                                ->helperText('Leave blank to keep current.')
+                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                            Forms\Components\TextInput::make('resend_key')->label('Resend API Key')->password()
+                                ->helperText('Leave blank to keep current.')
+                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'resend'),
+                            Forms\Components\TextInput::make('from_address')->label('From Address')->email()->required(),
+                            Forms\Components\TextInput::make('from_name')->label('From Name'),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Tabs\Tab::make('Security')
+                        ->icon('heroicon-o-shield-check')
+                        ->schema([
+                            Forms\Components\Select::make('captcha_provider')->label('CAPTCHA Provider')
+                                ->options(['none' => 'Disabled', 'recaptcha' => 'reCAPTCHA', 'turnstile' => 'Cloudflare Turnstile'])
+                                ->reactive()->columnSpan(1),
+                            Forms\Components\Select::make('require_2fa')->label('Require 2FA')
+                                ->options(['0' => 'Not Required', '1' => 'Admin Only', '2' => 'All Users'])->columnSpan(1),
+                            Forms\Components\TextInput::make('recaptcha_website_key')->label('reCAPTCHA Site Key')
+                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'recaptcha')->columnSpan(1),
+                            Forms\Components\TextInput::make('recaptcha_secret_key')->label('reCAPTCHA Secret Key')->password()
+                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'recaptcha')
+                                ->helperText('Leave blank to keep current.')->columnSpan(1),
+                            Forms\Components\TextInput::make('turnstile_website_key')->label('Turnstile Site Key')
+                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'turnstile')->columnSpan(1),
+                            Forms\Components\TextInput::make('turnstile_secret_key')->label('Turnstile Secret Key')->password()
+                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'turnstile')
+                                ->helperText('Leave blank to keep current.')->columnSpan(1),
+                        ])->columns(2),
+                ])
+                ->persistTabInQueryString()
+                ->columnSpanFull(),
+        ])->statePath('data');
     }
 
-    public function mailForm(Form $form): Form
+    public function save(): void
     {
-        $driver = config('mail.default');
-        $fields = [
-            Forms\Components\Placeholder::make('driver_info')
-                ->label('Active Driver')
-                ->content(strtoupper($driver) . ' — change via .env or artisan command'),
-        ];
-
-        if ($driver === 'smtp') {
-            $fields = array_merge($fields, [
-                Forms\Components\TextInput::make('smtp_host')->label('SMTP Host')->required(),
-                Forms\Components\TextInput::make('smtp_port')->label('SMTP Port')->numeric()->required(),
-                Forms\Components\Select::make('smtp_encryption')->label('Encryption')
-                    ->options(['' => 'None', 'tls' => 'TLS', 'ssl' => 'SSL']),
-                Forms\Components\TextInput::make('smtp_username')->label('Username'),
-                Forms\Components\TextInput::make('smtp_password')->label('Password')->password()
-                    ->helperText('Leave blank to keep current.'),
-            ]);
-        } elseif ($driver === 'resend') {
-            $fields[] = Forms\Components\TextInput::make('resend_key')->label('Resend API Key')->password()
-                ->helperText('Leave blank to keep current.');
-        }
-
-        $fields[] = Forms\Components\TextInput::make('from_address')->label('From Address')->email()->required();
-        $fields[] = Forms\Components\TextInput::make('from_name')->label('From Name');
-
-        return $form->schema($fields)->columns(2)->statePath('mailData');
-    }
-
-    public function securityForm(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Select::make('captcha_provider')->label('CAPTCHA Provider')
-                ->options(['none' => 'Disabled', 'recaptcha' => 'reCAPTCHA', 'turnstile' => 'Cloudflare Turnstile'])
-                ->reactive(),
-            Forms\Components\Select::make('require_2fa')->label('Require 2FA')
-                ->options([0 => 'Not Required', 1 => 'Admin Only', 2 => 'All Users']),
-            Forms\Components\TextInput::make('recaptcha_website_key')->label('reCAPTCHA Site Key')
-                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'recaptcha'),
-            Forms\Components\TextInput::make('recaptcha_secret_key')->label('reCAPTCHA Secret Key')->password()
-                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'recaptcha'),
-            Forms\Components\TextInput::make('turnstile_website_key')->label('Turnstile Site Key')
-                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'turnstile'),
-            Forms\Components\TextInput::make('turnstile_secret_key')->label('Turnstile Secret Key')->password()
-                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'turnstile'),
-        ])->columns(2)->statePath('securityData');
-    }
-
-    public function saveGeneral(): void
-    {
-        $data = $this->generalForm->getState();
+        $data = $this->form->getState();
         $settings = app(SettingsRepositoryInterface::class);
+        $encrypter = app(Encrypter::class);
+        $driver = $data['mail_driver'];
 
+        // General
         $settings->set('settings::app:name', $data['app_name']);
         $settings->set('settings::app:locale', $data['app_locale']);
         $settings->set('settings::pterodactyl:guzzle:timeout', $data['pterodactyl_guzzle_timeout']);
         $settings->set('settings::pterodactyl:guzzle:connect_timeout', $data['pterodactyl_guzzle_connect_timeout']);
 
-        Notification::make()->title('General settings saved.')->success()->send();
-    }
-
-    public function saveMail(): void
-    {
-        $data = $this->mailForm->getState();
-        $settings = app(SettingsRepositoryInterface::class);
-        $encrypter = app(Encrypter::class);
-        $driver = config('mail.default');
+        // Mail - update .env for driver change
+        $this->writeEnvValue('MAIL_MAILER', $driver);
 
         if ($driver === 'smtp') {
             $settings->set('settings::mail:mailers:smtp:host', $data['smtp_host']);
@@ -163,32 +160,27 @@ class Settings extends Page implements Forms\Contracts\HasForms
                 $settings->set('settings::services:resend:key', $encrypter->encrypt($data['resend_key']));
             }
         }
-
         $settings->set('settings::mail:from:address', $data['from_address']);
         $settings->set('settings::mail:from:name', $data['from_name']);
 
-        app(\Illuminate\Contracts\Console\Kernel::class)->call('queue:restart');
-
-        Notification::make()->title('Mail settings saved.')->success()->send();
-    }
-
-    public function saveSecurity(): void
-    {
-        $data = $this->securityForm->getState();
-        $settings = app(SettingsRepositoryInterface::class);
-
+        // Security
         $settings->set('settings::captcha:provider', $data['captcha_provider']);
         $settings->set('settings::pterodactyl:auth:2fa_required', $data['require_2fa']);
-
         if ($data['captcha_provider'] === 'recaptcha') {
             $settings->set('settings::captcha:recaptcha:website_key', $data['recaptcha_website_key'] ?? '');
-            $settings->set('settings::captcha:recaptcha:secret_key', $data['recaptcha_secret_key'] ?? '');
+            if (!empty($data['recaptcha_secret_key'])) {
+                $settings->set('settings::captcha:recaptcha:secret_key', $data['recaptcha_secret_key']);
+            }
         } elseif ($data['captcha_provider'] === 'turnstile') {
             $settings->set('settings::captcha:turnstile:website_key', $data['turnstile_website_key'] ?? '');
-            $settings->set('settings::captcha:turnstile:secret_key', $data['turnstile_secret_key'] ?? '');
+            if (!empty($data['turnstile_secret_key'])) {
+                $settings->set('settings::captcha:turnstile:secret_key', $data['turnstile_secret_key']);
+            }
         }
 
-        Notification::make()->title('Security settings saved.')->success()->send();
+        app(\Illuminate\Contracts\Console\Kernel::class)->call('queue:restart');
+
+        Notification::make()->title('Settings saved successfully.')->success()->send();
     }
 
     public function testMail(): void
@@ -196,14 +188,56 @@ class Settings extends Page implements Forms\Contracts\HasForms
         try {
             NotificationFacade::route('mail', auth()->user()->email)
                 ->notify(new MailTested(auth()->user()));
-            Notification::make()->title('Test email sent.')->success()->send();
+            Notification::make()->title('Test email sent successfully.')->success()->send();
         } catch (\Exception $e) {
-            Notification::make()->title('Failed to send.')->body($e->getMessage())->danger()->send();
+            Notification::make()->title('Failed to send test email.')->body($e->getMessage())->danger()->send();
         }
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('testMail')
+                ->label('Test Mail')
+                ->icon('heroicon-o-paper-airplane')
+                ->color('success')
+                ->action('testMail'),
+            Action::make('save')
+                ->label('Save Settings')
+                ->icon('heroicon-o-check')
+                ->action('save'),
+        ];
     }
 
     public static function canAccess(): bool
     {
         return auth()->user()?->root_admin ?? false;
+    }
+
+    /**
+     * Write a single value to the .env file.
+     */
+    private function writeEnvValue(string $key, ?string $value): void
+    {
+        $path = base_path('.env');
+        if (!file_exists($path)) {
+            return;
+        }
+
+        $escaped = $value;
+        if (!is_null($value) && preg_match('/([^\w.\-+\/])+/', $value)) {
+            $escaped = '"' . addslashes($value) . '"';
+        }
+
+        $contents = file_get_contents($path);
+        $entry = $key . '=' . ($escaped ?? '');
+
+        if (preg_match('/^' . $key . '=(.*)$/m', $contents)) {
+            $contents = preg_replace('/^' . $key . '=(.*)$/m', $entry, $contents);
+        } else {
+            $contents .= PHP_EOL . $entry;
+        }
+
+        file_put_contents($path, $contents);
     }
 }

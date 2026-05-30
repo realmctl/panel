@@ -7,6 +7,7 @@ use Pterodactyl\Models\Node;
 use Pterodactyl\Models\User;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Allocation;
+use Pterodactyl\Services\Helpers\SoftwareVersionService;
 
 class Dashboard extends Page
 {
@@ -22,16 +23,22 @@ class Dashboard extends Page
 
     public function getViewData(): array
     {
+        $versionService = app(SoftwareVersionService::class);
+
         return [
             'version' => config('app.version'),
             'laravelVersion' => app()->version(),
             'phpVersion' => PHP_VERSION,
+            'isLatest' => $versionService->isLatestPanel(),
+            'latestVersion' => $versionService->getPanel(),
             'servers' => Server::count(),
             'users' => User::count(),
             'nodes' => Node::count(),
             'allocations' => Allocation::count(),
             'suspendedServers' => Server::where('status', 'suspended')->count(),
             'activeNodes' => Node::where('maintenance_mode', false)->count(),
+            'totalMemory' => Node::sum('memory'),
+            'totalDisk' => Node::sum('disk'),
         ];
     }
 
