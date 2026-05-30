@@ -9,9 +9,10 @@ RUN yarn run build:production
 # Stage 1: Install PHP dependencies
 FROM --platform=$TARGETOS/$TARGETARCH php:8.3-fpm-alpine AS backend
 WORKDIR /app
-RUN apk add --no-cache --update ca-certificates curl git unzip libpng-dev libxml2-dev libzip-dev \
+RUN apk add --no-cache --update ca-certificates curl git unzip libpng-dev libxml2-dev libzip-dev icu-dev \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install bcmath gd pdo_mysql zip \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install bcmath gd pdo_mysql zip intl \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
@@ -21,9 +22,10 @@ RUN composer dump-autoload --optimize
 # Stage 2: Final image
 FROM --platform=$TARGETOS/$TARGETARCH php:8.3-fpm-alpine
 WORKDIR /app
-RUN apk add --no-cache --update ca-certificates dcron curl supervisor tar unzip nginx libpng-dev libxml2-dev libzip-dev certbot certbot-nginx mysql-client \
+RUN apk add --no-cache --update ca-certificates dcron curl supervisor tar unzip nginx libpng-dev libxml2-dev libzip-dev icu-dev certbot certbot-nginx mysql-client \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install bcmath gd pdo_mysql zip
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install bcmath gd pdo_mysql zip intl
 
 COPY . ./
 COPY --from=frontend /app/public/assets ./public/assets
