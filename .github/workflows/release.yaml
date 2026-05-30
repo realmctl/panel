@@ -23,8 +23,8 @@ jobs:
           VERSION: ${{ github.ref_name }}
         run: |
           BRANCH=release/${{ env.VERSION }}
-          git config --local user.email 'ci@pterodactyl.io'
-          git config --local user.name 'Pterodactyl CI'
+          git config --local user.email 'ci@realmctl.com'
+          git config --local user.name 'Realm CI'
           git checkout -b "$BRANCH"
           git push -u origin "$BRANCH"
           sed -i "s/'canary'/'${VERSION:1}'/" config/app.php
