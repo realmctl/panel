@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - "v*"
+      - "realm-v*"
 jobs:
   release:
     name: Release
@@ -23,11 +24,14 @@ jobs:
           VERSION: ${{ github.ref_name }}
         run: |
           BRANCH=release/${{ env.VERSION }}
+          # Strip prefix: "realm-v0.1.1" -> "0.1.1", "v0.1.1" -> "0.1.1"
+          SEMVER="${VERSION#realm-}"
+          SEMVER="${SEMVER#v}"
           git config --local user.email 'ci@realmctl.com'
           git config --local user.name 'Realm CI'
           git checkout -b "$BRANCH"
           git push -u origin "$BRANCH"
-          sed -i "s/'canary'/'${VERSION:1}'/" config/app.php
+          sed -i "s/'canary'/'${SEMVER}'/" config/app.php
           git add config/app.php
           git commit -m 'ci(release): bump version'
           git push
