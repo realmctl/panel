@@ -16,9 +16,12 @@ class EggResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
 
-    protected static ?string $navigationGroup = 'Server Management';
-
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Server Management';
+    }
 
     public static function form(Form $form): Form
     {

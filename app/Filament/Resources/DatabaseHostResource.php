@@ -16,11 +16,14 @@ class DatabaseHostResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
 
-    protected static ?string $navigationGroup = 'Infrastructure';
-
     protected static ?string $navigationLabel = 'Database Hosts';
 
     protected static ?int $navigationSort = 4;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Infrastructure';
+    }
 
     public static function form(Form $form): Form
     {

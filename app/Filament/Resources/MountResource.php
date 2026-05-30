@@ -16,9 +16,12 @@ class MountResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-folder-open';
 
-    protected static ?string $navigationGroup = 'Infrastructure';
-
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Infrastructure';
+    }
 
     public static function form(Form $form): Form
     {

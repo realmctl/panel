@@ -16,9 +16,12 @@ class ServerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
 
-    protected static ?string $navigationGroup = 'Server Management';
-
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Server Management';
+    }
 
     public static function form(Form $form): Form
     {

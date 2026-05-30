@@ -16,9 +16,12 @@ class NestResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static ?string $navigationGroup = 'Server Management';
-
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Server Management';
+    }
 
     public static function form(Form $form): Form
     {

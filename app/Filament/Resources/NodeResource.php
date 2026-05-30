@@ -16,9 +16,12 @@ class NodeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-server-stack';
 
-    protected static ?string $navigationGroup = 'Infrastructure';
-
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Infrastructure';
+    }
 
     public static function form(Form $form): Form
     {
