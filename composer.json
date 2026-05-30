@@ -25,7 +25,7 @@
         "ext-posix": "*",
         "ext-zip": "*",
         "aws/aws-sdk-php": "^3.369",
-        "filament/filament": "3.3",
+        "filament/filament": "^3.3",
         "guzzlehttp/guzzle": "^7.9.2",
         "hashids/hashids": "^5.0.2",
         "laracasts/utilities": "~3.2.3",
