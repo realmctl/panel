@@ -4,10 +4,12 @@ namespace Pterodactyl\Providers\Filament;
 
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\View\PanelsRenderHook;
 use Filament\Support\Colors\Color;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Support\HtmlString;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -30,6 +32,14 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Amber,
             ])
             ->brandName('Realm Admin')
+            ->theme(asset('css/filament/filament/app.css'))
+            ->renderHook(
+                PanelsRenderHook::STYLES_AFTER,
+                fn (): HtmlString => new HtmlString(sprintf(
+                    '<link href="%s" rel="stylesheet" data-realm-filament-theme />',
+                    asset('css/filament/filament/app.css') . '?v=' . $this->getFilamentAssetVersion(),
+                )),
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'Pterodactyl\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'Pterodactyl\\Filament\\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'Pterodactyl\\Filament\\Widgets')
@@ -55,5 +65,12 @@ class AdminPanelProvider extends PanelProvider
                 'User Management',
                 'Infrastructure',
             ]);
+    }
+
+    private function getFilamentAssetVersion(): string
+    {
+        $path = public_path('css/filament/filament/app.css');
+
+        return is_file($path) ? (string) filemtime($path) : (string) time();
     }
 }
