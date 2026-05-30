@@ -7,6 +7,7 @@ import {
     faFileArchive,
     faFileCode,
     faFileDownload,
+    faHistory,
     faLevelUpAlt,
     faPencilAlt,
     faTrashAlt,
@@ -31,6 +32,7 @@ import compressFiles from '@/api/server/files/compressFiles';
 import decompressFiles from '@/api/server/files/decompressFiles';
 import isEqual from 'react-fast-compare';
 import ChmodFileModal from '@/components/server/files/ChmodFileModal';
+import FileRevisionModal from '@/components/server/files/FileRevisionModal';
 import { Dialog } from '@/components/elements/dialog';
 
 type ModalType = 'rename' | 'move' | 'chmod';
@@ -59,6 +61,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [modal, setModal] = useState<ModalType | null>(null);
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showRevisions, setShowRevisions] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
@@ -139,6 +142,13 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                 You will not be able to recover the contents of&nbsp;
                 <span className={'font-semibold text-gray-50'}>{file.name}</span> once deleted.
             </Dialog.Confirm>
+            {file.isFile && (
+                <FileRevisionModal
+                    visible={showRevisions}
+                    filePath={join(directory, file.name)}
+                    onDismissed={() => setShowRevisions(false)}
+                />
+            )}
             <DropdownMenu
                 ref={onClickRef}
                 renderToggle={(onClick) => (
@@ -186,6 +196,11 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                     </Can>
                 )}
                 {file.isFile && <Row onClick={doDownload} icon={faFileDownload} title={'Download'} />}
+                {file.isFile && (
+                    <Can action={'file.revision-read'}>
+                        <Row onClick={() => setShowRevisions(true)} icon={faHistory} title={'History'} />
+                    </Can>
+                )}
                 <Can action={'file.delete'}>
                     <Row onClick={() => setShowConfirmation(true)} icon={faTrashAlt} title={'Delete'} $danger />
                 </Can>

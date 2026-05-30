@@ -20,6 +20,7 @@ import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import { encodePathSegments, hashToPath } from '@/helpers';
 import { dirname } from 'pathe';
 import CodemirrorEditor from '@/components/elements/CodemirrorEditor';
+import FileRevisionModal from '@/components/server/files/FileRevisionModal';
 
 export default () => {
     const [error, setError] = useState('');
@@ -28,6 +29,7 @@ export default () => {
     const [content, setContent] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [mode, setMode] = useState('text/plain');
+    const [showRevisions, setShowRevisions] = useState(false);
 
     const history = useHistory();
     const { hash } = useLocation();
@@ -139,6 +141,13 @@ export default () => {
                         ))}
                     </Select>
                 </div>
+                {action === 'edit' && (
+                    <Can action={'file.revision-read'}>
+                        <Button isSecondary css={tw`flex-1 sm:flex-none mr-4`} onClick={() => setShowRevisions(true)}>
+                            History
+                        </Button>
+                    </Can>
+                )}
                 {action === 'edit' ? (
                     <Can action={'file.update'}>
                         <Button css={tw`flex-1 sm:flex-none`} onClick={() => save()}>
@@ -153,6 +162,21 @@ export default () => {
                     </Can>
                 )}
             </div>
+            {action === 'edit' && (
+                <FileRevisionModal
+                    visible={showRevisions}
+                    filePath={hashToPath(hash)}
+                    onDismissed={() => setShowRevisions(false)}
+                    onRestored={() => {
+                        // Reload file content after restore
+                        setLoading(true);
+                        getFileContents(uuid, hashToPath(hash))
+                            .then(setContent)
+                            .catch((error) => addError({ message: httpErrorToHuman(error), key: 'files:view' }))
+                            .finally(() => setLoading(false));
+                    }}
+                />
+            )}
         </PageContentBlock>
     );
 };

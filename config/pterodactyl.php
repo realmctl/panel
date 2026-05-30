@@ -131,6 +131,14 @@ return [
 
     'files' => [
         'max_edit_size' => env('PTERODACTYL_FILES_MAX_EDIT_SIZE', 1024 * 1024 * 4),
+        'revisions' => [
+            // Maximum number of revisions to keep per file. Set to null to disable.
+            'max_per_file' => env('PTERODACTYL_FILE_REVISIONS_MAX_PER_FILE', null),
+            // Maximum age of revisions in days. Set to null to disable.
+            'max_age_days' => env('PTERODACTYL_FILE_REVISIONS_MAX_AGE_DAYS', null),
+            // Maximum total revision storage per server in bytes. Set to null to disable.
+            'max_storage_per_server' => env('PTERODACTYL_FILE_REVISIONS_MAX_STORAGE', null),
+        ],
     ],
 
     /*

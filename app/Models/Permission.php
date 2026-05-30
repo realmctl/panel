@@ -55,6 +55,9 @@ class Permission extends Model
     public const ACTION_FILE_DELETE = 'file.delete';
     public const ACTION_FILE_ARCHIVE = 'file.archive';
     public const ACTION_FILE_SFTP = 'file.sftp';
+    public const ACTION_FILE_REVISION_READ = 'file.revision-read';
+    public const ACTION_FILE_REVISION_RESTORE = 'file.revision-restore';
+    public const ACTION_FILE_REVISION_DELETE = 'file.revision-delete';
 
     public const ACTION_STARTUP_READ = 'startup.read';
     public const ACTION_STARTUP_UPDATE = 'startup.update';
@@ -136,6 +139,9 @@ class Permission extends Model
                 'delete' => 'Allows a user to delete files or directories.',
                 'archive' => 'Allows a user to archive the contents of a directory as well as decompress existing archives on the system.',
                 'sftp' => 'Allows a user to connect to SFTP and manage server files using the other assigned file permissions.',
+                'revision-read' => 'Allows a user to view the revision history of files on this server.',
+                'revision-restore' => 'Allows a user to restore a file to a previous revision.',
+                'revision-delete' => 'Allows a user to delete file revisions.',
             ],
         ],
 

@@ -95,6 +95,14 @@ Route::group([
         Route::middleware([ResourceLimit::FilePull->middleware()])
             ->post('/pull', [Client\Servers\FileController::class, 'pull']);
         Route::get('/upload', Client\Servers\FileUploadController::class);
+
+        Route::group(['prefix' => '/revisions'], function () {
+            Route::get('/', [Client\Servers\FileRevisionController::class, 'index']);
+            Route::get('/{revision}', [Client\Servers\FileRevisionController::class, 'view']);
+            Route::get('/{revision}/download', [Client\Servers\FileRevisionController::class, 'download']);
+            Route::post('/{revision}/restore', [Client\Servers\FileRevisionController::class, 'restore']);
+            Route::delete('/{revision}', [Client\Servers\FileRevisionController::class, 'delete']);
+        });
     });
 
     Route::group(['prefix' => '/schedules'], function () {

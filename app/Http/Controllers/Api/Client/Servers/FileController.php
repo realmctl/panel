@@ -8,7 +8,9 @@ use Pterodactyl\Enum\JwtScope;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
+use Pterodactyl\Models\FileRevision;
 use Pterodactyl\Services\Nodes\NodeJWTService;
+use Pterodactyl\Services\Files\FileRevisionService;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Transformers\Api\Client\FileObjectTransformer;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
@@ -32,6 +34,7 @@ class FileController extends ClientApiController
     public function __construct(
         private NodeJWTService $jwtService,
         private DaemonFileRepository $fileRepository,
+        private FileRevisionService $revisionService,
     ) {
         parent::__construct();
     }
@@ -108,9 +111,19 @@ class FileController extends ClientApiController
      */
     public function write(WriteFileContentRequest $request, Server $server): JsonResponse
     {
-        $this->fileRepository->setServer($server)->putContent($request->get('file'), $request->getContent());
+        $filePath = $request->get('file');
 
-        Activity::event('server:file.write')->property('file', $request->get('file'))->log();
+        // Automatically create a revision of the current file before overwriting
+        $this->revisionService->createRevisionBeforeWrite(
+            $server,
+            $filePath,
+            $request->user()->id,
+            FileRevision::ACTION_EDITED
+        );
+
+        $this->fileRepository->setServer($server)->putContent($filePath, $request->getContent());
+
+        Activity::event('server:file.write')->property('file', $filePath)->log();
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
