@@ -19,7 +19,7 @@ class Overview extends Page
 
     protected static ?int $navigationSort = -2;
 
-    protected string $view = 'filament.pages.overview';
+    protected static string $view = 'filament.pages.overview';
 
     public function getViewData(): array
     {

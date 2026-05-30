@@ -16,13 +16,13 @@ class Settings extends Page implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
 
-    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static $navigationLabel = 'Settings';
+    protected static ?string $navigationLabel = 'Settings';
 
-    protected static $title = 'Settings';
+    protected static ?string $title = 'Settings';
 
-    protected static $navigationSort = 99;
+    protected static ?int $navigationSort = 99;
 
     protected static string $view = 'filament.pages.settings-page';
 
