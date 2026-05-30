@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->unsignedInteger('server_id');
-            $table->string('file_path', 1024);
+            $table->string('file_path', 512);
             $table->string('hash', 128)->nullable();
             $table->unsignedBigInteger('size')->default(0);
             $table->unsignedInteger('user_id')->nullable();

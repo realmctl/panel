@@ -42,7 +42,7 @@ class FileRevision extends Model
     public static array $validationRules = [
         'uuid' => 'required|uuid|unique:file_revisions,uuid',
         'server_id' => 'required|integer|exists:servers,id',
-        'file_path' => 'required|string|max:1024',
+        'file_path' => 'required|string|max:512',
         'hash' => 'nullable|string|max:128',
         'size' => 'required|integer|min:0',
         'user_id' => 'nullable|integer|exists:users,id',
