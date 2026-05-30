@@ -5,6 +5,7 @@ namespace Pterodactyl\Providers\Filament;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -50,7 +51,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->authGuard('web')
-            ->darkMode(forced: true)
+            ->darkMode()
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 'Server Management',
