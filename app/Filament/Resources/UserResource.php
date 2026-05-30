@@ -13,11 +13,11 @@ use Pterodactyl\Filament\Resources\UserResource\Pages;
 
 class UserResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static $navigationIcon = 'heroicon-o-users';
 
-    protected static ?int $navigationSort = 1;
+    protected static $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string
     {

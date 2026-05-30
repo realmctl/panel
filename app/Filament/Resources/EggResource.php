@@ -12,11 +12,11 @@ use Pterodactyl\Filament\Resources\EggResource\Pages;
 
 class EggResource extends Resource
 {
-    protected static ?string $model = Egg::class;
+    protected static $model = Egg::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
+    protected static $navigationIcon = 'heroicon-o-puzzle-piece';
 
-    protected static ?int $navigationSort = 3;
+    protected static $navigationSort = 3;
 
     public static function getNavigationGroup(): ?string
     {

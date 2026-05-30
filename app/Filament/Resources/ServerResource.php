@@ -12,11 +12,11 @@ use Pterodactyl\Filament\Resources\ServerResource\Pages;
 
 class ServerResource extends Resource
 {
-    protected static ?string $model = Server::class;
+    protected static $model = Server::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cube';
+    protected static $navigationIcon = 'heroicon-o-cube';
 
-    protected static ?int $navigationSort = 1;
+    protected static $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string
     {

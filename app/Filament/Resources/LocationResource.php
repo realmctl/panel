@@ -12,11 +12,11 @@ use Pterodactyl\Filament\Resources\LocationResource\Pages;
 
 class LocationResource extends Resource
 {
-    protected static ?string $model = Location::class;
+    protected static $model = Location::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    protected static $navigationIcon = 'heroicon-o-map-pin';
 
-    protected static ?int $navigationSort = 2;
+    protected static $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string
     {

@@ -12,11 +12,11 @@ use Pterodactyl\Filament\Resources\NestResource\Pages;
 
 class NestResource extends Resource
 {
-    protected static ?string $model = Nest::class;
+    protected static $model = Nest::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static ?int $navigationSort = 2;
+    protected static $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string
     {

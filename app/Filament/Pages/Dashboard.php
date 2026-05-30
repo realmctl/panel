@@ -8,13 +8,13 @@ use Pterodactyl\Services\Helpers\SoftwareVersionService;
 
 class Dashboard extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static $navigationIcon = 'heroicon-o-home';
 
-    protected static ?string $navigationLabel = 'Overview';
+    protected static $navigationLabel = 'Overview';
 
-    protected static ?string $title = 'Overview';
+    protected static $title = 'Overview';
 
-    protected static ?int $navigationSort = -2;
+    protected static $navigationSort = -2;
 
     protected static string $view = 'filament.pages.overview';
 

@@ -12,11 +12,11 @@ use Pterodactyl\Filament\Resources\MountResource\Pages;
 
 class MountResource extends Resource
 {
-    protected static ?string $model = Mount::class;
+    protected static $model = Mount::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-folder-open';
+    protected static $navigationIcon = 'heroicon-o-folder-open';
 
-    protected static ?int $navigationSort = 3;
+    protected static $navigationSort = 3;
 
     public static function getNavigationGroup(): ?string
     {

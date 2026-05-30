@@ -12,13 +12,13 @@ use Pterodactyl\Filament\Resources\DatabaseHostResource\Pages;
 
 class DatabaseHostResource extends Resource
 {
-    protected static ?string $model = DatabaseHost::class;
+    protected static $model = DatabaseHost::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
+    protected static $navigationIcon = 'heroicon-o-circle-stack';
 
-    protected static ?string $navigationLabel = 'Database Hosts';
+    protected static $navigationLabel = 'Database Hosts';
 
-    protected static ?int $navigationSort = 4;
+    protected static $navigationSort = 4;
 
     public static function getNavigationGroup(): ?string
     {
