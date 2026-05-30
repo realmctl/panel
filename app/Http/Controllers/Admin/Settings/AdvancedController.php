@@ -30,9 +30,13 @@ class AdvancedController extends Controller
     public function index(): View
     {
         $showRecaptchaWarning = false;
+        $provider = $this->config->get('captcha.provider', 'none');
+
         if (
-            $this->config->get('recaptcha._shipped_secret_key') === $this->config->get('recaptcha.secret_key')
-            || $this->config->get('recaptcha._shipped_website_key') === $this->config->get('recaptcha.website_key')
+            $provider === 'recaptcha' && (
+                $this->config->get('captcha.recaptcha._shipped_secret_key') === $this->config->get('captcha.recaptcha.secret_key')
+                || $this->config->get('captcha.recaptcha._shipped_website_key') === $this->config->get('captcha.recaptcha.website_key')
+            )
         ) {
             $showRecaptchaWarning = true;
         }

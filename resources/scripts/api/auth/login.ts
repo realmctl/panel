@@ -10,16 +10,18 @@ export interface LoginData {
     username: string;
     password: string;
     recaptchaData?: string | null;
+    turnstileData?: string | null;
 }
 
-export default ({ username, password, recaptchaData }: LoginData): Promise<LoginResponse> => {
+export default ({ username, password, recaptchaData, turnstileData }: LoginData): Promise<LoginResponse> => {
     return new Promise((resolve, reject) => {
         http.get('/sanctum/csrf-cookie')
             .then(() =>
                 http.post('/auth/login', {
                     user: username,
                     password,
-                    'g-recaptcha-response': recaptchaData,
+                    'g-recaptcha-response': recaptchaData || undefined,
+                    'cf-turnstile-response': turnstileData || undefined,
                 })
             )
             .then((response) => {

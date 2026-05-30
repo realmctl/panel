@@ -1,5 +1,10 @@
 import { action, Action } from 'easy-peasy';
 
+export interface CaptchaSettings {
+    provider: 'recaptcha' | 'turnstile' | 'none';
+    siteKey: string;
+}
+
 export interface SiteSettings {
     name: string;
     locale: string;
@@ -7,6 +12,7 @@ export interface SiteSettings {
         enabled: boolean;
         siteKey: string;
     };
+    captcha: CaptchaSettings;
 }
 
 export interface SettingsStore {
