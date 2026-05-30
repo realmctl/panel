@@ -74,46 +74,48 @@
     <x-filament::grid cols="1" md="2" class="gap-4 lg:gap-6">
         <x-filament::section icon="heroicon-o-information-circle" class="transition-all duration-300 hover:shadow-md">
             <x-slot name="heading">System Information</x-slot>
-            <dl class="grid grid-cols-2 gap-3.5">
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-100 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Panel Version</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $version }}</dd>
+            
+            <div class="divide-y divide-gray-100 dark:divide-white/5 text-sm">
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">Panel Version</span>
+                    <kbd class="px-2 py-1 rounded bg-gray-50 dark:bg-white/5 font-mono text-xs font-semibold text-gray-900 dark:text-white border border-gray-200 dark:border-white/10">{{ $version }}</kbd>
                 </div>
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-100 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">PHP Version</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $phpVersion }}</dd>
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">PHP Version</span>
+                    <kbd class="px-2 py-1 rounded bg-gray-50 dark:bg-white/5 font-mono text-xs font-semibold text-gray-900 dark:text-white border border-gray-200 dark:border-white/10">{{ $phpVersion }}</kbd>
                 </div>
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-100 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Laravel</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $laravelVersion }}</dd>
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">Laravel Version</span>
+                    <kbd class="px-2 py-1 rounded bg-gray-50 dark:bg-white/5 font-mono text-xs font-semibold text-gray-900 dark:text-white border border-gray-200 dark:border-white/10">{{ $laravelVersion }}</kbd>
                 </div>
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-100 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Suspended</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold {{ $suspendedServers > 0 ? 'text-danger-500 font-bold' : 'text-gray-900 dark:text-white' }}">{{ $suspendedServers }}</dd>
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">Suspended Servers</span>
+                    <span class="font-mono text-sm font-semibold {{ $suspendedServers > 0 ? 'text-danger-500 font-bold' : 'text-gray-900 dark:text-white' }}">{{ $suspendedServers }}</span>
                 </div>
-            </dl>
+            </div>
         </x-filament::section>
 
         <x-filament::section icon="heroicon-o-chart-bar" class="transition-all duration-300 hover:shadow-md">
             <x-slot name="heading">Resource Overview</x-slot>
-            <dl class="grid grid-cols-2 gap-3.5">
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-100 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total Memory</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($totalMemory) }} MiB</dd>
+
+            <div class="divide-y divide-gray-100 dark:divide-white/5 text-sm">
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">Total Memory</span>
+                    <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($totalMemory) }} MiB</span>
                 </div>
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-200 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total Disk</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($totalDisk) }} MiB</dd>
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">Total Disk</span>
+                    <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($totalDisk) }} MiB</span>
                 </div>
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-200 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Active Nodes</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $activeNodes }}</dd>
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">Active Nodes</span>
+                    <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $activeNodes }}</span>
                 </div>
-                <div class="rounded-xl bg-gray-50/50 p-3.5 dark:bg-white/5 border border-gray-200 dark:border-white/10 transition-all duration-300 hover:border-primary-500/30 dark:hover:border-primary-500/30">
-                    <dt class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Maintenance</dt>
-                    <dd class="mt-1.5 font-mono text-sm font-semibold {{ ($nodes - $activeNodes) > 0 ? 'text-warning-500 font-bold' : 'text-gray-900 dark:text-white' }}">{{ $nodes - $activeNodes }}</dd>
+                <div class="flex justify-between items-center py-3">
+                    <span class="font-medium text-gray-500 dark:text-gray-400">Maintenance Nodes</span>
+                    <span class="font-mono text-sm font-semibold {{ ($nodes - $activeNodes) > 0 ? 'text-warning-500 font-bold' : 'text-gray-900 dark:text-white' }}">{{ $nodes - $activeNodes }}</span>
                 </div>
-            </dl>
+            </div>
         </x-filament::section>
     </x-filament::grid>
 </x-filament-panels::page>
