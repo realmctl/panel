@@ -2,13 +2,10 @@
 
 namespace Pterodactyl\Filament\Resources;
 
-use UnitEnum;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Pterodactyl\Models\Nest;
 use Filament\Resources\Resource;
 use Pterodactyl\Filament\Resources\NestResource\Pages;
@@ -17,15 +14,15 @@ class NestResource extends Resource
 {
     protected static ?string $model = Nest::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Server Management';
+    protected static ?string $navigationGroup = 'Server Management';
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->maxLength(191),
@@ -48,14 +45,12 @@ class NestResource extends Resource
                 Tables\Columns\TextColumn::make('eggs_count')->label('Eggs')->counts('eggs')->sortable(),
                 Tables\Columns\TextColumn::make('servers_count')->label('Servers')->counts('servers')->sortable(),
             ])
-            ->recordActions([
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
-            ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

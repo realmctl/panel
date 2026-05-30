@@ -2,34 +2,29 @@
 
 namespace Pterodactyl\Filament\Resources;
 
-use UnitEnum;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Pterodactyl\Models\Egg;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Pterodactyl\Filament\Resources\EggResource\Pages;
 
 class EggResource extends Resource
 {
     protected static ?string $model = Egg::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-puzzle-piece';
+    protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Server Management';
+    protected static ?string $navigationGroup = 'Server Management';
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
-            Tabs::make('Egg')->tabs([
-                Tab::make('Configuration')->schema([
+        return $form->schema([
+            Forms\Components\Tabs::make('Egg')->tabs([
+                Forms\Components\Tabs\Tab::make('Configuration')->schema([
                     Forms\Components\Select::make('nest_id')
                         ->relationship('nest', 'name')
                         ->required()
@@ -52,7 +47,7 @@ class EggResource extends Resource
                     Forms\Components\Toggle::make('force_outgoing_ip')
                         ->label('Force Outgoing IP'),
                 ]),
-                Tab::make('Process Management')->schema([
+                Forms\Components\Tabs\Tab::make('Process Management')->schema([
                     Forms\Components\Textarea::make('config_files')
                         ->label('Configuration Files')
                         ->helperText('JSON encoded configuration file definitions.'),
@@ -65,7 +60,7 @@ class EggResource extends Resource
                         ->label('Stop Command')
                         ->maxLength(191),
                 ]),
-                Tab::make('Install Script')->schema([
+                Forms\Components\Tabs\Tab::make('Install Script')->schema([
                     Forms\Components\TextInput::make('script_container')
                         ->label('Script Container')
                         ->default('ghcr.io/pterodactyl/installers:alpine'),
@@ -98,14 +93,9 @@ class EggResource extends Resource
                     ->relationship('nest', 'name')
                     ->label('Nest'),
             ])
-            ->recordActions([
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ]);
     }
 

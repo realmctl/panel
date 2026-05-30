@@ -2,13 +2,10 @@
 
 namespace Pterodactyl\Filament\Resources;
 
-use UnitEnum;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Pterodactyl\Models\Location;
 use Filament\Resources\Resource;
 use Pterodactyl\Filament\Resources\LocationResource\Pages;
@@ -17,15 +14,15 @@ class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-map-pin';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Infrastructure';
+    protected static ?string $navigationGroup = 'Infrastructure';
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             Forms\Components\TextInput::make('short')
                 ->label('Short Code')
                 ->required()
@@ -47,14 +44,12 @@ class LocationResource extends Resource
                 Tables\Columns\TextColumn::make('nodes_count')->label('Nodes')->counts('nodes')->sortable(),
                 Tables\Columns\TextColumn::make('servers_count')->label('Servers')->counts('servers')->sortable(),
             ])
-            ->recordActions([
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
-            ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

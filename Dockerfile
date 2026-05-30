@@ -7,7 +7,7 @@ COPY . ./
 RUN yarn run build:production
 
 # Stage 1: Install PHP dependencies
-FROM --platform=$TARGETOS/$TARGETARCH php:8.4-fpm-alpine AS backend
+FROM --platform=$TARGETOS/$TARGETARCH php:8.3-fpm-alpine AS backend
 WORKDIR /app
 RUN apk add --no-cache --update ca-certificates curl git unzip libpng-dev libxml2-dev libzip-dev icu-dev \
     && docker-php-ext-configure zip \
@@ -20,7 +20,7 @@ COPY . ./
 RUN composer dump-autoload --optimize
 
 # Stage 2: Final image
-FROM --platform=$TARGETOS/$TARGETARCH php:8.4-fpm-alpine
+FROM --platform=$TARGETOS/$TARGETARCH php:8.3-fpm-alpine
 WORKDIR /app
 RUN apk add --no-cache --update ca-certificates dcron curl supervisor tar unzip nginx libpng-dev libxml2-dev libzip-dev icu-dev certbot certbot-nginx mysql-client \
     && docker-php-ext-configure zip \

@@ -2,16 +2,12 @@
 
 namespace Pterodactyl\Filament\Resources;
 
-use UnitEnum;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Pterodactyl\Models\User;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Hash;
 use Pterodactyl\Filament\Resources\UserResource\Pages;
 
@@ -19,16 +15,16 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static string|UnitEnum|null $navigationGroup = 'User Management';
+    protected static ?string $navigationGroup = 'User Management';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
-            Section::make('Account Information')->schema([
+        return $form->schema([
+            Forms\Components\Section::make('Account Information')->schema([
                 Forms\Components\TextInput::make('username')
                     ->required()
                     ->unique(ignoreRecord: true)
@@ -51,7 +47,7 @@ class UserResource extends Resource
                     ->maxLength(191),
             ])->columns(2),
 
-            Section::make('Password')->schema([
+            Forms\Components\Section::make('Password')->schema([
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->dehydrateStateUsing(fn ($state) => !empty($state) ? Hash::make($state) : null)
@@ -61,7 +57,7 @@ class UserResource extends Resource
                     ->label(fn (string $operation) => $operation === 'create' ? 'Password' : 'New Password (leave blank to keep current)'),
             ]),
 
-            Section::make('Permissions')->schema([
+            Forms\Components\Section::make('Permissions')->schema([
                 Forms\Components\Toggle::make('root_admin')
                     ->label('Administrator')
                     ->helperText('Grants full administrative access to the panel.'),
@@ -115,13 +111,13 @@ class UserResource extends Resource
                 Tables\Filters\TernaryFilter::make('root_admin')
                     ->label('Administrator'),
             ])
-            ->recordActions([
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
-            ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
