@@ -37,7 +37,7 @@
                 </div>
                 <div>
                     <p class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Filament</p>
-                    <p class="mt-1 font-mono text-sm text-gray-950 dark:text-white">{{ \Composer\InstalledVersions::getPrettyVersion('filament/filament') }}</p>
+                    <p class="mt-1 font-mono text-sm text-gray-950 dark:text-white">{{ $filamentVersion }}</p>
                 </div>
             </div>
         </x-filament::section>

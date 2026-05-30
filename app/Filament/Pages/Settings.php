@@ -2,10 +2,14 @@
 
 namespace Pterodactyl\Filament\Pages;
 
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Notifications\Notification;
 use Pterodactyl\Notifications\MailTested;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
@@ -16,13 +20,13 @@ class Settings extends Page implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
 
-    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static $navigationLabel = 'Settings';
+    protected static ?string $navigationLabel = 'Settings';
 
-    protected static $title = 'Settings';
+    protected static ?string $title = 'Settings';
 
-    protected static $navigationSort = 99;
+    protected static ?int $navigationSort = 99;
 
     protected static string $view = 'filament.pages.settings-page';
 
@@ -56,12 +60,12 @@ class Settings extends Page implements Forms\Contracts\HasForms
         ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\Tabs::make('Settings')
+        return $schema->components([
+            Tabs::make('Settings')
                 ->tabs([
-                    Forms\Components\Tabs\Tab::make('General')
+                    Tab::make('General')
                         ->icon('heroicon-o-cog-6-tooth')
                         ->schema([
                             Forms\Components\TextInput::make('app_name')->label('Panel Name')->required()->columnSpan(1),
@@ -72,7 +76,7 @@ class Settings extends Page implements Forms\Contracts\HasForms
                             Forms\Components\TextInput::make('pterodactyl_guzzle_connect_timeout')->label('Connect Timeout (s)')->numeric()->required()->columnSpan(1),
                         ])->columns(2),
 
-                    Forms\Components\Tabs\Tab::make('Mail')
+                    Tab::make('Mail')
                         ->icon('heroicon-o-envelope')
                         ->schema([
                             Forms\Components\Select::make('mail_driver')->label('Mail Driver')
@@ -84,45 +88,45 @@ class Settings extends Page implements Forms\Contracts\HasForms
                                     'postmark' => 'Postmark',
                                 ])
                                 ->required()
-                                ->reactive()
+                                ->live()
                                 ->columnSpan(2),
                             Forms\Components\TextInput::make('smtp_host')->label('SMTP Host')->required()
-                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                                ->visible(fn (Get $get) => $get('mail_driver') === 'smtp'),
                             Forms\Components\TextInput::make('smtp_port')->label('SMTP Port')->numeric()->required()
-                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                                ->visible(fn (Get $get) => $get('mail_driver') === 'smtp'),
                             Forms\Components\Select::make('smtp_encryption')->label('Encryption')
                                 ->options(['' => 'None', 'tls' => 'TLS', 'ssl' => 'SSL'])
-                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                                ->visible(fn (Get $get) => $get('mail_driver') === 'smtp'),
                             Forms\Components\TextInput::make('smtp_username')->label('Username')
-                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                                ->visible(fn (Get $get) => $get('mail_driver') === 'smtp'),
                             Forms\Components\TextInput::make('smtp_password')->label('Password')->password()
                                 ->helperText('Leave blank to keep current.')
-                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'smtp'),
+                                ->visible(fn (Get $get) => $get('mail_driver') === 'smtp'),
                             Forms\Components\TextInput::make('resend_key')->label('Resend API Key')->password()
                                 ->helperText('Leave blank to keep current.')
-                                ->visible(fn (Forms\Get $get) => $get('mail_driver') === 'resend'),
+                                ->visible(fn (Get $get) => $get('mail_driver') === 'resend'),
                             Forms\Components\TextInput::make('from_address')->label('From Address')->email()->required(),
                             Forms\Components\TextInput::make('from_name')->label('From Name'),
                         ])
                         ->columns(2),
 
-                    Forms\Components\Tabs\Tab::make('Security')
+                    Tab::make('Security')
                         ->icon('heroicon-o-shield-check')
                         ->schema([
                             Forms\Components\Select::make('captcha_provider')->label('CAPTCHA Provider')
                                 ->options(['none' => 'Disabled', 'recaptcha' => 'reCAPTCHA', 'turnstile' => 'Cloudflare Turnstile'])
-                                ->reactive()->columnSpan(1),
+                                ->live()->columnSpan(1),
                             Forms\Components\Select::make('require_2fa')->label('Require 2FA')
                                 ->options(['0' => 'Not Required', '1' => 'Admin Only', '2' => 'All Users'])->columnSpan(1),
                             Forms\Components\TextInput::make('recaptcha_website_key')->label('reCAPTCHA Site Key')
-                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'recaptcha')->columnSpan(1),
+                                ->visible(fn (Get $get) => $get('captcha_provider') === 'recaptcha')->columnSpan(1),
                             Forms\Components\TextInput::make('recaptcha_secret_key')->label('reCAPTCHA Secret Key')->password()
-                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'recaptcha')
+                                ->visible(fn (Get $get) => $get('captcha_provider') === 'recaptcha')
                                 ->helperText('Leave blank to keep current.')->columnSpan(1),
                             Forms\Components\TextInput::make('turnstile_website_key')->label('Turnstile Site Key')
-                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'turnstile')->columnSpan(1),
+                                ->visible(fn (Get $get) => $get('captcha_provider') === 'turnstile')->columnSpan(1),
                             Forms\Components\TextInput::make('turnstile_secret_key')->label('Turnstile Secret Key')->password()
-                                ->visible(fn (Forms\Get $get) => $get('captcha_provider') === 'turnstile')
+                                ->visible(fn (Get $get) => $get('captcha_provider') === 'turnstile')
                                 ->helperText('Leave blank to keep current.')->columnSpan(1),
                         ])->columns(2),
                 ])

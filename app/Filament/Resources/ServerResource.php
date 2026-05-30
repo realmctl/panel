@@ -2,31 +2,32 @@
 
 namespace Pterodactyl\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Pterodactyl\Models\Server;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Pterodactyl\Filament\Resources\ServerResource\Pages;
 
 class ServerResource extends Resource
 {
-    protected static $model = Server::class;
+    protected static ?string $model = Server::class;
 
-    protected static $navigationIcon = 'heroicon-o-cube';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
-    protected static $navigationSort = 1;
+    protected static string|UnitEnum|null $navigationGroup = 'Server Management';
 
-    public static function getNavigationGroup(): ?string
+    protected static ?int $navigationSort = 1;
+
+    public static function form(Schema $schema): Schema
     {
-        return 'Server Management';
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Section::make('Server Details')->schema([
+        return $schema->components([
+            Section::make('Server Details')->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(191),
@@ -43,7 +44,7 @@ class ServerResource extends Resource
                     ->maxLength(191),
             ])->columns(2),
 
-            Forms\Components\Section::make('Resource Limits')->schema([
+            Section::make('Resource Limits')->schema([
                 Forms\Components\TextInput::make('memory')
                     ->label('Memory (MiB)')
                     ->numeric()
@@ -74,14 +75,14 @@ class ServerResource extends Resource
                     ->helperText('e.g. 0-3 or 0,1,2'),
             ])->columns(3),
 
-            Forms\Components\Section::make('Allocation')->schema([
+            Section::make('Allocation')->schema([
                 Forms\Components\Select::make('node_id')
                     ->label('Node')
                     ->relationship('node', 'name')
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->reactive(),
+                    ->live(),
                 Forms\Components\Select::make('allocation_id')
                     ->label('Primary Allocation')
                     ->relationship('allocation', 'port')
@@ -89,7 +90,7 @@ class ServerResource extends Resource
                     ->required(),
             ])->columns(2),
 
-            Forms\Components\Section::make('Limits')->schema([
+            Section::make('Feature Limits')->schema([
                 Forms\Components\TextInput::make('database_limit')
                     ->label('Database Limit')
                     ->numeric()
@@ -152,12 +153,12 @@ class ServerResource extends Resource
                     ->label('Owner')
                     ->searchable(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

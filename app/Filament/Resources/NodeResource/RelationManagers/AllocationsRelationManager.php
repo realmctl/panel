@@ -4,17 +4,18 @@ namespace Pterodactyl\Filament\Resources\NodeResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 
 class AllocationsRelationManager extends RelationManager
 {
     protected static string $relationship = 'allocations';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             Forms\Components\TextInput::make('ip')
                 ->label('IP Address')
                 ->required(),
@@ -47,14 +48,16 @@ class AllocationsRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Actions\CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 }

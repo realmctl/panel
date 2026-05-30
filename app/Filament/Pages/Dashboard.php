@@ -8,13 +8,13 @@ use Pterodactyl\Services\Helpers\SoftwareVersionService;
 
 class Dashboard extends Page
 {
-    protected static $navigationIcon = 'heroicon-o-home';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
 
-    protected static $navigationLabel = 'Overview';
+    protected static ?string $navigationLabel = 'Overview';
 
-    protected static $title = 'Overview';
+    protected static ?string $title = 'Overview';
 
-    protected static $navigationSort = -2;
+    protected static ?int $navigationSort = -2;
 
     protected static string $view = 'filament.pages.overview';
 
@@ -38,6 +38,7 @@ class Dashboard extends Page
             'version' => config('app.version'),
             'laravelVersion' => app()->version(),
             'phpVersion' => PHP_VERSION,
+            'filamentVersion' => \Composer\InstalledVersions::getPrettyVersion('filament/filament') ?? 'unknown',
             'isLatest' => $versionService->isLatestPanel(),
             'latestVersion' => $versionService->getPanel(),
             'totalMemory' => Node::sum('memory'),

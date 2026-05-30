@@ -2,30 +2,30 @@
 
 namespace Pterodactyl\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Pterodactyl\Models\Nest;
 use Filament\Resources\Resource;
 use Pterodactyl\Filament\Resources\NestResource\Pages;
 
 class NestResource extends Resource
 {
-    protected static $model = Nest::class;
+    protected static ?string $model = Nest::class;
 
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static $navigationSort = 2;
+    protected static string|UnitEnum|null $navigationGroup = 'Server Management';
 
-    public static function getNavigationGroup(): ?string
+    protected static ?int $navigationSort = 2;
+
+    public static function form(Schema $schema): Schema
     {
-        return 'Server Management';
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
+        return $schema->components([
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->maxLength(191),
@@ -48,12 +48,14 @@ class NestResource extends Resource
                 Tables\Columns\TextColumn::make('eggs_count')->label('Eggs')->counts('eggs')->sortable(),
                 Tables\Columns\TextColumn::make('servers_count')->label('Servers')->counts('servers')->sortable(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

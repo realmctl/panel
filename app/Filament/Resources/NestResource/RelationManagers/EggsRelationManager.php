@@ -4,17 +4,18 @@ namespace Pterodactyl\Filament\Resources\NestResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 
 class EggsRelationManager extends RelationManager
 {
     protected static string $relationship = 'eggs';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             Forms\Components\TextInput::make('name')->required()->maxLength(191),
             Forms\Components\Textarea::make('description'),
             Forms\Components\TextInput::make('author')->email()->required(),
@@ -29,8 +30,8 @@ class EggsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('author'),
                 Tables\Columns\TextColumn::make('servers_count')->label('Servers')->counts('servers'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                Actions\EditAction::make(),
             ]);
     }
 }

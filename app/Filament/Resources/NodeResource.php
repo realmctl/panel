@@ -2,31 +2,32 @@
 
 namespace Pterodactyl\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Pterodactyl\Models\Node;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Pterodactyl\Filament\Resources\NodeResource\Pages;
 
 class NodeResource extends Resource
 {
-    protected static $model = Node::class;
+    protected static ?string $model = Node::class;
 
-    protected static $navigationIcon = 'heroicon-o-server-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-server-stack';
 
-    protected static $navigationSort = 1;
+    protected static string|UnitEnum|null $navigationGroup = 'Infrastructure';
 
-    public static function getNavigationGroup(): ?string
+    protected static ?int $navigationSort = 1;
+
+    public static function form(Schema $schema): Schema
     {
-        return 'Infrastructure';
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Section::make('Basic Information')->schema([
+        return $schema->components([
+            Section::make('Basic Information')->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(100),
@@ -42,7 +43,7 @@ class NodeResource extends Resource
                     ->default(true),
             ])->columns(2),
 
-            Forms\Components\Section::make('Connection')->schema([
+            Section::make('Connection')->schema([
                 Forms\Components\TextInput::make('fqdn')
                     ->label('FQDN')
                     ->required()
@@ -58,7 +59,7 @@ class NodeResource extends Resource
                     ->label('Maintenance Mode'),
             ])->columns(2),
 
-            Forms\Components\Section::make('Resources')->schema([
+            Section::make('Resources')->schema([
                 Forms\Components\TextInput::make('memory')
                     ->label('Total Memory (MiB)')
                     ->numeric()
@@ -88,7 +89,7 @@ class NodeResource extends Resource
                     ->suffix('MiB'),
             ])->columns(2),
 
-            Forms\Components\Section::make('Daemon Settings')->schema([
+            Section::make('Daemon Settings')->schema([
                 Forms\Components\TextInput::make('daemonListen')
                     ->label('Daemon Port')
                     ->numeric()
@@ -148,12 +149,12 @@ class NodeResource extends Resource
                 Tables\Filters\TernaryFilter::make('maintenance_mode')
                     ->label('Maintenance'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -2,33 +2,34 @@
 
 namespace Pterodactyl\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Pterodactyl\Models\DatabaseHost;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Pterodactyl\Filament\Resources\DatabaseHostResource\Pages;
 
 class DatabaseHostResource extends Resource
 {
-    protected static $model = DatabaseHost::class;
+    protected static ?string $model = DatabaseHost::class;
 
-    protected static $navigationIcon = 'heroicon-o-circle-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-circle-stack';
 
-    protected static $navigationLabel = 'Database Hosts';
+    protected static string|UnitEnum|null $navigationGroup = 'Infrastructure';
 
-    protected static $navigationSort = 4;
+    protected static ?string $navigationLabel = 'Database Hosts';
 
-    public static function getNavigationGroup(): ?string
+    protected static ?int $navigationSort = 4;
+
+    public static function form(Schema $schema): Schema
     {
-        return 'Infrastructure';
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Section::make('Host Details')->schema([
+        return $schema->components([
+            Section::make('Host Details')->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(191),
@@ -73,9 +74,14 @@ class DatabaseHostResource extends Resource
                 Tables\Columns\TextColumn::make('node.name')->label('Node'),
                 Tables\Columns\TextColumn::make('databases_count')->label('Databases')->counts('databases'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

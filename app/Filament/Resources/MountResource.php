@@ -2,31 +2,32 @@
 
 namespace Pterodactyl\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Pterodactyl\Models\Mount;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Pterodactyl\Filament\Resources\MountResource\Pages;
 
 class MountResource extends Resource
 {
-    protected static $model = Mount::class;
+    protected static ?string $model = Mount::class;
 
-    protected static $navigationIcon = 'heroicon-o-folder-open';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder-open';
 
-    protected static $navigationSort = 3;
+    protected static string|UnitEnum|null $navigationGroup = 'Infrastructure';
 
-    public static function getNavigationGroup(): ?string
+    protected static ?int $navigationSort = 3;
+
+    public static function form(Schema $schema): Schema
     {
-        return 'Infrastructure';
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Section::make('Mount Configuration')->schema([
+        return $schema->components([
+            Section::make('Mount Configuration')->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->unique(ignoreRecord: true)
@@ -48,7 +49,7 @@ class MountResource extends Resource
                     ->default(false),
             ])->columns(2),
 
-            Forms\Components\Section::make('Assignments')->schema([
+            Section::make('Assignments')->schema([
                 Forms\Components\Select::make('eggs')
                     ->relationship('eggs', 'name')
                     ->multiple()
@@ -74,9 +75,14 @@ class MountResource extends Resource
                 Tables\Columns\IconColumn::make('read_only')->boolean(),
                 Tables\Columns\IconColumn::make('user_mountable')->boolean(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
