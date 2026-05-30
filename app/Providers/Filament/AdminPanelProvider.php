@@ -30,6 +30,8 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Amber,
             ])
             ->brandName('Realm Admin')
+            ->brandLogo(asset('assets/logo.png'))
+            ->brandLogoHeight('2rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'Pterodactyl\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'Pterodactyl\\Filament\\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'Pterodactyl\\Filament\\Widgets')
