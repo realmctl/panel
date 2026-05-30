@@ -19,13 +19,23 @@ class AssetComposer
      */
     public function compose(View $view): void
     {
+        $provider = config('captcha.provider', 'none');
+
         $view->with('asset', $this->assetHashService);
         $view->with('siteConfiguration', [
             'name' => config('app.name') ?? 'Pterodactyl',
             'locale' => config('app.locale') ?? 'en',
             'recaptcha' => [
-                'enabled' => config('recaptcha.enabled', false),
-                'siteKey' => config('recaptcha.website_key') ?? '',
+                'enabled' => $provider === 'recaptcha',
+                'siteKey' => config('captcha.recaptcha.website_key') ?? '',
+            ],
+            'captcha' => [
+                'provider' => $provider,
+                'siteKey' => match ($provider) {
+                    'recaptcha' => config('captcha.recaptcha.website_key') ?? '',
+                    'turnstile' => config('captcha.turnstile.website_key') ?? '',
+                    default => '',
+                },
             ],
         ]);
     }

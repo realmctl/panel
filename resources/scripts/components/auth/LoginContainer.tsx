@@ -21,29 +21,100 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
     const [token, setToken] = useState('');
 
     const { clearFlashes, clearAndAddHttpError } = useFlash();
-    const { enabled: recaptchaEnabled, siteKey } = useStoreState((state) => state.settings.data!.recaptcha);
+    const { enabled: recaptchaEnabled, siteKey: recaptchaSiteKey } = useStoreState(
+        (state) => state.settings.data!.recaptcha
+    );
+    const { provider: captchaProvider, siteKey: captchaSiteKey } = useStoreState(
+        (state) => state.settings.data!.captcha
+    );
+
+    const turnstileRef = useRef<HTMLDivElement>(null);
+    const turnstileWidgetId = useRef<string | null>(null);
 
     useEffect(() => {
         clearFlashes();
     }, []);
 
+    // Load Turnstile script and render widget when provider is turnstile.
+    useEffect(() => {
+        if (captchaProvider !== 'turnstile' || !captchaSiteKey) return;
+
+        const scriptId = 'cf-turnstile-script';
+        if (!document.getElementById(scriptId)) {
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        const renderWidget = () => {
+            if (turnstileRef.current && window.turnstile && !turnstileWidgetId.current) {
+                turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+                    sitekey: captchaSiteKey,
+                    callback: (response: string) => {
+                        setToken(response);
+                    },
+                    'expired-callback': () => {
+                        setToken('');
+                    },
+                });
+            }
+        };
+
+        // Wait for the script to load.
+        const interval = setInterval(() => {
+            if (window.turnstile) {
+                renderWidget();
+                clearInterval(interval);
+            }
+        }, 100);
+
+        return () => {
+            clearInterval(interval);
+            if (turnstileWidgetId.current && window.turnstile) {
+                window.turnstile.remove(turnstileWidgetId.current);
+                turnstileWidgetId.current = null;
+            }
+        };
+    }, [captchaProvider, captchaSiteKey]);
+
+    const resetCaptcha = () => {
+        setToken('');
+        if (captchaProvider === 'recaptcha' && ref.current) {
+            ref.current.reset();
+        } else if (captchaProvider === 'turnstile' && turnstileWidgetId.current && window.turnstile) {
+            window.turnstile.reset(turnstileWidgetId.current);
+        }
+    };
+
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         clearFlashes();
 
-        // If there is no token in the state yet, request the token and then abort this submit request
-        // since it will be re-submitted when the recaptcha data is returned by the component.
-        if (recaptchaEnabled && !token) {
+        // For reCAPTCHA: if there is no token yet, execute the invisible challenge.
+        if (captchaProvider === 'recaptcha' && !token) {
             ref.current!.execute().catch((error) => {
                 console.error(error);
-
                 setSubmitting(false);
                 clearAndAddHttpError({ error });
             });
-
             return;
         }
 
-        login({ ...values, recaptchaData: token })
+        // For Turnstile: the widget is visible and the token should already be set.
+        // If not, show an error.
+        if (captchaProvider === 'turnstile' && !token) {
+            setSubmitting(false);
+            clearAndAddHttpError({ error: new Error('Please complete the CAPTCHA challenge.') });
+            return;
+        }
+
+        login({
+            ...values,
+            recaptchaData: captchaProvider === 'recaptcha' ? token : null,
+            turnstileData: captchaProvider === 'turnstile' ? token : null,
+        })
             .then((response) => {
                 if (response.complete) {
                     // @ts-expect-error this is valid
@@ -55,10 +126,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
             })
             .catch((error) => {
                 console.error(error);
-
-                setToken('');
-                if (ref.current) ref.current.reset();
-
+                resetCaptcha();
                 setSubmitting(false);
                 clearAndAddHttpError({ error });
             });
@@ -84,11 +152,11 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             Login
                         </Button>
                     </div>
-                    {recaptchaEnabled && (
+                    {captchaProvider === 'recaptcha' && (
                         <Reaptcha
                             ref={ref}
                             size={'invisible'}
-                            sitekey={siteKey || '_invalid_key'}
+                            sitekey={recaptchaSiteKey || captchaSiteKey || '_invalid_key'}
                             onVerify={(response) => {
                                 setToken(response);
                                 submitForm();
@@ -98,6 +166,11 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                                 setToken('');
                             }}
                         />
+                    )}
+                    {captchaProvider === 'turnstile' && (
+                        <div css={tw`mt-4 flex justify-center`}>
+                            <div ref={turnstileRef} />
+                        </div>
                     )}
                     <div css={tw`mt-6 text-center`}>
                         <Link
