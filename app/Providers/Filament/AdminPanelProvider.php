@@ -22,8 +22,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->id('admin')
-            ->path('realm-admin')
-            ->login()
+            ->path('admin')
             ->colors([
                 'primary' => Color::Blue,
                 'danger' => Color::Red,
