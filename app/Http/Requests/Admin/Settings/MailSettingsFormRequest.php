@@ -12,6 +12,16 @@ class MailSettingsFormRequest extends AdminFormRequest
      */
     public function rules(): array
     {
+        $driver = config('mail.default');
+
+        if ($driver === 'resend') {
+            return [
+                'services:resend:key' => 'nullable|string|max:191',
+                'mail:from:address' => 'required|string|email',
+                'mail:from:name' => 'nullable|string|max:191',
+            ];
+        }
+
         return [
             'mail:mailers:smtp:host' => 'required|string',
             'mail:mailers:smtp:port' => 'required|integer|between:1,65535',
@@ -31,8 +41,13 @@ class MailSettingsFormRequest extends AdminFormRequest
     {
         $keys = array_flip(array_keys($this->rules()));
 
+        // Don't overwrite password/key if left empty
         if (empty($this->input('mail:mailers:smtp:password'))) {
             unset($keys['mail:mailers:smtp:password']);
+        }
+
+        if (empty($this->input('services:resend:key'))) {
+            unset($keys['services:resend:key']);
         }
 
         return $this->only(array_flip($keys));

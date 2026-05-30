@@ -52,11 +52,21 @@ class SettingsServiceProvider extends ServiceProvider
     ];
 
     /**
+     * Keys specific to the Resend mail driver.
+     */
+    protected array $resendKeys = [
+        'services:resend:key',
+        'mail:from:address',
+        'mail:from:name',
+    ];
+
+    /**
      * Keys that are encrypted and should be decrypted when set in the
      * configuration array.
      */
     protected static array $encrypted = [
         'mail:mailers:smtp:password',
+        'services:resend:key',
     ];
 
     /**
@@ -68,6 +78,8 @@ class SettingsServiceProvider extends ServiceProvider
         // are configured using SMTP as the driver.
         if ($config->get('mail.default') === 'smtp') {
             $this->keys = array_merge($this->keys, $this->emailKeys);
+        } elseif ($config->get('mail.default') === 'resend') {
+            $this->keys = array_merge($this->keys, $this->resendKeys);
         }
 
         try {

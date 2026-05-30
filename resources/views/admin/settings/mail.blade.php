@@ -6,7 +6,7 @@
 @endsection
 
 @section('content-header')
-    <h1>Mail Settings<small>Configure how Pterodactyl should handle sending emails.</small></h1>
+    <h1>Mail Settings<small>Configure how the panel should handle sending emails.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
         <li class="active">Settings</li>
@@ -20,20 +20,56 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Email Settings</h3>
+                    <span class="label label-default pull-right">Driver: {{ strtoupper($driver ?? 'smtp') }}</span>
                 </div>
                 @if($disabled)
                     <div class="box-body">
                         <div class="row">
                             <div class="col-xs-12">
                                 <div class="alert alert-info no-margin-bottom">
-                                    This interface is limited to instances using SMTP as the mail driver. Please either use <code>php artisan p:environment:mail</code> command to update your email settings, or set <code>MAIL_DRIVER=smtp</code> in your environment file.
-                                    @if(config('mail.default') === 'resend')
-                                        <br /><br />You are currently using the <strong>Resend</strong> mail driver. To configure it, set <code>RESEND_KEY</code> in your environment file or run <code>php artisan p:environment:mail</code>.
-                                    @endif
+                                    This interface supports SMTP and Resend drivers. Please use <code>php artisan p:environment:mail</code> to configure your current mail driver, or set <code>MAIL_MAILER=smtp</code> or <code>MAIL_MAILER=resend</code> in your environment file.
                                 </div>
                             </div>
                         </div>
                     </div>
+                @elseif(($driver ?? 'smtp') === 'resend')
+                    <form>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label class="control-label">Resend API Key</label>
+                                    <div>
+                                        <input type="password" class="form-control" name="services:resend:key" />
+                                        <p class="text-muted small">Your Resend API key. Leave blank to keep the existing key. Get one at <a href="https://resend.com/api-keys" target="_blank">resend.com/api-keys</a>.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr />
+                                <div class="form-group col-md-6">
+                                    <label class="control-label">Mail From</label>
+                                    <div>
+                                        <input required type="email" class="form-control" name="mail:from:address" value="{{ old('mail:from:address', config('mail.from.address')) }}" />
+                                        <p class="text-muted small">Enter an email address that all outgoing emails will originate from. This must be a verified domain in Resend.</p>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="control-label">Mail From Name <span class="field-optional"></span></label>
+                                    <div>
+                                        <input type="text" class="form-control" name="mail:from:name" value="{{ old('mail:from:name', config('mail.from.name')) }}" />
+                                        <p class="text-muted small">The name that emails should appear to come from.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            {{ csrf_field() }}
+                            <div class="pull-right">
+                                <button type="button" id="testButton" class="btn btn-sm btn-success">Test</button>
+                                <button type="button" id="saveButton" class="btn btn-sm btn-primary">Save</button>
+                            </div>
+                        </div>
+                    </form>
                 @else
                     <form>
                         <div class="box-body">
@@ -118,11 +154,15 @@
 
     <script>
         function saveSettings() {
-            return $.ajax({
-                method: 'PATCH',
-                url: '/admin/settings/mail',
-                contentType: 'application/json',
-                data: JSON.stringify({
+            var data = {};
+            @if(($driver ?? 'smtp') === 'resend')
+                data = {
+                    'services:resend:key': $('input[name="services:resend:key"]').val(),
+                    'mail:from:address': $('input[name="mail:from:address"]').val(),
+                    'mail:from:name': $('input[name="mail:from:name"]').val()
+                };
+            @else
+                data = {
                     'mail:mailers:smtp:host': $('input[name="mail:mailers:smtp:host"]').val(),
                     'mail:mailers:smtp:port': $('input[name="mail:mailers:smtp:port"]').val(),
                     'mail:mailers:smtp:encryption': $('select[name="mail:mailers:smtp:encryption"]').val(),
@@ -130,7 +170,14 @@
                     'mail:mailers:smtp:password': $('input[name="mail:mailers:smtp:password"]').val(),
                     'mail:from:address': $('input[name="mail:from:address"]').val(),
                     'mail:from:name': $('input[name="mail:from:name"]').val()
-                }),
+                };
+            @endif
+
+            return $.ajax({
+                method: 'PATCH',
+                url: '/admin/settings/mail',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
                 headers: { 'X-CSRF-Token': $('input[name="_token"]').val() }
             }).fail(function (jqXHR) {
                 showErrorDialog(jqXHR, 'save');

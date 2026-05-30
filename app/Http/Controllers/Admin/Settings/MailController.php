@@ -30,18 +30,18 @@ class MailController extends Controller
     }
 
     /**
-     * Render UI for editing mail settings. This UI should only display if
-     * the server is configured to send mail using SMTP.
+     * Render UI for editing mail settings.
      */
     public function index(): View
     {
         return view('admin.settings.mail', [
-            'disabled' => $this->config->get('mail.default') !== 'smtp',
+            'disabled' => !in_array($this->config->get('mail.default'), ['smtp', 'resend']),
+            'driver' => $this->config->get('mail.default'),
         ]);
     }
 
     /**
-     * Handle request to update SMTP mail settings.
+     * Handle request to update mail settings.
      *
      * @throws DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -49,8 +49,8 @@ class MailController extends Controller
      */
     public function update(MailSettingsFormRequest $request): Response
     {
-        if ($this->config->get('mail.default') !== 'smtp') {
-            throw new DisplayException('This feature is only available if SMTP is the selected email driver for the Panel.');
+        if (!in_array($this->config->get('mail.default'), ['smtp', 'resend'])) {
+            throw new DisplayException('This feature is only available for SMTP and Resend mail drivers.');
         }
 
         $values = $request->normalize();
