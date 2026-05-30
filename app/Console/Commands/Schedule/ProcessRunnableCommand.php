@@ -51,7 +51,7 @@ class ProcessRunnableCommand extends Command
      * never throw an exception out, otherwise you'll end up killing the entire run group causing
      * any other schedules to not process correctly.
      *
-     * @see https://github.com/pterodactyl/panel/issues/2609
+     * @see https://github.com/realmopensource/panel/issues/2609
      */
     protected function processSchedule(Schedule $schedule)
     {

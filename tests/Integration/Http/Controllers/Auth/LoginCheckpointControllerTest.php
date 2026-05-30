@@ -69,7 +69,7 @@ class LoginCheckpointControllerTest extends HttpTestCase
      * logic fails if the token's timestamp is before the `totp_authenticated_at`
      * column value.
      *
-     * @see https://github.com/pterodactyl/panel/security/advisories/GHSA-rgmp-4873-r683
+     * @see https://github.com/realmopensource/panel/security/advisories/GHSA-rgmp-4873-r683
      */
     #[TestWith([1])]
     #[TestWith([30])]

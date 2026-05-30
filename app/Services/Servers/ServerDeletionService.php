@@ -70,7 +70,7 @@ class ServerDeletionService
                     // the host instance, but we couldn't delete it anyways so not sure how we would
                     // handle this better anyways.
                     //
-                    // @see https://github.com/pterodactyl/panel/issues/2085
+                    // @see https://github.com/realmopensource/panel/issues/2085
                     $database->delete();
 
                     Log::warning($exception);

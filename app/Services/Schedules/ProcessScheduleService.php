@@ -73,7 +73,7 @@ class ProcessScheduleService
             // When using dispatchNow the RunTaskJob::failed() function is not called automatically
             // so we need to manually trigger it and then continue with the exception throw.
             //
-            // @see https://github.com/pterodactyl/panel/issues/2550
+            // @see https://github.com/realmopensource/panel/issues/2550
             try {
                 $this->dispatcher->dispatchNow($job);
             } catch (\Exception $exception) {

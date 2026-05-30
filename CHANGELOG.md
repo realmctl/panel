@@ -23,8 +23,8 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 
 ## v1.12.1
 ### Fixed
-* [CVE-2026-26016](https://github.com/pterodactyl/panel/security/advisories/GHSA-g7vw-f8p5-c728)
-* [GHSA-hr7j-63v7-vj7g](https://github.com/pterodactyl/panel/security/advisories/GHSA-hr7j-63v7-vj7g)
+* [CVE-2026-26016](https://github.com/realmopensource/panel/security/advisories/GHSA-g7vw-f8p5-c728)
+* [GHSA-hr7j-63v7-vj7g](https://github.com/realmopensource/panel/security/advisories/GHSA-hr7j-63v7-vj7g)
 * Fixes bug where presigned URLs would 
 * Fixes issue where certain input values would cause the activity log screen to stop rendering properly due to improper element encoding.
 * Fixes improper display of unicode characters in console output.
@@ -43,9 +43,9 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 ## v1.12.0
 ### Fixed
 
-* [CVE-2025-68954](https://github.com/pterodactyl/panel/security/advisories/GHSA-8c39-xppg-479c)
-* [CVE-2025-69197](https://github.com/pterodactyl/panel/security/advisories/GHSA-rgmp-4873-r683)
-* [CVE-2025-69198](https://github.com/pterodactyl/panel/security/advisories/GHSA-jw2v-cq5x-q68g)
+* [CVE-2025-68954](https://github.com/realmopensource/panel/security/advisories/GHSA-8c39-xppg-479c)
+* [CVE-2025-69197](https://github.com/realmopensource/panel/security/advisories/GHSA-rgmp-4873-r683)
+* [CVE-2025-69198](https://github.com/realmopensource/panel/security/advisories/GHSA-jw2v-cq5x-q68g)
 * Fixes a self-XSS issue when entering random data into boxes while creating a new database host.
 * Fixes missing `HttpForbiddenException` import in the backup status controller.
 * Fixes issue where scheduled tasks would execute every minute regardless of their configured cron syntax.
@@ -54,7 +54,7 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 * Fixes node description not being settable via the API.
 * Fixes 0-bytes files returning an error when attempting to upload.
 * Fixes nodes displaying the first available location even when that field was not edited and the node has a different value set.
-* Fixes allocation notes not being reset when a server is deleted. ([#5157](https://github.com/pterodactyl/panel/pull/5157))
+* Fixes allocation notes not being reset when a server is deleted. ([#5157](https://github.com/realmopensource/panel/pull/5157))
 
 ### Changed
 * Minimum NodeJS version updated to 22 for building.
@@ -98,7 +98,7 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 * Improved validation rules on `docker_image` fields to prevent invalid inputs
 
 ### Fixed
-* Multiple XSS vulnerabilities in the admin area ([GHSA-384w-wffr-x63q](https://github.com/pterodactyl/panel/security/advisories/GHSA-384w-wffr-x63q))
+* Multiple XSS vulnerabilities in the admin area ([GHSA-384w-wffr-x63q](https://github.com/realmopensource/panel/security/advisories/GHSA-384w-wffr-x63q))
 
 ## v1.11.5
 ### Fixed
@@ -404,7 +404,7 @@ be considered deprecated, but will continue to work. Application keys _will not_
 
 ## v1.6.6
 ### Fixed
-* **[security]** Fixes a CSRF vulnerability for both the administrative test email endpoint and node auto-deployment token generation endpoint. [GHSA-wwgq-9jhf-qgw6](https://github.com/pterodactyl/panel/security/advisories/GHSA-wwgq-9jhf-qgw6)
+* **[security]** Fixes a CSRF vulnerability for both the administrative test email endpoint and node auto-deployment token generation endpoint. [GHSA-wwgq-9jhf-qgw6](https://github.com/realmopensource/panel/security/advisories/GHSA-wwgq-9jhf-qgw6)
 
 ### Changed
 * Updates Minecraft eggs to include latest Java 17 yolk by default.
@@ -768,7 +768,7 @@ it easy to parse through the project and make contributions.
 ## v0.7.18 (Derelict Dermodactylus)
 ### Fixed
 * **[Security]** Re-addressed missed endpoint that would not properly limit a user account to 5 API keys.
-* **[Security]** Addresses a Client API vulnerability that would allow a user to list all servers on the system ([`GHSA-6888-7f3w-92jx`](https://github.com/pterodactyl/panel/security/advisories/GHSA-6888-7f3w-92jx))
+* **[Security]** Addresses a Client API vulnerability that would allow a user to list all servers on the system ([`GHSA-6888-7f3w-92jx`](https://github.com/realmopensource/panel/security/advisories/GHSA-6888-7f3w-92jx))
 
 ## v0.7.17 (Derelict Dermodactylus)
 ### Fixed
