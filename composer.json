@@ -87,7 +87,8 @@
         "cs:check": "php-cs-fixer fix --dry-run --diff --verbose",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi || true"
+            "@php artisan package:discover --ansi || true",
+            "@php artisan filament:assets --ansi || true"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
