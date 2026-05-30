@@ -2,13 +2,17 @@
 
 namespace Pterodactyl\Filament\Pages;
 
+use BackedEnum;
 use Filament\Pages\Page;
 use Pterodactyl\Models\Node;
+use Pterodactyl\Models\User;
+use Pterodactyl\Models\Server;
+use Pterodactyl\Models\Allocation;
 use Pterodactyl\Services\Helpers\SoftwareVersionService;
 
-class Dashboard extends Page
+class Overview extends Page
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'Overview';
 
@@ -16,23 +20,18 @@ class Dashboard extends Page
 
     protected static ?int $navigationSort = -2;
 
+    protected static ?string $slug = '/';
+
     protected string $view = 'filament.pages.overview';
-
-    public function getHeaderWidgets(): array
-    {
-        return [
-            \Pterodactyl\Filament\Widgets\StatsOverview::class,
-        ];
-    }
-
-    public function getHeaderWidgetsColumns(): int|array
-    {
-        return 4;
-    }
 
     public function getViewData(): array
     {
         $versionService = app(SoftwareVersionService::class);
+        $nodes = Node::count();
+        $activeNodes = Node::where('maintenance_mode', false)->count();
+        $allocations = Allocation::count();
+        $usedAllocations = Allocation::whereNotNull('server_id')->count();
+        $suspendedServers = Server::where('status', 'suspended')->count();
 
         return [
             'version' => config('app.version'),
@@ -41,6 +40,13 @@ class Dashboard extends Page
             'filamentVersion' => \Composer\InstalledVersions::getPrettyVersion('filament/filament') ?? 'unknown',
             'isLatest' => $versionService->isLatestPanel(),
             'latestVersion' => $versionService->getPanel(),
+            'servers' => Server::count(),
+            'users' => User::count(),
+            'nodes' => $nodes,
+            'activeNodes' => $activeNodes,
+            'allocations' => $allocations,
+            'usedAllocations' => $usedAllocations,
+            'suspendedServers' => $suspendedServers,
             'totalMemory' => Node::sum('memory'),
             'totalDisk' => Node::sum('disk'),
         ];

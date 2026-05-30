@@ -30,11 +30,11 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Amber,
             ])
             ->brandName('Realm Admin')
-            ->brandLogo(asset('assets/logo.png'))
-            ->brandLogoHeight('2rem')
+            ->brandLogo('https://cdn.ordnary.com/realmctl/logo.png')
+            ->brandLogoHeight('2.5rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'Pterodactyl\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'Pterodactyl\\Filament\\Pages')
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'Pterodactyl\\Filament\\Widgets')
+            ->pages([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -50,7 +50,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->authGuard('web')
-            ->darkMode(true)
+            ->darkMode(forced: true)
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 'Server Management',
