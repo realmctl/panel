@@ -17,7 +17,7 @@ class ManageApiKeys extends ManageRecords
             Actions\CreateAction::make()
                 ->label('Create New')
                 ->modalHeading('Create Application API Credentials')
-                ->mutateFormDataBeforeCreate(function (array $data): array {
+                ->mutateFormDataUsing(function (array $data): array {
                     $encrypter = app(\Illuminate\Contracts\Encryption\Encrypter::class);
                     $data['user_id'] = auth()->id();
                     $data['key_type'] = \Pterodactyl\Models\ApiKey::TYPE_APPLICATION;
