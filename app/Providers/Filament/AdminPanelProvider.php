@@ -51,7 +51,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->authGuard('web')
-            ->darkMode()
+            ->defaultThemeMode(ThemeMode::Dark)
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 'Server Management',
