@@ -27,6 +27,9 @@
                             <div class="col-xs-12">
                                 <div class="alert alert-info no-margin-bottom">
                                     This interface is limited to instances using SMTP as the mail driver. Please either use <code>php artisan p:environment:mail</code> command to update your email settings, or set <code>MAIL_DRIVER=smtp</code> in your environment file.
+                                    @if(config('mail.default') === 'resend')
+                                        <br /><br />You are currently using the <strong>Resend</strong> mail driver. To configure it, set <code>RESEND_KEY</code> in your environment file or run <code>php artisan p:environment:mail</code>.
+                                    @endif
                                 </div>
                             </div>
                         </div>
