@@ -88,8 +88,12 @@
                 </div>
                 <div class="card-footer">
                     {!! csrf_field() !!}
-                    <span class="form-hint">A username and password for this database will be randomly generated after form submission.</span>
-                    <button type="submit" class="btn btn-primary float-end"><i class="ti ti-device-floppy me-1"></i> Save</button>
+                    <div class="d-flex align-items-center">
+                        <span class="form-hint mb-0">A username and password will be randomly generated.</span>
+                        <button type="submit" class="btn btn-primary ms-auto">
+                            <i class="ti ti-device-floppy me-1"></i> Save
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
