@@ -3,15 +3,12 @@ import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import performPasswordReset from '@/api/auth/performPasswordReset';
 import { httpErrorToHuman } from '@/api/http';
-import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { Actions, useStoreActions } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { Formik, FormikHelpers } from 'formik';
 import { object, ref, string } from 'yup';
-import Field from '@/components/elements/Field';
-import Input from '@/components/elements/Input';
-import tw from 'twin.macro';
-import Button from '@/components/elements/Button';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import AuthToast from '@/components/auth/AuthToast';
 
 interface Values {
     password: string;
@@ -37,62 +34,126 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
             })
             .catch((error) => {
                 console.error(error);
-
                 setSubmitting(false);
                 addFlash({ type: 'error', title: 'Error', message: httpErrorToHuman(error) });
             });
     };
 
     return (
-        <Formik
-            onSubmit={submit}
-            initialValues={{
-                password: '',
-                passwordConfirmation: '',
-            }}
-            validationSchema={object().shape({
-                password: string()
-                    .required('A new password is required.')
-                    .min(8, 'Your new password should be at least 8 characters in length.'),
-                passwordConfirmation: string()
-                    .required('Your new password does not match.')
-                    // @ts-expect-error this is valid
-                    .oneOf([ref('password'), null], 'Your new password does not match.'),
-            })}
-        >
-            {({ isSubmitting }) => (
-                <LoginFormContainer title={'Reset Password'} css={tw`w-full flex`}>
-                    <div>
-                        <label>Email</label>
-                        <Input value={email} isLight disabled />
-                    </div>
-                    <div css={tw`mt-6`}>
-                        <Field
-                            light
-                            label={'New Password'}
-                            name={'password'}
-                            type={'password'}
-                            description={'Passwords must be at least 8 characters in length.'}
-                        />
-                    </div>
-                    <div css={tw`mt-6`}>
-                        <Field light label={'Confirm New Password'} name={'passwordConfirmation'} type={'password'} />
-                    </div>
-                    <div css={tw`mt-6`}>
-                        <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>
-                            Reset Password
-                        </Button>
-                    </div>
-                    <div css={tw`mt-6 text-center`}>
-                        <Link
-                            to={'/auth/login'}
-                            css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
-                        >
-                            Return to Login
-                        </Link>
-                    </div>
-                </LoginFormContainer>
-            )}
-        </Formik>
+        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0f1117' }}>
+            <div className={'w-full max-w-md px-6'}>
+                <div className={'mb-8'}>
+                    <h1 className={'text-xl font-semibold text-white'}>Reset Password</h1>
+                    <p className={'mt-2 text-sm text-gray-400'}>
+                        Enter your new password below.
+                    </p>
+                </div>
+
+                <AuthToast />
+
+                <Formik
+                    onSubmit={submit}
+                    initialValues={{
+                        password: '',
+                        passwordConfirmation: '',
+                    }}
+                    validationSchema={object().shape({
+                        password: string()
+                            .required('A new password is required.')
+                            .min(8, 'Your new password should be at least 8 characters in length.'),
+                        passwordConfirmation: string()
+                            .required('Your new password does not match.')
+                            // @ts-expect-error this is valid
+                            .oneOf([ref('password'), null], 'Your new password does not match.'),
+                    })}
+                >
+                    {({ isSubmitting, handleSubmit, handleChange, handleBlur, values, errors, touched }) => (
+                        <form onSubmit={handleSubmit}>
+                            <div className={'mb-4'}>
+                                <label
+                                    htmlFor={'email-reset'}
+                                    className={'block text-sm font-medium text-gray-300 mb-1.5'}
+                                >
+                                    Email
+                                </label>
+                                <input
+                                    type={'email'}
+                                    id={'email-reset'}
+                                    value={email}
+                                    disabled
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed'}
+                                />
+                            </div>
+
+                            <div className={'mb-4'}>
+                                <label
+                                    htmlFor={'password-reset'}
+                                    className={'block text-sm font-medium text-gray-300 mb-1.5'}
+                                >
+                                    New Password
+                                </label>
+                                <input
+                                    type={'password'}
+                                    id={'password-reset'}
+                                    name={'password'}
+                                    autoComplete={'new-password'}
+                                    placeholder={'••••••••'}
+                                    disabled={isSubmitting}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.password}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                />
+                                {touched.password && errors.password && (
+                                    <p className={'mt-1 text-xs text-red-400'}>{errors.password}</p>
+                                )}
+                                <p className={'mt-1 text-xs text-gray-500'}>Passwords must be at least 8 characters in length.</p>
+                            </div>
+
+                            <div className={'mb-6'}>
+                                <label
+                                    htmlFor={'password-confirm-reset'}
+                                    className={'block text-sm font-medium text-gray-300 mb-1.5'}
+                                >
+                                    Confirm New Password
+                                </label>
+                                <input
+                                    type={'password'}
+                                    id={'password-confirm-reset'}
+                                    name={'passwordConfirmation'}
+                                    autoComplete={'new-password'}
+                                    placeholder={'••••••••'}
+                                    disabled={isSubmitting}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.passwordConfirmation}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                />
+                                {touched.passwordConfirmation && errors.passwordConfirmation && (
+                                    <p className={'mt-1 text-xs text-red-400'}>{errors.passwordConfirmation}</p>
+                                )}
+                            </div>
+
+                            <button
+                                type={'submit'}
+                                disabled={isSubmitting}
+                                className={'w-full h-10 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'}
+                            >
+                                {isSubmitting ? 'Resetting...' : 'Reset Password'}
+                            </button>
+                        </form>
+                    )}
+                </Formik>
+
+                <p className={'mt-6 text-sm text-center text-gray-400'}>
+                    <Link
+                        to={'/auth/login'}
+                        className={'font-medium text-blue-400 hover:text-blue-300 no-underline'}
+                    >
+                        Return to Login
+                    </Link>
+                </p>
+            </div>
+        </div>
     );
 };

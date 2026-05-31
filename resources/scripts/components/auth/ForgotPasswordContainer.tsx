@@ -1,17 +1,14 @@
-import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import requestPasswordResetEmail from '@/api/auth/requestPasswordResetEmail';
 import { httpErrorToHuman } from '@/api/http';
-import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
-import Field from '@/components/elements/Field';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
-import tw from 'twin.macro';
-import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import AuthToast from '@/components/auth/AuthToast';
 
 interface Values {
     email: string;
@@ -22,7 +19,7 @@ export default () => {
     const [token, setToken] = useState('');
 
     const { clearFlashes, addFlash } = useFlash();
-    const { enabled: recaptchaEnabled, siteKey: recaptchaSiteKey } = useStoreState(
+    const { siteKey: recaptchaSiteKey } = useStoreState(
         (state) => state.settings.data!.recaptcha
     );
     const { provider: captchaProvider, siteKey: captchaSiteKey } = useStoreState(
@@ -36,7 +33,6 @@ export default () => {
         clearFlashes();
     }, []);
 
-    // Load Turnstile script and render widget when provider is turnstile.
     useEffect(() => {
         if (captchaProvider !== 'turnstile' || !captchaSiteKey) return;
 
@@ -92,7 +88,6 @@ export default () => {
     const handleSubmission = ({ email }: Values, { setSubmitting, resetForm }: FormikHelpers<Values>) => {
         clearFlashes();
 
-        // For reCAPTCHA: if there is no token yet, execute the invisible challenge.
         if (captchaProvider === 'recaptcha' && !token) {
             ref.current!.execute().catch((error) => {
                 console.error(error);
@@ -102,7 +97,6 @@ export default () => {
             return;
         }
 
-        // For Turnstile: the widget is visible and the token should already be set.
         if (captchaProvider === 'turnstile' && !token) {
             setSubmitting(false);
             addFlash({ type: 'error', title: 'Error', message: 'Please complete the CAPTCHA challenge.' });
@@ -125,61 +119,93 @@ export default () => {
     };
 
     return (
-        <Formik
-            onSubmit={handleSubmission}
-            initialValues={{ email: '' }}
-            validationSchema={object().shape({
-                email: string()
-                    .email('A valid email address must be provided to continue.')
-                    .required('A valid email address must be provided to continue.'),
-            })}
-        >
-            {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={'Request Password Reset'} css={tw`w-full flex`}>
-                    <Field
-                        light
-                        label={'Email'}
-                        description={
-                            'Enter your account email address to receive instructions on resetting your password.'
-                        }
-                        name={'email'}
-                        type={'email'}
-                    />
-                    <div css={tw`mt-6`}>
-                        <Button type={'submit'} size={'xlarge'} disabled={isSubmitting} isLoading={isSubmitting}>
-                            Send Email
-                        </Button>
-                    </div>
-                    {captchaProvider === 'recaptcha' && (
-                        <Reaptcha
-                            ref={ref}
-                            size={'invisible'}
-                            sitekey={recaptchaSiteKey || captchaSiteKey || '_invalid_key'}
-                            onVerify={(response) => {
-                                setToken(response);
-                                submitForm();
-                            }}
-                            onExpire={() => {
-                                setSubmitting(false);
-                                setToken('');
-                            }}
-                        />
+        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0f1117' }}>
+            <div className={'w-full max-w-md px-6'}>
+                <div className={'mb-8'}>
+                    <h1 className={'text-xl font-semibold text-white'}>Reset your password</h1>
+                    <p className={'mt-2 text-sm text-gray-400'}>
+                        Enter your email address and we&apos;ll send you instructions to reset your password.
+                    </p>
+                </div>
+
+                <AuthToast />
+
+                <Formik
+                    onSubmit={handleSubmission}
+                    initialValues={{ email: '' }}
+                    validationSchema={object().shape({
+                        email: string()
+                            .email('A valid email address must be provided to continue.')
+                            .required('A valid email address must be provided to continue.'),
+                    })}
+                >
+                    {({ isSubmitting, setSubmitting, submitForm, handleSubmit, handleChange, handleBlur, values, errors, touched }) => (
+                        <form onSubmit={handleSubmit}>
+                            <div className={'mb-6'}>
+                                <label
+                                    htmlFor={'email-forgot'}
+                                    className={'block text-sm font-medium text-gray-300 mb-1.5'}
+                                >
+                                    Email Address
+                                </label>
+                                <input
+                                    type={'email'}
+                                    id={'email-forgot'}
+                                    name={'email'}
+                                    autoComplete={'email'}
+                                    placeholder={'you@example.com'}
+                                    disabled={isSubmitting}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.email}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                />
+                                {touched.email && errors.email && (
+                                    <p className={'mt-1 text-xs text-red-400'}>{errors.email}</p>
+                                )}
+                            </div>
+
+                            <button
+                                type={'submit'}
+                                disabled={isSubmitting}
+                                className={'w-full h-10 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'}
+                            >
+                                {isSubmitting ? 'Sending...' : 'Send Reset Email'}
+                            </button>
+
+                            {captchaProvider === 'recaptcha' && (
+                                <Reaptcha
+                                    ref={ref}
+                                    size={'invisible'}
+                                    sitekey={recaptchaSiteKey || captchaSiteKey || '_invalid_key'}
+                                    onVerify={(response) => {
+                                        setToken(response);
+                                        submitForm();
+                                    }}
+                                    onExpire={() => {
+                                        setSubmitting(false);
+                                        setToken('');
+                                    }}
+                                />
+                            )}
+                            {captchaProvider === 'turnstile' && (
+                                <div className={'mt-4 flex justify-center'}>
+                                    <div ref={turnstileRef} />
+                                </div>
+                            )}
+                        </form>
                     )}
-                    {captchaProvider === 'turnstile' && (
-                        <div css={tw`mt-4 flex justify-center`}>
-                            <div ref={turnstileRef} />
-                        </div>
-                    )}
-                    <div css={tw`mt-6 text-center`}>
-                        <Link
-                            to={'/auth/login'}
-                            css={tw`text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
-                        >
-                            Return to Login
-                        </Link>
-                    </div>
-                </LoginFormContainer>
-            )}
-        </Formik>
+                </Formik>
+
+                <p className={'mt-6 text-sm text-center text-gray-400'}>
+                    <Link
+                        to={'/auth/login'}
+                        className={'font-medium text-blue-400 hover:text-blue-300 no-underline'}
+                    >
+                        Return to Login
+                    </Link>
+                </p>
+            </div>
+        </div>
     );
 };
