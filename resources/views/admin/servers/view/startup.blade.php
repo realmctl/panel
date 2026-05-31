@@ -37,7 +37,7 @@
     </div>
     <div class="row row-cards">
         <div class="col-lg-6">
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">Service Configuration</h3>
                 </div>
@@ -88,7 +88,7 @@
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="row" id="appendVariablesTo"></div>
+            <div class="row row-cards" id="appendVariablesTo"></div>
         </div>
     </div>
 </form>
