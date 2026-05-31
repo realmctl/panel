@@ -113,14 +113,12 @@ export default ({ server }: { server: Server }) => {
     const diskDisplay = stats ? bytesToString(stats.diskUsageInBytes) : '--';
 
     return (
-        <div className={'relative rounded-xl overflow-hidden border border-[#2d3338]/50 group'}>
+        <div className={'relative rounded-md overflow-hidden border border-[#2d3338]/50 group'} style={{ backgroundColor: '#192024' }}>
             {/* Background image */}
             <div
-                className={'absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity duration-300'}
+                className={'absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300'}
                 style={{ backgroundImage: `url(${backgroundImage})` }}
             />
-            {/* Dark overlay */}
-            <div className={'absolute inset-0'} style={{ backgroundColor: 'rgba(15, 23, 30, 0.75)' }} />
 
             {/* Content */}
             <div className={'relative p-5'}>
@@ -156,7 +154,7 @@ export default ({ server }: { server: Server }) => {
                 {/* Manage button */}
                 <Link
                     to={`/server/${server.id}`}
-                    className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium no-underline transition-all duration-150 ${
+                    className={`block w-full text-center py-2.5 rounded-md text-sm font-medium no-underline transition-all duration-150 ${
                         isSuspended
                             ? 'bg-red-500/80 hover:bg-red-500 text-white'
                             : 'bg-blue-500/80 hover:bg-blue-500 text-white'

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useRouteMatch } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots, faQuestionCircle, faChevronDown, faCogs, faSignOutAlt, faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faQuestionCircle, faChevronDown, faCogs, faSignOutAlt, faUser, faSearch, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import debounce from 'debounce';
@@ -12,6 +12,95 @@ import http from '@/api/http';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import Avatar from '@/components/Avatar';
 import { ip } from '@/lib/formatters';
+import { ServerContext } from '@/state/server';
+
+const ServerSwitcher = () => {
+    const history = useHistory();
+    const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
+    const currentServerName = ServerContext.useStoreState((state) => state.server.data?.name) || 'Switch Server';
+    const [open, setOpen] = useState(false);
+    const [servers, setServers] = useState<Server[]>([]);
+    const [loaded, setLoaded] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (ref.current && !ref.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        if (open && !loaded) {
+            getServers({})
+                .then((result) => {
+                    setServers(result.items);
+                    setLoaded(true);
+                })
+                .catch(() => setServers([]));
+        }
+    }, [open]);
+
+    return (
+        <div className={'relative ml-4'} ref={ref}>
+            <button
+                onClick={() => setOpen(!open)}
+                className={'flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-100 transition-colors duration-150 bg-neutral-800/50 border border-[#2d3338] rounded-lg px-3 py-1.5 cursor-pointer'}
+            >
+                <FontAwesomeIcon icon={faExchangeAlt} className={'text-xs'} />
+                <span className={'max-w-[160px] truncate'}>{currentServerName}</span>
+                <FontAwesomeIcon icon={faChevronDown} className={'text-xs'} />
+            </button>
+
+            {open && (
+                <div
+                    className={'absolute left-0 top-full mt-2 w-72 rounded-lg shadow-lg py-2 z-50 border border-[#2d3338] max-h-80 overflow-y-auto'}
+                    style={{ backgroundColor: '#1e2a2f' }}
+                >
+                    {!loaded ? (
+                        <div className={'px-4 py-3 text-sm text-neutral-400 text-center'}>Loading...</div>
+                    ) : servers.length === 0 ? (
+                        <div className={'px-4 py-3 text-sm text-neutral-400 text-center'}>No servers found</div>
+                    ) : (
+                        servers.map((server) => (
+                            <button
+                                key={server.uuid}
+                                onClick={() => {
+                                    setOpen(false);
+                                    history.push(`/server/${server.id}`);
+                                }}
+                                className={`flex items-center w-full px-4 py-2 text-left border-0 cursor-pointer transition-colors duration-150 ${
+                                    serverMatch?.params.id === server.id
+                                        ? 'bg-blue-500/20 text-neutral-100'
+                                        : 'bg-transparent text-neutral-300 hover:bg-neutral-700/50 hover:text-neutral-100'
+                                }`}
+                            >
+                                <div className={'flex-1 min-w-0'}>
+                                    <p className={'text-sm truncate m-0'}>{server.name}</p>
+                                    <p className={'text-xs text-neutral-400 m-0 mt-0.5'}>
+                                        {server.allocations
+                                            .filter((alloc) => alloc.isDefault)
+                                            .map((allocation) => (
+                                                <span key={allocation.ip + allocation.port.toString()}>
+                                                    {allocation.alias || ip(allocation.ip)}:{allocation.port}
+                                                </span>
+                                            ))}
+                                    </p>
+                                </div>
+                                {serverMatch?.params.id === server.id && (
+                                    <span className={'text-xs text-blue-400 ml-2 flex-none'}>Current</span>
+                                )}
+                            </button>
+                        ))
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
 
 export default () => {
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
@@ -27,6 +116,10 @@ export default () => {
     const searchRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const history = useHistory();
+
+    // Detect if we're on a server page
+    const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
+    const isOnServerPage = !!serverMatch;
 
     const onTriggerLogout = () => {
         setIsLoggingOut(true);
@@ -92,7 +185,7 @@ export default () => {
     return (
         <div className={'w-full border-b border-[#2d3338]/50'} style={{ backgroundColor: '#192024' }}>
             <SpinnerOverlay visible={isLoggingOut} />
-            <div className={'mx-auto w-full flex items-center h-[3.5rem] max-w-[1200px] px-4'}>
+            <div className={'w-full flex items-center h-[3.5rem] max-w-[1200px] mx-4 xl:mx-auto'}>
                 {/* Brand / Logo */}
                 <div className={'flex items-center'}>
                     <Link
@@ -106,6 +199,9 @@ export default () => {
                             style={{ filter: 'brightness(0) invert(1)' }}
                         />
                     </Link>
+
+                    {/* Server switcher - only visible on server pages */}
+                    {isOnServerPage && <ServerSwitcher />}
                 </div>
 
                 {/* Right side navigation */}

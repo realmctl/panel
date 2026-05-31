@@ -16,7 +16,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, children }) => {
 
     return (
         <div className={'w-full'} style={{ backgroundColor: '#192024' }}>
-            <div className={'mx-auto w-full max-w-[1200px] px-4 pt-6' + (children ? ' pb-4' : ' pb-6')}>
+            <div className={'w-full max-w-[1200px] mx-4 xl:mx-auto pt-6' + (children ? ' pb-4' : ' pb-6')}>
                 <h1 className={'text-2xl font-header font-semibold text-neutral-100'}>
                     {title}
                 </h1>

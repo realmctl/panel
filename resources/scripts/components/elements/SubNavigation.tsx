@@ -6,7 +6,7 @@ const SubNavigation = styled.div`
     background-color: #192024;
 
     & > div {
-        ${tw`flex items-center text-sm mx-auto px-4`};
+        ${tw`flex items-center text-sm mx-4 xl:mx-auto`};
         max-width: 1200px;
         gap: 1.25rem;
 
