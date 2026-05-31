@@ -1,123 +1,106 @@
 @extends('layouts.admin')
 
 @section('title')
-    Manage User: {{ $user->username }}
+    User — {{ $user->username }}
 @endsection
 
 @section('content-header')
-    <h1>{{ $user->name_first }} {{ $user->name_last}}<small>{{ $user->username }}</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.users') }}">Users</a></li>
-        <li class="active">{{ $user->username }}</li>
-    </ol>
+    <h2 class="page-title">{{ $user->name_first }} {{ $user->name_last }}</h2>
 @endsection
 
 @section('admin-content')
-<div class="row">
     <form action="{{ route('admin.users.view', $user->id) }}" method="post">
-        <div class="col-md-6">
-            <div class="box box-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Identity</h3>
-                </div>
-                <div class="box-body">
-                    <div class="form-group">
-                        <label for="email" class="control-label">Email</label>
-                        <div>
-                            <input type="email" name="email" value="{{ $user->email }}" class="form-control form-autocomplete-stop">
-                        </div>
+        {!! csrf_field() !!}
+        {!! method_field('PATCH') !!}
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Identity</h3>
                     </div>
-                    <div class="form-group">
-                        <label for="registered" class="control-label">Username</label>
-                        <div>
-                            <input type="text" name="username" value="{{ $user->username }}" class="form-control form-autocomplete-stop">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" value="{{ $user->email }}" class="form-control" autocomplete="off">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="registered" class="control-label">Client First Name</label>
-                        <div>
-                            <input type="text" name="name_first" value="{{ $user->name_first }}" class="form-control form-autocomplete-stop">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" value="{{ $user->username }}" class="form-control" autocomplete="off">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="registered" class="control-label">Client Last Name</label>
-                        <div>
-                            <input type="text" name="name_last" value="{{ $user->name_last }}" class="form-control form-autocomplete-stop">
+                        <div class="mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="name_first" value="{{ $user->name_first }}" class="form-control" autocomplete="off">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Default Language</label>
-                        <div>
-                            <select name="language" class="form-control">
+                        <div class="mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="name_last" value="{{ $user->name_last }}" class="form-control" autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Default Language</label>
+                            <select name="language" class="form-select">
                                 @foreach($languages as $key => $value)
                                     <option value="{{ $key }}" @if($user->language === $key) selected @endif>{{ $value }}</option>
                                 @endforeach
                             </select>
-                            <p class="text-muted"><small>The default language to use when rendering the Panel for this user.</small></p>
                         </div>
                     </div>
-                </div>
-                <div class="box-footer">
-                    {!! csrf_field() !!}
-                    {!! method_field('PATCH') !!}
-                    <input type="submit" value="Update User" class="btn btn-primary btn-sm">
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Password</h3>
-                </div>
-                <div class="box-body">
-                    <div class="alert alert-success" style="display:none;margin-bottom:10px;" id="gen_pass"></div>
-                    <div class="form-group no-margin-bottom">
-                        <label for="password" class="control-label">Password <span class="field-optional"></span></label>
-                        <div>
-                            <input type="password" id="password" name="password" class="form-control form-autocomplete-stop">
-                            <p class="text-muted small">Leave blank to keep this user's password the same. User will not receive any notification if password is changed.</p>
-                        </div>
+                    <div class="card-footer text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-device-floppy me-1"></i> Update User
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Permissions</h3>
+            <div class="col-lg-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Password</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" autocomplete="off">
+                            <span class="form-hint">Leave blank to keep the current password. User will not be notified of changes.</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="box-body">
-                    <div class="form-group">
-                        <label for="root_admin" class="control-label">Administrator</label>
-                        <div>
-                            <select name="root_admin" class="form-control">
-                                <option value="0">@lang('strings.no')</option>
-                                <option value="1" {{ $user->root_admin ? 'selected="selected"' : '' }}>@lang('strings.yes')</option>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Permissions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Administrator</label>
+                            <select name="root_admin" class="form-select">
+                                <option value="0">No</option>
+                                <option value="1" {{ $user->root_admin ? 'selected' : '' }}>Yes</option>
                             </select>
-                            <p class="text-muted"><small>Setting this to 'Yes' gives a user full administrative access.</small></p>
+                            <span class="form-hint">Setting this to 'Yes' gives a user full administrative access.</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-    <div class="col-xs-12">
-        <div class="box box-danger">
-            <div class="box-header with-border">
-                <h3 class="box-title">Delete User</h3>
-            </div>
-            <div class="box-body">
-                <p class="no-margin">There must be no servers associated with this account in order for it to be deleted.</p>
-            </div>
-            <div class="box-footer">
-                <form action="{{ route('admin.users.view', $user->id) }}" method="POST">
-                    {!! csrf_field() !!}
-                    {!! method_field('DELETE') !!}
-                    <input id="delete" type="submit" class="btn btn-sm btn-danger pull-right" {{ $user->servers->count() < 1 ?: 'disabled' }} value="Delete User" />
-                </form>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-danger mt-3">
+                <div class="card-header">
+                    <h3 class="card-title text-danger">Delete User</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">There must be no servers associated with this account in order for it to be deleted.</p>
+                </div>
+                <div class="card-footer">
+                    <form action="{{ route('admin.users.view', $user->id) }}" method="POST">
+                        {!! csrf_field() !!}
+                        {!! method_field('DELETE') !!}
+                        <button type="submit" class="btn btn-outline-danger float-end" {{ $user->servers->count() < 1 ?: 'disabled' }}>
+                            <i class="ti ti-trash me-1"></i> Delete User
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection

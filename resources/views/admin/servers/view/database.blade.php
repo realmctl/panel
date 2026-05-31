@@ -5,95 +5,91 @@
 @endsection
 
 @section('content-header')
-    <h1>{{ $server->name }}<small>Manage server databases.</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
-        <li class="active">Databases</li>
-    </ol>
+    <h2 class="page-title">{{ $server->name }}: Databases</h2>
 @endsection
 
 @section('admin-content')
 @include('admin.servers.partials.navigation')
 <div class="row">
-    <div class="col-sm-7">
-        <div class="alert alert-info">
-            Database passwords can be viewed when <a href="/server/{{ $server->uuidShort }}/databases">visiting this server</a> on the front-end.
-        </div>
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Active Databases</h3>
+    <div class="col-lg-7">
+        <div class="alert alert-warning"><i class="ti ti-alert-triangle me-2"></i> Database passwords can be viewed when <a href="/server/{{ $server->uuidShort }}/databases">visiting this server</a> on the front-end.</div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Active Databases</h3>
             </div>
-            <div class="box-body table-responsible no-padding">
-                <table class="table table-hover">
-                    <tr>
-                        <th>Database</th>
-                        <th>Username</th>
-                        <th>Connections From</th>
-                        <th>Host</th>
-                        <th>Max Connections</th>
-                        <th></th>
-                    </tr>
-                    @foreach($server->databases as $database)
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
                         <tr>
-                            <td>{{ $database->database }}</td>
-                            <td>{{ $database->username }}</td>
-                            <td>{{ $database->remote }}</td>
-                            <td><code>{{ $database->host->host }}:{{ $database->host->port }}</code></td>
-                            @if($database->max_connections != null)
-                                <td>{{ $database->max_connections }}</td>
-                            @else
-                                <td>Unlimited</td>
-                            @endif
-                            <td class="text-center">
-                                <button data-action="reset-password" data-id="{{ $database->id }}" class="btn btn-xs btn-primary"><i class="fa fa-refresh"></i></button>
-                                <button data-action="remove" data-id="{{ $database->id }}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
-                            </td>
+                            <th>Database</th>
+                            <th>Username</th>
+                            <th>Connections From</th>
+                            <th>Host</th>
+                            <th>Max Connections</th>
+                            <th></th>
                         </tr>
-                    @endforeach
+                    </thead>
+                    <tbody>
+                        @foreach($server->databases as $database)
+                            <tr>
+                                <td>{{ $database->database }}</td>
+                                <td>{{ $database->username }}</td>
+                                <td>{{ $database->remote }}</td>
+                                <td><code>{{ $database->host->host }}:{{ $database->host->port }}</code></td>
+                                @if($database->max_connections != null)
+                                    <td>{{ $database->max_connections }}</td>
+                                @else
+                                    <td>Unlimited</td>
+                                @endif
+                                <td class="text-center">
+                                    <button data-action="reset-password" data-id="{{ $database->id }}" class="btn btn-sm btn-primary"><i class="ti ti-refresh"></i></button>
+                                    <button data-action="remove" data-id="{{ $database->id }}" class="btn btn-sm btn-outline-danger"><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <div class="col-sm-5">
-        <div class="box box-success">
-            <div class="box-header with-border">
-                <h3 class="box-title">Create New Database</h3>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Create New Database</h3>
             </div>
             <form action="{{ route('admin.servers.view.database', $server->id) }}" method="POST">
-                <div class="box-body">
-                    <div class="form-group">
-                        <label for="pDatabaseHostId" class="control-label">Database Host</label>
-                        <select id="pDatabaseHostId" name="database_host_id" class="form-control">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="pDatabaseHostId" class="form-label">Database Host</label>
+                        <select id="pDatabaseHostId" name="database_host_id" class="form-select">
                             @foreach($hosts as $host)
                                 <option value="{{ $host->id }}">{{ $host->name }}</option>
                             @endforeach
                         </select>
-                        <p class="text-muted small">Select the host database server that this database should be created on.</p>
+                        <span class="form-hint">Select the host database server that this database should be created on.</span>
                     </div>
-                    <div class="form-group">
-                        <label for="pDatabaseName" class="control-label">Database</label>
+                    <div class="mb-3">
+                        <label for="pDatabaseName" class="form-label">Database</label>
                         <div class="input-group">
-                            <span class="input-group-addon">s{{ $server->id }}_</span>
+                            <span class="input-group-text">s{{ $server->id }}_</span>
                             <input id="pDatabaseName" type="text" name="database" class="form-control" placeholder="database" />
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="pRemote" class="control-label">Connections</label>
+                    <div class="mb-3">
+                        <label for="pRemote" class="form-label">Connections</label>
                         <input id="pRemote" type="text" name="remote" class="form-control" value="%" />
-                        <p class="text-muted small">This should reflect the IP address that connections are allowed from. Uses standard MySQL notation. If unsure leave as <code>%</code>.</p>
+                        <span class="form-hint">This should reflect the IP address that connections are allowed from. Uses standard MySQL notation. If unsure leave as <code>%</code>.</span>
                     </div>
-                    <div class="form-group">
-                        <label for="pmax_connections" class="control-label">Concurrent Connections</label>
+                    <div class="mb-3">
+                        <label for="pmax_connections" class="form-label">Concurrent Connections</label>
                         <input id="pmax_connections" type="text" name="max_connections" class="form-control"/>
-                        <p class="text-muted small">This should reflect the max number of concurrent connections from this user to the database. Leave empty for unlimited.</p>
+                        <span class="form-hint">This should reflect the max number of concurrent connections from this user to the database. Leave empty for unlimited.</span>
                     </div>
                 </div>
-                <div class="box-footer">
+                <div class="card-footer">
                     {!! csrf_field() !!}
-                    <p class="text-muted small no-margin">A username and password for this database will be randomly generated after form submission.</p>
-                    <input type="submit" class="btn btn-sm btn-success pull-right" value="Create Database" />
+                    <span class="form-hint">A username and password for this database will be randomly generated after form submission.</span>
+                    <button type="submit" class="btn btn-primary float-end"><i class="ti ti-device-floppy me-1"></i> Save</button>
                 </div>
             </form>
         </div>
@@ -101,8 +97,7 @@
 </div>
 @endsection
 
-@section('footer-scripts')
-    @parent
+@section('admin-js')
     <script>
     $('#pDatabaseHost').select2();
     $('[data-action="remove"]').click(function (event) {
@@ -138,7 +133,7 @@
     $('[data-action="reset-password"]').click(function (e) {
         e.preventDefault();
         var block = $(this);
-        $(this).addClass('disabled').find('i').addClass('fa-spin');
+        $(this).addClass('disabled').find('i').addClass('ti-spin');
         $.ajax({
             type: 'PATCH',
             url: '/admin/servers/view/{{ $server->id }}/database',
@@ -162,7 +157,7 @@
                 text: error
             });
         }).always(function () {
-            block.removeClass('disabled').find('i').removeClass('fa-spin');
+            block.removeClass('disabled').find('i').removeClass('ti-spin');
         });
     });
     </script>

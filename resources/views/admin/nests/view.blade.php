@@ -5,113 +5,103 @@
 @endsection
 
 @section('content-header')
-    <h1>{{ $nest->name }}<small>{{ str_limit($nest->description, 50) }}</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nests') }}">Nests</a></li>
-        <li class="active">{{ $nest->name }}</li>
-    </ol>
+    <h2 class="page-title">{{ $nest->name }}</h2>
 @endsection
 
 @section('admin-content')
-<div class="row">
-    <form action="{{ route('admin.nests.view', $nest->id) }}" method="POST">
-        <div class="col-md-6">
-            <div class="box">
-                <div class="box-body">
-                    <div class="form-group">
-                        <label class="control-label">Name <span class="field-required"></span></label>
-                        <div>
-                            <input type="text" name="name" class="form-control" value="{{ $nest->name }}" />
-                            <p class="text-muted"><small>This should be a descriptive category name that encompasses all of the options within the service.</small></p>
-                        </div>
+<div class="row mb-3">
+    <div class="col-lg-6">
+        <form action="{{ route('admin.nests.view', $nest->id) }}" method="POST">
+            {!! csrf_field() !!}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Nest Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ $nest->name }}" />
+                        <span class="form-hint">A descriptive category name that encompasses all eggs within this nest.</span>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label">Description</label>
-                        <div>
-                            <textarea name="description" class="form-control" rows="7">{{ $nest->description }}</textarea>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="5">{{ $nest->description }}</textarea>
                     </div>
                 </div>
-                <div class="box-footer">
-                    {!! csrf_field() !!}
-                    <button type="submit" name="_method" value="PATCH" class="btn btn-primary btn-sm pull-right">Save</button>
-                    <button id="deleteButton" type="submit" name="_method" value="DELETE" class="btn btn-sm btn-danger muted muted-hover"><i class="fa fa-trash-o"></i></button>
+                <div class="card-footer d-flex justify-content-between">
+                    <button id="deleteButton" type="submit" name="_method" value="DELETE" class="btn btn-outline-danger">
+                        <i class="ti ti-trash me-1"></i> Delete
+                    </button>
+                    <button type="submit" name="_method" value="PATCH" class="btn btn-primary">
+                        <i class="ti ti-device-floppy me-1"></i> Save
+                    </button>
                 </div>
             </div>
-        </div>
-    </form>
-    <div class="col-md-6">
-        <div class="box">
-            <div class="box-body">
-                <div class="form-group">
-                    <label class="control-label">Nest ID</label>
-                    <div>
-                        <input type="text" readonly class="form-control" value="{{ $nest->id }}" />
-                        <p class="text-muted small">A unique ID used for identification of this nest internally and through the API.</p>
-                    </div>
+        </form>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Information</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Nest ID</label>
+                    <input type="text" readonly class="form-control" value="{{ $nest->id }}" />
                 </div>
-                <div class="form-group">
-                    <label class="control-label">Author</label>
-                    <div>
-                        <input type="text" readonly class="form-control" value="{{ $nest->author }}" />
-                        <p class="text-muted small">The author of this service option. Please direct questions and issues to them unless this is an official option authored by <code>support@pterodactyl.io</code>.</p>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">Author</label>
+                    <input type="text" readonly class="form-control" value="{{ $nest->author }}" />
+                    <span class="form-hint">The author of this nest. Direct questions and issues to them unless authored by <code>support@realmctl.com</code>.</span>
                 </div>
-                <div class="form-group">
-                    <label class="control-label">UUID</label>
-                    <div>
-                        <input type="text" readonly class="form-control" value="{{ $nest->uuid }}" />
-                        <p class="text-muted small">A UUID that all servers using this option are assigned for identification purposes.</p>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">UUID</label>
+                    <input type="text" readonly class="form-control" value="{{ $nest->uuid }}" />
                 </div>
             </div>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-12">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Nest Eggs</h3>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Nest Eggs</h3>
+                <div class="card-actions">
+                    <a href="{{ route('admin.nests.egg.new') }}" class="btn btn-primary">
+                        <i class="ti ti-plus me-1"></i> New Egg
+                    </a>
+                </div>
             </div>
-            <div class="box-body table-responsive no-padding">
-                <table class="table table-hover">
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th class="text-center">Servers</th>
-                        <th class="text-center"></th>
-                    </tr>
-                    @foreach($nest->eggs as $egg)
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
                         <tr>
-                            <td class="align-middle"><code>{{ $egg->id }}</code></td>
-                            <td class="align-middle"><a href="{{ route('admin.nests.egg.view', $egg->id) }}" data-toggle="tooltip" data-placement="right" title="{{ $egg->author }}">{{ $egg->name }}</a></td>
-                            <td class="col-xs-8 align-middle">{{ $egg->description }}</td>
-                            <td class="text-center align-middle"><code>{{ $egg->servers->count() }}</code></td>
-                            <td class="align-middle">
-                                <a href="{{ route('admin.nests.egg.export', ['egg' => $egg->id]) }}"><i class="fa fa-download"></i></a>
-                            </td>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th class="text-center">Servers</th>
+                            <th class="w-1"></th>
                         </tr>
-                    @endforeach
+                    </thead>
+                    <tbody>
+                        @foreach($nest->eggs as $egg)
+                            <tr>
+                                <td><code>{{ $egg->id }}</code></td>
+                                <td><a href="{{ route('admin.nests.egg.view', $egg->id) }}">{{ $egg->name }}</a></td>
+                                <td class="text-secondary">{{ $egg->description }}</td>
+                                <td class="text-center">{{ $egg->servers->count() }}</td>
+                                <td>
+                                    <a href="{{ route('admin.nests.egg.export', ['egg' => $egg->id]) }}" class="btn btn-sm btn-ghost-primary" title="Export">
+                                        <i class="ti ti-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
-            <div class="box-footer">
-                <a href="{{ route('admin.nests.egg.new') }}"><button class="btn btn-success btn-sm pull-right">New Egg</button></a>
-            </div>
         </div>
     </div>
 </div>
-@endsection
-
-@section('footer-scripts')
-    @parent
-    <script>
-        $('#deleteButton').on('mouseenter', function (event) {
-            $(this).find('i').html(' Delete Nest');
-        }).on('mouseleave', function (event) {
-            $(this).find('i').html('');
-        });
-    </script>
 @endsection
