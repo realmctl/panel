@@ -1,5 +1,5 @@
 import TransferListener from '@/components/server/TransferListener';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import NavigationBar from '@/components/NavigationBar';
 import TransitionRouter from '@/TransitionRouter';
@@ -16,11 +16,85 @@ import PageHeader from '@/components/elements/PageHeader';
 import InstallListener from '@/components/server/InstallListener';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLinkAlt, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from 'react-router';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
+
+const ServerPowerHeader = () => {
+    const status = ServerContext.useStoreState((state) => state.status.value);
+    const instance = ServerContext.useStoreState((state) => state.socket.instance);
+    const [moreOpen, setMoreOpen] = useState(false);
+    const moreRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
+                setMoreOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const sendPowerAction = (action: string) => {
+        if (instance) {
+            instance.send('set state', action);
+        }
+        setMoreOpen(false);
+    };
+
+    return (
+        <div className={'flex items-center gap-2'}>
+            {status === 'running' && (
+                <button
+                    onClick={() => sendPowerAction('stop')}
+                    className={'px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md border-0 cursor-pointer transition-colors duration-150'}
+                >
+                    Shut down
+                </button>
+            )}
+            {(status === 'offline' || status === null) && (
+                <button
+                    onClick={() => sendPowerAction('start')}
+                    className={'px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md border-0 cursor-pointer transition-colors duration-150'}
+                >
+                    Start
+                </button>
+            )}
+            <div className={'relative'} ref={moreRef}>
+                <button
+                    onClick={() => setMoreOpen(!moreOpen)}
+                    className={'flex items-center justify-center w-9 h-9 text-neutral-300 hover:text-neutral-100 bg-neutral-700/50 hover:bg-neutral-700 rounded-md border-0 cursor-pointer transition-colors duration-150'}
+                >
+                    <FontAwesomeIcon icon={faEllipsisH} />
+                </button>
+                {moreOpen && (
+                    <div
+                        className={'absolute right-0 top-full mt-2 w-44 rounded-lg shadow-lg py-1 z-50 border border-[#2d3338]'}
+                        style={{ backgroundColor: '#1e2a2f' }}
+                    >
+                        <button
+                            onClick={() => sendPowerAction('restart')}
+                            disabled={status === 'offline' || status === null}
+                            className={'flex items-center w-full px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 border-0 bg-transparent cursor-pointer transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'}
+                        >
+                            Restart
+                        </button>
+                        <button
+                            onClick={() => sendPowerAction('kill')}
+                            disabled={status === 'offline' || status === null}
+                            className={'flex items-center w-full px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-neutral-700/50 border-0 bg-transparent cursor-pointer transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'}
+                        >
+                            Kill Server
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 export default () => {
     const match = useRouteMatch<{ id: string }>();
@@ -75,7 +149,7 @@ export default () => {
                 )
             ) : (
                 <>
-                    <PageHeader title={serverName || 'Server'}>
+                    <PageHeader title={serverName || 'Server'} rightActions={<ServerPowerHeader />}>
                         <CSSTransition timeout={150} classNames={'fade'} appear in>
                             <SubNavigation>
                                 <div>

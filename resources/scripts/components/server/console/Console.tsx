@@ -21,9 +21,9 @@ import 'xterm/css/xterm.css';
 import styles from './style.module.css';
 
 const theme = {
-    background: th`colors.black`.toString(),
+    background: '#192024',
     cursor: 'transparent',
-    black: th`colors.black`.toString(),
+    black: '#192024',
     red: '#E54B4B',
     green: '#9ECE58',
     yellow: '#FAED70',
@@ -48,12 +48,12 @@ const terminalProps: ITerminalOptions = {
     allowTransparency: true,
     fontSize: 12,
     fontFamily: th('fontFamily.mono'),
-    rows: 30,
+    rows: 16,
     theme: theme,
 };
 
 export default () => {
-    const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@pterodactyl~ \u001b[0m';
+    const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@realm~ \u001b[0m';
     const ref = useRef<HTMLDivElement>(null);
     const terminal = useMemo(() => new Terminal({ ...terminalProps }), []);
     const fitAddon = new FitAddon();
@@ -88,7 +88,7 @@ export default () => {
 
     const handleDaemonErrorOutput = (line: string) =>
         terminal.writeln(
-            TERMINAL_PRELUDE + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
+            '\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
         );
 
     const handlePowerChangeEvent = (state: string) =>
@@ -201,9 +201,7 @@ export default () => {
     return (
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
-            <div
-                className={classNames(styles.container, styles.overflows_container, { 'rounded-b': !canSendCommands })}
-            >
+            <div className={classNames(styles.container, styles.overflows_container)}>
                 <div className={'h-full'}>
                     <div id={styles.terminal} ref={ref} />
                 </div>
@@ -213,7 +211,7 @@ export default () => {
                     <input
                         className={classNames('peer', styles.command_input)}
                         type={'text'}
-                        placeholder={'Type a command...'}
+                        placeholder={'Enter a command...'}
                         aria-label={'Console command input.'}
                         disabled={!instance || !connected}
                         onKeyDown={handleCommandKeyDown}
@@ -226,7 +224,7 @@ export default () => {
                             styles.command_icon
                         )}
                     >
-                        <ChevronDoubleRightIcon className={'w-4 h-4'} />
+                        <span className={'font-mono text-sm font-bold'}>$</span>
                     </div>
                 </div>
             )}

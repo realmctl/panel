@@ -19,19 +19,18 @@
 }
 
 .terminal {
-    @apply flex flex-col w-full;
+    @apply flex flex-col w-full h-full;
 
     & .overflows_container {
-        @apply -ml-4 sm:ml-0;
-        width: calc(100% + 2rem);
-
-        @screen sm {
-            @apply w-full;
-        }
+        @apply sm:ml-0;
+        width: 100%;
     }
 
     & > .container {
-        @apply rounded-t p-1 sm:p-2 bg-black min-h-[16rem] flex-1 font-mono text-sm;
+        @apply p-2 font-mono text-sm flex-1;
+        background-color: #192024;
+        min-height: 200px;
+        overflow: hidden;
 
         & #terminal {
             @apply h-full;
@@ -41,20 +40,30 @@
             }
 
             &::-webkit-scrollbar-thumb {
-                @apply bg-gray-900;
+                background-color: #2d3338;
             }
         }
     }
 
     & .command_icon {
         @apply flex items-center top-0 left-0 absolute z-10 select-none h-full px-3 transition-colors duration-100;
+        color: #6b7280;
     }
 
     & .command_input {
-        @apply relative bg-gray-900 px-2 text-gray-100 pl-10 pr-4 py-2 w-full font-mono text-sm sm:rounded-b;
+        @apply relative px-2 text-gray-100 pl-10 pr-4 py-3 w-full font-mono text-sm;
         @apply focus:ring-0 outline-none focus-visible:outline-none;
-        @apply border-0 border-b-2 border-transparent transition-colors duration-100;
-        @apply active:border-cyan-500 focus:border-cyan-500;
+        @apply border-0 border-t transition-colors duration-100;
+        border-color: #2d3338;
+        background-color: #192024;
+
+        &:focus {
+            border-color: #3b82f6;
+        }
+
+        &::placeholder {
+            color: #4b5563;
+        }
     }
 }
 
