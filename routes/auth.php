@@ -59,6 +59,7 @@ Route::fallback([Auth\LoginController::class, 'index']);
 |--------------------------------------------------------------------------
 */
 Route::get('/oauth/complete', [Auth\LoginController::class, 'index'])->name('auth.oauth.complete');
+Route::get('/oauth/complete/status', [Auth\OAuthController::class, 'completionStatus']);
 Route::post('/oauth/complete', [Auth\OAuthController::class, 'completeRegistration']);
 Route::get('/oauth/{provider}', [Auth\OAuthController::class, 'redirect'])->name('auth.oauth.redirect');
 Route::get('/oauth/{provider}/callback', [Auth\OAuthController::class, 'callback'])->name('auth.oauth.callback');

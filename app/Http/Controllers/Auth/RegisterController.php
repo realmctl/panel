@@ -4,13 +4,16 @@ namespace Pterodactyl\Http\Controllers\Auth;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Models\User;
+use Pterodactyl\Services\Users\UserCreationService;
 
 class RegisterController extends Controller
 {
+    public function __construct(
+        private UserCreationService $creationService,
+    ) {
+    }
+
     /**
      * Handle a registration request.
      */
@@ -28,11 +31,10 @@ class RegisterController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
-            'uuid' => Str::uuid()->toString(),
+        $this->creationService->handle([
             'email' => $request->input('email'),
             'username' => $request->input('username'),
-            'password' => Hash::make($request->input('password')),
+            'password' => $request->input('password'),
             'name_first' => $request->input('name_first'),
             'name_last' => $request->input('name_last'),
         ]);

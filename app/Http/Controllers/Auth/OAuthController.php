@@ -6,15 +6,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\User;
+use Pterodactyl\Services\Users\UserCreationService;
 
 class OAuthController extends Controller
 {
     private const SUPPORTED_PROVIDERS = ['google', 'discord', 'github'];
+
+    public function __construct(
+        private UserCreationService $creationService,
+    ) {
+    }
 
     /**
      * Redirect the user to the OAuth provider.
@@ -25,7 +29,6 @@ class OAuthController extends Controller
             return redirect('/auth/login');
         }
 
-        // Store whether this is a registration attempt
         if ($request->has('register')) {
             session(['oauth_register' => true]);
         }
@@ -58,17 +61,12 @@ class OAuthController extends Controller
         $user = User::where('email', $oauthUser->getEmail())->first();
 
         if ($user) {
-            // Existing user — log them in
             Auth::login($user, true);
 
             return redirect('/');
         }
 
         // No existing user — check if registration is enabled
-        if (!$isRegister && !config('pterodactyl.auth.registration_enabled', false)) {
-            return redirect('/auth/login');
-        }
-
         if (!config('pterodactyl.auth.registration_enabled', false)) {
             return redirect('/auth/login');
         }
@@ -81,23 +79,22 @@ class OAuthController extends Controller
         $nickname = $oauthUser->getNickname();
         $email = $oauthUser->getEmail();
 
-        // Must have an email at minimum
         if (!$email) {
             return redirect('/auth/login');
         }
 
-        // If provider gives a usable username, create account directly
-        if ($firstName && $nickname) {
-            $username = preg_replace('/[^a-zA-Z0-9_.-]/', '_', $nickname);
-            if (User::where('username', $username)->exists()) {
-                $username = $username . '_' . Str::random(4);
-            }
+        // Determine what's missing
+        $needsUsername = empty($nickname) || User::where('username', preg_replace('/[^a-zA-Z0-9_.-]/', '_', $nickname))->exists();
+        $needsName = empty($firstName);
 
-            $user = User::create([
-                'uuid' => Str::uuid()->toString(),
+        // If nothing is missing, create account directly
+        if (!$needsUsername && !$needsName) {
+            $username = preg_replace('/[^a-zA-Z0-9_.-]/', '_', $nickname);
+
+            $user = $this->creationService->handle([
                 'email' => $email,
                 'username' => $username,
-                'password' => Hash::make(Str::random(32)),
+                'password' => str_random(32),
                 'name_first' => $firstName,
                 'name_last' => $lastName ?: $firstName,
             ]);
@@ -107,12 +104,15 @@ class OAuthController extends Controller
             return redirect('/');
         }
 
-        // Missing required fields — redirect to completion page
+        // Store what we have and what's missing
         session([
             'oauth_pending' => [
                 'email' => $email,
                 'name_first' => $firstName,
                 'name_last' => $lastName,
+                'username' => !$needsUsername ? preg_replace('/[^a-zA-Z0-9_.-]/', '_', $nickname) : '',
+                'needs_username' => $needsUsername,
+                'needs_name' => $needsName,
                 'provider' => $provider,
             ],
         ]);
@@ -130,23 +130,47 @@ class OAuthController extends Controller
             return response()->json(['error' => 'No pending OAuth registration.'], 403);
         }
 
-        $request->validate([
-            'username' => 'required|string|min:3|max:32|unique:users,username|regex:/^[a-zA-Z0-9_.-]+$/',
-        ]);
+        $rules = [];
+        if ($pending['needs_username'] ?? true) {
+            $rules['username'] = 'required|string|min:3|max:32|unique:users,username|regex:/^[a-zA-Z0-9_.-]+$/';
+        }
+        if ($pending['needs_name'] ?? false) {
+            $rules['name_first'] = 'required|string|min:1|max:191';
+            $rules['name_last'] = 'required|string|min:1|max:191';
+        }
 
-        $user = User::create([
-            'uuid' => Str::uuid()->toString(),
+        $request->validate($rules);
+
+        $user = $this->creationService->handle([
             'email' => $pending['email'],
-            'username' => $request->input('username'),
-            'password' => Hash::make(Str::random(32)),
-            'name_first' => $pending['name_first'] ?: 'User',
-            'name_last' => $pending['name_last'] ?: 'User',
+            'username' => $request->input('username', $pending['username'] ?? ''),
+            'password' => str_random(32),
+            'name_first' => $request->input('name_first', $pending['name_first']) ?: 'User',
+            'name_last' => $request->input('name_last', $pending['name_last']) ?: 'User',
         ]);
 
         session()->forget('oauth_pending');
         Auth::login($user, true);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Return what fields are needed for completion.
+     */
+    public function completionStatus(Request $request): JsonResponse
+    {
+        $pending = session('oauth_pending');
+        if (!$pending) {
+            return response()->json(['error' => 'No pending OAuth registration.'], 403);
+        }
+
+        return response()->json([
+            'needs_username' => $pending['needs_username'] ?? true,
+            'needs_name' => $pending['needs_name'] ?? false,
+            'email' => $pending['email'] ?? '',
+            'provider' => $pending['provider'] ?? '',
+        ]);
     }
 
     /**
