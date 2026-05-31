@@ -95,6 +95,21 @@
                                 <span class="form-hint">A description of this Egg that will be displayed throughout the Panel as needed.</span>
                             </div>
                             <div class="mb-3">
+                                <label for="pBackground" class="form-label">Card Background</label>
+                                <select id="pBackground" name="background" class="form-select">
+                                    <option value="">Auto-detect (based on egg name)</option>
+                                    <option value="minecraft.png" {{ $egg->background === 'minecraft.png' ? 'selected' : '' }}>Minecraft</option>
+                                    <option value="rust.jpg" {{ $egg->background === 'rust.jpg' ? 'selected' : '' }}>Rust</option>
+                                    <option value="valheim.jpeg" {{ $egg->background === 'valheim.jpeg' ? 'selected' : '' }}>Valheim</option>
+                                    <option value="ark.webp" {{ $egg->background === 'ark.webp' ? 'selected' : '' }}>ARK</option>
+                                    <option value="terraria.jpg" {{ $egg->background === 'terraria.jpg' ? 'selected' : '' }}>Terraria</option>
+                                    <option value="csgo.jpg" {{ $egg->background === 'csgo.jpg' ? 'selected' : '' }}>CS2 / CS:GO</option>
+                                    <option value="gmod.jpeg" {{ $egg->background === 'gmod.jpeg' ? 'selected' : '' }}>Garry's Mod</option>
+                                    <option value="fivem.jpeg" {{ $egg->background === 'fivem.jpeg' ? 'selected' : '' }}>FiveM</option>
+                                </select>
+                                <span class="form-hint">The background image shown on server cards in the client panel. Leave as auto-detect to determine based on the egg name.</span>
+                            </div>
+                            <div class="mb-3">
                                 <label for="pStartup" class="form-label">Startup Command <span class="field-required"></span></label>
                                 <textarea id="pStartup" name="startup" class="form-control" rows="8">{{ $egg->startup }}</textarea>
                                 <span class="form-hint">The default startup command that should be used for new servers using this Egg.</span>

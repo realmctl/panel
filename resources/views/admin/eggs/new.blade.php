@@ -39,6 +39,21 @@
                                 <span class="form-hint">A description of this Egg.</span>
                             </div>
                             <div class="mb-3">
+                                <label for="pBackground" class="form-label">Card Background</label>
+                                <select id="pBackground" name="background" class="form-select">
+                                    <option value="">Auto-detect (based on egg name)</option>
+                                    <option value="minecraft.png" {{ old('background') === 'minecraft.png' ? 'selected' : '' }}>Minecraft</option>
+                                    <option value="rust.jpg" {{ old('background') === 'rust.jpg' ? 'selected' : '' }}>Rust</option>
+                                    <option value="valheim.jpeg" {{ old('background') === 'valheim.jpeg' ? 'selected' : '' }}>Valheim</option>
+                                    <option value="ark.webp" {{ old('background') === 'ark.webp' ? 'selected' : '' }}>ARK</option>
+                                    <option value="terraria.jpg" {{ old('background') === 'terraria.jpg' ? 'selected' : '' }}>Terraria</option>
+                                    <option value="csgo.jpg" {{ old('background') === 'csgo.jpg' ? 'selected' : '' }}>CS2 / CS:GO</option>
+                                    <option value="gmod.jpeg" {{ old('background') === 'gmod.jpeg' ? 'selected' : '' }}>Garry's Mod</option>
+                                    <option value="fivem.jpeg" {{ old('background') === 'fivem.jpeg' ? 'selected' : '' }}>FiveM</option>
+                                </select>
+                                <span class="form-hint">The background image shown on server cards in the client panel.</span>
+                            </div>
+                            <div class="mb-3">
                                 <div class="form-check">
                                     <input id="pForceOutgoingIp" name="force_outgoing_ip" type="checkbox" class="form-check-input" value="1" {{ \Pterodactyl\Helpers\Utilities::checked('force_outgoing_ip', 0) }} />
                                     <label for="pForceOutgoingIp" class="form-check-label fw-bold">Force Outgoing IP</label>

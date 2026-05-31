@@ -93,6 +93,7 @@ class Egg extends Model implements Identifiable
     protected $fillable = [
         'name',
         'description',
+        'background',
         'features',
         'docker_images',
         'force_outgoing_ip',
@@ -129,6 +130,7 @@ class Egg extends Model implements Identifiable
         'uuid' => 'required|string|size:36',
         'name' => 'required|string|max:191',
         'description' => 'string|nullable',
+        'background' => 'string|nullable|max:191',
         'features' => 'array|nullable',
         'author' => 'required|string|email',
         'file_denylist' => 'array|nullable',

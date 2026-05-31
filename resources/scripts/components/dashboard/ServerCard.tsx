@@ -7,53 +7,42 @@ import Spinner from '@/components/elements/Spinner';
 
 type Timer = ReturnType<typeof setInterval>;
 
-// Map server type keywords to background images
+// Map egg name to background image
 const getServerBackground = (server: Server): string => {
-    const image = server.dockerImage.toLowerCase();
-    const name = server.name.toLowerCase();
-    const features = server.eggFeatures.map((f) => f.toLowerCase());
+    // Use the egg's configured background if set
+    if (server.eggBackground) {
+        return `/assets/backgrounds/${server.eggBackground}`;
+    }
 
-    if (image.includes('minecraft') || name.includes('minecraft') || features.includes('minecraft')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/minecraft.jpg';
-    }
-    if (image.includes('rust') || name.includes('rust') || features.includes('rust')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/rust.jpg';
-    }
-    if (image.includes('valheim') || name.includes('valheim') || features.includes('valheim')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/valheim.jpg';
-    }
-    if (image.includes('ark') || name.includes('ark') || features.includes('ark')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/ark.jpg';
-    }
-    if (image.includes('terraria') || name.includes('terraria') || features.includes('terraria')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/terraria.jpg';
-    }
-    if (image.includes('csgo') || image.includes('cs2') || name.includes('csgo') || name.includes('cs2') || features.includes('csgo')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/csgo.jpg';
-    }
-    if (image.includes('gmod') || image.includes('garrysmod') || name.includes('gmod') || features.includes('gmod')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/gmod.jpg';
-    }
-    if (image.includes('fivem') || name.includes('fivem') || features.includes('fivem')) {
-        return 'https://cdn.ordnary.com/realmctl/backgrounds/fivem.jpg';
-    }
-    // Default fallback
-    return 'https://cdn.ordnary.com/realmctl/backgrounds/default.jpg';
+    // Fallback: detect from egg name
+    const egg = server.eggName.toLowerCase();
+
+    if (egg.includes('minecraft')) return '/assets/backgrounds/minecraft.png';
+    if (egg.includes('rust')) return '/assets/backgrounds/rust.jpg';
+    if (egg.includes('valheim')) return '/assets/backgrounds/valheim.jpeg';
+    if (egg.includes('ark')) return '/assets/backgrounds/ark.webp';
+    if (egg.includes('terraria')) return '/assets/backgrounds/terraria.jpg';
+    if (egg.includes('csgo') || egg.includes('cs2') || egg.includes('counter-strike') || egg.includes('counter strike')) return '/assets/backgrounds/csgo.jpg';
+    if (egg.includes('gmod') || egg.includes('garry')) return '/assets/backgrounds/gmod.jpeg';
+    if (egg.includes('fivem')) return '/assets/backgrounds/fivem.jpeg';
+
+    // Fallback: check docker image
+    const image = server.dockerImage.toLowerCase();
+    if (image.includes('minecraft')) return '/assets/backgrounds/minecraft.png';
+    if (image.includes('rust')) return '/assets/backgrounds/rust.jpg';
+    if (image.includes('valheim')) return '/assets/backgrounds/valheim.jpeg';
+    if (image.includes('ark')) return '/assets/backgrounds/ark.webp';
+    if (image.includes('terraria')) return '/assets/backgrounds/terraria.jpg';
+    if (image.includes('csgo') || image.includes('cs2')) return '/assets/backgrounds/csgo.jpg';
+    if (image.includes('gmod')) return '/assets/backgrounds/gmod.jpeg';
+    if (image.includes('fivem')) return '/assets/backgrounds/fivem.jpeg';
+
+    return '/assets/backgrounds/minecraft.png';
 };
 
 const getServerType = (server: Server): string => {
-    const image = server.dockerImage.toLowerCase();
-    const name = server.name.toLowerCase();
-    const features = server.eggFeatures.map((f) => f.toLowerCase());
-
-    if (image.includes('minecraft') || name.includes('minecraft') || features.includes('minecraft')) return 'Minecraft Server';
-    if (image.includes('rust') || name.includes('rust') || features.includes('rust')) return 'Rust Server';
-    if (image.includes('valheim') || name.includes('valheim') || features.includes('valheim')) return 'Valheim Server';
-    if (image.includes('ark') || name.includes('ark') || features.includes('ark')) return 'ARK Server';
-    if (image.includes('terraria') || name.includes('terraria') || features.includes('terraria')) return 'Terraria Server';
-    if (image.includes('csgo') || image.includes('cs2') || name.includes('csgo') || name.includes('cs2')) return 'CS2 Server';
-    if (image.includes('gmod') || image.includes('garrysmod') || name.includes('gmod')) return 'GMod Server';
-    if (image.includes('fivem') || name.includes('fivem') || features.includes('fivem')) return 'FiveM Server';
+    // Use the egg name directly as the server type
+    if (server.eggName) return server.eggName;
     return 'Game Server';
 };
 
