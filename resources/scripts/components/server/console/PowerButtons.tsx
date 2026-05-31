@@ -53,6 +53,7 @@ export default ({ className }: PowerButtonProps) => {
                     className={'flex-1'}
                     disabled={status !== 'offline'}
                     onClick={onButtonClick.bind(this, 'start')}
+                    style={status !== 'offline' ? { display: 'none' } : undefined}
                 >
                     Start
                 </Button>
