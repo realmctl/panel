@@ -1,9 +1,22 @@
 const path = require('node:path');
+const fs = require('node:fs');
 const webpack = require('webpack');
 const { WebpackAssetsManifest } = require('webpack-assets-manifest');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+// Read .env file to get MOCK_SERVERS and other custom vars
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split('\n').forEach((line) => {
+        const match = line.match(/^([^#=]+)=(.*)$/);
+        if (match && !process.env[match[1].trim()]) {
+            process.env[match[1].trim()] = match[2].trim().replace(/^["']|["']$/g, '');
+        }
+    });
+}
 
 module.exports = {
     cache: true,
@@ -107,6 +120,7 @@ module.exports = {
             NODE_ENV: process.env.NODE_ENV || 'development',
             DEBUG: process.env.NODE_ENV !== 'production',
             WEBPACK_BUILD_HASH: Date.now().toString(16),
+            MOCK_SERVERS: process.env.MOCK_SERVERS || 'false',
         }),
         new WebpackAssetsManifest({
             output: 'manifest.json',

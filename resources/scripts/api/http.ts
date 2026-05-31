@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { store } from '@/state';
+import { enableMockServers } from '@/api/mock';
 
 const http: AxiosInstance = axios.create({
     withCredentials: true,
@@ -10,6 +11,11 @@ const http: AxiosInstance = axios.create({
         'Content-Type': 'application/json',
     },
 });
+
+// Enable mock servers for UI development (set MOCK_SERVERS=true in .env)
+if (process.env.MOCK_SERVERS === 'true') {
+    enableMockServers(http);
+}
 
 http.interceptors.request.use((req) => {
     if (!req.url?.endsWith('/resources')) {

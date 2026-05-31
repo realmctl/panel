@@ -7,7 +7,6 @@ import PageContentBlock from '@/components/elements/PageContentBlock';
 import useFlash from '@/plugins/useFlash';
 import { useStoreState } from 'easy-peasy';
 import { usePersistedState } from '@/plugins/usePersistedState';
-import Switch from '@/components/elements/Switch';
 import tw from 'twin.macro';
 import useSWR from 'swr';
 import { PaginatedResult } from '@/api/http';
@@ -55,15 +54,27 @@ export default () => {
     return (
         <PageContentBlock title={'Dashboard'} showFlashKey={'dashboard'}>
             {rootAdmin && (
-                <div css={tw`mb-2 flex justify-end items-center`}>
-                    <p css={tw`uppercase text-xs text-neutral-400 mr-2`}>
-                        {showOnlyAdmin ? "Showing others' servers" : 'Showing your servers'}
-                    </p>
-                    <Switch
-                        name={'show_all_servers'}
-                        defaultChecked={showOnlyAdmin}
-                        onChange={() => setShowOnlyAdmin((s) => !s)}
-                    />
+                <div className={'mb-4 flex justify-end items-center'}>
+                    <div
+                        className={'flex items-center gap-2 px-3 py-1.5 rounded-md border border-[#2d3338]/50 cursor-pointer select-none transition-colors duration-150 hover:border-[#3d4348]'}
+                        style={{ backgroundColor: '#192024' }}
+                        onClick={() => setShowOnlyAdmin((s) => !s)}
+                    >
+                        <span className={'text-xs text-neutral-400'}>
+                            {showOnlyAdmin ? "Others' servers" : 'Your servers'}
+                        </span>
+                        <div
+                            className={`relative w-8 h-4 rounded-full transition-colors duration-200 ${
+                                showOnlyAdmin ? 'bg-blue-500' : 'bg-neutral-600'
+                            }`}
+                        >
+                            <div
+                                className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform duration-200 ${
+                                    showOnlyAdmin ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                            />
+                        </div>
+                    </div>
                 </div>
             )}
             {!servers ? (

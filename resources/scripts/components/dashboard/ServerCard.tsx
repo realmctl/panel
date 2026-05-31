@@ -113,55 +113,63 @@ export default ({ server }: { server: Server }) => {
     const diskDisplay = stats ? bytesToString(stats.diskUsageInBytes) : '--';
 
     return (
-        <div className={'relative rounded-md overflow-hidden border border-[#2d3338]/50 group'} style={{ backgroundColor: '#192024' }}>
-            {/* Background image */}
-            <div
-                className={'absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300'}
-                style={{ backgroundImage: `url(${backgroundImage})` }}
-            />
+        <div className={'rounded-md overflow-hidden border border-[#2d3338]/50 group'} style={{ backgroundColor: '#192024' }}>
+            {/* Banner image that covers the top half and fades into card */}
+            <div className={'relative overflow-hidden'}>
+                {/* Image covers full width, extends behind the content */}
+                <div
+                    className={'absolute inset-0 bg-cover bg-center'}
+                    style={{ backgroundImage: `url(${backgroundImage})`, height: '160px' }}
+                />
+                {/* Gradient: transparent at top, fades to card color */}
+                <div
+                    className={'absolute inset-0 pointer-events-none'}
+                    style={{ height: '160px', background: 'linear-gradient(to bottom, rgba(25, 32, 36, 0.1) 0%, rgba(25, 32, 36, 0.4) 35%, rgba(25, 32, 36, 0.85) 65%, rgba(25, 32, 36, 1) 100%)' }}
+                />
 
-            {/* Content */}
-            <div className={'relative p-5'}>
-                {/* Header: Name + Status */}
-                <div className={'flex items-start justify-between mb-3'}>
-                    <div>
-                        <h3 className={'text-white text-lg font-semibold m-0'}>{server.name}</h3>
-                        <p className={'text-neutral-400 text-sm m-0 mt-0.5'}>{serverType}</p>
+                {/* Content overlaid on the image/gradient */}
+                <div className={'relative px-5 pt-5 pb-5'}>
+                    {/* Header: Name + Status */}
+                    <div className={'flex items-start justify-between mb-6'}>
+                        <div>
+                            <h3 className={'text-white text-lg font-semibold m-0'}>{server.name}</h3>
+                            <p className={'text-neutral-300 text-sm m-0 mt-0.5'}>{serverType}</p>
+                        </div>
+                        <StatusBadge status={currentStatus} />
                     </div>
-                    <StatusBadge status={currentStatus} />
+
+                    {/* Stats */}
+                    <div className={'grid grid-cols-2 gap-x-4 gap-y-2 mb-4'}>
+                        <div>
+                            <span className={'text-neutral-400 text-xs'}>IP: </span>
+                            <span className={'text-neutral-100 text-xs font-medium'}>{address}</span>
+                        </div>
+                        <div>
+                            <span className={'text-neutral-400 text-xs'}>CPU: </span>
+                            <span className={'text-neutral-100 text-xs font-medium'}>{cpuDisplay}</span>
+                        </div>
+                        <div>
+                            <span className={'text-neutral-400 text-xs'}>RAM: </span>
+                            <span className={'text-neutral-100 text-xs font-medium'}>{memoryDisplay}</span>
+                        </div>
+                        <div>
+                            <span className={'text-neutral-400 text-xs'}>Storage: </span>
+                            <span className={'text-neutral-100 text-xs font-medium'}>{diskDisplay}</span>
+                        </div>
+                    </div>
+
+                    {/* Manage button */}
+                    <Link
+                        to={`/server/${server.id}`}
+                        className={`block w-full text-center py-2.5 rounded-md text-sm font-medium no-underline transition-all duration-150 border ${
+                            isSuspended
+                                ? 'bg-red-500/20 hover:bg-red-500/40 text-red-200 border-red-500/30'
+                                : 'bg-[#1e2a30] hover:bg-[#243238] text-neutral-200 border-[#2d3338]'
+                        }`}
+                    >
+                        {isSuspended ? 'Suspended' : 'Manage server'}
+                    </Link>
                 </div>
-
-                {/* Stats */}
-                <div className={'grid grid-cols-2 gap-x-4 gap-y-2 mt-4 mb-4'}>
-                    <div>
-                        <span className={'text-neutral-400 text-xs'}>IP: </span>
-                        <span className={'text-neutral-200 text-xs'}>{address}</span>
-                    </div>
-                    <div>
-                        <span className={'text-neutral-400 text-xs'}>CPU: </span>
-                        <span className={'text-neutral-200 text-xs'}>{cpuDisplay}</span>
-                    </div>
-                    <div>
-                        <span className={'text-neutral-400 text-xs'}>RAM: </span>
-                        <span className={'text-neutral-200 text-xs'}>{memoryDisplay}</span>
-                    </div>
-                    <div>
-                        <span className={'text-neutral-400 text-xs'}>Storage: </span>
-                        <span className={'text-neutral-200 text-xs'}>{diskDisplay}</span>
-                    </div>
-                </div>
-
-                {/* Manage button */}
-                <Link
-                    to={`/server/${server.id}`}
-                    className={`block w-full text-center py-2.5 rounded-md text-sm font-medium no-underline transition-all duration-150 ${
-                        isSuspended
-                            ? 'bg-red-500/80 hover:bg-red-500 text-white'
-                            : 'bg-blue-500/80 hover:bg-blue-500 text-white'
-                    }`}
-                >
-                    {isSuspended ? 'Suspended' : 'Manage Server'}
-                </Link>
             </div>
         </div>
     );
