@@ -11,6 +11,16 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link{{ $activeTab === 'security' ? ' active' : '' }}" href="{{ route('admin.settings.security') }}">
+                <i class="ti ti-shield me-1"></i> Security
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ $activeTab === 'oauth' ? ' active' : '' }}" href="{{ route('admin.settings.oauth') }}">
+                <i class="ti ti-key me-1"></i> OAuth
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link{{ $activeTab === 'advanced' ? ' active' : '' }}" href="{{ route('admin.settings.advanced') }}">
                 <i class="ti ti-tool me-1"></i> Advanced
             </a>

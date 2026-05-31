@@ -6,8 +6,7 @@
 @endsection
 
 @section('content-header')
-    <h2 class="page-title">Settings</h2>
-    <p class="text-secondary">Configure how the panel should handle sending emails.</p>
+    <h2 class="page-title">Mail Settings</h2>
 @endsection
 
 @section('admin-content')

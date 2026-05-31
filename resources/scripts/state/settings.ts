@@ -13,6 +13,12 @@ export interface SiteSettings {
         siteKey: string;
     };
     captcha: CaptchaSettings;
+    oauth: {
+        google: boolean;
+        discord: boolean;
+        github: boolean;
+    };
+    registration: boolean;
 }
 
 export interface SettingsStore {

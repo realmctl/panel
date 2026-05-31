@@ -42,6 +42,7 @@ return [
             'window' => env('APP_2FA_WINDOW', 4),
             'verify_newer' => true,
         ],
+        'registration_enabled' => (bool) env('APP_REGISTRATION_ENABLED', false),
     ],
 
     /*

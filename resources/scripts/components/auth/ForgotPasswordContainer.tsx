@@ -9,6 +9,7 @@ import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import AuthToast from '@/components/auth/AuthToast';
+import AuthFooter from '@/components/auth/AuthFooter';
 
 interface Values {
     email: string;
@@ -206,6 +207,8 @@ export default () => {
                     </Link>
                 </p>
             </div>
+
+            <AuthFooter />
         </div>
     );
 };

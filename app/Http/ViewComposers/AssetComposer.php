@@ -37,6 +37,12 @@ class AssetComposer
                     default => '',
                 },
             ],
+            'oauth' => [
+                'google' => (bool) config('oauth.google.enabled', false),
+                'discord' => (bool) config('oauth.discord.enabled', false),
+                'github' => (bool) config('oauth.github.enabled', false),
+            ],
+            'registration' => (bool) config('pterodactyl.auth.registration_enabled', false),
         ]);
     }
 }

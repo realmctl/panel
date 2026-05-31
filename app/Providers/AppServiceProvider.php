@@ -76,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
         // is configured to allow it.
         if (!config('pterodactyl.load_environment_only', false) && $this->app->environment() !== 'testing') {
             $this->app->register(SettingsServiceProvider::class);
+            $this->app->register(OAuthServiceProvider::class);
         }
 
         $this->app->singleton('extensions.themes', function () {

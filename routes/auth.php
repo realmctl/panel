@@ -15,6 +15,7 @@ use Pterodactyl\Http\Controllers\Auth;
 // These routes are defined so that we can continue to reference them programmatically.
 // They all route to the same controller function which passes off to React.
 Route::get('/login', [Auth\LoginController::class, 'index'])->name('auth.login');
+Route::get('/register', [Auth\LoginController::class, 'index'])->name('auth.register');
 Route::get('/password', [Auth\LoginController::class, 'index'])->name('auth.forgot-password');
 Route::get('/password/reset/{token}', [Auth\LoginController::class, 'index'])->name('auth.reset');
 
@@ -26,6 +27,9 @@ Route::middleware(['throttle:authentication'])->group(function () {
     // Login endpoints.
     Route::post('/login', [Auth\LoginController::class, 'login'])->middleware('recaptcha');
     Route::post('/login/checkpoint', Auth\LoginCheckpointController::class)->name('auth.login-checkpoint');
+
+    // Registration endpoint.
+    Route::post('/register', [Auth\RegisterController::class, 'register'])->middleware('recaptcha');
 
     // Forgot password route. A post to this endpoint will trigger an
     // email to be sent containing a reset token.
@@ -48,3 +52,13 @@ Route::post('/logout', [Auth\LoginController::class, 'logout'])
 
 // Catch any other combinations of routes and pass them off to the React component.
 Route::fallback([Auth\LoginController::class, 'index']);
+
+/*
+|--------------------------------------------------------------------------
+| OAuth Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/oauth/{provider}', [Auth\OAuthController::class, 'redirect'])->name('auth.oauth.redirect');
+Route::get('/oauth/{provider}/callback', [Auth\OAuthController::class, 'callback'])->name('auth.oauth.callback');
+Route::get('/oauth/complete', [Auth\LoginController::class, 'index'])->name('auth.oauth.complete');
+Route::post('/oauth/complete', [Auth\OAuthController::class, 'completeRegistration']);

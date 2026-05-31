@@ -44,6 +44,14 @@
                         </select>
                         <span class="form-hint">The default language to use when rendering UI components.</span>
                     </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">User Registration</label>
+                        <select class="form-select" name="pterodactyl:auth:registration_enabled">
+                            <option value="false" @if(!old('pterodactyl:auth:registration_enabled', config('pterodactyl.auth.registration_enabled'))) selected @endif>Disabled</option>
+                            <option value="true" @if(old('pterodactyl:auth:registration_enabled', config('pterodactyl.auth.registration_enabled'))) selected @endif>Enabled</option>
+                        </select>
+                        <span class="form-hint">Allow new users to create accounts from the login page.</span>
+                    </div>
                 </div>
             </div>
             <div class="card-footer text-end">

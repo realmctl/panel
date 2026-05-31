@@ -9,6 +9,7 @@ import { Formik, FormikHelpers } from 'formik';
 import { object, ref, string } from 'yup';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import AuthToast from '@/components/auth/AuthToast';
+import AuthFooter from '@/components/auth/AuthFooter';
 
 interface Values {
     password: string;
@@ -154,6 +155,8 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                     </Link>
                 </p>
             </div>
+
+            <AuthFooter />
         </div>
     );
 };

@@ -10,9 +10,9 @@ use Prologue\Alerts\AlertsMessageBag;
 use Illuminate\Contracts\Console\Kernel;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
-use Pterodactyl\Http\Requests\Admin\Settings\AdvancedSettingsFormRequest;
+use Pterodactyl\Http\Requests\Admin\Settings\OAuthSettingsFormRequest;
 
-class AdvancedController extends Controller
+class OAuthController extends Controller
 {
     public function __construct(
         private AlertsMessageBag $alert,
@@ -22,26 +22,28 @@ class AdvancedController extends Controller
     }
 
     /**
-     * Render advanced Panel settings UI.
+     * Render the OAuth settings page.
      */
     public function index(): View
     {
-        return view('admin.settings.advanced');
+        return view('admin.settings.oauth');
     }
 
     /**
+     * Update OAuth settings.
+     *
      * @throws DataValidationException
      * @throws RecordNotFoundException
      */
-    public function update(AdvancedSettingsFormRequest $request): RedirectResponse
+    public function update(OAuthSettingsFormRequest $request): RedirectResponse
     {
         foreach ($request->normalize() as $key => $value) {
             $this->settings->set('settings::' . $key, $value);
         }
 
         $this->kernel->call('queue:restart');
-        $this->alert->success('Advanced settings have been updated successfully.')->flash();
+        $this->alert->success('OAuth settings have been updated successfully.')->flash();
 
-        return redirect()->route('admin.settings.advanced');
+        return redirect()->route('admin.settings.oauth');
     }
 }

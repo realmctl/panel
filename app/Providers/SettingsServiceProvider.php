@@ -32,9 +32,19 @@ class SettingsServiceProvider extends ServiceProvider
         'pterodactyl:console:count',
         'pterodactyl:console:frequency',
         'pterodactyl:auth:2fa_required',
+        'pterodactyl:auth:registration_enabled',
         'pterodactyl:client_features:allocations:enabled',
         'pterodactyl:client_features:allocations:range_start',
         'pterodactyl:client_features:allocations:range_end',
+        'oauth:google:enabled',
+        'oauth:google:client_id',
+        'oauth:google:client_secret',
+        'oauth:discord:enabled',
+        'oauth:discord:client_id',
+        'oauth:discord:client_secret',
+        'oauth:github:enabled',
+        'oauth:github:client_id',
+        'oauth:github:client_secret',
     ];
 
     /**

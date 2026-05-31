@@ -1,0 +1,42 @@
+<?php
+
+namespace Pterodactyl\Http\Controllers\Auth;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Pterodactyl\Http\Controllers\Controller;
+use Pterodactyl\Models\User;
+
+class RegisterController extends Controller
+{
+    /**
+     * Handle a registration request.
+     */
+    public function register(Request $request): JsonResponse
+    {
+        if (!config('pterodactyl.auth.registration_enabled', false)) {
+            return response()->json(['error' => 'Registration is disabled.'], 403);
+        }
+
+        $request->validate([
+            'name_first' => 'required|string|min:1|max:191',
+            'name_last' => 'required|string|min:1|max:191',
+            'email' => 'required|email|unique:users,email',
+            'username' => 'required|string|min:3|max:32|unique:users,username|regex:/^[a-zA-Z0-9_.-]+$/',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        User::create([
+            'uuid' => Str::uuid()->toString(),
+            'email' => $request->input('email'),
+            'username' => $request->input('username'),
+            'password' => Hash::make($request->input('password')),
+            'name_first' => $request->input('name_first'),
+            'name_last' => $request->input('name_last'),
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+}

@@ -39,4 +39,28 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OAuth Providers (Socialite)
+    |--------------------------------------------------------------------------
+    */
+
+    'google' => [
+        'client_id' => env('OAUTH_GOOGLE_CLIENT_ID', ''),
+        'client_secret' => env('OAUTH_GOOGLE_CLIENT_SECRET', ''),
+        'redirect' => '/auth/oauth/google/callback',
+    ],
+
+    'discord' => [
+        'client_id' => env('OAUTH_DISCORD_CLIENT_ID', ''),
+        'client_secret' => env('OAUTH_DISCORD_CLIENT_SECRET', ''),
+        'redirect' => '/auth/oauth/discord/callback',
+    ],
+
+    'github' => [
+        'client_id' => env('OAUTH_GITHUB_CLIENT_ID', ''),
+        'client_secret' => env('OAUTH_GITHUB_CLIENT_SECRET', ''),
+        'redirect' => '/auth/oauth/github/callback',
+    ],
 ];

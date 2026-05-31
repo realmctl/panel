@@ -8,6 +8,7 @@ import useFlash from '@/plugins/useFlash';
 import { FlashStore } from '@/state/flashes';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import AuthToast from '@/components/auth/AuthToast';
+import AuthFooter from '@/components/auth/AuthFooter';
 
 interface Values {
     code: string;
@@ -89,6 +90,8 @@ const LoginCheckpointContainer = () => {
                     </Link>
                 </div>
             </div>
+
+            <AuthFooter />
         </div>
     );
 };
