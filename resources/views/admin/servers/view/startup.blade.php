@@ -11,7 +11,7 @@
 @section('admin-content')
 @include('admin.servers.partials.navigation')
 <form action="{{ route('admin.servers.view.startup', $server->id) }}" method="POST">
-    <div class="row">
+    <div class="row row-cards">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
@@ -35,7 +35,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row row-cards">
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
