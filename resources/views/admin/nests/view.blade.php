@@ -13,7 +13,7 @@
     </ol>
 @endsection
 
-@section('content')
+@section('admin-content')
 <div class="row">
     <form action="{{ route('admin.nests.view', $nest->id) }}" method="POST">
         <div class="col-md-6">

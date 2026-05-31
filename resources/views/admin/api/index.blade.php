@@ -5,70 +5,83 @@
 @endsection
 
 @section('content-header')
-    <h1>Application API<small>Control access credentials for managing this Panel via the API.</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li class="active">Application API</li>
-    </ol>
+    <h2 class="page-title">Application API</h2>
 @endsection
 
-@section('content')
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="box box-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Credentials List</h3>
-                    <div class="box-tools">
-                        <a href="{{ route('admin.api.new') }}" class="btn btn-sm btn-primary">Create New</a>
-                    </div>
-                </div>
-                <div class="box-body table-responsive no-padding">
-                    <table class="table table-hover">
+@section('admin-content')
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">API Credentials</h3>
+            <div class="card-actions">
+                <a href="{{ route('admin.api.new') }}" class="btn btn-primary">
+                    <i class="ti ti-plus me-1"></i> Create New
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Memo</th>
+                        <th>Last Used</th>
+                        <th>Created</th>
+                        <th>Created by</th>
+                        <th class="w-1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($keys as $key)
                         <tr>
-                            <th>Key</th>
-                            <th>Memo</th>
-                            <th>Last Used</th>
-                            <th>Created</th>
-                            <th>Created by</th>
-                            <th></th>
-                        </tr>
-                        @foreach($keys as $key)
-                            <tr>
-                                <td><code>
+                            <td>
+                                <code>
                                     @if (Auth::user()->is($key->user))
                                         {{ $key->identifier . decrypt($key->token) }}
                                     @else
                                         {{ $key->identifier . '****' }}
                                     @endif
-                                </code></td>
-                                <td>{{ $key->memo }}</td>
-                                <td>
-                                    @if(!is_null($key->last_used_at))
-                                        @datetimeHuman($key->last_used_at)
-                                    @else
-                                        &mdash;
-                                    @endif
-                                </td>
-                                <td>@datetimeHuman($key->created_at)</td>
-                                <td>
-                                    <a href="{{ route('admin.users.view', $key->user->id) }}">{{ $key->user->username }}</a>
-                                </td>
-                                <td>
-                                    <a href="#" data-action="revoke-key" data-attr="{{ $key->identifier }}">
-                                        <i class="fa fa-trash-o text-danger"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </table>
+                                </code>
+                            </td>
+                            <td>{{ $key->memo }}</td>
+                            <td class="text-secondary">
+                                @if(!is_null($key->last_used_at))
+                                    @datetimeHuman($key->last_used_at)
+                                @else
+                                    &mdash;
+                                @endif
+                            </td>
+                            <td class="text-secondary">@datetimeHuman($key->created_at)</td>
+                            <td>
+                                <a href="{{ route('admin.users.view', $key->user->id) }}">{{ $key->user->username }}</a>
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-ghost-danger btn-icon" data-action="revoke-key" data-attr="{{ $key->identifier }}" title="Revoke">
+                                    <i class="ti ti-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @if($keys->isEmpty())
+            <div class="card-body">
+                <div class="empty">
+                    <div class="empty-icon"><i class="ti ti-key" style="font-size: 3rem;"></i></div>
+                    <p class="empty-title">No API keys</p>
+                    <p class="empty-subtitle text-secondary">Create your first API key to get started.</p>
+                    <div class="empty-action">
+                        <a href="{{ route('admin.api.new') }}" class="btn btn-primary">
+                            <i class="ti ti-plus me-1"></i> Create New
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 @endsection
 
-@section('footer-scripts')
-    @parent
+@section('admin-js')
     <script>
         $(document).ready(function() {
             $('[data-action="revoke-key"]').click(function (event) {
@@ -97,7 +110,7 @@
                             title: '',
                             text: 'API Key has been revoked.'
                         });
-                        self.parent().parent().slideUp();
+                        self.closest('tr').slideUp();
                     }).fail(function (jqXHR) {
                         console.error(jqXHR);
                         swal({

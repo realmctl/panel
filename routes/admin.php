@@ -49,6 +49,7 @@ Route::group(['prefix' => 'locations'], function () {
 */
 Route::group(['prefix' => 'databases'], function () {
     Route::get('/', [Admin\DatabaseController::class, 'index'])->name('admin.databases');
+    Route::get('/new', [Admin\DatabaseController::class, 'new'])->name('admin.databases.new');
     Route::get('/view/{host:id}', [Admin\DatabaseController::class, 'view'])->name('admin.databases.view');
 
     Route::post('/', [Admin\DatabaseController::class, 'create']);

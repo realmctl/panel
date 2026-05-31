@@ -48,6 +48,16 @@ class DatabaseController extends Controller
     }
 
     /**
+     * Display form to create a new database host.
+     */
+    public function new(): View
+    {
+        return view('admin.databases.new', [
+            'locations' => $this->locationRepository->getAllWithNodes(),
+        ]);
+    }
+
+    /**
      * Display database host to user.
      *
      * @throws RecordNotFoundException

@@ -14,7 +14,7 @@
     </ol>
 @endsection
 
-@section('content')
+@section('admin-content')
     @include('admin.servers.partials.navigation')
     <div class="row equal-height">
         <div class="col-sm-4">

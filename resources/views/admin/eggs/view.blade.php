@@ -14,7 +14,7 @@
     </ol>
 @endsection
 
-@section('content')
+@section('admin-content')
 <div class="row">
     <div class="col-xs-12">
         <div class="nav-tabs-custom nav-tabs-floating">

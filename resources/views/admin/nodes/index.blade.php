@@ -1,80 +1,87 @@
 @extends('layouts.admin')
 
 @section('title')
-    List Nodes
-@endsection
-
-@section('scripts')
-    @parent
-    {!! Theme::css('vendor/fontawesome/animation.min.css') !!}
+    Nodes
 @endsection
 
 @section('content-header')
-    <h1>Nodes<small>All nodes available on the system.</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li class="active">Nodes</li>
-    </ol>
+    <h2 class="page-title">Nodes</h2>
 @endsection
 
-@section('content')
-<div class="row">
-    <div class="col-xs-12">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Node List</h3>
-                <div class="box-tools search01">
-                    <form action="{{ route('admin.nodes') }}" method="GET">
-                        <div class="input-group input-group-sm">
-                            <input type="text" name="filter[name]" class="form-control pull-right" value="{{ request()->input('filter.name') }}" placeholder="Search Nodes">
-                            <div class="input-group-btn">
-                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                                <a href="{{ route('admin.nodes.new') }}"><button type="button" class="btn btn-sm btn-primary" style="border-radius: 0 3px 3px 0;margin-left:-1px;">Create New</button></a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+@section('admin-content')
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Node List</h3>
+            <div class="card-actions">
+                <form action="{{ route('admin.nodes') }}" method="GET" class="d-inline-flex align-items-center me-2">
+                    <div class="input-group input-group-sm" style="width: 200px;">
+                        <input type="text" name="filter[name]" class="form-control" value="{{ request()->input('filter.name') }}" placeholder="Search...">
+                        <button type="submit" class="btn btn-icon"><i class="ti ti-search"></i></button>
+                    </div>
+                </form>
+                <a href="{{ route('admin.nodes.new') }}" class="btn btn-primary">
+                    <i class="ti ti-plus me-1"></i> Create New
+                </a>
             </div>
-            <div class="box-body table-responsive no-padding">
-                <table class="table table-hover">
-                    <tbody>
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Location</th>
-                            <th>Memory</th>
-                            <th>Disk</th>
-                            <th class="text-center">Servers</th>
-                            <th class="text-center">SSL</th>
-                            <th class="text-center">Public</th>
-                        </tr>
-                        @foreach ($nodes as $node)
-                            <tr>
-                                <td class="text-center text-muted left-icon" data-action="ping" data-secret="{{ $node->getDecryptedKey() }}" data-location="{{ $node->scheme }}://{{ $node->fqdn }}:{{ $node->daemonListen }}/api/system"><i class="fa fa-fw fa-refresh fa-spin"></i></td>
-                                <td>{!! $node->maintenance_mode ? '<span class="label label-warning"><i class="fa fa-wrench"></i></span> ' : '' !!}<a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></td>
-                                <td>{{ $node->location->short }}</td>
-                                <td>{{ $node->memory }} MiB</td>
-                                <td>{{ $node->disk }} MiB</td>
-                                <td class="text-center">{{ $node->servers_count }}</td>
-                                <td class="text-center" style="color:{{ ($node->scheme === 'https') ? '#50af51' : '#d9534f' }}"><i class="fa fa-{{ ($node->scheme === 'https') ? 'lock' : 'unlock' }}"></i></td>
-                                <td class="text-center"><i class="fa fa-{{ ($node->public) ? 'eye' : 'eye-slash' }}"></i></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @if($nodes->hasPages())
-                <div class="box-footer with-border">
-                    <div class="col-md-12 text-center">{!! $nodes->appends(['query' => Request::input('query')])->render() !!}</div>
-                </div>
-            @endif
         </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th class="w-1"></th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Memory</th>
+                        <th>Disk</th>
+                        <th class="text-center">Servers</th>
+                        <th class="text-center">SSL</th>
+                        <th class="text-center">Public</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($nodes as $node)
+                        <tr>
+                            <td class="text-center" data-action="ping" data-secret="{{ $node->getDecryptedKey() }}" data-location="{{ $node->scheme }}://{{ $node->fqdn }}:{{ $node->daemonListen }}/api/system">
+                                <span class="status-dot status-dot-animated bg-secondary"></span>
+                            </td>
+                            <td>
+                                @if($node->maintenance_mode)
+                                    <span class="badge bg-warning-lt me-1"><i class="ti ti-tool"></i></span>
+                                @endif
+                                <a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a>
+                            </td>
+                            <td class="text-secondary">{{ $node->location->short }}</td>
+                            <td class="text-secondary">{{ $node->memory }} MiB</td>
+                            <td class="text-secondary">{{ $node->disk }} MiB</td>
+                            <td class="text-center">{{ $node->servers_count }}</td>
+                            <td class="text-center">
+                                @if($node->scheme === 'https')
+                                    <span class="badge bg-success-lt"><i class="ti ti-lock"></i></span>
+                                @else
+                                    <span class="badge bg-danger-lt"><i class="ti ti-lock-open"></i></span>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($node->public)
+                                    <span class="badge bg-success-lt"><i class="ti ti-eye"></i></span>
+                                @else
+                                    <span class="badge bg-secondary-lt"><i class="ti ti-eye-off"></i></span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @if($nodes->hasPages())
+            <div class="card-footer d-flex align-items-center">
+                {!! $nodes->appends(['query' => Request::input('query')])->render() !!}
+            </div>
+        @endif
     </div>
-</div>
 @endsection
 
-@section('footer-scripts')
-    @parent
+@section('admin-js')
     <script>
     (function pingNodes() {
         $('td[data-action="ping"]').each(function(i, element) {
@@ -86,18 +93,13 @@
                 },
                 timeout: 5000
             }).done(function (data) {
-                $(element).find('i').tooltip({
-                    title: 'v' + data.version,
-                });
-                $(element).removeClass('text-muted').find('i').removeClass().addClass('fa fa-fw fa-heartbeat faa-pulse animated').css('color', '#50af51');
+                $(element).find('.status-dot').removeClass('bg-secondary').addClass('bg-success');
+                $(element).attr('title', 'v' + data.version);
             }).fail(function (error) {
-                var errorText = 'Error connecting to node! Check browser console for details.';
-                try {
-                    errorText = error.responseJSON.errors[0].detail || errorText;
-                } catch (ex) {}
-
-                $(element).removeClass('text-muted').find('i').removeClass().addClass('fa fa-fw fa-heart-o').css('color', '#d9534f');
-                $(element).find('i').tooltip({ title: errorText });
+                $(element).find('.status-dot').removeClass('bg-secondary status-dot-animated').addClass('bg-danger');
+                var errorText = 'Error connecting to node!';
+                try { errorText = error.responseJSON.errors[0].detail || errorText; } catch (ex) {}
+                $(element).attr('title', errorText);
             });
         }).promise().done(function () {
             setTimeout(pingNodes, 10000);

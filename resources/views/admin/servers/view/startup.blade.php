@@ -14,7 +14,7 @@
     </ol>
 @endsection
 
-@section('content')
+@section('admin-content')
 @include('admin.servers.partials.navigation')
 <form action="{{ route('admin.servers.view.startup', $server->id) }}" method="POST">
     <div class="row">

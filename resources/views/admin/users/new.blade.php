@@ -13,7 +13,7 @@
     </ol>
 @endsection
 
-@section('content')
+@section('admin-content')
 <div class="row">
     <form method="post">
         <div class="col-md-6">

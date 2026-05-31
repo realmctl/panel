@@ -5,65 +5,84 @@
 @endsection
 
 @section('content-header')
-    <h1>{{ $node->name }}<small>Your daemon configuration file.</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
-        <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
-        <li class="active">Configuration</li>
-    </ol>
+    <h2 class="page-title">{{ $node->name }} — Configuration</h2>
 @endsection
 
-@section('content')
-<div class="row">
-    <div class="col-xs-12">
-        <div class="nav-tabs-custom nav-tabs-floating">
-            <ul class="nav nav-tabs">
-                <li><a href="{{ route('admin.nodes.view', $node->id) }}">About</a></li>
-                <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a></li>
-                <li class="active"><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a></li>
-                <li><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a></li>
-                <li><a href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a></li>
-            </ul>
-        </div>
+@section('admin-content')
+<div class="row mb-3">
+    <div class="col-lg-12">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view', $node->id) }}">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a>
+            </li>
+        </ul>
     </div>
 </div>
 <div class="row">
-    <div class="col-sm-8">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Configuration File</h3>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Configuration File</h3>
+                <div class="card-actions">
+                    <button type="button" class="btn btn-sm" id="copyConfigBtn">
+                        <i class="ti ti-copy me-1"></i> Copy
+                    </button>
+                </div>
             </div>
-            <div class="box-body">
-                <pre class="no-margin">{{ $node->getYamlConfiguration() }}</pre>
+            <div class="card-body">
+                <pre class="mb-0" id="configContent">{{ $node->getYamlConfiguration() }}</pre>
             </div>
-            <div class="box-footer">
-                <p class="no-margin">This file should be placed in your daemon's root directory (usually <code>/etc/pterodactyl</code>) in a file called <code>config.yml</code>.</p>
+            <div class="card-footer">
+                <p class="mb-0">This file should be placed in your daemon's root directory (usually <code>/etc/pterodactyl</code>) in a file called <code>config.yml</code>.</p>
             </div>
         </div>
     </div>
-    <div class="col-sm-4">
-        <div class="box box-success">
-            <div class="box-header with-border">
-                <h3 class="box-title">Auto-Deploy</h3>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Auto-Deploy</h3>
             </div>
-            <div class="box-body">
-                <p class="text-muted small">
+            <div class="card-body">
+                <small class="form-hint">
                     Use the button below to generate a custom deployment command that can be used to configure
                     wings on the target server with a single command.
-                </p>
+                </small>
             </div>
-            <div class="box-footer">
-                <button type="button" id="configTokenBtn" class="btn btn-sm btn-default" style="width:100%;">Generate Token</button>
+            <div class="card-footer">
+                <button type="button" id="configTokenBtn" class="btn btn-primary w-100">
+                    <i class="ti ti-key me-1"></i> Generate Token
+                </button>
             </div>
         </div>
     </div>
 </div>
 @endsection
 
-@section('footer-scripts')
-    @parent
+@section('admin-js')
     <script>
+    $('#copyConfigBtn').on('click', function () {
+        var text = document.getElementById('configContent').textContent;
+        navigator.clipboard.writeText(text).then(function () {
+            var btn = $('#copyConfigBtn');
+            btn.html('<i class="ti ti-check me-1"></i> Copied!');
+            setTimeout(function () {
+                btn.html('<i class="ti ti-copy me-1"></i> Copy');
+            }, 2000);
+        });
+    });
+
     $('#configTokenBtn').on('click', function (event) {
         $.ajax({
             method: 'POST',

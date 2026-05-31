@@ -13,7 +13,7 @@
     </ol>
 @endsection
 
-@section('content')
+@section('admin-content')
 <div class="row">
     <form action="{{ route('admin.users.view', $user->id) }}" method="post">
         <div class="col-md-6">

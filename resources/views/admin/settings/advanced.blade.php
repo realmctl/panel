@@ -6,148 +6,131 @@
 @endsection
 
 @section('content-header')
-    <h1>Advanced Settings<small>Configure advanced settings for Pterodactyl.</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li class="active">Settings</li>
-    </ol>
+    <h2 class="page-title">Advanced Settings</h2>
 @endsection
 
-@section('content')
+@section('admin-content')
     @yield('settings::nav')
-    <div class="row">
-        <div class="col-xs-12">
-            <form action="" method="POST">
-                <div class="box">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">CAPTCHA</h3>
-                    </div>
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="form-group col-md-4">
-                                <label class="control-label">Provider</label>
-                                <div>
-                                    <select class="form-control" name="captcha:provider" id="captchaProvider">
-                                        <option value="recaptcha" @if(old('captcha:provider', config('captcha.provider')) === 'recaptcha') selected @endif>Google reCAPTCHA</option>
-                                        <option value="turnstile" @if(old('captcha:provider', config('captcha.provider')) === 'turnstile') selected @endif>Cloudflare Turnstile</option>
-                                        <option value="none" @if(old('captcha:provider', config('captcha.provider')) === 'none') selected @endif>Disabled</option>
-                                    </select>
-                                    <p class="text-muted small">Select which CAPTCHA provider to use on login and password reset forms. Cloudflare Turnstile does not force mobile QR-code verification.</p>
-                                </div>
-                            </div>
-                        </div>
-                        {{-- Google reCAPTCHA keys --}}
-                        <div class="row" id="recaptchaSettings">
-                            <div class="form-group col-md-6">
-                                <label class="control-label">reCAPTCHA Site Key</label>
-                                <div>
-                                    <input type="text" class="form-control" name="captcha:recaptcha:website_key" value="{{ old('captcha:recaptcha:website_key', config('captcha.recaptcha.website_key')) }}">
-                                </div>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label class="control-label">reCAPTCHA Secret Key</label>
-                                <div>
-                                    <input type="text" class="form-control" name="captcha:recaptcha:secret_key" value="{{ old('captcha:recaptcha:secret_key', config('captcha.recaptcha.secret_key')) }}">
-                                    <p class="text-muted small">Used for communication between your site and Google. Be sure to keep it a secret.</p>
-                                </div>
-                            </div>
-                        </div>
-                        {{-- Cloudflare Turnstile keys --}}
-                        <div class="row" id="turnstileSettings" style="display: none;">
-                            <div class="form-group col-md-6">
-                                <label class="control-label">Turnstile Site Key</label>
-                                <div>
-                                    <input type="text" class="form-control" name="captcha:turnstile:website_key" value="{{ old('captcha:turnstile:website_key', config('captcha.turnstile.website_key')) }}">
-                                </div>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label class="control-label">Turnstile Secret Key</label>
-                                <div>
-                                    <input type="text" class="form-control" name="captcha:turnstile:secret_key" value="{{ old('captcha:turnstile:secret_key', config('captcha.turnstile.secret_key')) }}">
-                                    <p class="text-muted small">Used for communication between your site and Cloudflare. Be sure to keep it a secret.</p>
-                                </div>
-                            </div>
-                        </div>
-                        @if($showRecaptchaWarning)
-                            <div class="row" id="recaptchaWarning">
-                                <div class="col-xs-12">
-                                    <div class="alert alert-warning no-margin">
-                                        You are currently using reCAPTCHA keys that were shipped with this Panel. For improved security it is recommended to <a href="https://www.google.com/recaptcha/admin">generate new invisible reCAPTCHA keys</a> that are tied specifically to your website.
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
+    <form action="" method="POST">
+        {{-- CAPTCHA --}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">CAPTCHA</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Provider</label>
+                        <select class="form-select" name="captcha:provider" id="captchaProvider">
+                            <option value="recaptcha" @if(old('captcha:provider', config('captcha.provider')) === 'recaptcha') selected @endif>Google reCAPTCHA</option>
+                            <option value="turnstile" @if(old('captcha:provider', config('captcha.provider')) === 'turnstile') selected @endif>Cloudflare Turnstile</option>
+                            <option value="none" @if(old('captcha:provider', config('captcha.provider')) === 'none') selected @endif>Disabled</option>
+                        </select>
+                        <span class="form-hint">Select which CAPTCHA provider to use on login and password reset forms.</span>
                     </div>
                 </div>
-                <div class="box">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">HTTP Connections</h3>
+                {{-- Google reCAPTCHA --}}
+                <div class="row" id="recaptchaSettings">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">reCAPTCHA Site Key</label>
+                        <input type="text" class="form-control" name="captcha:recaptcha:website_key" value="{{ old('captcha:recaptcha:website_key', config('captcha.recaptcha.website_key')) }}">
                     </div>
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label class="control-label">Connection Timeout</label>
-                                <div>
-                                    <input type="number" required class="form-control" name="pterodactyl:guzzle:connect_timeout" value="{{ old('pterodactyl:guzzle:connect_timeout', config('pterodactyl.guzzle.connect_timeout')) }}">
-                                    <p class="text-muted small">The amount of time in seconds to wait for a connection to be opened before throwing an error.</p>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label class="control-label">Request Timeout</label>
-                                <div>
-                                    <input type="number" required class="form-control" name="pterodactyl:guzzle:timeout" value="{{ old('pterodactyl:guzzle:timeout', config('pterodactyl.guzzle.timeout')) }}">
-                                    <p class="text-muted small">The amount of time in seconds to wait for a request to be completed before throwing an error.</p>
-                                </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">reCAPTCHA Secret Key</label>
+                        <input type="text" class="form-control" name="captcha:recaptcha:secret_key" value="{{ old('captcha:recaptcha:secret_key', config('captcha.recaptcha.secret_key')) }}">
+                        <span class="form-hint">Used for communication between your site and Google. Keep it secret.</span>
+                    </div>
+                </div>
+                {{-- Cloudflare Turnstile --}}
+                <div class="row" id="turnstileSettings" style="display: none;">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Turnstile Site Key</label>
+                        <input type="text" class="form-control" name="captcha:turnstile:website_key" value="{{ old('captcha:turnstile:website_key', config('captcha.turnstile.website_key')) }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Turnstile Secret Key</label>
+                        <input type="text" class="form-control" name="captcha:turnstile:secret_key" value="{{ old('captcha:turnstile:secret_key', config('captcha.turnstile.secret_key')) }}">
+                        <span class="form-hint">Used for communication between your site and Cloudflare. Keep it secret.</span>
+                    </div>
+                </div>
+                @if($showRecaptchaWarning)
+                    <div class="row" id="recaptchaWarning">
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <i class="ti ti-alert-triangle me-2"></i>
+                                You are currently using reCAPTCHA keys that were shipped with this Panel. For improved security it is recommended to <a href="https://www.google.com/recaptcha/admin" target="_blank">generate new invisible reCAPTCHA keys</a> tied to your website.
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="box">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Automatic Allocation Creation</h3>
-                    </div>
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="form-group col-md-4">
-                                <label class="control-label">Status</label>
-                                <div>
-                                    <select class="form-control" name="pterodactyl:client_features:allocations:enabled">
-                                        <option value="false">Disabled</option>
-                                        <option value="true" @if(old('pterodactyl:client_features:allocations:enabled', config('pterodactyl.client_features.allocations.enabled'))) selected @endif>Enabled</option>
-                                    </select>
-                                    <p class="text-muted small">If enabled users will have the option to automatically create new allocations for their server via the frontend.</p>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label class="control-label">Starting Port</label>
-                                <div>
-                                    <input type="number" class="form-control" name="pterodactyl:client_features:allocations:range_start" value="{{ old('pterodactyl:client_features:allocations:range_start', config('pterodactyl.client_features.allocations.range_start')) }}">
-                                    <p class="text-muted small">The starting port in the range that can be automatically allocated.</p>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label class="control-label">Ending Port</label>
-                                <div>
-                                    <input type="number" class="form-control" name="pterodactyl:client_features:allocations:range_end" value="{{ old('pterodactyl:client_features:allocations:range_end', config('pterodactyl.client_features.allocations.range_end')) }}">
-                                    <p class="text-muted small">The ending port in the range that can be automatically allocated.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="box box-primary">
-                    <div class="box-footer">
-                        {{ csrf_field() }}
-                        <button type="submit" name="_method" value="PATCH" class="btn btn-sm btn-primary pull-right">Save</button>
-                    </div>
-                </div>
-            </form>
+                @endif
+            </div>
         </div>
-    </div>
+
+        {{-- HTTP Connections --}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">HTTP Connections</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Connection Timeout</label>
+                        <div class="input-group">
+                            <input type="number" required class="form-control" name="pterodactyl:guzzle:connect_timeout" value="{{ old('pterodactyl:guzzle:connect_timeout', config('pterodactyl.guzzle.connect_timeout')) }}">
+                            <span class="input-group-text">seconds</span>
+                        </div>
+                        <span class="form-hint">Time to wait for a connection to be opened before throwing an error.</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Request Timeout</label>
+                        <div class="input-group">
+                            <input type="number" required class="form-control" name="pterodactyl:guzzle:timeout" value="{{ old('pterodactyl:guzzle:timeout', config('pterodactyl.guzzle.timeout')) }}">
+                            <span class="input-group-text">seconds</span>
+                        </div>
+                        <span class="form-hint">Time to wait for a request to complete before throwing an error.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Automatic Allocation Creation --}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">Automatic Allocation Creation</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="pterodactyl:client_features:allocations:enabled">
+                            <option value="false">Disabled</option>
+                            <option value="true" @if(old('pterodactyl:client_features:allocations:enabled', config('pterodactyl.client_features.allocations.enabled'))) selected @endif>Enabled</option>
+                        </select>
+                        <span class="form-hint">If enabled, users can automatically create new allocations for their server via the frontend.</span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Starting Port</label>
+                        <input type="number" class="form-control" name="pterodactyl:client_features:allocations:range_start" value="{{ old('pterodactyl:client_features:allocations:range_start', config('pterodactyl.client_features.allocations.range_start')) }}">
+                        <span class="form-hint">The starting port in the range that can be automatically allocated.</span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Ending Port</label>
+                        <input type="number" class="form-control" name="pterodactyl:client_features:allocations:range_end" value="{{ old('pterodactyl:client_features:allocations:range_end', config('pterodactyl.client_features.allocations.range_end')) }}">
+                        <span class="form-hint">The ending port in the range that can be automatically allocated.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                {{ csrf_field() }}
+                <button type="submit" name="_method" value="PATCH" class="btn btn-primary">
+                    <i class="ti ti-device-floppy me-1"></i> Save
+                </button>
+            </div>
+        </div>
+    </form>
 @endsection
 
-@section('footer-scripts')
-    @parent
+@section('admin-js')
     <script>
         (function () {
             var providerSelect = document.getElementById('captchaProvider');

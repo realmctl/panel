@@ -14,7 +14,7 @@
     </ol>
 @endsection
 
-@section('content')
+@section('admin-content')
     <div class="row">
         <div class="col-sm-6">
             <div class="box box-primary">

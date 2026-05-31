@@ -5,156 +5,159 @@
 @endsection
 
 @section('content-header')
-    <h1>{{ $node->name }}<small>Control allocations available for servers on this node.</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
-        <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
-        <li class="active">Allocations</li>
-    </ol>
+    <h2 class="page-title">{{ $node->name }} — Allocations</h2>
 @endsection
 
-@section('content')
-<div class="row">
-    <div class="col-xs-12">
-        <div class="nav-tabs-custom nav-tabs-floating">
-            <ul class="nav nav-tabs">
-                <li><a href="{{ route('admin.nodes.view', $node->id) }}">About</a></li>
-                <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a></li>
-                <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a></li>
-                <li class="active"><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a></li>
-                <li><a href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a></li>
-            </ul>
-        </div>
+@section('admin-content')
+<div class="row mb-3">
+    <div class="col-lg-12">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view', $node->id) }}">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a>
+            </li>
+        </ul>
     </div>
 </div>
 <div class="row">
-    <div class="col-sm-8">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Existing Allocations</h3>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Existing Allocations</h3>
             </div>
-            <div class="box-body table-responsive no-padding" style="overflow-x: visible">
-                <table class="table table-hover" style="margin-bottom:0;">
-                    <tr>
-                        <th>
-                            <input type="checkbox" class="select-all-files hidden-xs" data-action="selectAll">
-                        </th>
-                        <th>IP Address <i class="fa fa-fw fa-minus-square" style="font-weight:normal;color:#d9534f;cursor:pointer;" data-toggle="modal" data-target="#allocationModal"></i></th>
-                        <th>IP Alias</th>
-                        <th>Port</th>
-                        <th>Assigned To</th>
-                        <th>
-                            <div class="btn-group hidden-xs">
-                                <button type="button" id="mass_actions" class="btn btn-sm btn-default dropdown-toggle disabled"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mass Actions <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-massactions">
-                                    <li><a href="#" id="selective-deletion" data-action="selective-deletion">Delete <i class="fa fa-fw fa-trash-o"></i></a></li>
-                                </ul>
-                            </div>
-                        </th>
-                    </tr>
-                    @foreach($node->allocations as $allocation)
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
                         <tr>
-                            <td class="middle min-size" data-identifier="type">
-                                @if(is_null($allocation->server_id))
-                                <input type="checkbox" class="select-file hidden-xs" data-action="addSelection">
-                                @else
-                                <input disabled="disabled" type="checkbox" class="select-file hidden-xs" data-action="addSelection">
-                                @endif
-                            </td>
-                            <td class="col-sm-3 middle" data-identifier="ip">{{ $allocation->ip }}</td>
-                            <td class="col-sm-3 middle">
-                                <input class="form-control input-sm" type="text" value="{{ $allocation->ip_alias }}" data-action="set-alias" data-id="{{ $allocation->id }}" placeholder="none" />
-                                <span class="input-loader"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
-                            </td>
-                            <td class="col-sm-2 middle" data-identifier="port">{{ $allocation->port }}</td>
-                            <td class="col-sm-3 middle">
-                                @if(! is_null($allocation->server))
-                                    <a href="{{ route('admin.servers.view', $allocation->server_id) }}">{{ $allocation->server->name }}</a>
-                                @endif
-                            </td>
-                            <td class="col-sm-1 middle">
-                                @if(is_null($allocation->server_id))
-                                    <button data-action="deallocate" data-id="{{ $allocation->id }}" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
-                                @endif
-                            </td>
+                            <th>
+                                <input type="checkbox" class="form-check-input select-all-files" data-action="selectAll">
+                            </th>
+                            <th>IP Address <i class="ti ti-square-minus text-danger" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#allocationModal"></i></th>
+                            <th>IP Alias</th>
+                            <th>Port</th>
+                            <th>Assigned To</th>
+                            <th>
+                                <div class="btn-group">
+                                    <button type="button" id="mass_actions" class="btn btn-sm btn-outline-secondary dropdown-toggle disabled"
+                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mass Actions</button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" id="selective-deletion" data-action="selective-deletion"><i class="ti ti-trash me-1"></i> Delete</a></li>
+                                    </ul>
+                                </div>
+                            </th>
                         </tr>
-                    @endforeach
+                    </thead>
+                    <tbody>
+                        @foreach($node->allocations as $allocation)
+                            <tr>
+                                <td class="min-size" data-identifier="type">
+                                    @if(is_null($allocation->server_id))
+                                    <input type="checkbox" class="form-check-input select-file" data-action="addSelection">
+                                    @else
+                                    <input disabled="disabled" type="checkbox" class="form-check-input select-file" data-action="addSelection">
+                                    @endif
+                                </td>
+                                <td data-identifier="ip">{{ $allocation->ip }}</td>
+                                <td>
+                                    <input class="form-control form-control-sm" type="text" value="{{ $allocation->ip_alias }}" data-action="set-alias" data-id="{{ $allocation->id }}" placeholder="none" />
+                                    <span class="input-loader"><i class="ti ti-refresh"></i></span>
+                                </td>
+                                <td data-identifier="port">{{ $allocation->port }}</td>
+                                <td>
+                                    @if(! is_null($allocation->server))
+                                        <a href="{{ route('admin.servers.view', $allocation->server_id) }}">{{ $allocation->server->name }}</a>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if(is_null($allocation->server_id))
+                                        <button data-action="deallocate" data-id="{{ $allocation->id }}" class="btn btn-sm btn-outline-danger"><i class="ti ti-trash"></i></button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
             @if($node->allocations->hasPages())
-                <div class="box-footer text-center">
+                <div class="card-footer text-center">
                     {{ $node->allocations->render() }}
                 </div>
             @endif
         </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-lg-4">
         <form action="{{ route('admin.nodes.view.allocation', $node->id) }}" method="POST">
-            <div class="box box-success">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Assign New Allocations</h3>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Assign New Allocations</h3>
                 </div>
-                <div class="box-body">
-                    <div class="form-group">
-                        <label for="pAllocationIP" class="control-label">IP Address</label>
-                        <div>
-                            <select class="form-control" name="allocation_ip" id="pAllocationIP" multiple>
-                                @foreach($allocations as $allocation)
-                                    <option value="{{ $allocation->ip }}">{{ $allocation->ip }}</option>
-                                @endforeach
-                            </select>
-                            <p class="text-muted small">Enter an IP address to assign ports to here.</p>
-                        </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="pAllocationIP" class="form-label">IP Address</label>
+                        <select class="form-select" name="allocation_ip" id="pAllocationIP" multiple>
+                            @foreach($allocations as $allocation)
+                                <option value="{{ $allocation->ip }}">{{ $allocation->ip }}</option>
+                            @endforeach
+                        </select>
+                        <small class="form-hint">Enter an IP address to assign ports to here.</small>
                     </div>
-                    <div class="form-group">
-                        <label for="pAllocationIP" class="control-label">IP Alias</label>
-                        <div>
-                            <input type="text" id="pAllocationAlias" class="form-control" name="allocation_alias" placeholder="alias" />
-                            <p class="text-muted small">If you would like to assign a default alias to these allocations enter it here.</p>
-                        </div>
+                    <div class="mb-3">
+                        <label for="pAllocationAlias" class="form-label">IP Alias</label>
+                        <input type="text" id="pAllocationAlias" class="form-control" name="allocation_alias" placeholder="alias" />
+                        <small class="form-hint">If you would like to assign a default alias to these allocations enter it here.</small>
                     </div>
-                    <div class="form-group">
-                        <label for="pAllocationPorts" class="control-label">Ports</label>
-                        <div>
-                            <select class="form-control" name="allocation_ports[]" id="pAllocationPorts" multiple></select>
-                            <p class="text-muted small">Enter individual ports or port ranges here separated by commas or spaces.</p>
-                        </div>
+                    <div class="mb-3">
+                        <label for="pAllocationPorts" class="form-label">Ports</label>
+                        <select class="form-select" name="allocation_ports[]" id="pAllocationPorts" multiple></select>
+                        <small class="form-hint">Enter individual ports or port ranges here separated by commas or spaces.</small>
                     </div>
                 </div>
-                <div class="box-footer">
+                <div class="card-footer text-end">
                     {!! csrf_field() !!}
-                    <button type="submit" class="btn btn-success btn-sm pull-right">Submit</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ti ti-device-floppy me-1"></i> Submit
+                    </button>
                 </div>
             </div>
         </form>
     </div>
 </div>
-<div class="modal fade" id="allocationModal" tabindex="-1" role="dialog">
+
+{{-- Delete Allocations Modal --}}
+<div class="modal modal-blur fade" id="allocationModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Delete Allocations for IP Block</h4>
+                <h5 class="modal-title">Delete Allocations for IP Block</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('admin.nodes.view.allocation.removeBlock', $node->id) }}" method="POST">
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <select class="form-control" name="ip">
-                                @foreach($allocations as $allocation)
-                                    <option value="{{ $allocation->ip }}">{{ $allocation->ip }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <select class="form-select" name="ip">
+                            @foreach($allocations as $allocation)
+                                <option value="{{ $allocation->ip }}">{{ $allocation->ip }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
                     {{{ csrf_field() }}}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-danger">Delete Allocations</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="ti ti-trash me-1"></i> Delete Allocations
+                    </button>
                 </div>
             </form>
         </div>
@@ -162,8 +165,7 @@
 </div>
 @endsection
 
-@section('footer-scripts')
-    @parent
+@section('admin-js')
     <script>
     $('[data-action="addSelection"]').on('click', function () {
         updateMassActions();
