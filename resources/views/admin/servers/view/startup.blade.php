@@ -37,15 +37,12 @@
     </div>
     <div class="row row-cards">
         <div class="col-lg-6">
-            <div class="card mb-3">
+            <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Service Configuration</h3>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <div class="alert alert-warning"><i class="ti ti-alert-triangle me-2"></i> Changing any of the below values will result in the server processing a re-install command. The server will be stopped and will then proceed. If you would like the service scripts to not run, ensure the box is checked at the bottom.</div>
-                        <div class="alert alert-warning"><i class="ti ti-alert-triangle me-2"></i> <strong>This is a destructive operation in many cases. This server will be stopped immediately in order for this action to proceed.</strong></div>
-                    </div>
+                    <div class="alert alert-warning"><i class="ti ti-alert-triangle me-2"></i> Changing any of the below values will result in the server processing a re-install command. The server will be stopped and will then proceed.</div>
                     <div class="mb-3">
                         <label for="pNestId" class="form-label">Nest</label>
                         <select name="nest_id" id="pNestId" class="form-select">
@@ -69,10 +66,12 @@
                             <input id="pSkipScripting" name="skip_scripts" type="checkbox" class="form-check-input" value="1" @if($server->skip_scripts) checked @endif />
                             <label for="pSkipScripting" class="form-check-label"><strong>Skip Egg Install Script</strong></label>
                         </div>
-                        <span class="form-hint">If the selected Egg has an install script attached to it, the script will run during install. If you would like to skip this step, check this box.</span>
+                        <span class="form-hint">If the selected Egg has an install script attached to it, the script will run during install.</span>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Docker Image Configuration</h3>
@@ -82,12 +81,14 @@
                         <label for="pDockerImage" class="form-label">Image</label>
                         <select id="pDockerImage" name="docker_image" class="form-select"></select>
                         <input id="pDockerImageCustom" name="custom_docker_image" value="{{ old('custom_docker_image') }}" class="form-control mt-2" placeholder="Or enter a custom image..."/>
-                        <span class="form-hint">This is the Docker image that will be used to run this server. Select an image from the dropdown or enter a custom image in the text field above.</span>
+                        <span class="form-hint">Select an image from the dropdown or enter a custom image above.</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+    </div>
+    <div class="row row-cards">
+        <div class="col-lg-12">
             <div class="row row-cards" id="appendVariablesTo"></div>
         </div>
     </div>
