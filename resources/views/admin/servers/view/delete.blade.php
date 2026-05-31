@@ -10,7 +10,7 @@
 
 @section('admin-content')
 @include('admin.servers.partials.navigation')
-<div class="row">
+<div class="row row-deck">
     <div class="col-lg-6">
         <div class="card">
             <div class="card-header">
@@ -18,9 +18,9 @@
             </div>
             <div class="card-body">
                 <p>This action will attempt to delete the server from both the panel and daemon. If either one reports an error the action will be cancelled.</p>
-                <div class="alert alert-danger">
+                <div class="alert alert-danger mb-0">
                     <i class="ti ti-alert-triangle me-2"></i>
-                    Deleting a server is irreversible. <strong>All server data</strong> (including files and users) will be removed.
+                    Deleting a server is irreversible. All server data (including files and users) will be removed.
                 </div>
             </div>
             <div class="card-footer">
@@ -40,9 +40,9 @@
             </div>
             <div class="card-body">
                 <p>This action will attempt to delete the server from both the panel and daemon. If the daemon does not respond, or reports an error, the deletion will continue.</p>
-                <div class="alert alert-danger">
+                <div class="alert alert-danger mb-0">
                     <i class="ti ti-alert-triangle me-2"></i>
-                    This method may leave dangling files on your daemon if it reports an error. <strong>All server data</strong> will be removed from the panel.
+                    This method may leave dangling files on your daemon if it reports an error. All server data will be removed from the panel.
                 </div>
             </div>
             <div class="card-footer">
