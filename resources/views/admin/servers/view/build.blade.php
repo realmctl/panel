@@ -10,8 +10,8 @@
 
 @section('admin-content')
 @include('admin.servers.partials.navigation')
+<form action="{{ route('admin.servers.view.build', $server->id) }}" method="POST">
 <div class="row">
-    <form action="{{ route('admin.servers.view.build', $server->id) }}" method="POST">
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-header">
@@ -167,8 +167,9 @@
                 </div>
             </div>
         </div>
-    </form>
+    </div>
 </div>
+</form>
 @endsection
 
 @section('admin-js')
