@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Server } from '@/api/server/getServer';
 import getServers from '@/api/getServers';
-import ServerRow from '@/components/dashboard/ServerRow';
+import ServerCard from '@/components/dashboard/ServerCard';
 import Spinner from '@/components/elements/Spinner';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import useFlash from '@/plugins/useFlash';
@@ -72,9 +72,11 @@ export default () => {
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) =>
                         items.length > 0 ? (
-                            items.map((server, index) => (
-                                <ServerRow key={server.uuid} server={server} css={index > 0 ? tw`mt-2` : undefined} />
-                            ))
+                            <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
+                                {items.map((server) => (
+                                    <ServerCard key={server.uuid} server={server} />
+                                ))}
+                            </div>
                         ) : (
                             <p css={tw`text-center text-sm text-neutral-400`}>
                                 {showOnlyAdmin

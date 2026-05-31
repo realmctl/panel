@@ -26,6 +26,7 @@ interface ExtendedWindow extends Window {
         username: string;
         email: string;
         /* eslint-disable camelcase */
+        name_first: string;
         root_admin: boolean;
         use_totp: boolean;
         language: string;
@@ -45,6 +46,7 @@ const App = () => {
             username: PterodactylUser.username,
             email: PterodactylUser.email,
             language: PterodactylUser.language,
+            nameFirst: PterodactylUser.name_first,
             rootAdmin: PterodactylUser.root_admin,
             useTotp: PterodactylUser.use_totp,
             createdAt: new Date(PterodactylUser.created_at),

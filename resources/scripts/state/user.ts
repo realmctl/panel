@@ -6,6 +6,7 @@ export interface UserData {
     username: string;
     email: string;
     language: string;
+    nameFirst: string;
     rootAdmin: boolean;
     useTotp: boolean;
     createdAt: Date;
