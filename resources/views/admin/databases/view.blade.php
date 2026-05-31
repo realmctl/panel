@@ -11,7 +11,7 @@
 @section('admin-content')
     <form action="{{ route('admin.databases.view', $host->id) }}" method="POST">
         {!! csrf_field() !!}
-        <div class="row row-deck">
+        <div class="row">
             <div class="col-lg-6">
                 <div class="card mb-3">
                     <div class="card-header">
@@ -69,14 +69,16 @@
                             The account must have the <code>WITH GRANT OPTION</code> permission. Do not use the same MySQL account used by this panel.
                         </div>
                     </div>
-                    <div class="card-footer d-flex">
-                        <button name="_method" value="DELETE" class="btn btn-outline-danger">
-                            <i class="ti ti-trash me-1"></i> Delete
-                        </button>
-                        <button name="_method" value="PATCH" class="btn btn-primary ms-auto">
-                            <i class="ti ti-device-floppy me-1"></i> Save
-                        </button>
-                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="d-flex">
+                    <button name="_method" value="DELETE" class="btn btn-outline-danger">
+                        <i class="ti ti-trash me-1"></i> Delete
+                    </button>
+                    <button name="_method" value="PATCH" class="btn btn-primary ms-auto">
+                        <i class="ti ti-device-floppy me-1"></i> Save
+                    </button>
                 </div>
             </div>
         </div>
