@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Servers;
 
+use Throwable;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Jobs\RevokeSftpAccessJob;
@@ -27,7 +28,7 @@ class DetailsModificationService
     /**
      * Update the details for a single server instance.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Server $server, array $data): Server
     {

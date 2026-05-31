@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Remote\Servers;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Throwable;
+use Pterodactyl\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
 use Webmozart\Assert\Assert;
@@ -33,7 +36,7 @@ class ServerDetailsController extends Controller
      * Returns details about the server that allows Wings to self-recover and ensure
      * that the state of the server matches the Panel at all times.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function __invoke(Request $request, string $uuid): JsonResponse
     {
@@ -84,7 +87,7 @@ class ServerDetailsController extends Controller
      * do not get incorrectly stuck in installing/restoring from backup states since
      * a Wings reboot would completely stop those processes.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function resetState(Request $request): JsonResponse
     {
@@ -109,7 +112,7 @@ class ServerDetailsController extends Controller
         $this->connection->transaction(function () use ($node, $servers) {
             /** @var Server $server */
             foreach ($servers as $server) {
-                /** @var \Pterodactyl\Models\ActivityLog|null $activity */
+                /** @var ActivityLog|null $activity */
                 $activity = $server->activity->first();
                 if (!is_null($activity)) {
                     if ($subject = $activity->subjects->where('subject_type', 'backup')->first()) {

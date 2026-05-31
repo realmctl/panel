@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
@@ -91,7 +92,7 @@ abstract class BaseTransformer extends TransformerAbstract
      *
      * @return T
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      *
      * @noinspection PhpDocSignatureInspection
      */

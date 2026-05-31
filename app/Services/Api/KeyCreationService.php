@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Api;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Pterodactyl\Models\ApiKey;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Pterodactyl\Contracts\Repository\ApiKeyRepositoryInterface;
@@ -33,7 +34,7 @@ class KeyCreationService
      * This will automatically generate an identifier and an encrypted token that are
      * stored in the database.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function handle(array $data, array $permissions = []): ApiKey
     {

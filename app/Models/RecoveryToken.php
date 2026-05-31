@@ -2,13 +2,14 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
  * @property int $user_id
  * @property string $token
- * @property \Carbon\CarbonImmutable $created_at
+ * @property CarbonImmutable $created_at
  * @property User $user
  */
 class RecoveryToken extends Model
@@ -27,7 +28,7 @@ class RecoveryToken extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {

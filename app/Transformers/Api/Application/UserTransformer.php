@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Pterodactyl\Models\User;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\NullResource;
@@ -46,7 +47,7 @@ class UserTransformer extends BaseTransformer
     /**
      * Return the servers associated with this user.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeServers(User $user): Collection|NullResource
     {

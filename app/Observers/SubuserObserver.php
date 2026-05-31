@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Observers;
 
+use Pterodactyl\Events\Subuser\Creating;
+use Pterodactyl\Events\Subuser\Created;
+use Pterodactyl\Events\Subuser\Deleting;
+use Pterodactyl\Events\Subuser\Deleted;
 use Pterodactyl\Events;
 use Pterodactyl\Models\Subuser;
 use Pterodactyl\Notifications\AddedToServer;
@@ -14,7 +18,7 @@ class SubuserObserver
      */
     public function creating(Subuser $subuser): void
     {
-        event(new Events\Subuser\Creating($subuser));
+        event(new Creating($subuser));
     }
 
     /**
@@ -22,7 +26,7 @@ class SubuserObserver
      */
     public function created(Subuser $subuser): void
     {
-        event(new Events\Subuser\Created($subuser));
+        event(new Created($subuser));
 
         $subuser->user->notify(new AddedToServer([
             'user' => $subuser->user->name_first,
@@ -36,7 +40,7 @@ class SubuserObserver
      */
     public function deleting(Subuser $subuser): void
     {
-        event(new Events\Subuser\Deleting($subuser));
+        event(new Deleting($subuser));
     }
 
     /**
@@ -44,7 +48,7 @@ class SubuserObserver
      */
     public function deleted(Subuser $subuser): void
     {
-        event(new Events\Subuser\Deleted($subuser));
+        event(new Deleted($subuser));
 
         $subuser->user->notify(new RemovedFromServer([
             'user' => $subuser->user->name_first,

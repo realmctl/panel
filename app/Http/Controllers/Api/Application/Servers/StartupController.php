@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
 
+use Illuminate\Validation\ValidationException;
+use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\User;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Services\Servers\StartupModificationService;
@@ -22,10 +26,10 @@ class StartupController extends ApplicationApiController
     /**
      * Update the startup and environment settings for a specific server.
      *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws ValidationException
+     * @throws DaemonConnectionException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function index(UpdateServerStartupRequest $request, Server $server): array
     {

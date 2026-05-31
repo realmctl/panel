@@ -2,6 +2,11 @@
 
 namespace Pterodactyl\Http\Controllers\Auth;
 
+use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
+use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
+use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
+use Exception;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -35,11 +40,11 @@ class LoginCheckpointController extends AbstractLoginController
      * token. Once a user has reached this stage it is assumed that they have already
      * provided a valid username and password.
      *
-     * @throws \PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException
-     * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
-     * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
-     * @throws \Exception
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws IncompatibleWithGoogleAuthenticatorException
+     * @throws InvalidCharactersException
+     * @throws SecretKeyTooShortException
+     * @throws Exception
+     * @throws ValidationException
      */
     public function __invoke(LoginCheckpointRequest $request): JsonResponse
     {
@@ -98,7 +103,7 @@ class LoginCheckpointController extends AbstractLoginController
      * Determines if a given recovery token is valid for the user account. If we find a matching token
      * it will be deleted from the database.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function isValidRecoveryToken(User $user, string $value): bool
     {

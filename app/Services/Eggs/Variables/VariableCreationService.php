@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Eggs\Variables;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException;
 use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Traits\Services\ValidatesValidationRules;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
@@ -31,8 +33,8 @@ class VariableCreationService
     /**
      * Create a new variable for a given Egg.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException
+     * @throws DataValidationException
+     * @throws BadValidationRuleException
      * @throws ReservedVariableNameException
      */
     public function handle(int $egg, array $data): EggVariable

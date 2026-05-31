@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
+use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Throwable;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Pterodactyl\Enum\JwtScope;
@@ -42,7 +44,7 @@ class FileController extends ClientApiController
     /**
      * Returns a listing of files in a given directory.
      *
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function directory(ListFilesRequest $request, Server $server): array
     {
@@ -58,7 +60,7 @@ class FileController extends ClientApiController
     /**
      * Return the contents of a specified file for the user.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function contents(GetFileContentsRequest $request, Server $server): Response
     {
@@ -76,7 +78,7 @@ class FileController extends ClientApiController
      * Generates a one-time token with a link that the user can use to
      * download a given file.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function download(GetFileContentsRequest $request, Server $server): array
     {
@@ -107,7 +109,7 @@ class FileController extends ClientApiController
     /**
      * Writes the contents of the specified file to the server.
      *
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function write(WriteFileContentRequest $request, Server $server): JsonResponse
     {
@@ -131,7 +133,7 @@ class FileController extends ClientApiController
     /**
      * Creates a new folder on the server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function create(CreateFolderRequest $request, Server $server): JsonResponse
     {
@@ -150,7 +152,7 @@ class FileController extends ClientApiController
     /**
      * Renames a file on the remote machine.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function rename(RenameFileRequest $request, Server $server): JsonResponse
     {
@@ -169,7 +171,7 @@ class FileController extends ClientApiController
     /**
      * Copies a file on the server.
      *
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function copy(CopyFileRequest $request, Server $server): JsonResponse
     {
@@ -183,7 +185,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function compress(CompressFilesRequest $request, Server $server): array
     {
@@ -203,7 +205,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function decompress(DecompressFilesRequest $request, Server $server): JsonResponse
     {
@@ -225,7 +227,7 @@ class FileController extends ClientApiController
     /**
      * Deletes files or folders for the server in the given root directory.
      *
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function delete(DeleteFileRequest $request, Server $server): JsonResponse
     {
@@ -245,7 +247,7 @@ class FileController extends ClientApiController
     /**
      * Updates file permissions for file(s) in the given root directory.
      *
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function chmod(ChmodFilesRequest $request, Server $server): JsonResponse
     {
@@ -260,7 +262,7 @@ class FileController extends ClientApiController
     /**
      * Requests that a file be downloaded from a remote location by Wings.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function pull(PullFileRequest $request, Server $server): JsonResponse
     {

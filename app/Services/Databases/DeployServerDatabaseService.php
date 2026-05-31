@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Services\Databases;
 
+use Throwable;
+use Pterodactyl\Exceptions\Service\Database\TooManyDatabasesException;
+use Pterodactyl\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Database;
@@ -18,9 +21,9 @@ class DeployServerDatabaseService
     }
 
     /**
-     * @throws \Throwable
-     * @throws \Pterodactyl\Exceptions\Service\Database\TooManyDatabasesException
-     * @throws \Pterodactyl\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException
+     * @throws Throwable
+     * @throws TooManyDatabasesException
+     * @throws DatabaseClientFeatureNotEnabledException
      */
     public function handle(Server $server, array $data): Database
     {

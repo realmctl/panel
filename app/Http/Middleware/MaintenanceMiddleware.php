@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Middleware;
 
+use Closure;
+use Pterodactyl\Models\Server;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
@@ -17,9 +19,9 @@ class MaintenanceMiddleware
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, \Closure $next): mixed
+    public function handle(Request $request, Closure $next): mixed
     {
-        /** @var \Pterodactyl\Models\Server $server */
+        /** @var Server $server */
         $server = $request->attributes->get('server');
         $node = $server->getRelation('node');
 

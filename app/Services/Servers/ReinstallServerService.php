@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Servers;
 
+use Throwable;
 use Pterodactyl\Models\Server;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Repositories\Wings\DaemonServerRepository;
@@ -20,7 +21,7 @@ class ReinstallServerService
     /**
      * Reinstall a server on the remote daemon.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Server $server): Server
     {

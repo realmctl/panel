@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Eggs;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
@@ -21,7 +22,7 @@ class EggCreationService
     /**
      * Create a new service option and assign it to the given service.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      * @throws NoParentConfigurationFoundException
      */
     public function handle(array $data): Egg

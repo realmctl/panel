@@ -2,6 +2,13 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Servers;
 
+use JavaScript;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Illuminate\Validation\ValidationException;
+use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException;
+use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
+use Throwable;
 use Illuminate\View\View;
 use Pterodactyl\Models\Nest;
 use Pterodactyl\Models\Node;
@@ -30,7 +37,7 @@ class CreateServerController extends Controller
     /**
      * Displays the create server page.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function index(): View|RedirectResponse
     {
@@ -43,7 +50,7 @@ class CreateServerController extends Controller
 
         $nests = $this->nestRepository->getWithEggs();
 
-        \JavaScript::put([
+        JavaScript::put([
             'nodeData' => $this->nodeRepository->getNodesForServerCreation(),
             'nests' => $nests->map(function (Nest $item) {
                 return array_merge($item->toArray(), [
@@ -61,11 +68,11 @@ class CreateServerController extends Controller
     /**
      * Create a new server on the remote system.
      *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException
-     * @throws \Throwable
+     * @throws ValidationException
+     * @throws DisplayException
+     * @throws NoViableAllocationException
+     * @throws NoViableNodeException
+     * @throws Throwable
      */
     public function store(ServerFormRequest $request): RedirectResponse
     {

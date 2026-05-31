@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Servers;
 
+use JavaScript;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Nest;
@@ -66,7 +68,7 @@ class ServerViewController extends Controller
     /**
      * Returns the server startup management page.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function startup(Request $request, Server $server): View
     {
@@ -129,7 +131,7 @@ class ServerViewController extends Controller
             $canTransfer = true;
         }
 
-        \JavaScript::put([
+        JavaScript::put([
             'nodeData' => $this->nodeRepository->getNodesForServerCreation(),
         ]);
 

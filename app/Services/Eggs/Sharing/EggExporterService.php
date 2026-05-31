@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Eggs\Sharing;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Carbon\Carbon;
 use Pterodactyl\Models\Egg;
 use Illuminate\Support\Collection;
@@ -20,7 +21,7 @@ class EggExporterService
     /**
      * Return a JSON representation of an egg and its variables.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function handle(int $egg): string
     {

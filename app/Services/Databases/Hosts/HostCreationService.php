@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Databases\Hosts;
 
+use Throwable;
 use Pterodactyl\Models\DatabaseHost;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\ConnectionInterface;
@@ -26,7 +27,7 @@ class HostCreationService
     /**
      * Create a new database host on the Panel.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(array $data): DatabaseHost
     {

@@ -8,7 +8,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Pterodactyl\Exceptions\DisplayException;
 
 /**
- * @method \GuzzleHttp\Exception\GuzzleException getPrevious()
+ * @method GuzzleException getPrevious()
  */
 class DaemonConnectionException extends DisplayException
 {

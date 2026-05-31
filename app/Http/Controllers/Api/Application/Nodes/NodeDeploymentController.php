@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\Nodes;
 
+use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
 use Pterodactyl\Services\Deployment\FindViableNodesService;
 use Pterodactyl\Transformers\Api\Application\NodeTransformer;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
@@ -22,7 +23,7 @@ class NodeDeploymentController extends ApplicationApiController
      * similarly to the server creation process, but allows you to pass the deployment object
      * to this endpoint and get back a list of all Nodes satisfying the requirements.
      *
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException
+     * @throws NoViableNodeException
      */
     public function __invoke(GetDeployableNodesRequest $request): array
     {

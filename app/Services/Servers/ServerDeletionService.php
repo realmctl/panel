@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Services\Servers;
 
+use Exception;
+use Throwable;
+use Pterodactyl\Exceptions\DisplayException;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Support\Facades\Log;
@@ -37,8 +40,8 @@ class ServerDeletionService
     /**
      * Delete a server from the panel, clear any allocation notes, and remove any associated databases from hosts.
      *
-     * @throws \Throwable
-     * @throws \Pterodactyl\Exceptions\DisplayException
+     * @throws Throwable
+     * @throws DisplayException
      */
     public function handle(Server $server): void
     {
@@ -60,7 +63,7 @@ class ServerDeletionService
             foreach ($server->databases as $database) {
                 try {
                     $this->databaseManagementService->delete($database);
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     if (!$this->force) {
                         throw $exception;
                     }

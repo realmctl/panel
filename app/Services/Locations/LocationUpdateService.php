@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Locations;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\Location;
 use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 
@@ -17,8 +19,8 @@ class LocationUpdateService
     /**
      * Update an existing location.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function handle(Location|int $location, array $data): Location
     {

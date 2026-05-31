@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Databases;
 
+use Throwable;
 use Pterodactyl\Models\Database;
 use Pterodactyl\Helpers\Utilities;
 use Illuminate\Database\ConnectionInterface;
@@ -25,7 +26,7 @@ class DatabasePasswordService
     /**
      * Updates a password for a given database.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Database|int $database): string
     {

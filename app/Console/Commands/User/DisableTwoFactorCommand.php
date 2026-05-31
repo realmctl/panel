@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Console\Commands\User;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Console\Command;
 use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
 
@@ -22,8 +24,8 @@ class DisableTwoFactorCommand extends Command
     /**
      * Handle command execution process.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function handle()
     {

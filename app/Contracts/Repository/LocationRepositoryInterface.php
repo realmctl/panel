@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Contracts\Repository;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\Location;
 use Illuminate\Support\Collection;
 
@@ -20,14 +21,14 @@ interface LocationRepositoryInterface extends RepositoryInterface
     /**
      * Return all the nodes and their respective count of servers for a location.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function getWithNodes(int $id): Location;
 
     /**
      * Return a location and the count of nodes in that location.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function getWithNodeCount(int $id): Location;
 }

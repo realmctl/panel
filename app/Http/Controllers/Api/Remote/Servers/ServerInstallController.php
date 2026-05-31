@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Remote\Servers;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -26,7 +28,7 @@ class ServerInstallController extends Controller
     /**
      * Returns installation information for a server.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function index(Request $request, string $uuid): JsonResponse
     {
@@ -47,8 +49,8 @@ class ServerInstallController extends Controller
     /**
      * Updates the installation state of a server.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws RecordNotFoundException
+     * @throws DataValidationException
      */
     public function store(InstallationDataRequest $request, string $uuid): JsonResponse
     {

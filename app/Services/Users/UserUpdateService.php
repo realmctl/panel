@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Users;
 
+use Throwable;
 use Pterodactyl\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 use Pterodactyl\Events\User\PasswordChanged;
@@ -21,7 +22,7 @@ class UserUpdateService
     /**
      * Update the user model instance and return the updated model.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(User $user, array $data): User
     {

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\Nest;
 use Pterodactyl\Models\Server;
@@ -43,7 +44,7 @@ class NestTransformer extends BaseTransformer
     /**
      * Include the Eggs relationship on the given Nest model transformation.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeEggs(Nest $model): Collection|NullResource
     {
@@ -59,7 +60,7 @@ class NestTransformer extends BaseTransformer
     /**
      * Include the servers relationship on the given Nest model.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeServers(Nest $model): Collection|NullResource
     {

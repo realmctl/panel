@@ -2,6 +2,11 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Throwable;
+use Illuminate\Validation\ValidationException;
+use Pterodactyl\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -30,8 +35,8 @@ class TwoFactorController extends ClientApiController
      * it on their account. If two-factor is already enabled this endpoint
      * will return a 400 error.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function index(Request $request): JsonResponse
     {
@@ -47,8 +52,8 @@ class TwoFactorController extends ClientApiController
     /**
      * Updates a user's account to have two-factor enabled.
      *
-     * @throws \Throwable
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws Throwable
+     * @throws ValidationException
      */
     public function store(Request $request): JsonResponse
     {
@@ -78,7 +83,7 @@ class TwoFactorController extends ClientApiController
      * Disables two-factor authentication on an account if the password provided
      * is valid.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function delete(Request $request): JsonResponse
     {
@@ -86,7 +91,7 @@ class TwoFactorController extends ClientApiController
             throw new BadRequestHttpException('The password provided was not valid.');
         }
 
-        /** @var \Pterodactyl\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $user->update([

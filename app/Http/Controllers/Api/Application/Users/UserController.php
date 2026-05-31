@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\Users;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Exception;
+use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Models\User;
 use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -64,8 +68,8 @@ class UserController extends ApplicationApiController
      * Revocation errors are returned under the 'revocation_errors' key in the response
      * meta. If there are no errors this is an empty array.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function update(UpdateUserRequest $request, User $user): array
     {
@@ -82,8 +86,8 @@ class UserController extends ApplicationApiController
      * Store a new user on the system. Returns the created user and an HTTP/201
      * header on successful creation.
      *
-     * @throws \Exception
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws Exception
+     * @throws DataValidationException
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
@@ -103,7 +107,7 @@ class UserController extends ApplicationApiController
      * Handle a request to delete a user from the Panel. Returns a HTTP/204 response
      * on successful deletion.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
+     * @throws DisplayException
      */
     public function delete(DeleteUserRequest $request, User $user): JsonResponse
     {

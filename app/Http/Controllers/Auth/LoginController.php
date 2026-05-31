@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Auth;
 
+use Pterodactyl\Exceptions\DisplayException;
+use Illuminate\Validation\ValidationException;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -26,8 +28,8 @@ class LoginController extends AbstractLoginController
     /**
      * Handle a login request to the application.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws DisplayException
+     * @throws ValidationException
      */
     public function login(Request $request): JsonResponse
     {

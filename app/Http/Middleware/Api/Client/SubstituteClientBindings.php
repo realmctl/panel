@@ -2,15 +2,18 @@
 
 namespace Pterodactyl\Http\Middleware\Api\Client;
 
+use Closure;
+use Illuminate\Http\Request;
+use Pterodactyl\Models\Subuser;
 use Pterodactyl\Models\Server;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class SubstituteClientBindings extends SubstituteBindings
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      */
-    public function handle($request, \Closure $next): mixed
+    public function handle($request, Closure $next): mixed
     {
         // Override default behavior of the model binding to use a specific table
         // column rather than the default 'id'.
@@ -25,7 +28,7 @@ class SubstituteClientBindings extends SubstituteBindings
         });
 
         $this->router->bind('user', function ($value, $route) {
-            /** @var \Pterodactyl\Models\Subuser $match */
+            /** @var Subuser $match */
             $match = $route->parameter('server')
                 ->subusers()
                 ->whereRelation('user', 'uuid', '=', $value)

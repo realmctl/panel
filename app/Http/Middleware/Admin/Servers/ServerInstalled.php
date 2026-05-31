@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Middleware\Admin\Servers;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
@@ -13,7 +14,7 @@ class ServerInstalled
     /**
      * Checks that the server is installed before allowing access through the route.
      */
-    public function handle(Request $request, \Closure $next): mixed
+    public function handle(Request $request, Closure $next): mixed
     {
         /** @var Server|null $server */
         $server = $request->route()->parameter('server');

@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Middleware\Api\Daemon;
 
+use Closure;
+use Pterodactyl\Models\Node;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
@@ -31,7 +33,7 @@ class DaemonAuthenticate
      *
      * @throws HttpException
      */
-    public function handle(Request $request, \Closure $next): mixed
+    public function handle(Request $request, Closure $next): mixed
     {
         if (in_array($request->route()->getName(), $this->except)) {
             return $next($request);
@@ -48,7 +50,7 @@ class DaemonAuthenticate
         }
 
         try {
-            /** @var \Pterodactyl\Models\Node $node */
+            /** @var Node $node */
             $node = $this->repository->findFirstWhere([
                 'daemon_token_id' => $parts[0],
             ]);

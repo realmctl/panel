@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\ScheduleFactory;
+use Exception;
 use Cron\CronExpression;
 use Carbon\CarbonImmutable;
 use Illuminate\Container\Container;
@@ -22,17 +26,17 @@ use Pterodactyl\Contracts\Extensions\HashidsInterface;
  * @property bool $is_active
  * @property bool $is_processing
  * @property bool $only_when_online
- * @property \Carbon\Carbon|null $last_run_at
- * @property \Carbon\Carbon|null $next_run_at
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon|null $last_run_at
+ * @property Carbon|null $next_run_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property string $hashid
  * @property Server $server
- * @property \Illuminate\Database\Eloquent\Collection<int, \Pterodactyl\Models\Task> $tasks
+ * @property Collection<int, Task> $tasks
  */
 class Schedule extends Model
 {
-    /** @use HasFactory<\Database\Factories\ScheduleFactory> */
+    /** @use HasFactory<ScheduleFactory> */
     use HasFactory;
 
     /**
@@ -114,7 +118,7 @@ class Schedule extends Model
     /**
      * Returns the schedule's execution crontab entry as a string.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getNextRunDate(): CarbonImmutable
     {
@@ -134,7 +138,7 @@ class Schedule extends Model
     /**
      * Return tasks belonging to a schedule.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Task, $this>
+     * @return HasMany<Task, $this>
      */
     public function tasks(): HasMany
     {
@@ -144,7 +148,7 @@ class Schedule extends Model
     /**
      * Return the server model that a schedule belongs to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Server, $this>
+     * @return BelongsTo<Server, $this>
      */
     public function server(): BelongsTo
     {

@@ -2,6 +2,13 @@
 
 namespace Pterodactyl\Services\Servers;
 
+use Throwable;
+use Pterodactyl\Exceptions\DisplayException;
+use Illuminate\Validation\ValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
+use Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Egg;
@@ -42,12 +49,12 @@ class ServerCreationService
      * as possible given the input data. For example, if an allocation_id is passed with
      * no node_id the node_is will be picked from the allocation.
      *
-     * @throws \Throwable
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException
+     * @throws Throwable
+     * @throws DisplayException
+     * @throws ValidationException
+     * @throws RecordNotFoundException
+     * @throws NoViableNodeException
+     * @throws NoViableAllocationException
      */
     public function handle(array $data, ?DeploymentObject $deployment = null): Server
     {
@@ -109,9 +116,9 @@ class ServerCreationService
     /**
      * Gets an allocation to use for automatic deployment.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException
+     * @throws DisplayException
+     * @throws NoViableAllocationException
+     * @throws NoViableNodeException
      */
     private function configureDeployment(array $data, DeploymentObject $deployment): Allocation
     {
@@ -130,7 +137,7 @@ class ServerCreationService
     /**
      * Store the server in the database and return the model.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     private function createModel(array $data): Server
     {

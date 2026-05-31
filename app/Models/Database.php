@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\Carbon;
+use Database\Factories\DatabaseFactory;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,14 +19,14 @@ use Pterodactyl\Contracts\Extensions\HashidsInterface;
  * @property string $remote
  * @property string $password
  * @property int $max_connections
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property Server $server
  * @property DatabaseHost $host
  */
 class Database extends Model
 {
-    /** @use HasFactory<\Database\Factories\DatabaseFactory> */
+    /** @use HasFactory<DatabaseFactory> */
     use HasFactory;
 
     /**
@@ -79,7 +82,7 @@ class Database extends Model
      *
      * @param string|null $field
      *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
     public function resolveRouteBinding($value, $field = null): ?\Illuminate\Database\Eloquent\Model
     {
@@ -95,7 +98,7 @@ class Database extends Model
     /**
      * Gets the host database server associated with a database.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\DatabaseHost, $this>
+     * @return BelongsTo<DatabaseHost, $this>
      */
     public function host(): BelongsTo
     {
@@ -105,7 +108,7 @@ class Database extends Model
     /**
      * Gets the server associated with a database.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Server, $this>
+     * @return BelongsTo<Server, $this>
      */
     public function server(): BelongsTo
     {

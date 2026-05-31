@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Settings;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
@@ -47,8 +49,8 @@ class AdvancedController extends Controller
     }
 
     /**
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function update(AdvancedSettingsFormRequest $request): RedirectResponse
     {

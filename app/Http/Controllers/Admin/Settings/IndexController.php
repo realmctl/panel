@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Settings;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
@@ -41,8 +43,8 @@ class IndexController extends Controller
     /**
      * Handle settings update.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function update(BaseSettingsFormRequest $request): RedirectResponse
     {

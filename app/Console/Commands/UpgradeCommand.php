@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Console\Commands;
 
+use Closure;
+use Exception;
+use Illuminate\Foundation\Application;
 use Illuminate\Console\Command;
 use Pterodactyl\Console\Kernel;
 use Symfony\Component\Process\Process;
@@ -28,7 +31,7 @@ class UpgradeCommand extends Command
      * This places the application in maintenance mode as well while the commands
      * are being executed.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function handle()
     {
@@ -131,7 +134,7 @@ class UpgradeCommand extends Command
             });
         });
 
-        /** @var \Illuminate\Foundation\Application $app */
+        /** @var Application $app */
         $app = require __DIR__ . '/../../../bootstrap/app.php';
         /** @var Kernel $kernel */
         $kernel = $app->make(Kernel::class);
@@ -176,7 +179,7 @@ class UpgradeCommand extends Command
         $this->info('Panel has been successfully upgraded. Please ensure you also update any Wings instances: https://realmctl.com/wings/1.0/upgrading.html');
     }
 
-    protected function withProgress(ProgressBar $bar, \Closure $callback)
+    protected function withProgress(ProgressBar $bar, Closure $callback)
     {
         $bar->clear();
         $callback();

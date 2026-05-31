@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use ReflectionException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -37,7 +39,7 @@ class ApiController extends Controller
     /**
      * Render view allowing an admin to create a new application API key.
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function create(): View
     {
@@ -57,7 +59,7 @@ class ApiController extends Controller
     /**
      * Store the new key and redirect the user back to the application key listing.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function store(StoreApplicationApiKeyRequest $request): RedirectResponse
     {

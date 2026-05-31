@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models;
 
+use LogicException;
+use Illuminate\Support\Collection;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
 use Pterodactyl\Events\ActivityLogged;
@@ -25,10 +27,10 @@ use Illuminate\Database\Eloquent\Model as IlluminateModel;
  * @property string|null $actor_type
  * @property int|null $actor_id
  * @property int|null $api_key_id
- * @property \Illuminate\Support\Collection|null $properties
+ * @property Collection|null $properties
  * @property Carbon $timestamp
  * @property IlluminateModel|\Eloquent $actor
- * @property \Illuminate\Database\Eloquent\Collection<int, \Pterodactyl\Models\ActivityLogSubject> $subjects
+ * @property \Illuminate\Database\Eloquent\Collection<int, ActivityLogSubject> $subjects
  * @property int|null $subjects_count
  * @property ApiKey|null $apiKey
  *
@@ -87,7 +89,7 @@ class ActivityLog extends Model implements Identifiable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, $this>
+     * @return MorphTo<\Illuminate\Database\Eloquent\Model, $this>
      */
     public function actor(): MorphTo
     {
@@ -100,7 +102,7 @@ class ActivityLog extends Model implements Identifiable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\ActivityLogSubject, $this>
+     * @return HasMany<ActivityLogSubject, $this>
      */
     public function subjects(): HasMany
     {
@@ -108,7 +110,7 @@ class ActivityLog extends Model implements Identifiable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\ApiKey, $this>
+     * @return HasOne<ApiKey, $this>
      */
     public function apiKey(): HasOne
     {
@@ -136,7 +138,7 @@ class ActivityLog extends Model implements Identifiable
     public function prunable()
     {
         if (is_null(config('activity.prune_days'))) {
-            throw new \LogicException('Cannot prune activity logs: no "prune_days" configuration value is set.');
+            throw new LogicException('Cannot prune activity logs: no "prune_days" configuration value is set.');
         }
 
         return static::where('timestamp', '<=', Carbon::now()->subDays(config('activity.prune_days')));

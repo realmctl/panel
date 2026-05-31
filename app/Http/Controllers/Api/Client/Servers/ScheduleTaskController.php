@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Exception;
 use Pterodactyl\Models\Task;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
@@ -34,7 +37,7 @@ class ScheduleTaskController extends ClientApiController
     /**
      * Create a new task for a given schedule and store it in the database.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      * @throws ServiceLimitExceededException
      */
     public function store(StoreTaskRequest $request, Server $server, Schedule $schedule): array
@@ -95,8 +98,8 @@ class ScheduleTaskController extends ClientApiController
     /**
      * Updates a given task for a server.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function update(StoreTaskRequest $request, Server $server, Schedule $schedule, Task $task): array
     {
@@ -151,7 +154,7 @@ class ScheduleTaskController extends ClientApiController
      * Delete a given task for a schedule. If there are subsequent tasks stored in the database
      * for this schedule their sequence IDs are decremented properly.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(ClientApiRequest $request, Server $server, Schedule $schedule, Task $task): JsonResponse
     {

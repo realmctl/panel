@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Servers;
 
+use Exception;
+use Throwable;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Repositories\Wings\DaemonServerRepository;
@@ -23,7 +25,7 @@ class SuspensionService
     /**
      * Suspends a server on the system.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function toggle(Server $server, string $action = self::ACTION_SUSPEND): void
     {
@@ -50,7 +52,7 @@ class SuspensionService
         try {
             // Tell wings to re-sync the server state.
             $this->daemonServerRepository->setServer($server)->sync();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             // Rollback the server's suspension status if wings fails to sync the server.
             $server->update([
                 'status' => $isSuspending ? null : Server::STATUS_SUSPENDED,

@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Remote\Backups;
 
+use Exception;
+use Throwable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Pterodactyl\Models\Node;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Backup;
@@ -27,14 +31,14 @@ class BackupRemoteUploadController extends Controller
     /**
      * Returns the required presigned urls to upload a backup to S3 cloud storage.
      *
-     * @throws \Exception
-     * @throws \Throwable
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws Exception
+     * @throws Throwable
+     * @throws ModelNotFoundException
      */
     public function __invoke(Request $request, string $backup): JsonResponse
     {
         // Get the node associated with the request.
-        /** @var \Pterodactyl\Models\Node $node */
+        /** @var Node $node */
         $node = $request->attributes->get('node');
 
         // Get the size query parameter.

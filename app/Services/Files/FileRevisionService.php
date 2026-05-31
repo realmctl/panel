@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Files;
 
+use Throwable;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\FileRevision;
@@ -25,7 +26,7 @@ class FileRevisionService
     {
         try {
             $content = $this->fileRepository->setServer($server)->getContent($filePath, null);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // File doesn't exist yet (new file), no revision to create
             return null;
         }

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Extensions\Backups;
 
+use InvalidArgumentException;
 use Closure;
 use Aws\S3\S3Client;
 use Illuminate\Support\Arr;
@@ -69,7 +70,7 @@ class BackupManager
         $config = $this->getConfig($name);
 
         if (empty($config['adapter'])) {
-            throw new \InvalidArgumentException("Backup disk [$name] does not have a configured adapter.");
+            throw new InvalidArgumentException("Backup disk [$name] does not have a configured adapter.");
         }
 
         $adapter = $config['adapter'];
@@ -87,7 +88,7 @@ class BackupManager
             return $instance;
         }
 
-        throw new \InvalidArgumentException("Adapter [$adapter] is not supported.");
+        throw new InvalidArgumentException("Adapter [$adapter] is not supported.");
     }
 
     /**
@@ -163,7 +164,7 @@ class BackupManager
     /**
      * Register a custom adapter creator closure.
      */
-    public function extend(string $adapter, \Closure $callback): self
+    public function extend(string $adapter, Closure $callback): self
     {
         $this->customCreators[$adapter] = $callback;
 

@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use Exception;
+use Throwable;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\User;
@@ -85,7 +89,7 @@ class UserController extends Controller
     /**
      * Delete a user from the system.
      *
-     * @throws \Exception
+     * @throws Exception
      * @throws DisplayException
      */
     public function delete(Request $request, User $user): RedirectResponse
@@ -102,8 +106,8 @@ class UserController extends Controller
     /**
      * Create a user.
      *
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      */
     public function store(NewUserFormRequest $request): RedirectResponse
     {
@@ -116,8 +120,8 @@ class UserController extends Controller
     /**
      * Update a user on the system.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function update(UserFormRequest $request, User $user): RedirectResponse
     {

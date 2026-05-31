@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 use Pterodactyl\Services\Activity\ActivityLogTargetableService;
 
 /**
- * @mixin \Pterodactyl\Services\Activity\ActivityLogTargetableService
+ * @mixin ActivityLogTargetableService
  */
 class LogTarget extends Facade
 {

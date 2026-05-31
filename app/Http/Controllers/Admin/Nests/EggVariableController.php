@@ -2,6 +2,11 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Nests;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException;
+use Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
+use Pterodactyl\Exceptions\DisplayException;
 use Illuminate\View\View;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\EggVariable;
@@ -33,7 +38,7 @@ class EggVariableController extends Controller
     /**
      * Handle request to view the variables attached to an Egg.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function view(int $egg): View
     {
@@ -45,9 +50,9 @@ class EggVariableController extends Controller
     /**
      * Handle a request to create a new Egg variable.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException
+     * @throws DataValidationException
+     * @throws BadValidationRuleException
+     * @throws ReservedVariableNameException
      */
     public function store(EggVariableFormRequest $request, Egg $egg): RedirectResponse
     {
@@ -60,10 +65,10 @@ class EggVariableController extends Controller
     /**
      * Handle a request to update an existing Egg variable.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException
+     * @throws DisplayException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
+     * @throws ReservedVariableNameException
      */
     public function update(EggVariableFormRequest $request, Egg $egg, EggVariable $variable): RedirectResponse
     {

@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Services\Databases;
 
+use InvalidArgumentException;
+use Exception;
+use Throwable;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Database;
 use Pterodactyl\Helpers\Utilities;
@@ -64,7 +67,7 @@ class DatabaseManagementService
     /**
      * Create a new database that is linked to a specific host.
      *
-     * @throws \Throwable
+     * @throws Throwable
      * @throws TooManyDatabasesException
      * @throws DatabaseClientFeatureNotEnabledException
      */
@@ -84,7 +87,7 @@ class DatabaseManagementService
 
         // Protect against developer mistakes...
         if (empty($data['database']) || !preg_match(self::MATCH_NAME_REGEX, $data['database'])) {
-            throw new \InvalidArgumentException('The database name passed to DatabaseManagementService::handle MUST be prefixed with "s{server_id}_".');
+            throw new InvalidArgumentException('The database name passed to DatabaseManagementService::handle MUST be prefixed with "s{server_id}_".');
         }
 
         $data = array_merge($data, [
@@ -115,7 +118,7 @@ class DatabaseManagementService
 
                 return $database;
             });
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             try {
                 // This is actually incorrect, it can be null in the case that the $database model
                 // itself isn't able to be created in Pterodactyl's database.
@@ -126,7 +129,7 @@ class DatabaseManagementService
                     $this->repository->dropUser($database->username, $database->remote);
                     $this->repository->flush();
                 }
-            } catch (\Throwable $deletionException) { // @phpstan-ignore catch.neverThrown
+            } catch (Throwable $deletionException) { // @phpstan-ignore catch.neverThrown
                 // Do nothing here. We've already encountered an issue before this point so no
                 // reason to prioritize this error over the initial one.
             }
@@ -138,7 +141,7 @@ class DatabaseManagementService
     /**
      * Delete a database from the given host server.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Database $database): ?bool
     {
@@ -157,7 +160,7 @@ class DatabaseManagementService
      * and avoiding user confusion we will ignore the specific host and just look across all hosts.
      *
      * @throws DuplicateDatabaseNameException
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function createModel(array $data): Database
     {

@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Nests;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Service\Egg\BadJsonFormatException;
+use Pterodactyl\Exceptions\Service\InvalidFileUploadException;
 use Pterodactyl\Models\Egg;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
@@ -26,7 +30,7 @@ class EggShareController extends Controller
     }
 
     /**
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function export(Egg $egg): Response
     {
@@ -43,10 +47,10 @@ class EggShareController extends Controller
     /**
      * Import a new service option using an XML file.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\BadJsonFormatException
-     * @throws \Pterodactyl\Exceptions\Service\InvalidFileUploadException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
+     * @throws BadJsonFormatException
+     * @throws InvalidFileUploadException
      */
     public function import(EggImportFormRequest $request): RedirectResponse
     {
@@ -59,10 +63,10 @@ class EggShareController extends Controller
     /**
      * Update an existing Egg using a new imported file.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\BadJsonFormatException
-     * @throws \Pterodactyl\Exceptions\Service\InvalidFileUploadException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
+     * @throws BadJsonFormatException
+     * @throws InvalidFileUploadException
      */
     public function update(EggImportFormRequest $request, Egg $egg): RedirectResponse
     {

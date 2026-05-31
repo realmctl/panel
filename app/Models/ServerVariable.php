@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -9,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $server_id
  * @property int $variable_id
  * @property string $variable_value
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property EggVariable $variable
  * @property Server $server
  */
@@ -42,7 +43,7 @@ class ServerVariable extends Model
     /**
      * Returns the server this variable is associated with.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Server, $this>
+     * @return BelongsTo<Server, $this>
      */
     public function server(): BelongsTo
     {
@@ -52,7 +53,7 @@ class ServerVariable extends Model
     /**
      * Returns information about a given variables parent.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\EggVariable, $this>
+     * @return BelongsTo<EggVariable, $this>
      */
     public function variable(): BelongsTo
     {

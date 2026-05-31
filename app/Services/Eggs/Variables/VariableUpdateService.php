@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Eggs\Variables;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Exceptions\DisplayException;
@@ -34,8 +36,8 @@ class VariableUpdateService
      * Update a specific egg variable.
      *
      * @throws DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      * @throws ReservedVariableNameException
      */
     public function handle(EggVariable $variable, array $data): mixed

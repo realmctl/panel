@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Console;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Ramsey\Uuid\Uuid;
 use Pterodactyl\Models\ActivityLog;
 use Illuminate\Console\Scheduling\Schedule;
@@ -52,8 +54,8 @@ class Kernel extends ConsoleKernel
     /**
      * I wonder what this does.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws DataValidationException
+     * @throws BindingResolutionException
      */
     private function registerTelemetry(Schedule $schedule): void
     {

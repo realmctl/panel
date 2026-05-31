@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Console\Commands\Environment;
 
+use DateTimeZone;
+use Pterodactyl\Exceptions\PterodactylException;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel;
 use Pterodactyl\Traits\Commands\EnvironmentWriterTrait;
@@ -59,7 +61,7 @@ class AppSettingsCommand extends Command
     /**
      * Handle command execution.
      *
-     * @throws \Pterodactyl\Exceptions\PterodactylException
+     * @throws PterodactylException
      */
     public function handle(): int
     {
@@ -88,7 +90,7 @@ class AppSettingsCommand extends Command
         $this->output->comment('The timezone should match one of PHP\'s supported timezones. If you are unsure, please reference https://php.net/manual/en/timezones.php.');
         $this->variables['APP_TIMEZONE'] = $this->option('timezone') ?? $this->anticipate(
             'Application Timezone',
-            \DateTimeZone::listIdentifiers(),
+            DateTimeZone::listIdentifiers(),
             config('app.timezone')
         );
 

@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Auth;
 
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Pterodactyl\Models\User;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Hashing\Hasher;
@@ -68,11 +72,11 @@ class ResetPasswordController extends Controller
      * account do not automatically log them in. In those cases, send the user back to the login
      * form with a note telling them their password was changed and to log back in.
      *
-     * @param \Illuminate\Contracts\Auth\CanResetPassword&\Pterodactyl\Models\User $user
+     * @param CanResetPassword&User $user
      * @param string $password
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     protected function resetPassword($user, $password)
     {

@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
 
+use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Services\Servers\BuildModificationService;
 use Pterodactyl\Services\Servers\DetailsModificationService;
@@ -25,9 +28,9 @@ class ServerDetailsController extends ApplicationApiController
     /**
      * Update the details for a specific server.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DisplayException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function details(UpdateServerDetailsRequest $request, Server $server): array
     {
@@ -44,9 +47,9 @@ class ServerDetailsController extends ApplicationApiController
     /**
      * Update the build details for a specific server.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DisplayException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function build(UpdateServerBuildConfigurationRequest $request, Server $server): array
     {

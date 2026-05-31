@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Providers;
 
+use Illuminate\Contracts\Config\Repository;
 use Pterodactyl\Extensions\Hashids;
 use Illuminate\Support\ServiceProvider;
 use Pterodactyl\Contracts\Extensions\HashidsInterface;
@@ -14,7 +15,7 @@ class HashidsServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HashidsInterface::class, function () {
-            /** @var \Illuminate\Contracts\Config\Repository $config */
+            /** @var Repository $config */
             $config = $this->app['config'];
 
             return new Hashids(

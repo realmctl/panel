@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Backups;
 
+use Throwable;
+use Pterodactyl\Extensions\Filesystem\S3Filesystem;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Backup;
 use GuzzleHttp\Exception\ClientException;
@@ -24,7 +26,7 @@ class DeleteBackupService
      * Deletes a backup from the system. If the backup is stored in S3 a request
      * will be made to delete that backup from the disk as well.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Backup $backup): void
     {
@@ -63,14 +65,14 @@ class DeleteBackupService
     /**
      * Deletes a backup from an S3 disk.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function deleteFromS3(Backup $backup): void
     {
         $this->connection->transaction(function () use ($backup) {
             $backup->delete();
 
-            /** @var \Pterodactyl\Extensions\Filesystem\S3Filesystem $adapter */
+            /** @var S3Filesystem $adapter */
             $adapter = $this->manager->adapter(Backup::ADAPTER_AWS_S3);
 
             // @phpstan-ignore-next-line method.notFound

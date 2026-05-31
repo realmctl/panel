@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Console\Commands\User;
 
+use Exception;
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Illuminate\Console\Command;
 use Pterodactyl\Services\Users\UserCreationService;
 
@@ -22,8 +24,8 @@ class MakeUserCommand extends Command
     /**
      * Handle command request to create a new user.
      *
-     * @throws \Exception
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws Exception
+     * @throws DataValidationException
      */
     public function handle()
     {

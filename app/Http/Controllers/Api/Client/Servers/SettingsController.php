@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Throwable;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
@@ -29,8 +32,8 @@ class SettingsController extends ClientApiController
     /**
      * Renames a server.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function rename(RenameServerRequest $request, Server $server): JsonResponse
     {
@@ -59,7 +62,7 @@ class SettingsController extends ClientApiController
     /**
      * Reinstalls the server on the daemon.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function reinstall(ReinstallServerRequest $request, Server $server): JsonResponse
     {
@@ -73,7 +76,7 @@ class SettingsController extends ClientApiController
     /**
      * Changes the Docker image in use by the server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function dockerImage(SetDockerImageRequest $request, Server $server): JsonResponse
     {

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Nodes;
 
+use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
@@ -21,7 +22,7 @@ class SystemInformationController extends Controller
     /**
      * Returns system information from the Daemon.
      *
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function __invoke(Request $request, Node $node): JsonResponse
     {

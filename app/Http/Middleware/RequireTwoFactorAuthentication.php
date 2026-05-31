@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Middleware;
 
+use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Prologue\Alerts\AlertsMessageBag;
@@ -33,7 +34,7 @@ class RequireTwoFactorAuthentication
      *
      * @throws TwoFactorAuthRequiredException
      */
-    public function handle(Request $request, \Closure $next): mixed
+    public function handle(Request $request, Closure $next): mixed
     {
         $user = $request->user();
         $uri = rtrim($request->getRequestUri(), '/') . '/';

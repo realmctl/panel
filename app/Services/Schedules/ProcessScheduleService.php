@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Schedules;
 
+use Throwable;
 use Exception;
 use Pterodactyl\Models\Schedule;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -23,7 +24,7 @@ class ProcessScheduleService
     /**
      * Process a schedule and push the first task onto the queue worker.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Schedule $schedule, bool $now = false): void
     {
@@ -54,7 +55,7 @@ class ProcessScheduleService
 
                     return;
                 }
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 if (!$exception instanceof DaemonConnectionException) {
                     // If we encountered some exception during this process that wasn't just an
                     // issue connecting to Wings run the failed sequence for a job. Otherwise we
@@ -76,7 +77,7 @@ class ProcessScheduleService
             // @see https://github.com/realmopensource/panel/issues/2550
             try {
                 $this->dispatcher->dispatchNow($job);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $job->failed($exception);
 
                 throw $exception;

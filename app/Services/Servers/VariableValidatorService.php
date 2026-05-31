@@ -34,7 +34,7 @@ class VariableValidatorService
             $query = $query->where('user_editable', true)->where('user_viewable', true);
         }
 
-        /** @var \Pterodactyl\Models\EggVariable[] $variables */
+        /** @var EggVariable[] $variables */
         $variables = $query->get();
 
         $data = $rules = $customAttributes = [];

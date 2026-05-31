@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Models;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -35,7 +36,7 @@ abstract class Model extends IlluminateModel
      * Listen for the model saving event and fire off the validation
      * function before it is saved.
      *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
     protected static function boot()
     {

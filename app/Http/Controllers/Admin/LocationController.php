@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Throwable;
+use Exception;
 use Illuminate\View\View;
 use Pterodactyl\Models\Location;
 use Illuminate\Http\RedirectResponse;
@@ -43,7 +46,7 @@ class LocationController extends Controller
     /**
      * Return the location view page.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function view(int $id): View
     {
@@ -55,7 +58,7 @@ class LocationController extends Controller
     /**
      * Handle request to create new location.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function create(LocationFormRequest $request): RedirectResponse
     {
@@ -68,7 +71,7 @@ class LocationController extends Controller
     /**
      * Handle request to update or delete location.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function update(LocationFormRequest $request, Location $location): RedirectResponse
     {
@@ -85,7 +88,7 @@ class LocationController extends Controller
     /**
      * Delete a location from the system.
      *
-     * @throws \Exception
+     * @throws Exception
      * @throws DisplayException
      */
     public function delete(Location $location): RedirectResponse

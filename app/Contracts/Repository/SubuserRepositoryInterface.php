@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Contracts\Repository;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\Subuser;
 
 interface SubuserRepositoryInterface extends RepositoryInterface
@@ -19,7 +20,7 @@ interface SubuserRepositoryInterface extends RepositoryInterface
     /**
      * Return a subuser and associated permissions given a user_id and server_id.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function getWithPermissionsUsingUserAndServer(int $user, int $server): Subuser;
 }

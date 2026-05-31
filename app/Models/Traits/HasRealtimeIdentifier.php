@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models\Traits;
 
+use ReflectionClass;
+use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
@@ -20,7 +22,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  *
  * @method static Builder whereIdentifier(string $identifier)
  *
- * @mixin \Illuminate\Database\Eloquent\Model
+ * @mixin Model
  */
 trait HasRealtimeIdentifier
 {
@@ -57,7 +59,7 @@ trait HasRealtimeIdentifier
 
     protected static function bootHasRealtimeIdentifier(): void
     {
-        $attrs = (new \ReflectionClass(static::class))->getAttributes(Identifiable::class);
+        $attrs = (new ReflectionClass(static::class))->getAttributes(Identifiable::class);
 
         Assert::count(
             $attrs,

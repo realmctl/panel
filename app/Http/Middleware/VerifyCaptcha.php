@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Pterodactyl\Events\Auth\FailedCaptcha;
@@ -18,7 +19,7 @@ class VerifyCaptcha
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, \Closure $next): mixed
+    public function handle(Request $request, Closure $next): mixed
     {
         if (!$this->captcha->isEnabled()) {
             return $next($request);

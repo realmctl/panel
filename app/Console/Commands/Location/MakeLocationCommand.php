@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Console\Commands\Location;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Illuminate\Console\Command;
 use Pterodactyl\Services\Locations\LocationCreationService;
 
@@ -24,7 +25,7 @@ class MakeLocationCommand extends Command
     /**
      * Handle the command execution process.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function handle()
     {

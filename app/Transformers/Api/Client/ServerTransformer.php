@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Client;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Subuser;
@@ -85,7 +86,7 @@ class ServerTransformer extends BaseClientTransformer
     /**
      * Returns the allocations associated with this server.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeAllocations(Server $server): Collection
     {
@@ -110,7 +111,7 @@ class ServerTransformer extends BaseClientTransformer
     }
 
     /**
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeVariables(Server $server): Collection|NullResource
     {
@@ -128,7 +129,7 @@ class ServerTransformer extends BaseClientTransformer
     /**
      * Returns the egg associated with this server.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeEgg(Server $server): Item
     {
@@ -138,7 +139,7 @@ class ServerTransformer extends BaseClientTransformer
     /**
      * Returns the subusers associated with this server.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeSubusers(Server $server): Collection|NullResource
     {

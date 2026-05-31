@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Console\Commands\Environment;
 
+use Pterodactyl\Exceptions\PterodactylException;
 use Illuminate\Console\Command;
 use Pterodactyl\Traits\Commands\EnvironmentWriterTrait;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -37,7 +38,7 @@ class EmailSettingsCommand extends Command
     /**
      * Handle command execution.
      *
-     * @throws \Pterodactyl\Exceptions\PterodactylException
+     * @throws PterodactylException
      */
     public function handle()
     {

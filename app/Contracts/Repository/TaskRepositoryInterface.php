@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Contracts\Repository;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\Task;
 
 interface TaskRepositoryInterface extends RepositoryInterface
@@ -9,7 +10,7 @@ interface TaskRepositoryInterface extends RepositoryInterface
     /**
      * Get a task and the server relationship for that task.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function getTaskForJobProcess(int $id): Task;
 

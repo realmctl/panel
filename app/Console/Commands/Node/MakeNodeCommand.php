@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Console\Commands\Node;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Illuminate\Console\Command;
 use Pterodactyl\Services\Nodes\NodeCreationService;
 
@@ -38,7 +39,7 @@ class MakeNodeCommand extends Command
     /**
      * Handle the command execution process.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function handle()
     {

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Repositories\Wings;
 
+use Pterodactyl\Models\Node;
 use Illuminate\Support\Arr;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Server;
@@ -12,8 +13,8 @@ use Pterodactyl\Exceptions\Http\Server\FileSizeTooLargeException;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 /**
- * @method \Pterodactyl\Repositories\Wings\DaemonFileRepository setNode(\Pterodactyl\Models\Node $node)
- * @method \Pterodactyl\Repositories\Wings\DaemonFileRepository setServer(\Pterodactyl\Models\Server $server)
+ * @method DaemonFileRepository setNode(Node $node)
+ * @method DaemonFileRepository setServer(Server $server)
  */
 class DaemonFileRepository extends DaemonRepository
 {

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Servers;
 
+use Throwable;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\User;
@@ -24,7 +25,7 @@ class StartupModificationService
     /**
      * Process startup modification for a server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Server $server, array $data): Server
     {

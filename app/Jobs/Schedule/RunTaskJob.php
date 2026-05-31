@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Jobs\Schedule;
 
+use InvalidArgumentException;
+use Exception;
+use Throwable;
 use Carbon\CarbonImmutable;
 use Pterodactyl\Models\Task;
 use Illuminate\Bus\Queueable;
@@ -30,7 +33,7 @@ class RunTaskJob implements ShouldQueue
     /**
      * Run the job and send actions to the daemon running the server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(
         DaemonCommandRepository $commandRepository,
@@ -69,9 +72,9 @@ class RunTaskJob implements ShouldQueue
                     $backupService->setIgnoredFiles(explode(PHP_EOL, $this->task->payload))->handle($server, null, true);
                     break;
                 default:
-                    throw new \InvalidArgumentException('Invalid task action provided: ' . $this->task->action);
+                    throw new InvalidArgumentException('Invalid task action provided: ' . $this->task->action);
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             // If this isn't a DaemonConnectionException on a task that allows for failures
             // throw the exception back up the chain so that the task is stopped.
             if (!($this->task->continue_on_failure && $exception instanceof DaemonConnectionException)) {
@@ -86,7 +89,7 @@ class RunTaskJob implements ShouldQueue
     /**
      * Handle a failure while sending the action to the daemon or otherwise processing the job.
      */
-    public function failed(?\Exception $exception = null)
+    public function failed(?Exception $exception = null)
     {
         $this->markTaskNotQueued();
         $this->markScheduleComplete();

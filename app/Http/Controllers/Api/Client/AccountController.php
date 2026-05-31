@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client;
 
+use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Auth\AuthManager;
@@ -67,7 +68,7 @@ class AccountController extends ClientApiController
      * Update the authenticated user's password. All existing sessions will be logged
      * out immediately.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function updatePassword(UpdatePasswordRequest $request): JsonResponse
     {

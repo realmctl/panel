@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Exceptions;
 
+use Throwable;
 use Exception;
 use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
@@ -22,7 +23,7 @@ class DisplayException extends PterodactylException implements HttpExceptionInte
     /**
      * DisplayException constructor.
      */
-    public function __construct(string $message, ?\Throwable $previous = null, protected string $level = self::LEVEL_ERROR, int $code = 0)
+    public function __construct(string $message, ?Throwable $previous = null, protected string $level = self::LEVEL_ERROR, int $code = 0)
     {
         parent::__construct($message, $code, $previous);
     }
@@ -62,17 +63,17 @@ class DisplayException extends PterodactylException implements HttpExceptionInte
      * Log the exception to the logs using the defined error level only if the previous
      * exception is set.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function report()
     {
-        if (!$this->getPrevious() instanceof \Exception || !Handler::isReportable($this->getPrevious())) {
+        if (!$this->getPrevious() instanceof Exception || !Handler::isReportable($this->getPrevious())) {
             return null;
         }
 
         try {
             $logger = Container::getInstance()->make(LoggerInterface::class);
-        } catch (\Exception) {
+        } catch (Exception) {
             throw $this->getPrevious();
         }
 

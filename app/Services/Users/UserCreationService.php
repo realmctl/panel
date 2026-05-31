@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Users;
 
+use Exception;
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Pterodactyl\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
@@ -26,8 +28,8 @@ class UserCreationService
     /**
      * Create a new user on the system.
      *
-     * @throws \Exception
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws Exception
+     * @throws DataValidationException
      */
     public function handle(array $data): User
     {

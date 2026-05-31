@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Eggs;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
 use Pterodactyl\Exceptions\Service\Egg\NoParentConfigurationFoundException;
@@ -18,8 +20,8 @@ class EggUpdateService
     /**
      * Update a service option.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      * @throws NoParentConfigurationFoundException
      */
     public function handle(Egg $egg, array $data): void

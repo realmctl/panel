@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\NodeFactory;
 use Illuminate\Support\Str;
 use Symfony\Component\Yaml\Yaml;
 use Illuminate\Container\Container;
@@ -35,17 +38,17 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int $daemonListen
  * @property int $daemonSFTP
  * @property string $daemonBase
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property Location $location
- * @property \Pterodactyl\Models\Mount[]|\Illuminate\Database\Eloquent\Collection $mounts
- * @property \Pterodactyl\Models\Server[]|\Illuminate\Database\Eloquent\Collection $servers
- * @property \Pterodactyl\Models\Allocation[]|\Illuminate\Database\Eloquent\Collection $allocations
+ * @property Mount[]|Collection $mounts
+ * @property Server[]|Collection $servers
+ * @property Allocation[]|Collection $allocations
  */
 #[Attributes\Identifiable('node')]
 class Node extends Model implements Identifiable
 {
-    /** @use HasFactory<\Database\Factories\NodeFactory> */
+    /** @use HasFactory<NodeFactory> */
     use HasFactory;
     use Notifiable;
     use HasRealtimeIdentifier;
@@ -199,7 +202,7 @@ class Node extends Model implements Identifiable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Pterodactyl\Models\Mount, \Pterodactyl\Models\MountNode, $this>
+     * @return HasManyThrough<Mount, MountNode, $this>
      */
     public function mounts(): HasManyThrough
     {
@@ -209,7 +212,7 @@ class Node extends Model implements Identifiable
     /**
      * Gets the location associated with a node.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Location, $this>
+     * @return BelongsTo<Location, $this>
      */
     public function location(): BelongsTo
     {
@@ -219,7 +222,7 @@ class Node extends Model implements Identifiable
     /**
      * Gets the servers associated with a node.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Server, $this>
+     * @return HasMany<Server, $this>
      */
     public function servers(): HasMany
     {
@@ -229,7 +232,7 @@ class Node extends Model implements Identifiable
     /**
      * Gets the allocations associated with a node.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Allocation, $this>
+     * @return HasMany<Allocation, $this>
      */
     public function allocations(): HasMany
     {

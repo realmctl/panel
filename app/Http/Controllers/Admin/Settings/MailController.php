@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Settings;
 
+use Exception;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -44,8 +47,8 @@ class MailController extends Controller
      * Handle request to update mail settings.
      *
      * @throws DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function update(MailSettingsFormRequest $request): Response
     {
@@ -79,7 +82,7 @@ class MailController extends Controller
         try {
             Notification::route('mail', $request->user()->email)
                 ->notify(new MailTested($request->user()));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return response($exception->getMessage(), 500);
         }
 

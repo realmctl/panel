@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Eggs;
 
+use JsonException;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Egg;
 use Illuminate\Http\UploadedFile;
@@ -13,7 +14,7 @@ class EggParserService
     /**
      * Takes an uploaded file and parses out the egg configuration from within.
      *
-     * @throws \JsonException
+     * @throws JsonException
      * @throws InvalidFileUploadException
      */
     public function handle(UploadedFile $file): array

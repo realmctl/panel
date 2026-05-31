@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\BackupFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Pterodactyl\Contracts\Models\Identifiable;
 use Pterodactyl\Models\Traits\HasRealtimeIdentifier;
@@ -20,17 +22,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string|null $checksum
  * @property int $bytes
  * @property string|null $upload_id
- * @property \Carbon\CarbonImmutable|null $completed_at
- * @property \Carbon\CarbonImmutable $created_at
- * @property \Carbon\CarbonImmutable $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property CarbonImmutable|null $completed_at
+ * @property CarbonImmutable $created_at
+ * @property CarbonImmutable $updated_at
+ * @property CarbonImmutable|null $deleted_at
  * @property Server $server
- * @property \Pterodactyl\Models\AuditLog[] $audits
+ * @property AuditLog[] $audits
  */
 #[Attributes\Identifiable('bkup')]
 class Backup extends Model implements Identifiable
 {
-    /** @use HasFactory<\Database\Factories\BackupFactory> */
+    /** @use HasFactory<BackupFactory> */
     use HasFactory;
     use SoftDeletes;
     use HasRealtimeIdentifier;
@@ -77,7 +79,7 @@ class Backup extends Model implements Identifiable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Server, $this>
+     * @return BelongsTo<Server, $this>
      */
     public function server(): BelongsTo
     {

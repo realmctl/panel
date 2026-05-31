@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Servers;
 
+use Throwable;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Allocation;
@@ -27,7 +28,7 @@ class BuildModificationService
     /**
      * Change the build details for a specified server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      * @throws DisplayException
      */
     public function handle(Server $server, array $data): Server

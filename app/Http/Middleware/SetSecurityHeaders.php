@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Middleware;
 
+use Closure;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
 class SetSecurityHeaders
@@ -26,9 +28,9 @@ class SetSecurityHeaders
      * If a header has already been set in another location within the code it will be
      * skipped over here.
      *
-     * @param (\Closure(mixed): \Illuminate\Http\Response) $next
+     * @param Closure(mixed):Response $next
      */
-    public function handle(Request $request, \Closure $next): mixed
+    public function handle(Request $request, Closure $next): mixed
     {
         $response = $next($request);
 

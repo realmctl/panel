@@ -2,6 +2,14 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Service\Allocation\ServerUsingAllocationException;
+use Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException;
+use Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException;
+use Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException;
+use Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
@@ -66,7 +74,7 @@ class NodesController extends Controller
     /**
      * Post controller to create a new node on the system.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function store(NodeFormRequest $request): RedirectResponse
     {
@@ -79,9 +87,9 @@ class NodesController extends Controller
     /**
      * Updates settings for a node.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DisplayException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function updateSettings(NodeFormRequest $request, Node $node): RedirectResponse
     {
@@ -94,7 +102,7 @@ class NodesController extends Controller
     /**
      * Removes a single allocation from a node.
      *
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\ServerUsingAllocationException
+     * @throws ServerUsingAllocationException
      */
     public function allocationRemoveSingle(int $node, Allocation $allocation): Response
     {
@@ -106,7 +114,7 @@ class NodesController extends Controller
     /**
      * Removes multiple individual allocations from a node.
      *
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\ServerUsingAllocationException
+     * @throws ServerUsingAllocationException
      */
     public function allocationRemoveMultiple(Request $request, int $node): Response
     {
@@ -140,8 +148,8 @@ class NodesController extends Controller
     /**
      * Sets an alias for a specific allocation on a node.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function allocationSetAlias(AllocationAliasFormRequest $request): \Symfony\Component\HttpFoundation\Response
     {
@@ -155,10 +163,10 @@ class NodesController extends Controller
     /**
      * Creates new allocations on a node.
      *
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException
+     * @throws CidrOutOfRangeException
+     * @throws InvalidPortMappingException
+     * @throws PortOutOfRangeException
+     * @throws TooManyPortsInRangeException
      */
     public function createAllocation(AllocationFormRequest $request, Node $node): RedirectResponse
     {
@@ -171,7 +179,7 @@ class NodesController extends Controller
     /**
      * Deletes a node from the system.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
+     * @throws DisplayException
      */
     public function delete(int|Node $node): RedirectResponse
     {

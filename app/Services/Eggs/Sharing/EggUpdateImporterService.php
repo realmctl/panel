@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Eggs\Sharing;
 
+use Pterodactyl\Exceptions\Service\InvalidFileUploadException;
+use Throwable;
 use Pterodactyl\Models\Egg;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -21,7 +23,7 @@ class EggUpdateImporterService
     /**
      * Update an existing Egg using an uploaded JSON file.
      *
-     * @throws \Pterodactyl\Exceptions\Service\InvalidFileUploadException|\Throwable
+     * @throws InvalidFileUploadException|Throwable
      */
     public function handle(Egg $egg, UploadedFile $file): Egg
     {

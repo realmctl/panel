@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Services\Users;
 
+use Throwable;
+use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
+use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
+use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\User;
@@ -29,10 +33,10 @@ class ToggleTwoFactorService
     /**
      * Toggle 2FA on an account only if the token provided is valid.
      *
-     * @throws \Throwable
-     * @throws \PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException
-     * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
-     * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
+     * @throws Throwable
+     * @throws IncompatibleWithGoogleAuthenticatorException
+     * @throws InvalidCharactersException
+     * @throws SecretKeyTooShortException
      * @throws TwoFactorAuthenticationTokenInvalid
      */
     public function handle(User $user, string $token, ?bool $toggleState = null): array

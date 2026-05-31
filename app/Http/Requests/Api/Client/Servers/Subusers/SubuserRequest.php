@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Requests\Api\Client\Servers\Subusers;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Pterodactyl\Models\Server;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\User;
 use Pterodactyl\Models\Subuser;
@@ -16,7 +18,7 @@ abstract class SubuserRequest extends ClientApiRequest
     /**
      * Authorize the request and ensure that a user is not trying to modify themselves.
      *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
     public function authorize(): bool
     {
@@ -47,12 +49,12 @@ abstract class SubuserRequest extends ClientApiRequest
      * Validates that the permissions we are trying to assign can actually be assigned
      * by the user making the request.
      *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
     protected function validatePermissionsCanBeAssigned(array $permissions)
     {
         $user = $this->user();
-        /** @var \Pterodactyl\Models\Server $server */
+        /** @var Server $server */
         $server = $this->route()->parameter('server');
 
         // If we are a root admin or the server owner, no need to perform these checks.

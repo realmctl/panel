@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Services\Telemetry;
 
+use Exception;
+use PDO;
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Egg;
@@ -36,7 +39,7 @@ class TelemetryCollectionService
     {
         try {
             $data = $this->collect();
-        } catch (\Exception) {
+        } catch (Exception) {
             return;
         }
 
@@ -46,7 +49,7 @@ class TelemetryCollectionService
     /**
      * Collects telemetry data and returns it as an array.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function collect(): array
     {
@@ -59,7 +62,7 @@ class TelemetryCollectionService
         $nodes = Node::all()->map(function ($node) {
             try {
                 $info = $this->daemonConfigurationRepository->setNode($node)->getSystemInformation(2);
-            } catch (\Exception) {
+            } catch (Exception) {
                 return null;
             }
 
@@ -121,7 +124,7 @@ class TelemetryCollectionService
 
                     'database' => [
                         'type' => config('database.default'),
-                        'version' => DB::getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION),
+                        'version' => DB::getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION),
                     ],
                 ],
             ],

@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Throwable;
+use Exception;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\User;
 use Illuminate\Http\Response;
@@ -65,7 +68,7 @@ class ServersController extends Controller
      * Update the details for a server.
      *
      * @throws DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function setDetails(Request $request, Server $server): RedirectResponse
     {
@@ -83,7 +86,7 @@ class ServersController extends Controller
      *
      * @throws DisplayException
      * @throws DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function toggleInstall(Server $server): RedirectResponse
     {
@@ -105,7 +108,7 @@ class ServersController extends Controller
      *
      * @throws DisplayException
      * @throws DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function reinstallServer(Server $server): RedirectResponse
     {
@@ -120,7 +123,7 @@ class ServersController extends Controller
      *
      * @throws DisplayException
      * @throws DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function manageSuspension(Request $request, Server $server): RedirectResponse
     {
@@ -136,7 +139,7 @@ class ServersController extends Controller
      * Update the build configuration for a server.
      *
      * @throws DisplayException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      * @throws ValidationException
      */
     public function updateBuild(Request $request, Server $server): RedirectResponse
@@ -160,7 +163,7 @@ class ServersController extends Controller
      * Start the server deletion process.
      *
      * @throws DisplayException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function delete(Request $request, Server $server): RedirectResponse
     {
@@ -199,7 +202,7 @@ class ServersController extends Controller
     /**
      * Creates a new database assigned to a specific server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function newDatabase(StoreServerDatabaseRequest $request, Server $server): RedirectResponse
     {
@@ -216,7 +219,7 @@ class ServersController extends Controller
     /**
      * Resets the database password for a specific database on this server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function resetDatabasePassword(Request $request, Server $server): Response
     {
@@ -231,7 +234,7 @@ class ServersController extends Controller
     /**
      * Deletes a database from a server.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function deleteDatabase(Server $server, Database $database): Response
     {
@@ -243,7 +246,7 @@ class ServersController extends Controller
     /**
      * Add a mount to a server.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function addMount(Request $request, Server $server): RedirectResponse
     {

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Models\Server;
 use League\Fractal\Resource\Item;
@@ -42,7 +43,7 @@ class AllocationTransformer extends BaseTransformer
     /**
      * Load the node relationship onto a given transformation.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeNode(Allocation $allocation): Item|NullResource
     {
@@ -60,7 +61,7 @@ class AllocationTransformer extends BaseTransformer
     /**
      * Load the server relationship onto a given transformation.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeServer(Allocation $allocation): Item|NullResource
     {

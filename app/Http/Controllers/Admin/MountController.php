@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Throwable;
+use Exception;
 use Ramsey\Uuid\Uuid;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -45,7 +48,7 @@ class MountController extends Controller
     /**
      * Return the mount view page.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function view(string $id): View
     {
@@ -62,7 +65,7 @@ class MountController extends Controller
     /**
      * Handle request to create new mount.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function create(MountFormRequest $request): RedirectResponse
     {
@@ -80,7 +83,7 @@ class MountController extends Controller
     /**
      * Handle request to update or delete location.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function update(MountFormRequest $request, Mount $mount): RedirectResponse
     {
@@ -98,7 +101,7 @@ class MountController extends Controller
     /**
      * Delete a location from the system.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Mount $mount): RedirectResponse
     {

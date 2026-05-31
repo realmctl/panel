@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Repositories\Wings;
 
+use Pterodactyl\Models\Node;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Server;
 use GuzzleHttp\Exception\GuzzleException;
@@ -9,8 +10,8 @@ use GuzzleHttp\Exception\TransferException;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 /**
- * @method \Pterodactyl\Repositories\Wings\DaemonServerRepository setNode(\Pterodactyl\Models\Node $node)
- * @method \Pterodactyl\Repositories\Wings\DaemonServerRepository setServer(\Pterodactyl\Models\Server $server)
+ * @method DaemonServerRepository setNode(Node $node)
+ * @method DaemonServerRepository setServer(Server $server)
  */
 class DaemonServerRepository extends DaemonRepository
 {

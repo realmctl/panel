@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Repositories\Eloquent;
 
+use Exception;
 use Pterodactyl\Contracts\Repository\PermissionRepositoryInterface;
 
 class PermissionRepository extends EloquentRepository implements PermissionRepositoryInterface
@@ -9,10 +10,10 @@ class PermissionRepository extends EloquentRepository implements PermissionRepos
     /**
      * Return the model backing this repository.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function model(): string
     {
-        throw new \Exception('This functionality is not implemented.');
+        throw new Exception('This functionality is not implemented.');
     }
 }

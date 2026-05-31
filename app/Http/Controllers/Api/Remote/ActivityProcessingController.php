@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Remote;
 
+use DateTimeInterface;
+use Exception;
+use Pterodactyl\Models\Node;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\User;
@@ -19,7 +22,7 @@ class ActivityProcessingController extends Controller
     {
         $tz = Carbon::now()->getTimezone();
 
-        /** @var \Pterodactyl\Models\Node $node */
+        /** @var Node $node */
         $node = $request->attributes->get('node');
 
         $servers = $node->servers()->whereIn('uuid', $request->servers())->get()->keyBy('uuid');
@@ -35,11 +38,11 @@ class ActivityProcessingController extends Controller
 
             try {
                 $when = Carbon::createFromFormat(
-                    \DateTimeInterface::RFC3339,
+                    DateTimeInterface::RFC3339,
                     preg_replace('/(\.\d+)Z$/', 'Z', $datum['timestamp']),
                     'UTC'
                 );
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 Log::warning($exception, ['timestamp' => $datum['timestamp']]);
 
                 // If we cannot parse the value for some reason don't blow up this request, just go ahead

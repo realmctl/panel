@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
+use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 use Carbon\Carbon;
 use Pterodactyl\Models\Server;
 use Illuminate\Cache\Repository;
@@ -25,7 +26,7 @@ class ResourceUtilizationController extends ClientApiController
      * 20 seconds at a time to ensure that repeated requests to this endpoint do not cause
      * a flood of unnecessary API calls.
      *
-     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     * @throws DaemonConnectionException
      */
     public function __invoke(GetServerRequest $request, Server $server): array
     {

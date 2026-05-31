@@ -2,6 +2,11 @@
 
 namespace Pterodactyl\Services\Allocations;
 
+use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException;
+use Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException;
+use Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException;
+use Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Allocation;
@@ -22,11 +27,11 @@ class FindAssignableAllocationService
      * no allocation can be found, a new one will be created with a random port between the defined
      * range from the configuration.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException
+     * @throws DisplayException
+     * @throws CidrOutOfRangeException
+     * @throws InvalidPortMappingException
+     * @throws PortOutOfRangeException
+     * @throws TooManyPortsInRangeException
      */
     public function handle(Server $server): Allocation
     {
@@ -57,11 +62,11 @@ class FindAssignableAllocationService
      * in the settings. If there are no matches in that range, or something is wrong with the
      * range information provided an exception will be raised.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException
-     * @throws \Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException
+     * @throws DisplayException
+     * @throws CidrOutOfRangeException
+     * @throws InvalidPortMappingException
+     * @throws PortOutOfRangeException
+     * @throws TooManyPortsInRangeException
      */
     protected function createNewAllocation(Server $server): Allocation
     {

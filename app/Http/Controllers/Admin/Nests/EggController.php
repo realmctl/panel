@@ -2,6 +2,12 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Nests;
 
+use JavaScript;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Service\Egg\NoParentConfigurationFoundException;
+use Pterodactyl\Exceptions\Service\Egg\HasChildrenException;
+use Pterodactyl\Exceptions\Service\HasActiveServersException;
 use Illuminate\View\View;
 use Pterodactyl\Models\Egg;
 use Illuminate\Http\RedirectResponse;
@@ -34,12 +40,12 @@ class EggController extends Controller
     /**
      * Handle a request to display the Egg creation page.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function create(): View
     {
         $nests = $this->nestRepository->getWithEggs();
-        \JavaScript::put(['nests' => $nests->keyBy('id')]);
+        JavaScript::put(['nests' => $nests->keyBy('id')]);
 
         return view('admin.eggs.new', ['nests' => $nests]);
     }
@@ -47,8 +53,8 @@ class EggController extends Controller
     /**
      * Handle request to store a new Egg.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\NoParentConfigurationFoundException
+     * @throws DataValidationException
+     * @throws NoParentConfigurationFoundException
      */
     public function store(EggFormRequest $request): RedirectResponse
     {
@@ -79,9 +85,9 @@ class EggController extends Controller
     /**
      * Handle request to update an Egg.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\NoParentConfigurationFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
+     * @throws NoParentConfigurationFoundException
      */
     public function update(EggFormRequest $request, Egg $egg): RedirectResponse
     {
@@ -97,8 +103,8 @@ class EggController extends Controller
     /**
      * Handle request to destroy an egg.
      *
-     * @throws \Pterodactyl\Exceptions\Service\Egg\HasChildrenException
-     * @throws \Pterodactyl\Exceptions\Service\HasActiveServersException
+     * @throws HasChildrenException
+     * @throws HasActiveServersException
      */
     public function destroy(Egg $egg): RedirectResponse
     {

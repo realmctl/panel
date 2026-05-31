@@ -2,6 +2,13 @@
 
 namespace Pterodactyl\Models;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Notifications\DatabaseNotificationCollection;
+use Illuminate\Notifications\DatabaseNotification;
+use Database\Factories\ServerFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Exception;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Query\JoinClause;
 use Znck\Eloquent\Traits\BelongsToThrough;
@@ -43,72 +50,72 @@ use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
  * @property int|null $allocation_limit
  * @property int|null $database_limit
  * @property int $backup_limit
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $installed_at
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\ActivityLog[] $activity
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $installed_at
+ * @property Collection|ActivityLog[] $activity
  * @property int|null $activity_count
  * @property Allocation|null $allocation
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Allocation[] $allocations
+ * @property Collection|Allocation[] $allocations
  * @property int|null $allocations_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Backup[] $backups
+ * @property Collection|Backup[] $backups
  * @property int|null $backups_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Database[] $databases
+ * @property Collection|Database[] $databases
  * @property int|null $databases_count
  * @property Egg|null $egg
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Mount[] $mounts
+ * @property Collection|Mount[] $mounts
  * @property int|null $mounts_count
  * @property Nest $nest
  * @property Node $node
- * @property \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property int|null $notifications_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Schedule[] $schedules
+ * @property Collection|Schedule[] $schedules
  * @property int|null $schedules_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Subuser[] $subusers
+ * @property Collection|Subuser[] $subusers
  * @property int|null $subusers_count
  * @property ServerTransfer|null $transfer
  * @property User $user
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\EggVariable[] $variables
+ * @property Collection|EggVariable[] $variables
  * @property int|null $variables_count
  *
- * @method static \Database\Factories\ServerFactory factory(...$parameters)
- * @method static \Illuminate\Database\Eloquent\Builder|Server newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Server newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Server query()
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereAllocationId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereAllocationLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereBackupLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereCpu($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereDatabaseLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereDisk($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereEggId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereExternalId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereIo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereMemory($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereNestId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereNodeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereOomDisabled($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereOwnerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereSkipScripts($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereStartup($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereSwap($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereThreads($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereUuid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Server whereUuidShort($value)
+ * @method static ServerFactory factory(...$parameters)
+ * @method static Builder|Server newModelQuery()
+ * @method static Builder|Server newQuery()
+ * @method static Builder|Server query()
+ * @method static Builder|Server whereAllocationId($value)
+ * @method static Builder|Server whereAllocationLimit($value)
+ * @method static Builder|Server whereBackupLimit($value)
+ * @method static Builder|Server whereCpu($value)
+ * @method static Builder|Server whereCreatedAt($value)
+ * @method static Builder|Server whereDatabaseLimit($value)
+ * @method static Builder|Server whereDescription($value)
+ * @method static Builder|Server whereDisk($value)
+ * @method static Builder|Server whereEggId($value)
+ * @method static Builder|Server whereExternalId($value)
+ * @method static Builder|Server whereId($value)
+ * @method static Builder|Server whereImage($value)
+ * @method static Builder|Server whereIo($value)
+ * @method static Builder|Server whereMemory($value)
+ * @method static Builder|Server whereName($value)
+ * @method static Builder|Server whereNestId($value)
+ * @method static Builder|Server whereNodeId($value)
+ * @method static Builder|Server whereOomDisabled($value)
+ * @method static Builder|Server whereOwnerId($value)
+ * @method static Builder|Server whereSkipScripts($value)
+ * @method static Builder|Server whereStartup($value)
+ * @method static Builder|Server whereStatus($value)
+ * @method static Builder|Server whereSwap($value)
+ * @method static Builder|Server whereThreads($value)
+ * @method static Builder|Server whereUpdatedAt($value)
+ * @method static Builder|Server whereUuid($value)
+ * @method static Builder|Server whereUuidShort($value)
  *
  * @mixin \Eloquent
  */
 #[Attributes\Identifiable('serv')]
 class Server extends Model implements Identifiable
 {
-    /** @use HasFactory<\Database\Factories\ServerFactory> */
+    /** @use HasFactory<ServerFactory> */
     use HasFactory;
     use BelongsToThrough;
     use Notifiable;
@@ -223,7 +230,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets the user who owns the server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -233,7 +240,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets the subusers associated with a server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Subuser, $this>
+     * @return HasMany<Subuser, $this>
      */
     public function subusers(): HasMany
     {
@@ -243,7 +250,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets the default allocation for a server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\Allocation, $this>
+     * @return HasOne<Allocation, $this>
      */
     public function allocation(): HasOne
     {
@@ -253,7 +260,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets all allocations associated with this server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Allocation, $this>
+     * @return HasMany<Allocation, $this>
      */
     public function allocations(): HasMany
     {
@@ -263,7 +270,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets information for the nest associated with this server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Nest, $this>
+     * @return BelongsTo<Nest, $this>
      */
     public function nest(): BelongsTo
     {
@@ -273,7 +280,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets information for the egg associated with this server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\Egg, $this>
+     * @return HasOne<Egg, $this>
      */
     public function egg(): HasOne
     {
@@ -283,7 +290,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets information for the service variables associated with this server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\EggVariable, $this>
+     * @return HasMany<EggVariable, $this>
      */
     public function variables(): HasMany
     {
@@ -303,7 +310,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets information for the node associated with this server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Node, $this>
+     * @return BelongsTo<Node, $this>
      */
     public function node(): BelongsTo
     {
@@ -313,7 +320,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets information for the tasks associated with this server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Schedule, $this>
+     * @return HasMany<Schedule, $this>
      */
     public function schedules(): HasMany
     {
@@ -323,7 +330,7 @@ class Server extends Model implements Identifiable
     /**
      * Gets all databases associated with a server.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Database, $this>
+     * @return HasMany<Database, $this>
      */
     public function databases(): HasMany
     {
@@ -333,9 +340,9 @@ class Server extends Model implements Identifiable
     /**
      * Returns the location that a server belongs to.
      *
-     * @return \Znck\Eloquent\Relations\BelongsToThrough<\Pterodactyl\Models\Location, \Pterodactyl\Models\Node>
+     * @return \Znck\Eloquent\Relations\BelongsToThrough<Location, Node>
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function location(): \Znck\Eloquent\Relations\BelongsToThrough
     {
@@ -345,7 +352,7 @@ class Server extends Model implements Identifiable
     /**
      * Returns the associated server transfer.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\ServerTransfer, $this>
+     * @return HasOne<ServerTransfer, $this>
      */
     public function transfer(): HasOne
     {
@@ -353,7 +360,7 @@ class Server extends Model implements Identifiable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Backup, $this>
+     * @return HasMany<Backup, $this>
      */
     public function backups(): HasMany
     {
@@ -363,7 +370,7 @@ class Server extends Model implements Identifiable
     /**
      * Returns all mounts that have this server has mounted.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Pterodactyl\Models\Mount, \Pterodactyl\Models\MountServer, $this>
+     * @return HasManyThrough<Mount, MountServer, $this>
      */
     public function mounts(): HasManyThrough
     {
@@ -373,7 +380,7 @@ class Server extends Model implements Identifiable
     /**
      * Returns all of the activity log entries where the server is the subject.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Pterodactyl\Models\ActivityLog, $this>
+     * @return MorphToMany<ActivityLog, $this>
      */
     public function activity(): MorphToMany
     {

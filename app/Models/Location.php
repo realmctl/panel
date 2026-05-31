@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\Carbon;
+use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -10,14 +12,14 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int $id
  * @property string $short
  * @property string $long
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Pterodactyl\Models\Node[] $nodes
- * @property \Pterodactyl\Models\Server[] $servers
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Node[] $nodes
+ * @property Server[] $servers
  */
 class Location extends Model
 {
-    /** @use HasFactory<\Database\Factories\LocationFactory> */
+    /** @use HasFactory<LocationFactory> */
     use HasFactory;
 
     /**
@@ -52,7 +54,7 @@ class Location extends Model
     /**
      * Gets the nodes in a specified location.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Node, $this>
+     * @return HasMany<Node, $this>
      */
     public function nodes(): HasMany
     {
@@ -62,7 +64,7 @@ class Location extends Model
     /**
      * Gets the servers within a given location.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Pterodactyl\Models\Server, \Pterodactyl\Models\Node, $this>
+     * @return HasManyThrough<Server, Node, $this>
      */
     public function servers(): HasManyThrough
     {

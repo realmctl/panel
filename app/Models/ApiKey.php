@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Models;
 
+use Illuminate\Support\Carbon;
+use Database\Factories\ApiKeyFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Services\Acl\Api\AdminAcl;
@@ -19,10 +22,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $token
  * @property array|null $allowed_ips
  * @property string|null $memo
- * @property \Illuminate\Support\Carbon|null $last_used_at
- * @property \Illuminate\Support\Carbon|null $expires_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $last_used_at
+ * @property Carbon|null $expires_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property int $r_servers
  * @property int $r_nodes
  * @property int $r_allocations
@@ -35,35 +38,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property User $tokenable
  * @property User $user
  *
- * @method static \Database\Factories\ApiKeyFactory factory(...$parameters)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey query()
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereAllowedIps($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereIdentifier($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereKeyType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereLastUsedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereMemo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRAllocations($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRDatabaseHosts($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereREggs($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRLocations($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRNests($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRNodes($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRServerDatabases($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRServers($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereRUsers($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApiKey whereUserId($value)
+ * @method static ApiKeyFactory factory(...$parameters)
+ * @method static Builder|ApiKey newModelQuery()
+ * @method static Builder|ApiKey newQuery()
+ * @method static Builder|ApiKey query()
+ * @method static Builder|ApiKey whereAllowedIps($value)
+ * @method static Builder|ApiKey whereCreatedAt($value)
+ * @method static Builder|ApiKey whereId($value)
+ * @method static Builder|ApiKey whereIdentifier($value)
+ * @method static Builder|ApiKey whereKeyType($value)
+ * @method static Builder|ApiKey whereLastUsedAt($value)
+ * @method static Builder|ApiKey whereMemo($value)
+ * @method static Builder|ApiKey whereRAllocations($value)
+ * @method static Builder|ApiKey whereRDatabaseHosts($value)
+ * @method static Builder|ApiKey whereREggs($value)
+ * @method static Builder|ApiKey whereRLocations($value)
+ * @method static Builder|ApiKey whereRNests($value)
+ * @method static Builder|ApiKey whereRNodes($value)
+ * @method static Builder|ApiKey whereRServerDatabases($value)
+ * @method static Builder|ApiKey whereRServers($value)
+ * @method static Builder|ApiKey whereRUsers($value)
+ * @method static Builder|ApiKey whereToken($value)
+ * @method static Builder|ApiKey whereUpdatedAt($value)
+ * @method static Builder|ApiKey whereUserId($value)
  *
  * @mixin \Eloquent
  */
 class ApiKey extends Model implements HasAbilities
 {
-    /** @use HasFactory<\Database\Factories\ApiKeyFactory> */
+    /** @use HasFactory<ApiKeyFactory> */
     use HasFactory;
 
     /**
@@ -175,7 +178,7 @@ class ApiKey extends Model implements HasAbilities
     /**
      * Returns the user this token is assigned to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -185,7 +188,7 @@ class ApiKey extends Model implements HasAbilities
     /**
      * Required for support with Laravel Sanctum.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\User, $this>
+     * @return BelongsTo<User, $this>
      *
      * @see \Laravel\Sanctum\Guard::supportsTokens()
      */

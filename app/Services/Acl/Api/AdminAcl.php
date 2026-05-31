@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Acl\Api;
 
+use ReflectionClass;
+use ReflectionException;
 use Pterodactyl\Models\ApiKey;
 
 class AdminAcl
@@ -58,11 +60,11 @@ class AdminAcl
     /**
      * Return a list of all resource constants defined in this ACL.
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public static function getResourceList(): array
     {
-        $reflect = new \ReflectionClass(__CLASS__);
+        $reflect = new ReflectionClass(__CLASS__);
 
         return collect($reflect->getConstants())->filter(function ($value, $key) {
             return substr($key, 0, 9) === 'RESOURCE_';

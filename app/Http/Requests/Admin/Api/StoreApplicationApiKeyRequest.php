@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Requests\Admin\Api;
 
+use ReflectionException;
 use Pterodactyl\Models\ApiKey;
 use Pterodactyl\Services\Acl\Api\AdminAcl;
 use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
@@ -9,8 +10,8 @@ use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
 class StoreApplicationApiKeyRequest extends AdminFormRequest
 {
     /**
-     * @throws \ReflectionException
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws ReflectionException
      */
     public function rules(): array
     {

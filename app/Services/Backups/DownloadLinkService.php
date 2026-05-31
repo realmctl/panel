@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Backups;
 
+use Pterodactyl\Extensions\Filesystem\S3Filesystem;
 use Carbon\CarbonImmutable;
 use Pterodactyl\Models\User;
 use Pterodactyl\Enum\JwtScope;
@@ -47,7 +48,7 @@ class DownloadLinkService
      */
     protected function getS3BackupUrl(Backup $backup): string
     {
-        /** @var \Pterodactyl\Extensions\Filesystem\S3Filesystem $adapter */
+        /** @var S3Filesystem $adapter */
         $adapter = $this->backupManager->adapter(Backup::ADAPTER_AWS_S3);
 
         $request = $adapter->getClient()->createPresignedRequest(

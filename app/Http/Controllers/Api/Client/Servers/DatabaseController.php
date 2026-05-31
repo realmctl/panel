@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
+use Throwable;
+use Pterodactyl\Exceptions\Service\Database\TooManyDatabasesException;
+use Pterodactyl\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Database;
@@ -43,9 +47,9 @@ class DatabaseController extends ClientApiController
     /**
      * Create a new database for the given server and return it.
      *
-     * @throws \Throwable
-     * @throws \Pterodactyl\Exceptions\Service\Database\TooManyDatabasesException
-     * @throws \Pterodactyl\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException
+     * @throws Throwable
+     * @throws TooManyDatabasesException
+     * @throws DatabaseClientFeatureNotEnabledException
      */
     public function store(StoreDatabaseRequest $request, Server $server): array
     {
@@ -71,7 +75,7 @@ class DatabaseController extends ClientApiController
      * Rotates the password for the given server model and returns a fresh instance to
      * the caller.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function rotatePassword(RotatePasswordRequest $request, Server $server, Database $database): array
     {
@@ -89,7 +93,7 @@ class DatabaseController extends ClientApiController
     /**
      * Removes a database from the server.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function delete(DeleteDatabaseRequest $request, Server $server, Database $database): Response
     {

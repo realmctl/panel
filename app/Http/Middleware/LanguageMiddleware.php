@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 
@@ -17,7 +18,7 @@ class LanguageMiddleware
     /**
      * Handle an incoming request and set the user's preferred language.
      */
-    public function handle(Request $request, \Closure $next): mixed
+    public function handle(Request $request, Closure $next): mixed
     {
         $this->app->setLocale($request->user()->language ?? config('app.locale', 'en'));
 

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Locations;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Pterodactyl\Models\Location;
 use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 
@@ -17,7 +18,7 @@ class LocationCreationService
     /**
      * Create a new location.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function handle(array $data): Location
     {

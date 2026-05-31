@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Servers;
 
+use Throwable;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Pterodactyl\Enum\JwtScope;
@@ -34,7 +35,7 @@ class ServerTransferController extends Controller
     /**
      * Starts a transfer of a server to a new node.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function transfer(Request $request, Server $server): RedirectResponse
     {

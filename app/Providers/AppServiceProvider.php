@@ -2,6 +2,17 @@
 
 namespace Pterodactyl\Providers;
 
+use Pterodactyl\Models\Allocation;
+use Pterodactyl\Models\ApiKey;
+use Pterodactyl\Models\Backup;
+use Pterodactyl\Models\Database;
+use Pterodactyl\Models\Egg;
+use Pterodactyl\Models\EggVariable;
+use Pterodactyl\Models\Schedule;
+use Pterodactyl\Models\Server;
+use Pterodactyl\Models\UserSSHKey;
+use Pterodactyl\Models\Task;
+use Pterodactyl\Models\User;
 use Pterodactyl\Models;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
@@ -37,17 +48,17 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Relation::enforceMorphMap([
-            'allocation' => Models\Allocation::class,
-            'api_key' => Models\ApiKey::class,
-            'backup' => Models\Backup::class,
-            'database' => Models\Database::class,
-            'egg' => Models\Egg::class,
-            'egg_variable' => Models\EggVariable::class,
-            'schedule' => Models\Schedule::class,
-            'server' => Models\Server::class,
-            'ssh_key' => Models\UserSSHKey::class,
-            'task' => Models\Task::class,
-            'user' => Models\User::class,
+            'allocation' => Allocation::class,
+            'api_key' => ApiKey::class,
+            'backup' => Backup::class,
+            'database' => Database::class,
+            'egg' => Egg::class,
+            'egg_variable' => EggVariable::class,
+            'schedule' => Schedule::class,
+            'server' => Server::class,
+            'ssh_key' => UserSSHKey::class,
+            'task' => Task::class,
+            'user' => User::class,
         ]);
     }
 

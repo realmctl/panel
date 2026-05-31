@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Activity;
 
+use Throwable;
+use Closure;
 use Illuminate\Support\Arr;
 use Webmozart\Assert\Assert;
 use Illuminate\Support\Collection;
@@ -140,7 +142,7 @@ class ActivityLogService
 
         try {
             return $this->save();
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             if (config('app.env') !== 'production') {
                 /* @noinspection PhpUnhandledExceptionInspection */
                 throw $exception;
@@ -166,11 +168,11 @@ class ActivityLogService
      * and will only save the activity log entry if everything else successfully
      * settles.
      *
-     * @param \Closure($this): mixed $callback
+     * @param Closure($this):mixed $callback
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function transaction(\Closure $callback)
+    public function transaction(Closure $callback)
     {
         return $this->connection->transaction(function () use ($callback) {
             $response = $callback($this);
@@ -222,7 +224,7 @@ class ActivityLogService
     /**
      * Saves the activity log instance and attaches all of the subject models.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function save(): ActivityLog
     {

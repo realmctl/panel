@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use League\Fractal\Resource\Item;
 use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Models\ServerVariable;
@@ -34,7 +35,7 @@ class ServerVariableTransformer extends BaseTransformer
     /**
      * Return the parent service variable data.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeParent(EggVariable $variable): Item|NullResource
     {

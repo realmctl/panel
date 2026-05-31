@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Databases\Hosts;
 
+use Throwable;
 use Pterodactyl\Models\DatabaseHost;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\ConnectionInterface;
@@ -26,7 +27,7 @@ class HostUpdateService
     /**
      * Update a database host and persist to the database.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(int $hostId, array $data): DatabaseHost
     {

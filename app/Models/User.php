@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Models;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Notifications\DatabaseNotificationCollection;
+use Illuminate\Notifications\DatabaseNotification;
+use Database\Factories\UserFactory;
 use Pterodactyl\Rules\Username;
 use Pterodactyl\Facades\Activity;
 use Illuminate\Support\Collection;
@@ -22,8 +26,6 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Pterodactyl\Notifications\SendPasswordReset as ResetPasswordNotification;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
 
 /**
  * Pterodactyl\Models\User.
@@ -41,25 +43,25 @@ use Filament\Panel;
  * @property bool $root_admin
  * @property bool $use_totp
  * @property string|null $totp_secret
- * @property \Illuminate\Support\Carbon|null $totp_authenticated_at
+ * @property Carbon|null $totp_authenticated_at
  * @property bool $gravatar
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\ApiKey[] $apiKeys
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property \Illuminate\Database\Eloquent\Collection|ApiKey[] $apiKeys
  * @property int|null $api_keys_count
  * @property string $name
- * @property \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property int|null $notifications_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\RecoveryToken[] $recoveryTokens
+ * @property \Illuminate\Database\Eloquent\Collection|RecoveryToken[] $recoveryTokens
  * @property int|null $recovery_tokens_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Server[] $servers
+ * @property \Illuminate\Database\Eloquent\Collection|Server[] $servers
  * @property int|null $servers_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\UserSSHKey[] $sshKeys
+ * @property \Illuminate\Database\Eloquent\Collection|UserSSHKey[] $sshKeys
  * @property int|null $ssh_keys_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\ApiKey[] $tokens
+ * @property \Illuminate\Database\Eloquent\Collection|ApiKey[] $tokens
  * @property int|null $tokens_count
  *
- * @method static \Database\Factories\UserFactory factory(...$parameters)
+ * @method static UserFactory factory(...$parameters)
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
  * @method static Builder|User query()
@@ -88,17 +90,16 @@ class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract,
-    Identifiable,
-    FilamentUser
+    Identifiable
 {
     use Authenticatable;
     use Authorizable;
     use AvailableLanguages;
     use CanResetPassword;
-    /** @use \Pterodactyl\Models\Traits\HasAccessTokens<\Pterodactyl\Models\ApiKey> */
+    /** @use HasAccessTokens<ApiKey> */
     use HasAccessTokens;
     use Notifiable;
-    /** @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasRealtimeIdentifier;
 
@@ -238,17 +239,9 @@ class User extends Model implements
     }
 
     /**
-     * Determine if the user can access the Filament admin panel.
-     */
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $this->root_admin;
-    }
-
-    /**
      * Returns all servers that a user owns.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Server, $this>
+     * @return HasMany<Server, $this>
      */
     public function servers(): HasMany
     {
@@ -256,7 +249,7 @@ class User extends Model implements
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\ApiKey, $this>
+     * @return HasMany<ApiKey, $this>
      */
     public function apiKeys(): HasMany
     {
@@ -265,7 +258,7 @@ class User extends Model implements
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\RecoveryToken, $this>
+     * @return HasMany<RecoveryToken, $this>
      */
     public function recoveryTokens(): HasMany
     {
@@ -273,7 +266,7 @@ class User extends Model implements
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\UserSSHKey, $this>
+     * @return HasMany<UserSSHKey, $this>
      */
     public function sshKeys(): HasMany
     {
@@ -284,7 +277,7 @@ class User extends Model implements
      * Returns all the activity logs where this user is the subject — not to
      * be confused by activity logs where this user is the _actor_.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Pterodactyl\Models\ActivityLog, $this>
+     * @return MorphToMany<ActivityLog, $this>
      */
     public function activity(): MorphToMany
     {
@@ -295,7 +288,7 @@ class User extends Model implements
      * Returns all the servers that a user can access by way of being the owner of the
      * server, or because they are assigned as a subuser for that server.
      *
-     * @return \Illuminate\Database\Eloquent\Builder<\Pterodactyl\Models\Server>
+     * @return Builder<Server>
      */
     public function accessibleServers(): Builder
     {

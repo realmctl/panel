@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Remote\Servers;
 
+use Throwable;
+use Pterodactyl\Models\Server;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
 use Webmozart\Assert\Assert;
@@ -33,7 +35,7 @@ class ServerTransferController extends Controller
     /**
      * The daemon notifies us about a transfer failure.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function failure(Request $request, string $uuid): JsonResponse
     {
@@ -58,7 +60,7 @@ class ServerTransferController extends Controller
     /**
      * The daemon notifies us about a transfer success.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function success(Request $request, string $uuid): JsonResponse
     {
@@ -77,7 +79,7 @@ class ServerTransferController extends Controller
             throw new HttpForbiddenException('Requesting node does not have permission to access this server.');
         }
 
-        /** @var \Pterodactyl\Models\Server $server */
+        /** @var Server $server */
         $server = $this->connection->transaction(function () use ($server, $transfer) {
             $allocations = array_merge([$transfer->old_allocation], $transfer->old_additional_allocations);
 
@@ -113,7 +115,7 @@ class ServerTransferController extends Controller
      * Release all the reserved allocations for this transfer and mark it as failed in
      * the database.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function processFailedTransfer(ServerTransfer $transfer): JsonResponse
     {

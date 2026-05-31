@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Backups;
 
+use Throwable;
 use Ramsey\Uuid\Uuid;
 use Carbon\CarbonImmutable;
 use Webmozart\Assert\Assert;
@@ -69,7 +70,7 @@ class InitiateBackupService
     /**
      * Initiates the backup process for a server on Wings.
      *
-     * @throws \Throwable
+     * @throws Throwable
      * @throws TooManyBackupsException
      * @throws TooManyRequestsHttpException
      */

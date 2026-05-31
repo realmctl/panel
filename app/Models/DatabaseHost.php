@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\DatabaseHostFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,12 +17,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $password
  * @property int|null $max_databases
  * @property int|null $node_id
- * @property \Carbon\CarbonImmutable $created_at
- * @property \Carbon\CarbonImmutable $updated_at
+ * @property CarbonImmutable $created_at
+ * @property CarbonImmutable $updated_at
  */
 class DatabaseHost extends Model
 {
-    /** @use HasFactory<\Database\Factories\DatabaseHostFactory> */
+    /** @use HasFactory<DatabaseHostFactory> */
     use HasFactory;
 
     /**
@@ -72,7 +74,7 @@ class DatabaseHost extends Model
     /**
      * Gets the node associated with a database host.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Node, $this>
+     * @return BelongsTo<Node, $this>
      */
     public function node(): BelongsTo
     {
@@ -82,7 +84,7 @@ class DatabaseHost extends Model
     /**
      * Gets the databases associated with this host.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Database, $this>
+     * @return HasMany<Database, $this>
      */
     public function databases(): HasMany
     {

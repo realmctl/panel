@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Nodes;
 
+use Throwable;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Node;
 use Illuminate\Support\Facades\Log;
@@ -28,7 +29,7 @@ class NodeUpdateService
     /**
      * Update the configuration values for a given node on the machine.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Node $node, array $data, bool $resetToken = false): Node
     {

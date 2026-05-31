@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -14,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $user_id
  * @property string $action
  * @property string|null $content
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property Server $server
  * @property User|null $user
  */

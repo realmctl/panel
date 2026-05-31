@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use stdClass;
+use JsonException;
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\Nest;
@@ -37,13 +40,13 @@ class EggTransformer extends BaseTransformer
      * Transform an Egg model into a representation that can be consumed by
      * the application api.
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function transform(Egg $model): array
     {
         $files = json_decode($model->config_files, true, 512, JSON_THROW_ON_ERROR);
         if (empty($files)) {
-            $files = new \stdClass();
+            $files = new stdClass();
         }
 
         return [
@@ -82,7 +85,7 @@ class EggTransformer extends BaseTransformer
     /**
      * Include the Nest relationship for the given Egg in the transformation.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeNest(Egg $model): Item|NullResource
     {
@@ -98,7 +101,7 @@ class EggTransformer extends BaseTransformer
     /**
      * Include the Servers relationship for the given Egg in the transformation.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeServers(Egg $model): Collection|NullResource
     {
@@ -158,7 +161,7 @@ class EggTransformer extends BaseTransformer
     /**
      * Include the variables that are defined for this Egg.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeVariables(Egg $model): Collection|NullResource
     {

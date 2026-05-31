@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\Nodes;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Throwable;
+use Pterodactyl\Exceptions\Service\HasActiveServersException;
 use Pterodactyl\Models\Node;
 use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -58,7 +61,7 @@ class NodeController extends ApplicationApiController
      * Create a new node on the Panel. Returns the created node and an HTTP/201
      * status response on success.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function store(StoreNodeRequest $request): JsonResponse
     {
@@ -77,7 +80,7 @@ class NodeController extends ApplicationApiController
     /**
      * Update an existing node on the Panel.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function update(UpdateNodeRequest $request, Node $node): array
     {
@@ -96,7 +99,7 @@ class NodeController extends ApplicationApiController
      * Deletes a given node from the Panel as long as there are no servers
      * currently attached to it.
      *
-     * @throws \Pterodactyl\Exceptions\Service\HasActiveServersException
+     * @throws HasActiveServersException
      */
     public function delete(DeleteNodeRequest $request, Node $node): JsonResponse
     {

@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models;
 
+use Carbon\Carbon;
+use Database\Factories\ServerTransferFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,15 +19,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property array|null $new_additional_allocations
  * @property bool|null $successful
  * @property bool $archived
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property Server $server
  * @property Node $oldNode
  * @property Node $newNode
  */
 class ServerTransfer extends Model
 {
-    /** @use HasFactory<\Database\Factories\ServerTransferFactory> */
+    /** @use HasFactory<ServerTransferFactory> */
     use HasFactory;
 
     /**
@@ -75,7 +77,7 @@ class ServerTransfer extends Model
     /**
      * Gets the server associated with a server transfer.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\Server, $this>
+     * @return BelongsTo<Server, $this>
      */
     public function server(): BelongsTo
     {
@@ -85,7 +87,7 @@ class ServerTransfer extends Model
     /**
      * Gets the source node associated with a server transfer.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\Node, $this>
+     * @return HasOne<Node, $this>
      */
     public function oldNode(): HasOne
     {
@@ -95,7 +97,7 @@ class ServerTransfer extends Model
     /**
      * Gets the target node associated with a server transfer.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\Node, $this>
+     * @return HasOne<Node, $this>
      */
     public function newNode(): HasOne
     {

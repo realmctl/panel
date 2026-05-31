@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Nests;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
 
 class NestUpdateService
@@ -16,8 +18,8 @@ class NestUpdateService
     /**
      * Update a nest and prevent changing the author once it is set.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function handle(int $nest, array $data): void
     {

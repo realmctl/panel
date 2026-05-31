@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Models\Traits;
 
+use Pterodactyl\Models\Model;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Pterodactyl\Models\ApiKey;
@@ -12,11 +13,11 @@ use Pterodactyl\Extensions\Laravel\Sanctum\NewAccessToken;
 /**
  * @template TToken of \Laravel\Sanctum\Contracts\HasAbilities
  *
- * @mixin \Pterodactyl\Models\Model
+ * @mixin Model
  */
 trait HasAccessTokens
 {
-    /** @use \Laravel\Sanctum\HasApiTokens<TToken> */
+    /** @use HasApiTokens<TToken> */
     use HasApiTokens {
         tokens as private _tokens;
         createToken as private _createToken;

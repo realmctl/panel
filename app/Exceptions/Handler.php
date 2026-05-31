@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Exceptions;
 
+use PDOException;
+use Throwable;
+use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -79,7 +82,7 @@ class Handler extends ExceptionHandler
             $this->dontReport = [];
         }
 
-        $this->reportable(function (\PDOException $ex) {
+        $this->reportable(function (PDOException $ex) {
             $ex = $this->generateCleanedExceptionStack($ex);
         });
 
@@ -88,7 +91,7 @@ class Handler extends ExceptionHandler
         });
     }
 
-    private function generateCleanedExceptionStack(\Throwable $exception): string
+    private function generateCleanedExceptionStack(Throwable $exception): string
     {
         $cleanedStack = '';
         foreach ($exception->getTrace() as $index => $item) {
@@ -117,11 +120,11 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function render($request, \Throwable $e): Response
+    public function render($request, Throwable $e): Response
     {
         $connections = $this->container->make(Connection::class);
 
@@ -145,7 +148,7 @@ class Handler extends ExceptionHandler
      * Transform a validation exception into a consistent format to be returned for
      * calls to the API.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      */
     public function invalidJson($request, ValidationException $exception): JsonResponse
     {
@@ -187,7 +190,7 @@ class Handler extends ExceptionHandler
     /**
      * Return the exception as a JSONAPI representation for use on API requests.
      */
-    protected function convertExceptionToArray(\Throwable $e, array $override = []): array
+    protected function convertExceptionToArray(Throwable $e, array $override = []): array
     {
         $match = self::$exceptionResponseCodes[get_class($e)] ?? null;
 
@@ -233,7 +236,7 @@ class Handler extends ExceptionHandler
     /**
      * Return an array of exceptions that should not be reported.
      */
-    public static function isReportable(\Exception $exception): bool
+    public static function isReportable(Exception $exception): bool
     {
         return (new self(Container::getInstance()))->shouldReport($exception);
     }
@@ -241,7 +244,7 @@ class Handler extends ExceptionHandler
     /**
      * Convert an authentication exception into an unauthenticated response.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      */
     protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|RedirectResponse
     {
@@ -256,13 +259,13 @@ class Handler extends ExceptionHandler
      * Extracts all the previous exceptions that lead to the one passed into this
      * function being thrown.
      *
-     * @return \Throwable[]
+     * @return Throwable[]
      */
-    protected function extractPrevious(\Throwable $e): array
+    protected function extractPrevious(Throwable $e): array
     {
         $previous = [];
         while ($value = $e->getPrevious()) {
-            if (!$value instanceof \Throwable) { // @phpstan-ignore instanceof.alwaysTrue
+            if (!$value instanceof Throwable) { // @phpstan-ignore instanceof.alwaysTrue
                 break;
             }
             $previous[] = $value;
@@ -276,7 +279,7 @@ class Handler extends ExceptionHandler
      * Helper method to allow reaching into the handler to convert an exception
      * into the expected array response type.
      */
-    public static function toArray(\Throwable $e): array
+    public static function toArray(Throwable $e): array
     {
         return (new self(app()))->convertExceptionToArray($e);
     }

@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Console\Commands\Location;
 
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Service\Location\HasActiveNodesException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Pterodactyl\Services\Locations\LocationDeletionService;
@@ -28,8 +30,8 @@ class DeleteLocationCommand extends Command
     /**
      * Respond to the command request.
      *
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Location\HasActiveNodesException
+     * @throws RecordNotFoundException
+     * @throws HasActiveNodesException
      */
     public function handle()
     {

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Pterodactyl\Models\Subuser;
 use League\Fractal\Resource\Item;
 use League\Fractal\Resource\NullResource;
@@ -40,7 +41,7 @@ class SubuserTransformer extends BaseTransformer
     /**
      * Return a generic item of user for this subuser.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeUser(Subuser $subuser): Item|NullResource
     {
@@ -56,7 +57,7 @@ class SubuserTransformer extends BaseTransformer
     /**
      * Return a generic item of server for this subuser.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeServer(Subuser $subuser): Item|NullResource
     {

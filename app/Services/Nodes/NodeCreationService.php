@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Nodes;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Node;
@@ -20,7 +21,7 @@ class NodeCreationService
     /**
      * Create a new node on the panel.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function handle(array $data): Node
     {

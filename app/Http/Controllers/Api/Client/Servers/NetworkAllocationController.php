@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
@@ -45,8 +47,8 @@ class NetworkAllocationController extends ClientApiController
     /**
      * Set the primary allocation for a server.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function update(UpdateAllocationRequest $request, Server $server, Allocation $allocation): array
     {
@@ -69,8 +71,8 @@ class NetworkAllocationController extends ClientApiController
     /**
      * Set the primary allocation for a server.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function setPrimary(SetPrimaryAllocationRequest $request, Server $server, Allocation $allocation): array
     {

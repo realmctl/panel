@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,13 +16,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $subject_id
  * @property string $subject_type
  * @property ActivityLog|null $activityLog
- * @property \Illuminate\Database\Eloquent\Model $subject
+ * @property Model $subject
  *
- * @method static \Illuminate\Database\Eloquent\Builder|ActivityLogSubject newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ActivityLogSubject newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ActivityLogSubject query()
+ * @method static Builder|ActivityLogSubject newModelQuery()
+ * @method static Builder|ActivityLogSubject newQuery()
+ * @method static Builder|ActivityLogSubject query()
  *
- * @mixin \Illuminate\Database\Eloquent\Model
+ * @mixin Model
  */
 class ActivityLogSubject extends Pivot
 {
@@ -32,7 +34,7 @@ class ActivityLogSubject extends Pivot
     protected $guarded = ['id'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Pterodactyl\Models\ActivityLog, $this>
+     * @return BelongsTo<ActivityLog, $this>
      */
     public function activityLog(): BelongsTo
     {
@@ -40,7 +42,7 @@ class ActivityLogSubject extends Pivot
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, $this>
+     * @return MorphTo<Model, $this>
      */
     public function subject(): MorphTo
     {

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\Nests;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Pterodactyl\Models\Nest;
 use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
@@ -19,7 +20,7 @@ class NestCreationService
     /**
      * Create a new nest on the system.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function handle(array $data, ?string $author = null): Nest
     {

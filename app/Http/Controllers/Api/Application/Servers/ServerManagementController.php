@@ -2,6 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
 
+use Throwable;
+use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Services\Servers\SuspensionService;
@@ -24,7 +28,7 @@ class ServerManagementController extends ApplicationApiController
     /**
      * Suspend a server on the Panel.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function suspend(ServerWriteRequest $request, Server $server): Response
     {
@@ -36,7 +40,7 @@ class ServerManagementController extends ApplicationApiController
     /**
      * Unsuspend a server on the Panel.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function unsuspend(ServerWriteRequest $request, Server $server): Response
     {
@@ -48,9 +52,9 @@ class ServerManagementController extends ApplicationApiController
     /**
      * Mark a server as needing to be reinstalled.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     * @throws DisplayException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
      */
     public function reinstall(ServerWriteRequest $request, Server $server): Response
     {

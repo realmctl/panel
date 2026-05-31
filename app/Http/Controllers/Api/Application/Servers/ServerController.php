@@ -2,6 +2,13 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
 
+use Throwable;
+use Illuminate\Validation\ValidationException;
+use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException;
+use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
@@ -45,13 +52,13 @@ class ServerController extends ApplicationApiController
     /**
      * Create a new server on the system.
      *
-     * @throws \Throwable
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Pterodactyl\Exceptions\DisplayException
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException
-     * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException
+     * @throws Throwable
+     * @throws ValidationException
+     * @throws DisplayException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
+     * @throws NoViableAllocationException
+     * @throws NoViableNodeException
      */
     public function store(StoreServerRequest $request): JsonResponse
     {
@@ -75,7 +82,7 @@ class ServerController extends ApplicationApiController
     /**
      * Deletes a server.
      *
-     * @throws \Pterodactyl\Exceptions\DisplayException
+     * @throws DisplayException
      */
     public function delete(ServerWriteRequest $request, Server $server, string $force = ''): Response
     {

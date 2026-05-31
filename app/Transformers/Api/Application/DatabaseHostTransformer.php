@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Transformers\Api\Application;
 
+use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
 use Pterodactyl\Models\Database;
 use Pterodactyl\Models\DatabaseHost;
 use League\Fractal\Resource\Collection;
@@ -42,7 +43,7 @@ class DatabaseHostTransformer extends BaseTransformer
     /**
      * Include the databases associated with this host.
      *
-     * @throws \Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException
+     * @throws InvalidTransformerLevelException
      */
     public function includeDatabases(DatabaseHost $model): Collection|NullResource
     {

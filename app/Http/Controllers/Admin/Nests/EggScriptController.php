@@ -2,6 +2,9 @@
 
 namespace Pterodactyl\Http\Controllers\Admin\Nests;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Pterodactyl\Exceptions\Service\Egg\InvalidCopyFromException;
 use Illuminate\View\View;
 use Pterodactyl\Models\Egg;
 use Illuminate\Http\RedirectResponse;
@@ -51,9 +54,9 @@ class EggScriptController extends Controller
     /**
      * Handle a request to update the installation script for an Egg.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-     * @throws \Pterodactyl\Exceptions\Service\Egg\InvalidCopyFromException
+     * @throws DataValidationException
+     * @throws RecordNotFoundException
+     * @throws InvalidCopyFromException
      */
     public function update(EggScriptFormRequest $request, Egg $egg): RedirectResponse
     {

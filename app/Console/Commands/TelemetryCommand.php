@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Console\Commands;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
 use Illuminate\Console\Command;
 use Symfony\Component\VarDumper\VarDumper;
 use Pterodactyl\Services\Telemetry\TelemetryCollectionService;
@@ -23,7 +24,7 @@ class TelemetryCommand extends Command
     /**
      * Handle execution of command.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      */
     public function handle()
     {

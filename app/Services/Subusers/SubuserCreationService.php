@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Services\Subusers;
 
+use Pterodactyl\Exceptions\Model\DataValidationException;
+use Throwable;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Subuser;
@@ -31,10 +33,10 @@ class SubuserCreationService
      * If the email address already belongs to a user on the system a new user will not
      * be created.
      *
-     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws DataValidationException
      * @throws ServerSubuserExistsException
      * @throws UserIsServerOwnerException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(Server $server, string $email, array $permissions): Subuser
     {

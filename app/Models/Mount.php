@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rules\NotIn;
 use Pterodactyl\Contracts\Models\Identifiable;
 use Pterodactyl\Models\Traits\HasRealtimeIdentifier;
@@ -16,9 +17,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $target
  * @property bool $read_only
  * @property bool $user_mountable
- * @property \Pterodactyl\Models\Egg[]|\Illuminate\Database\Eloquent\Collection $eggs
- * @property \Pterodactyl\Models\Node[]|\Illuminate\Database\Eloquent\Collection $nodes
- * @property \Pterodactyl\Models\Server[]|\Illuminate\Database\Eloquent\Collection $servers
+ * @property Egg[]|Collection $eggs
+ * @property Node[]|Collection $nodes
+ * @property Server[]|Collection $servers
  */
 #[Attributes\Identifiable('moun')]
 class Mount extends Model implements Identifiable
@@ -100,7 +101,7 @@ class Mount extends Model implements Identifiable
     /**
      * Returns all eggs that have this mount assigned.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Pterodactyl\Models\Egg, $this>
+     * @return BelongsToMany<Egg, $this>
      */
     public function eggs(): BelongsToMany
     {
@@ -110,7 +111,7 @@ class Mount extends Model implements Identifiable
     /**
      * Returns all nodes that have this mount assigned.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Pterodactyl\Models\Node, $this>
+     * @return BelongsToMany<Node, $this>
      */
     public function nodes(): BelongsToMany
     {
@@ -120,7 +121,7 @@ class Mount extends Model implements Identifiable
     /**
      * Returns all servers that have this mount assigned.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Pterodactyl\Models\Server, $this>
+     * @return BelongsToMany<Server, $this>
      */
     public function servers(): BelongsToMany
     {
