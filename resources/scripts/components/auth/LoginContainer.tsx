@@ -239,7 +239,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                     )}
                 </Formik>
 
-                {(true) && (
+                {(oauth?.google || oauth?.discord || oauth?.github) && (
                     <div className={'mt-6'}>
                         <div className={'flex items-center mb-4'}>
                             <div className={'flex-1 h-px bg-gray-700/50'} />

@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Auth;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,9 @@ class OAuthController extends Controller
             session(['oauth_register' => true]);
         }
 
-        return Socialite::driver($provider)->redirect();
+        return Socialite::driver($provider)
+            ->redirectUrl(url("/auth/oauth/{$provider}/callback"))
+            ->redirect();
     }
 
     /**
@@ -42,7 +45,9 @@ class OAuthController extends Controller
         }
 
         try {
-            $oauthUser = Socialite::driver($provider)->user();
+            $oauthUser = Socialite::driver($provider)
+                ->redirectUrl(url("/auth/oauth/{$provider}/callback"))
+                ->user();
         } catch (\Exception $e) {
             return redirect('/auth/login');
         }
@@ -55,45 +60,42 @@ class OAuthController extends Controller
         if ($user) {
             // Existing user — log them in
             Auth::login($user, true);
+
             return redirect('/');
         }
 
         // No existing user — check if registration is enabled
-        if (!$isRegister || !config('pterodactyl.auth.registration_enabled', false)) {
+        if (!$isRegister && !config('pterodactyl.auth.registration_enabled', false)) {
             return redirect('/auth/login');
         }
 
-        // Try to create account with available data
+        if (!config('pterodactyl.auth.registration_enabled', false)) {
+            return redirect('/auth/login');
+        }
+
+        // Extract user info from provider
         $name = $oauthUser->getName() ?? '';
         $nameParts = explode(' ', $name, 2);
         $firstName = $nameParts[0] ?? '';
         $lastName = $nameParts[1] ?? '';
         $nickname = $oauthUser->getNickname();
+        $email = $oauthUser->getEmail();
 
-        // If we have enough info, create the account directly
-        if ($firstName && $oauthUser->getEmail()) {
-            // If no username from provider, redirect to completion page
-            if (!$nickname) {
-                session([
-                    'oauth_pending' => [
-                        'email' => $oauthUser->getEmail(),
-                        'name_first' => $firstName,
-                        'name_last' => $lastName,
-                        'provider' => $provider,
-                    ],
-                ]);
-                return redirect('/auth/oauth/complete');
-            }
+        // Must have an email at minimum
+        if (!$email) {
+            return redirect('/auth/login');
+        }
 
-            // Ensure username is unique
-            $username = Str::slug($nickname, '_');
+        // If provider gives a usable username, create account directly
+        if ($firstName && $nickname) {
+            $username = preg_replace('/[^a-zA-Z0-9_.-]/', '_', $nickname);
             if (User::where('username', $username)->exists()) {
                 $username = $username . '_' . Str::random(4);
             }
 
             $user = User::create([
                 'uuid' => Str::uuid()->toString(),
-                'email' => $oauthUser->getEmail(),
+                'email' => $email,
                 'username' => $username,
                 'password' => Hash::make(Str::random(32)),
                 'name_first' => $firstName,
@@ -101,38 +103,27 @@ class OAuthController extends Controller
             ]);
 
             Auth::login($user, true);
+
             return redirect('/');
         }
 
-        // Not enough info — redirect to completion
+        // Missing required fields — redirect to completion page
         session([
             'oauth_pending' => [
-                'email' => $oauthUser->getEmail() ?? '',
+                'email' => $email,
                 'name_first' => $firstName,
                 'name_last' => $lastName,
                 'provider' => $provider,
             ],
         ]);
+
         return redirect('/auth/oauth/complete');
-    }
-
-    /**
-     * Show the OAuth completion form (React handles this).
-     */
-    public function completeForm(Request $request)
-    {
-        if (!session()->has('oauth_pending')) {
-            return redirect('/auth/login');
-        }
-
-        // Pass pending data to the React app via the standard view
-        return view('templates.auth.core');
     }
 
     /**
      * Handle the OAuth completion form submission.
      */
-    public function completeRegistration(Request $request): \Illuminate\Http\JsonResponse
+    public function completeRegistration(Request $request): JsonResponse
     {
         $pending = session('oauth_pending');
         if (!$pending) {
@@ -141,8 +132,6 @@ class OAuthController extends Controller
 
         $request->validate([
             'username' => 'required|string|min:3|max:32|unique:users,username|regex:/^[a-zA-Z0-9_.-]+$/',
-            'name_first' => 'required_if:needs_name,true|string|max:191',
-            'name_last' => 'required_if:needs_name,true|string|max:191',
         ]);
 
         $user = User::create([
@@ -150,8 +139,8 @@ class OAuthController extends Controller
             'email' => $pending['email'],
             'username' => $request->input('username'),
             'password' => Hash::make(Str::random(32)),
-            'name_first' => $request->input('name_first', $pending['name_first']) ?: 'User',
-            'name_last' => $request->input('name_last', $pending['name_last']) ?: 'User',
+            'name_first' => $pending['name_first'] ?: 'User',
+            'name_last' => $pending['name_last'] ?: 'User',
         ]);
 
         session()->forget('oauth_pending');

@@ -47,6 +47,7 @@ const RegisterContainer = ({ history }: RouteComponentProps) => {
         (state) => state.settings.data!.captcha
     );
     const registration = useStoreState((state) => state.settings.data!.registration);
+    const oauth = useStoreState((state) => state.settings.data!.oauth);
 
     const turnstileRef = useRef<HTMLDivElement>(null);
     const turnstileWidgetId = useRef<string | null>(null);
