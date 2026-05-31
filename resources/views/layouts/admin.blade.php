@@ -58,6 +58,7 @@
 @endsection
 
 @section('js')
+    @include('layouts.scripts')
     {!! Theme::js('vendor/jquery/jquery.min.js?t={cache-version}') !!}
     {!! Theme::js('vendor/sweetalert/sweetalert.min.js?t={cache-version}') !!}
     {!! Theme::js('vendor/select2/select2.full.min.js?t={cache-version}') !!}
