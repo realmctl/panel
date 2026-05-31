@@ -92,7 +92,7 @@ return [
 
     'cdn' => [
         'cache_time' => 60,
-        'url' => 'http://cdn.ordnary.com/realmctl/latest.json',
+        'url' => 'https://cdn.ordnary.com/realmctl/latest.json',
     ],
 
     /*
