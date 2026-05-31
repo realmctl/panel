@@ -11,7 +11,7 @@
 @section('admin-content')
     <form action="{{ route('admin.databases.view', $host->id) }}" method="POST">
         {!! csrf_field() !!}
-        <div class="row">
+        <div class="row row-deck">
             <div class="col-lg-6">
                 <div class="card mb-3">
                     <div class="card-header">
@@ -64,7 +64,7 @@
                             <input type="password" name="password" class="form-control" />
                             <span class="form-hint">Leave blank to keep the current password.</span>
                         </div>
-                        <div class="alert alert-warning">
+                        <div class="alert alert-warning mb-0">
                             <i class="ti ti-alert-triangle me-2"></i>
                             The account must have the <code>WITH GRANT OPTION</code> permission. Do not use the same MySQL account used by this panel.
                         </div>
