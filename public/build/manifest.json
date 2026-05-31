@@ -1,0 +1,11 @@
+{
+  "resources/js/app.js": {
+    "file": "assets/app.js",
+    "isEntry": true,
+    "src": "resources/js/app.js",
+    "css": [
+      "assets/app.css",
+      "assets/tabler-icons.min.css"
+    ]
+  }
+}

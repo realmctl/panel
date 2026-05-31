@@ -1,0 +1,21 @@
+@import url("https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css");
+@import url("https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css");
+@import url("https://rsms.me/inter/inter.css");
+
+:root {
+    --tblr-primary: #000000;
+    --tblr-primary-rgb: 0, 0, 0;
+    --tblr-primary-fg: #ffffff;
+    --tblr-primary-darken: #000000;
+    --tblr-primary-lighten: #333333;
+}
+
+.ti-spin {
+    display: inline-block;
+    animation: ti-spin 1s linear infinite !important;
+}
+
+@keyframes ti-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
