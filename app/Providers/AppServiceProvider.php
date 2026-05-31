@@ -36,6 +36,11 @@ class AppServiceProvider extends ServiceProvider
         View::share('appVersion', $this->versionData()['version'] ?? 'undefined');
         View::share('appIsGit', $this->versionData()['is_git'] ?? false);
 
+        View::composer(
+            'vendor.tablar.partials.header.notifications',
+            \Pterodactyl\Http\ViewComposers\AdminNotificationComposer::class
+        );
+
         Paginator::useBootstrap();
 
         // If the APP_URL value is set with https:// make sure we force it here. Theoretically
