@@ -1,16 +1,18 @@
 const colors = require('tailwindcss/colors');
 
+// Dark palette matching PloudOS design
 const gray = {
-    50: 'hsl(216, 33%, 97%)',
-    100: 'hsl(214, 15%, 91%)',
-    200: 'hsl(210, 16%, 82%)',
-    300: 'hsl(211, 13%, 65%)',
-    400: 'hsl(211, 10%, 53%)',
-    500: 'hsl(211, 12%, 43%)',
-    600: 'hsl(209, 14%, 37%)',
-    700: 'hsl(209, 18%, 30%)',
-    800: 'hsl(209, 20%, 25%)',
-    900: 'hsl(210, 24%, 16%)',
+    50: '#e8eaed',
+    100: '#c4c8cf',
+    200: '#9da3ae',
+    300: '#767e8d',
+    400: '#586274',
+    500: '#3b475b',
+    600: '#2d3338',   // borders
+    700: '#192024',   // cards, topbar
+    800: '#0b0f10',   // page background
+    900: '#070a0b',   // deepest
+    950: '#040606',
 };
 
 module.exports = {
@@ -23,7 +25,7 @@ module.exports = {
                 header: ['"IBM Plex Sans"', '"Roboto"', 'system-ui', 'sans-serif'],
             },
             colors: {
-                black: '#131a20',
+                black: '#0b0f10',
                 gray: gray,
                 neutral: gray,
                 cyan: colors.cyan,

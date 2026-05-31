@@ -129,7 +129,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
     };
 
     return (
-        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0f1117' }}>
+        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0b0f10' }}>
             <div className={'w-full max-w-md px-6'}>
                 <div className={'mb-8'}>
                     <img
@@ -176,7 +176,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.username}
-                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
                                 />
                                 {touched.username && errors.username && (
                                     <p className={'mt-1 text-xs text-red-400'}>{errors.username}</p>
@@ -200,7 +200,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.password}
-                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
                                 />
                                 {touched.password && errors.password && (
                                     <p className={'mt-1 text-xs text-red-400'}>{errors.password}</p>
@@ -250,7 +250,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             {oauth.google && (
                             <a
                                 href={'/auth/oauth/google'}
-                                className={'flex-1 h-10 rounded-lg border border-gray-700/50 flex items-center justify-center hover:bg-[#1a1d25] transition-colors no-underline'}
+                                className={'flex-1 h-10 rounded-lg border border-gray-700/50 flex items-center justify-center hover:bg-[#192024] transition-colors no-underline'}
                                 style={{ backgroundColor: 'transparent' }}
                             >
                                 <svg className={'w-5 h-5'} viewBox="0 0 24 24" fill="currentColor">
@@ -264,7 +264,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             {oauth.discord && (
                             <a
                                 href={'/auth/oauth/discord'}
-                                className={'flex-1 h-10 rounded-lg border border-gray-700/50 flex items-center justify-center hover:bg-[#1a1d25] transition-colors no-underline'}
+                                className={'flex-1 h-10 rounded-lg border border-gray-700/50 flex items-center justify-center hover:bg-[#192024] transition-colors no-underline'}
                                 style={{ backgroundColor: 'transparent' }}
                             >
                                 <svg className={'w-5 h-5'} viewBox="0 0 24 24" fill="#5865F2">
@@ -275,7 +275,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             {oauth.github && (
                             <a
                                 href={'/auth/oauth/github'}
-                                className={'flex-1 h-10 rounded-lg border border-gray-700/50 flex items-center justify-center hover:bg-[#1a1d25] transition-colors no-underline'}
+                                className={'flex-1 h-10 rounded-lg border border-gray-700/50 flex items-center justify-center hover:bg-[#192024] transition-colors no-underline'}
                                 style={{ backgroundColor: 'transparent' }}
                             >
                                 <svg className={'w-5 h-5 text-white'} viewBox="0 0 24 24" fill="currentColor">

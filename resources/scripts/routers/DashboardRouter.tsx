@@ -5,6 +5,7 @@ import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import TransitionRouter from '@/TransitionRouter';
 import SubNavigation from '@/components/elements/SubNavigation';
+import PageHeader from '@/components/elements/PageHeader';
 import { useLocation } from 'react-router';
 import Spinner from '@/components/elements/Spinner';
 import routes from '@/routers/routes';
@@ -12,22 +13,30 @@ import routes from '@/routers/routes';
 export default () => {
     const location = useLocation();
 
+    const getPageTitle = () => {
+        if (location.pathname === '/') return 'Dashboard';
+        if (location.pathname.startsWith('/account')) return 'Account';
+        return 'Dashboard';
+    };
+
     return (
         <>
             <NavigationBar />
-            {location.pathname.startsWith('/account') && (
-                <SubNavigation>
-                    <div>
-                        {routes.account
-                            .filter((route) => !!route.name)
-                            .map(({ path, name, exact = false }) => (
-                                <NavLink key={path} to={`/account/${path}`.replace('//', '/')} exact={exact}>
-                                    {name}
-                                </NavLink>
-                            ))}
-                    </div>
-                </SubNavigation>
-            )}
+            <PageHeader title={getPageTitle()}>
+                {location.pathname.startsWith('/account') && (
+                    <SubNavigation>
+                        <div>
+                            {routes.account
+                                .filter((route) => !!route.name)
+                                .map(({ path, name, exact = false }) => (
+                                    <NavLink key={path} to={`/account/${path}`.replace('//', '/')} exact={exact}>
+                                        {name}
+                                    </NavLink>
+                                ))}
+                        </div>
+                    </SubNavigation>
+                )}
+            </PageHeader>
             <TransitionRouter>
                 <React.Suspense fallback={<Spinner centered />}>
                     <Switch location={location}>

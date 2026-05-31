@@ -41,7 +41,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
     };
 
     return (
-        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0f1117' }}>
+        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0b0f10' }}>
             <div className={'w-full max-w-md px-6'}>
                 <div className={'mb-8'}>
                     <h1 className={'text-xl font-semibold text-white'}>Reset Password</h1>
@@ -82,7 +82,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                                     id={'email-reset'}
                                     value={email}
                                     disabled
-                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed'}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed'}
                                 />
                             </div>
 
@@ -103,7 +103,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.password}
-                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
                                 />
                                 {touched.password && errors.password && (
                                     <p className={'mt-1 text-xs text-red-400'}>{errors.password}</p>
@@ -128,7 +128,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.passwordConfirmation}
-                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
                                 />
                                 {touched.passwordConfirmation && errors.passwordConfirmation && (
                                     <p className={'mt-1 text-xs text-red-400'}>{errors.passwordConfirmation}</p>

@@ -1,41 +1,32 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCogs, faLayerGroup, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faQuestionCircle, faChevronDown, faCogs, faSignOutAlt, faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
-import SearchContainer from '@/components/dashboard/search/SearchContainer';
-import tw, { theme } from 'twin.macro';
-import styled from 'styled-components/macro';
+import debounce from 'debounce';
+import getServers from '@/api/getServers';
+import { Server } from '@/api/server/getServer';
 import http from '@/api/http';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import Tooltip from '@/components/elements/tooltip/Tooltip';
 import Avatar from '@/components/Avatar';
-
-const RightNavigation = styled.div`
-    & > a,
-    & > button,
-    & > .navigation-link {
-        ${tw`flex items-center h-full no-underline text-neutral-300 px-6 cursor-pointer transition-all duration-150`};
-
-        &:active,
-        &:hover {
-            ${tw`text-neutral-100 bg-black`};
-        }
-
-        &:active,
-        &:hover,
-        &.active {
-            box-shadow: inset 0 -2px ${theme`colors.cyan.600`.toString()};
-        }
-    }
-`;
+import { ip } from '@/lib/formatters';
 
 export default () => {
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
+    const userName = useStoreState((state: ApplicationStore) => state.user.data!.username);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState<Server[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const searchRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const history = useHistory();
 
     const onTriggerLogout = () => {
         setIsLoggingOut(true);
@@ -45,47 +36,213 @@ export default () => {
         });
     };
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setDropdownOpen(false);
+            }
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setSearchOpen(false);
+                setSearchTerm('');
+                setSearchResults([]);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Focus input when search opens
+    useEffect(() => {
+        if (searchOpen && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [searchOpen]);
+
+    // Debounced search
+    const performSearch = React.useCallback(
+        debounce((term: string) => {
+            if (term.length < 3) {
+                setSearchResults([]);
+                setIsSearching(false);
+                return;
+            }
+            setIsSearching(true);
+            getServers({ query: term, type: rootAdmin ? 'admin-all' : undefined })
+                .then((servers) => setSearchResults(servers.items.filter((_, index) => index < 5)))
+                .catch(() => setSearchResults([]))
+                .finally(() => setIsSearching(false));
+        }, 500),
+        [rootAdmin]
+    );
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        performSearch(value);
+    };
+
+    const handleResultClick = (serverId: string) => {
+        setSearchOpen(false);
+        setSearchTerm('');
+        setSearchResults([]);
+        history.push(`/server/${serverId}`);
+    };
+
     return (
-        <div className={'w-full bg-neutral-900 shadow-md overflow-x-auto'}>
+        <div className={'w-full border-b border-[#2d3338]/50'} style={{ backgroundColor: '#192024' }}>
             <SpinnerOverlay visible={isLoggingOut} />
-            <div className={'mx-auto w-full flex items-center h-[3.5rem] max-w-[1200px]'}>
-                <div id={'logo'} className={'flex-1'}>
+            <div className={'mx-auto w-full flex items-center h-[3.5rem] max-w-[1200px] px-4'}>
+                {/* Brand / Logo */}
+                <div className={'flex items-center'}>
                     <Link
                         to={'/'}
-                        className={
-                            'text-2xl font-header font-medium px-4 no-underline text-neutral-200 hover:text-neutral-100 transition-colors duration-150'
-                        }
+                        className={'flex items-center no-underline'}
                     >
-                        {name}
+                        <img
+                            src={'https://cdn.ordnary.com/realmctl/logo.png'}
+                            className={'h-6'}
+                            alt={name}
+                            style={{ filter: 'brightness(0) invert(1)' }}
+                        />
                     </Link>
                 </div>
-                <RightNavigation className={'flex h-full items-center justify-center'}>
-                    <SearchContainer />
-                    <Tooltip placement={'bottom'} content={'Dashboard'}>
-                        <NavLink to={'/'} exact>
-                            <FontAwesomeIcon icon={faLayerGroup} />
-                        </NavLink>
-                    </Tooltip>
-                    {rootAdmin && (
-                        <Tooltip placement={'bottom'} content={'Admin'}>
-                            <a href={'/admin'} rel={'noreferrer'}>
-                                <FontAwesomeIcon icon={faCogs} />
-                            </a>
-                        </Tooltip>
-                    )}
-                    <Tooltip placement={'bottom'} content={'Account Settings'}>
-                        <NavLink to={'/account'}>
-                            <span className={'flex items-center w-5 h-5'}>
+
+                {/* Right side navigation */}
+                <div className={'flex items-center ml-auto gap-4'}>
+                    {/* Inline expanding search */}
+                    <div className={'relative flex items-center'} ref={searchRef}>
+                        <div
+                            className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out ${
+                                searchOpen ? 'w-64' : 'w-0'
+                            }`}
+                        >
+                            <input
+                                ref={searchInputRef}
+                                type={'text'}
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                placeholder={'Search servers...'}
+                                className={'w-full h-8 px-3 text-sm text-neutral-100 bg-neutral-800/60 border border-[#2d3338] rounded-lg outline-none focus:border-blue-500 transition-colors duration-150 placeholder-neutral-500'}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Escape') {
+                                        setSearchOpen(false);
+                                        setSearchTerm('');
+                                        setSearchResults([]);
+                                    }
+                                }}
+                            />
+                        </div>
+                        <button
+                            onClick={() => setSearchOpen(!searchOpen)}
+                            className={'flex items-center justify-center w-8 h-8 text-neutral-400 hover:text-neutral-100 bg-transparent border-0 cursor-pointer transition-colors duration-150'}
+                        >
+                            <FontAwesomeIcon icon={faSearch} />
+                        </button>
+
+                        {/* Search results dropdown */}
+                        {searchOpen && searchResults.length > 0 && (
+                            <div
+                                className={'absolute right-0 top-full mt-2 w-80 rounded-lg shadow-lg py-2 z-50 border border-[#2d3338]'}
+                                style={{ backgroundColor: '#1e2a2f' }}
+                            >
+                                {searchResults.map((server) => (
+                                    <button
+                                        key={server.uuid}
+                                        onClick={() => handleResultClick(server.identifier)}
+                                        className={'flex items-center w-full px-4 py-2 text-left bg-transparent border-0 cursor-pointer hover:bg-neutral-700/50 transition-colors duration-150'}
+                                    >
+                                        <div className={'flex-1 min-w-0'}>
+                                            <p className={'text-sm text-neutral-100 truncate m-0'}>{server.name}</p>
+                                            <p className={'text-xs text-neutral-400 m-0 mt-0.5'}>
+                                                {server.allocations
+                                                    .filter((alloc) => alloc.isDefault)
+                                                    .map((allocation) => (
+                                                        <span key={allocation.ip + allocation.port.toString()}>
+                                                            {allocation.alias || ip(allocation.ip)}:{allocation.port}
+                                                        </span>
+                                                    ))}
+                                            </p>
+                                        </div>
+                                        <span className={'text-xs py-1 px-2 bg-cyan-800 text-cyan-100 rounded ml-2 flex-none'}>
+                                            {server.node}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Loading indicator */}
+                        {searchOpen && isSearching && (
+                            <div
+                                className={'absolute right-0 top-full mt-2 w-80 rounded-lg shadow-lg py-3 z-50 border border-[#2d3338] text-center text-sm text-neutral-400'}
+                                style={{ backgroundColor: '#1e2a2f' }}
+                            >
+                                Searching...
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Give us feedback */}
+                    <a
+                        href={'#'}
+                        className={'flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-100 transition-colors duration-150 no-underline'}
+                    >
+                        <FontAwesomeIcon icon={faCommentDots} />
+                        <span>Give us feedback</span>
+                    </a>
+
+                    {/* Help & Support */}
+                    <a
+                        href={'#'}
+                        className={'flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-100 transition-colors duration-150 no-underline'}
+                    >
+                        <FontAwesomeIcon icon={faQuestionCircle} />
+                        <span>Help & Support</span>
+                    </a>
+
+                    {/* User dropdown */}
+                    <div className={'relative'} ref={dropdownRef}>
+                        <button
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            className={'flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-100 transition-colors duration-150 bg-transparent border-0 cursor-pointer px-0'}
+                        >
+                            <span className={'flex items-center w-6 h-6'}>
                                 <Avatar.User />
                             </span>
-                        </NavLink>
-                    </Tooltip>
-                    <Tooltip placement={'bottom'} content={'Sign Out'}>
-                        <button onClick={onTriggerLogout}>
-                            <FontAwesomeIcon icon={faSignOutAlt} />
+                            <span>{userName}</span>
+                            <FontAwesomeIcon icon={faChevronDown} className={'text-xs'} />
                         </button>
-                    </Tooltip>
-                </RightNavigation>
+
+                        {dropdownOpen && (
+                            <div className={'absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg py-1 z-50 border border-[#2d3338]'} style={{ backgroundColor: '#1e2a2f' }}>
+                                <Link
+                                    to={'/account'}
+                                    className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 no-underline transition-colors duration-150'}
+                                >
+                                    <FontAwesomeIcon icon={faUser} className={'w-4'} />
+                                    <span>My Account</span>
+                                </Link>
+                                {rootAdmin && (
+                                    <a
+                                        href={'/admin'}
+                                        className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 no-underline transition-colors duration-150'}
+                                    >
+                                        <FontAwesomeIcon icon={faCogs} className={'w-4'} />
+                                        <span>Admin</span>
+                                    </a>
+                                )}
+                                <button
+                                    onClick={onTriggerLogout}
+                                    className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 w-full border-0 bg-transparent cursor-pointer transition-colors duration-150'}
+                                >
+                                    <FontAwesomeIcon icon={faSignOutAlt} className={'w-4'} />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );

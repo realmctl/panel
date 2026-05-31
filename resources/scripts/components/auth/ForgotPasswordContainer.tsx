@@ -120,7 +120,7 @@ export default () => {
     };
 
     return (
-        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0f1117' }}>
+        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0b0f10' }}>
             <div className={'w-full max-w-md px-6'}>
                 <div className={'mb-8'}>
                     <h1 className={'text-xl font-semibold text-white'}>Reset your password</h1>
@@ -159,7 +159,7 @@ export default () => {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.email}
-                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                    className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'}
                                 />
                                 {touched.email && errors.email && (
                                     <p className={'mt-1 text-xs text-red-400'}>{errors.email}</p>

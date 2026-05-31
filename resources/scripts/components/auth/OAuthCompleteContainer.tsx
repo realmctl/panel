@@ -114,11 +114,11 @@ const OAuthCompleteContainer = ({ history }: RouteComponentProps) => {
             });
     };
 
-    const inputClass = 'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#1a1d25] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed';
+    const inputClass = 'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed';
 
     if (!needs) {
         return (
-            <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0f1117' }}>
+            <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0b0f10' }}>
                 <Spinner />
             </div>
         );
@@ -128,7 +128,7 @@ const OAuthCompleteContainer = ({ history }: RouteComponentProps) => {
     const currentVisualStep = needs.needs_name ? step : 1;
 
     return (
-        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0f1117' }}>
+        <div className={'flex items-center justify-center min-h-screen'} style={{ backgroundColor: '#0b0f10' }}>
             <div className={'w-full max-w-md px-6'}>
                 <div className={'mb-8'}>
                     <img
@@ -226,7 +226,7 @@ const OAuthCompleteContainer = ({ history }: RouteComponentProps) => {
                                     type={'button'}
                                     onClick={back}
                                     disabled={transitioning || submitting}
-                                    className={'flex-1 h-10 rounded-lg border border-gray-700/50 text-gray-300 text-sm font-medium hover:bg-[#1a1d25] transition-colors disabled:opacity-50'}
+                                    className={'flex-1 h-10 rounded-lg border border-gray-700/50 text-gray-300 text-sm font-medium hover:bg-[#192024] transition-colors disabled:opacity-50'}
                                 >
                                     Back
                                 </button>

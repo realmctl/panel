@@ -12,6 +12,7 @@ import { NotFound, ServerError } from '@/components/elements/ScreenBlock';
 import { httpErrorToHuman } from '@/api/http';
 import { useStoreState } from 'easy-peasy';
 import SubNavigation from '@/components/elements/SubNavigation';
+import PageHeader from '@/components/elements/PageHeader';
 import InstallListener from '@/components/server/InstallListener';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -30,6 +31,7 @@ export default () => {
 
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
+    const serverName = ServerContext.useStoreState((state) => state.server.data?.name);
     const inConflictState = ServerContext.useStoreState((state) => state.server.inConflictState);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
     const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
@@ -73,33 +75,35 @@ export default () => {
                 )
             ) : (
                 <>
-                    <CSSTransition timeout={150} classNames={'fade'} appear in>
-                        <SubNavigation>
-                            <div>
-                                {routes.server
-                                    .filter((route) => !!route.name)
-                                    .map((route) =>
-                                        route.permission ? (
-                                            <Can key={route.path} action={route.permission} matchAny>
-                                                <NavLink to={to(route.path, true)} exact={route.exact}>
+                    <PageHeader title={serverName || 'Server'}>
+                        <CSSTransition timeout={150} classNames={'fade'} appear in>
+                            <SubNavigation>
+                                <div>
+                                    {routes.server
+                                        .filter((route) => !!route.name)
+                                        .map((route) =>
+                                            route.permission ? (
+                                                <Can key={route.path} action={route.permission} matchAny>
+                                                    <NavLink to={to(route.path, true)} exact={route.exact}>
+                                                        {route.name}
+                                                    </NavLink>
+                                                </Can>
+                                            ) : (
+                                                <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
                                                     {route.name}
                                                 </NavLink>
-                                            </Can>
-                                        ) : (
-                                            <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
-                                                {route.name}
-                                            </NavLink>
-                                        )
+                                            )
+                                        )}
+                                    {rootAdmin && (
+                                        // eslint-disable-next-line react/jsx-no-target-blank
+                                        <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
+                                            <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                        </a>
                                     )}
-                                {rootAdmin && (
-                                    // eslint-disable-next-line react/jsx-no-target-blank
-                                    <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
-                                        <FontAwesomeIcon icon={faExternalLinkAlt} />
-                                    </a>
-                                )}
-                            </div>
-                        </SubNavigation>
-                    </CSSTransition>
+                                </div>
+                            </SubNavigation>
+                        </CSSTransition>
+                    </PageHeader>
                     <InstallListener />
                     <TransferListener />
                     <WebsocketHandler />
