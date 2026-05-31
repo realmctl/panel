@@ -22,6 +22,11 @@ use Pterodactyl\Http\Requests\Admin\Settings\MailSettingsFormRequest;
 class MailController extends Controller
 {
     /**
+     * Supported mail drivers that can be configured via the UI.
+     */
+    public const SUPPORTED_DRIVERS = ['smtp', 'mailgun', 'postmark', 'resend'];
+
+    /**
      * MailController constructor.
      */
     public function __construct(
@@ -37,9 +42,12 @@ class MailController extends Controller
      */
     public function index(): View
     {
+        $driver = $this->config->get('mail.default');
+
         return view('admin.settings.mail', [
-            'disabled' => !in_array($this->config->get('mail.default'), ['smtp', 'resend']),
-            'driver' => $this->config->get('mail.default'),
+            'disabled' => !in_array($driver, self::SUPPORTED_DRIVERS),
+            'driver' => $driver,
+            'providers' => self::SUPPORTED_DRIVERS,
         ]);
     }
 
@@ -52,11 +60,9 @@ class MailController extends Controller
      */
     public function update(MailSettingsFormRequest $request): Response
     {
-        if (!in_array($this->config->get('mail.default'), ['smtp', 'resend'])) {
-            throw new DisplayException('This feature is only available for SMTP and Resend mail drivers.');
-        }
-
         $values = $request->normalize();
+
+        // Handle the special "clear password" sentinel value for SMTP.
         if (array_get($values, 'mail:mailers:smtp:password') === '!e') {
             $values['mail:mailers:smtp:password'] = '';
         }

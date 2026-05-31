@@ -61,12 +61,41 @@ class SettingsServiceProvider extends ServiceProvider
     ];
 
     /**
+     * Keys specific to the Mailgun mail driver.
+     */
+    protected array $mailgunKeys = [
+        'services:mailgun:domain',
+        'services:mailgun:secret',
+        'services:mailgun:endpoint',
+        'mail:from:address',
+        'mail:from:name',
+    ];
+
+    /**
+     * Keys specific to the Postmark mail driver.
+     */
+    protected array $postmarkKeys = [
+        'services:postmark:token',
+        'mail:from:address',
+        'mail:from:name',
+    ];
+
+    /**
+     * The mail driver key stored in the database.
+     */
+    protected array $mailDriverKey = [
+        'mail:default',
+    ];
+
+    /**
      * Keys that are encrypted and should be decrypted when set in the
      * configuration array.
      */
     protected static array $encrypted = [
         'mail:mailers:smtp:password',
         'services:resend:key',
+        'services:mailgun:secret',
+        'services:postmark:token',
     ];
 
     /**
@@ -74,14 +103,6 @@ class SettingsServiceProvider extends ServiceProvider
      */
     public function boot(ConfigRepository $config, Encrypter $encrypter, Log $log, SettingsRepositoryInterface $settings): void
     {
-        // Only set the email driver settings from the database if we
-        // are configured using SMTP as the driver.
-        if ($config->get('mail.default') === 'smtp') {
-            $this->keys = array_merge($this->keys, $this->emailKeys);
-        } elseif ($config->get('mail.default') === 'resend') {
-            $this->keys = array_merge($this->keys, $this->resendKeys);
-        }
-
         try {
             $values = $settings->all()->mapWithKeys(function ($setting) {
                 return [$setting->key => $setting->value];
@@ -92,6 +113,22 @@ class SettingsServiceProvider extends ServiceProvider
             return;
         }
 
+        // Determine the active mail driver. The database value takes precedence
+        // over the .env value so that switching providers from the UI works.
+        $driver = array_get($values, 'settings::mail:default', $config->get('mail.default'));
+
+        // Always include the mail:default key so it gets written to config.
+        $this->keys = array_merge($this->keys, $this->mailDriverKey);
+
+        // Load the appropriate email driver settings from the database.
+        match ($driver) {
+            'smtp' => $this->keys = array_merge($this->keys, $this->emailKeys),
+            'resend' => $this->keys = array_merge($this->keys, $this->resendKeys),
+            'mailgun' => $this->keys = array_merge($this->keys, $this->mailgunKeys),
+            'postmark' => $this->keys = array_merge($this->keys, $this->postmarkKeys),
+            default => null,
+        };
+
         foreach ($this->keys as $key) {
             $value = array_get($values, 'settings::' . $key, $config->get(str_replace(':', '.', $key)));
             if (in_array($key, self::$encrypted)) {
@@ -101,7 +138,7 @@ class SettingsServiceProvider extends ServiceProvider
                 }
             }
 
-            switch (strtolower($value)) {
+            switch (strtolower($value ?? '')) {
                 case 'true':
                 case '(true)':
                     $value = true;
