@@ -26,7 +26,7 @@
                         <tr>
                             <td>External Identifier</td>
                             @if(is_null($server->external_id))
-                                <td><span class="badge bg-secondary">Not Set</span></td>
+                                <td><span class="badge bg-secondary-lt">Not Set</span></td>
                             @else
                                 <td><code>{{ $server->external_id }}</code></td>
                             @endif
@@ -62,7 +62,7 @@
                                 @if($server->threads != null)
                                     <code>{{ $server->threads }}</code>
                                 @else
-                                    <span class="badge bg-secondary">Not Set</span>
+                                    <span class="badge bg-secondary-lt">Not Set</span>
                                 @endif
                             </td>
                         </tr>
@@ -108,7 +108,7 @@
                                 @if($server->allocation->alias !== $server->allocation->ip)
                                     <code>{{ $server->allocation->alias }}:{{ $server->allocation->port }}</code>
                                 @else
-                                    <span class="badge bg-secondary">No Alias Assigned</span>
+                                    <span class="badge bg-secondary-lt">No Alias Assigned</span>
                                 @endif
                             </td>
                         </tr>
