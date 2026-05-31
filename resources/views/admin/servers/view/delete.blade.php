@@ -34,9 +34,9 @@
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="card border-danger">
+        <div class="card">
             <div class="card-header">
-                <h3 class="card-title text-danger">Force Delete Server</h3>
+                <h3 class="card-title">Force Delete Server</h3>
             </div>
             <div class="card-body">
                 <p>This action will attempt to delete the server from both the panel and daemon. If the daemon does not respond, or reports an error, the deletion will continue.</p>
