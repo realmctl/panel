@@ -10,7 +10,7 @@
 
 @section('admin-content')
     @include('admin.servers.partials.navigation')
-    <div class="row row-cards">
+    <div class="row row-deck row-cards">
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
