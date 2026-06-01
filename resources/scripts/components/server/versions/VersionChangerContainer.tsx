@@ -6,13 +6,13 @@ import installVersion, { InstallResponse } from '@/api/server/versions/installVe
 import Spinner from '@/components/elements/Spinner';
 
 const SERVER_TYPES = [
-    { id: 'paper', name: 'Paper', description: 'High performance Minecraft server', icon: '/assets/icons/paper.png' },
-    { id: 'purpur', name: 'Purpur', description: 'Paper fork with extra features', icon: '/assets/icons/purpur.png' },
-    { id: 'vanilla', name: 'Vanilla', description: 'Official Mojang server', icon: '/assets/icons/vanilla.png' },
-    { id: 'spigot', name: 'Spigot', description: 'Modified Minecraft server', icon: '/assets/icons/spigot.png' },
-    { id: 'fabric', name: 'Fabric', description: 'Lightweight modding platform', icon: '/assets/icons/fabric.png' },
-    { id: 'velocity', name: 'Velocity', description: 'Modern proxy server', icon: '/assets/icons/velocity.png' },
-    { id: 'snapshot', name: 'Snapshot', description: 'Vanilla development versions', icon: '/assets/icons/vanilla.png' },
+    { id: 'paper', name: 'Paper', description: 'High performance Minecraft server', icon: '/assets/icons/papermc.webp' },
+    { id: 'purpur', name: 'Purpur', description: 'Paper fork with extra features', icon: '/assets/icons/purpur.svg' },
+    { id: 'vanilla', name: 'Vanilla', description: 'Official Mojang server', icon: '/assets/icons/Grass_Block.png' },
+    { id: 'spigot', name: 'Spigot', description: 'Modified Minecraft server', icon: '/assets/icons/spigotmc.svg' },
+    { id: 'fabric', name: 'Fabric', description: 'Lightweight modding platform', icon: '/assets/icons/fabricmc.png' },
+    { id: 'velocity', name: 'Velocity', description: 'Modern proxy server', icon: '/assets/icons/velocity.webp' },
+    { id: 'snapshot', name: 'Snapshot', description: 'Vanilla development versions', icon: '/assets/icons/Grass_Block.png' },
 ];
 
 const DownloadProgress = () => {
@@ -108,23 +108,35 @@ export default () => {
                         <h2 className={'text-lg font-semibold text-neutral-100 m-0 mb-3'}>Server Type</h2>
                         <div className={'border-t border-[#2d3338]/50 mb-3'}></div>
                         <div className={'space-y-1'}>
-                            {SERVER_TYPES.map((type) => (
-                                <button
-                                    key={type.id}
-                                    onClick={() => setSelectedType(type.id)}
-                                    className={`w-full text-left px-3 py-2.5 rounded-md text-sm border-0 cursor-pointer transition-colors duration-150 flex items-center gap-3 ${
-                                        selectedType === type.id
-                                            ? 'bg-blue-500/20 text-blue-300'
-                                            : 'bg-transparent text-neutral-300 hover:bg-neutral-700/40 hover:text-neutral-100'
-                                    }`}
-                                >
-                                    <img src={type.icon} alt={type.name} className={'w-5 h-5 rounded-sm object-contain'} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                    <div>
-                                        <div className={'font-medium'}>{type.name}</div>
-                                        <div className={'text-xs text-neutral-500 mt-0.5'}>{type.description}</div>
-                                    </div>
-                                </button>
-                            ))}
+                            {SERVER_TYPES.map((type) => {
+                                const active = selectedType === type.id;
+                                return (
+                                    <button
+                                        key={type.id}
+                                        onClick={() => setSelectedType(type.id)}
+                                        className={`w-full text-left px-3 py-2.5 rounded-md text-sm border cursor-pointer transition-all duration-150 flex items-center gap-3 ${
+                                            active
+                                                ? 'border-blue-500/50 bg-blue-500/10 text-blue-200'
+                                                : 'border-transparent bg-transparent text-neutral-300 hover:bg-white/5 hover:text-neutral-100'
+                                        }`}
+                                    >
+                                        <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden transition-all duration-150 ${active ? 'ring-1 ring-blue-400/40' : ''}`} style={{ backgroundColor: '#0f1518' }}>
+                                            <img
+                                                src={type.icon}
+                                                alt={type.name}
+                                                className={'w-5 h-5 object-contain'}
+                                            />
+                                        </div>
+                                        <div className={'min-w-0'}>
+                                            <div className={'font-medium leading-tight'}>{type.name}</div>
+                                            <div className={'text-xs text-neutral-500 mt-0.5 truncate'}>{type.description}</div>
+                                        </div>
+                                        {active && (
+                                            <div className={'ml-auto w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0'} />
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
