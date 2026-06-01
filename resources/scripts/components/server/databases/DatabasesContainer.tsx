@@ -69,21 +69,20 @@ export default () => {
                                 ))}
                             </div>
                         ) : (
-                            <div
-                                className={'rounded-lg p-12 flex flex-col items-center justify-center'}
-                                style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
-                            >
-                                <h3 className={'text-base font-semibold text-neutral-100 mb-1'}>
+                            <div className={'flex flex-col items-center justify-center py-16'}>
+                                <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>
                                     {databaseLimit > 0 ? 'No databases yet' : 'Databases unavailable'}
                                 </h3>
-                                <p className={'text-sm text-neutral-500 text-center max-w-sm mb-6'}>
+                                <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
                                     {databaseLimit > 0
                                         ? 'Create a database to store your server data.'
                                         : 'Database creation is not enabled for this server.'}
                                 </p>
                                 {databaseLimit > 0 && (
                                     <Can action={'database.create'}>
-                                        <CreateDatabaseButton />
+                                        <div className={'mt-6'}>
+                                            <CreateDatabaseButton />
+                                        </div>
                                     </Can>
                                 )}
                             </div>

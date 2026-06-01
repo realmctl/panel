@@ -103,31 +103,27 @@ const BackupContainer = () => {
             <Pagination data={backups} onPageSelect={setPage}>
                 {({ items }) =>
                     !items.length ? (
-                        backupLimit === 0 ? (
-                            <div
-                                className={'rounded-lg p-8 text-center'}
-                                style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
-                            >
-                                <p className={'text-sm text-neutral-400'}>
-                                    Backups cannot be created for this server because the backup limit is set to 0.
-                                </p>
-                            </div>
-                        ) : (
-                            <div
-                                className={'rounded-lg p-12 flex flex-col items-center justify-center'}
-                                style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
-                            >
-                                <h3 className={'text-base font-semibold text-neutral-100 mb-1'}>No backups yet</h3>
-                                <p className={'text-sm text-neutral-500 text-center max-w-sm mb-6'}>
-                                    {page > 1
+                        <div className={'flex flex-col items-center justify-center py-16'}>
+                            <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>
+                                {backupLimit === 0 ? 'Backups unavailable' : 'No backups yet'}
+                            </h3>
+                            <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                                {backupLimit === 0
+                                    ? 'Backups cannot be created for this server because the backup limit is set to 0.'
+                                    : page > 1
                                         ? "Looks like we've run out of backups to show you, try going back a page."
                                         : 'Create a backup to protect your server data.'}
-                                </p>
+                            </p>
+                            {backupLimit > 0 && (
                                 <Can action={'backup.create'}>
-                                    {backupLimit > backups.backupCount && <CreateBackupButton />}
+                                    {backupLimit > backups.backupCount && (
+                                        <div className={'mt-6'}>
+                                            <CreateBackupButton />
+                                        </div>
+                                    )}
                                 </Can>
-                            </div>
-                        )
+                            )}
+                        </div>
                     ) : (
                         <div className={'grid grid-cols-1 md:grid-cols-2 gap-3'}>
                             {items.map((backup) => (
