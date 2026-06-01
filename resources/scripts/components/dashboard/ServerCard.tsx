@@ -68,7 +68,9 @@ const StatusBadge = ({ status }: { status: ServerPowerState | 'suspended' | 'ins
     );
 };
 
-export default ({ server }: { server: Server }) => {
+import { resolveColor } from '@/components/dashboard/groups/GroupColorDot';
+
+export default ({ server, groupColor }: { server: Server; groupColor?: string }) => {
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [stats, setStats] = useState<ServerStats | null>(null);
@@ -113,7 +115,13 @@ export default ({ server }: { server: Server }) => {
     const diskDisplay = stats ? bytesToString(stats.diskUsageInBytes) : '--';
 
     return (
-        <div className={'rounded-md overflow-hidden border border-[#2d3338]/50 group'} style={{ backgroundColor: '#192024' }}>
+        <div
+            className={'rounded-md overflow-hidden border group'}
+            style={{
+                backgroundColor: '#192024',
+                borderColor: groupColor ? resolveColor(groupColor) + '55' : 'rgba(45,51,56,0.5)',
+            }}
+        >
             {/* Banner image that covers the top half and fades into card */}
             <div className={'relative overflow-hidden'}>
                 {/* Image covers full width, extends behind the content */}

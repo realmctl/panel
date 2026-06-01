@@ -20,6 +20,14 @@ use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
 Route::get('/', [Client\ClientController::class, 'index'])->name('api:client.index');
 Route::get('/permissions', [Client\ClientController::class, 'permissions']);
 
+Route::prefix('/server-groups')->group(function () {
+    Route::get('/', [Client\ServerGroupController::class, 'index']);
+    Route::post('/', [Client\ServerGroupController::class, 'store']);
+    Route::patch('/{group:uuid}', [Client\ServerGroupController::class, 'update']);
+    Route::put('/{group:uuid}/servers', [Client\ServerGroupController::class, 'syncServers']);
+    Route::delete('/{group:uuid}', [Client\ServerGroupController::class, 'destroy']);
+});
+
 Route::prefix('/account')->middleware(AccountSubject::class)->group(function () {
     Route::prefix('/')->withoutMiddleware(RequireTwoFactorAuthentication::class)->group(function () {
         Route::get('/', [Client\AccountController::class, 'index'])->name('api:client.account');
@@ -125,6 +133,7 @@ Route::group([
             ->post('/allocations', [Client\Servers\NetworkAllocationController::class, 'store']);
         Route::post('/allocations/{allocation}', [Client\Servers\NetworkAllocationController::class, 'update']);
         Route::post('/allocations/{allocation}/primary', [Client\Servers\NetworkAllocationController::class, 'setPrimary']);
+        Route::post('/allocations/{allocation}/whitelist', [Client\Servers\NetworkAllocationController::class, 'updateWhitelist']);
         Route::delete('/allocations/{allocation}', [Client\Servers\NetworkAllocationController::class, 'delete']);
     });
 

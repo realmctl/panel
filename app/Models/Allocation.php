@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $port
  * @property int|null $server_id
  * @property string|null $notes
+ * @property bool $whitelist_enabled
+ * @property string $protocol
+ * @property array|null $allowed_ips
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string $alias
@@ -70,6 +73,8 @@ class Allocation extends Model
         'node_id' => 'integer',
         'port' => 'integer',
         'server_id' => 'integer',
+        'whitelist_enabled' => 'boolean',
+        'allowed_ips' => 'array',
     ];
 
     public static array $validationRules = [
@@ -79,6 +84,10 @@ class Allocation extends Model
         'ip_alias' => 'nullable|string',
         'server_id' => 'nullable|exists:servers,id',
         'notes' => 'nullable|string|max:256',
+        'whitelist_enabled' => 'boolean',
+        'protocol' => 'in:tcp,udp,both',
+        'allowed_ips' => 'nullable|array',
+        'allowed_ips.*' => ['string', 'regex:/^(\d{1,3}\.){3}\d{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/'],
     ];
 
     public function getRouteKeyName(): string

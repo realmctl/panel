@@ -72,7 +72,9 @@ const StatusIndicatorBox = styled(GreyRowBox)<{ $status: ServerPowerState | unde
 
 type Timer = ReturnType<typeof setInterval>;
 
-export default ({ server, className }: { server: Server; className?: string }) => {
+import { resolveColor } from '@/components/dashboard/groups/GroupColorDot';
+
+export default ({ server, className, groupColor }: { server: Server; className?: string; groupColor?: string }) => {
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [stats, setStats] = useState<ServerStats | null>(null);
@@ -113,8 +115,16 @@ export default ({ server, className }: { server: Server; className?: string }) =
 
     const backgroundImage = getServerBackground(server);
 
+    const resolvedGroupColor = groupColor ? resolveColor(groupColor) : undefined;
+
     return (
-        <StatusIndicatorBox as={Link} to={`/server/${server.id}`} className={className} $status={stats?.status}>
+        <StatusIndicatorBox
+            as={Link}
+            to={`/server/${server.id}`}
+            className={className}
+            $status={stats?.status}
+            style={resolvedGroupColor ? { borderLeft: `3px solid ${resolvedGroupColor}55` } : undefined}
+        >
             {/* Background image fading in from the right */}
             <div
                 className={'absolute inset-0 bg-cover bg-center pointer-events-none'}

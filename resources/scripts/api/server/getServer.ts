@@ -3,6 +3,8 @@ import { rawDataToServerAllocation, rawDataToServerEggVariable } from '@/api/tra
 import { ServerEggVariable, ServerStatus } from '@/api/server/types';
 import { Identifier } from '@/api/definitions';
 
+export type AllocationProtocol = 'tcp' | 'udp' | 'both';
+
 export interface Allocation {
     id: number;
     ip: string;
@@ -10,6 +12,9 @@ export interface Allocation {
     port: number;
     notes: string | null;
     isDefault: boolean;
+    whitelistEnabled: boolean;
+    protocol: AllocationProtocol;
+    allowedIps: string[];
 }
 
 export interface Server {

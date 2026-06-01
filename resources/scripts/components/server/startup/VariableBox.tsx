@@ -1,6 +1,5 @@
 import React, { memo, useState } from 'react';
 import { ServerEggVariable } from '@/api/server/types';
-import TitledGreyBox from '@/components/elements/TitledGreyBox';
 import { usePermissions } from '@/plugins/usePermissions';
 import InputSpinner from '@/components/elements/InputSpinner';
 import Input from '@/components/elements/Input';
@@ -44,10 +43,7 @@ const VariableBox = ({ variable }: Props) => {
                     false
                 )
             )
-            .catch((error) => {
-                console.error(error);
-                clearAndAddHttpError({ error, key: FLASH_KEY });
-            })
+            .catch((error) => { console.error(error); clearAndAddHttpError({ error, key: FLASH_KEY }); })
             .then(() => setLoading(false));
     }, 500);
 
@@ -58,20 +54,34 @@ const VariableBox = ({ variable }: Props) => {
     const selectValues = variable.rules.find((v) => v.startsWith('in:'))?.split(',') || [];
 
     return (
-        <TitledGreyBox
-            title={
-                <p className='text-sm uppercase'>
-                    {!variable.isEditable && (
-                        <span className='bg-neutral-700 text-xs py-1 px-2 rounded-full mr-2 mb-1'>Read Only</span>
-                    )}
-                    {variable.name}
-                </p>
-            }
+        <div
+            className={'rounded-lg overflow-hidden'}
+            style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
         >
-            <FlashMessageRender byKey={FLASH_KEY} className='mb-2 md:mb-4' />
-            <InputSpinner visible={loading}>
-                {useSwitch ? (
-                    <>
+            {/* Card header */}
+            <div
+                className={'flex items-center justify-between px-4 py-3'}
+                style={{ backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' }}
+            >
+                <span className={'text-xs uppercase tracking-wide text-neutral-300 font-medium'}>
+                    {variable.name}
+                </span>
+                {!variable.isEditable && (
+                    <span
+                        className={'text-xs px-2 py-0.5 rounded-full'}
+                        style={{ backgroundColor: '#1e2d38', color: '#64748b' }}
+                    >
+                        Read Only
+                    </span>
+                )}
+            </div>
+
+            {/* Card body */}
+            <div className={'px-4 py-4'}>
+                <FlashMessageRender byKey={FLASH_KEY} className={'mb-3'} />
+
+                <InputSpinner visible={loading}>
+                    {useSwitch ? (
                         <Switch
                             readOnly={!canEdit || !variable.isEditable}
                             name={variable.envVariable}
@@ -88,48 +98,39 @@ const VariableBox = ({ variable }: Props) => {
                                 }
                             }}
                         />
-                    </>
-                ) : (
-                    <>
-                        {selectValues.length > 0 ? (
-                            <>
-                                <Select
-                                    onChange={(e) => setVariableValue(e.target.value)}
-                                    name={variable.envVariable}
-                                    defaultValue={variable.serverValue ?? variable.defaultValue}
-                                    disabled={!canEdit || !variable.isEditable}
-                                >
-                                    {selectValues.map((selectValue) => (
-                                        <option
-                                            key={selectValue.replace('in:', '')}
-                                            value={selectValue.replace('in:', '')}
-                                        >
-                                            {selectValue.replace('in:', '')}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </>
-                        ) : (
-                            <>
-                                <Input
-                                    onKeyUp={(e) => {
-                                        if (canEdit && variable.isEditable) {
-                                            setVariableValue(e.currentTarget.value);
-                                        }
-                                    }}
-                                    readOnly={!canEdit || !variable.isEditable}
-                                    name={variable.envVariable}
-                                    defaultValue={variable.serverValue ?? ''}
-                                    placeholder={variable.defaultValue}
-                                />
-                            </>
-                        )}
-                    </>
-                )}
-            </InputSpinner>
+                    ) : selectValues.length > 0 ? (
+                        <Select
+                            onChange={(e) => setVariableValue(e.target.value)}
+                            name={variable.envVariable}
+                            defaultValue={variable.serverValue ?? variable.defaultValue}
+                            disabled={!canEdit || !variable.isEditable}
+                        >
+                            {selectValues.map((selectValue) => (
+                                <option key={selectValue.replace('in:', '')} value={selectValue.replace('in:', '')}>
+                                    {selectValue.replace('in:', '')}
+                                </option>
+                            ))}
+                        </Select>
+                    ) : (
+                        <Input
+                            onKeyUp={(e) => {
+                                if (canEdit && variable.isEditable) {
+                                    setVariableValue(e.currentTarget.value);
+                                }
+                            }}
+                            readOnly={!canEdit || !variable.isEditable}
+                            name={variable.envVariable}
+                            defaultValue={variable.serverValue ?? ''}
+                            placeholder={variable.defaultValue}
+                        />
+                    )}
+                </InputSpinner>
 
-            <p className='mt-1 text-xs text-neutral-300'>{variable.description}</p>
-        </TitledGreyBox>
+                {variable.description ? (
+                    <p className={'text-xs text-neutral-500 mt-3'}>{variable.description}</p>
+                ) : null}
+            </div>
+        </div>
     );
 };
 

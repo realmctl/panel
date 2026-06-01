@@ -19,6 +19,8 @@ use Pterodactyl\Http\Requests\Api\Client\Servers\Network\NewAllocationRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Network\DeleteAllocationRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Network\UpdateAllocationRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Network\SetPrimaryAllocationRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Network\UpdateAllocationWhitelistRequest;
+use Pterodactyl\Services\Allocations\AllocationWhitelistService;
 
 class NetworkAllocationController extends ClientApiController
 {
@@ -29,6 +31,7 @@ class NetworkAllocationController extends ClientApiController
         protected readonly ConnectionInterface $connection,
         private FindAssignableAllocationService $assignableAllocationService,
         private ServerRepository $serverRepository,
+        private AllocationWhitelistService $whitelistService,
     ) {
         parent::__construct();
     }
@@ -107,6 +110,35 @@ class NetworkAllocationController extends ClientApiController
 
             return $allocation;
         });
+
+        return $this->fractal->item($allocation)
+            ->transformWith($this->getTransformer(AllocationTransformer::class))
+            ->toArray();
+    }
+
+    /**
+     * Update the IP whitelist settings for an allocation.
+     *
+     * @throws DisplayException
+     */
+    public function updateWhitelist(UpdateAllocationWhitelistRequest $request, Server $server, Allocation $allocation): array
+    {
+        $allocation->forceFill([
+            'whitelist_enabled' => $request->boolean('whitelist_enabled'),
+            'protocol' => $request->input('protocol'),
+            'allowed_ips' => $request->input('allowed_ips', []),
+        ])->save();
+
+        Activity::event('server:allocation.whitelist')
+            ->subject($allocation)
+            ->property([
+                'allocation' => $allocation->toString(),
+                'enabled' => $allocation->whitelist_enabled,
+                'protocol' => $allocation->protocol,
+            ])
+            ->log();
+
+        $this->whitelistService->sync($server, $allocation);
 
         return $this->fractal->item($allocation)
             ->transformWith($this->getTransformer(AllocationTransformer::class))

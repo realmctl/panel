@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Subuser } from '@/state/server/subusers';
-import { Form, Formik } from 'formik';
+import { Form, Formik, useFormikContext } from 'formik';
 import { array, object, string } from 'yup';
 import Field from '@/components/elements/Field';
 import { Actions, useStoreActions, useStoreState } from 'easy-peasy';
@@ -17,6 +17,26 @@ import PermissionTitleBox from '@/components/server/users/PermissionTitleBox';
 import asModal from '@/hoc/asModal';
 import PermissionRow from '@/components/server/users/PermissionRow';
 import ModalContext from '@/context/ModalContext';
+
+const AddAllPermissionsButton = ({ editablePermissions }: { editablePermissions: string[] }) => {
+    const { setFieldValue, values } = useFormikContext<Values>();
+    const allSelected = editablePermissions.every((p) => values.permissions.includes(p));
+
+    return (
+        <div css={tw`mt-3 flex justify-end`}>
+            <Button
+                type={'button'}
+                color={'grey'}
+                size={'xsmall'}
+                onClick={() =>
+                    setFieldValue('permissions', allSelected ? [] : editablePermissions)
+                }
+            >
+                {allSelected ? 'Remove All' : 'Add All'}
+            </Button>
+        </div>
+    );
+};
 
 type Props = {
     subuser?: Subuser;
@@ -116,6 +136,9 @@ const EditSubuserModal = ({ subuser }: Props) => {
                     </div>
                 </div>
                 <FlashMessageRender byKey={'user:edit'} css={tw`mt-4`} />
+                {!subuser && canEditUser && (
+                    <AddAllPermissionsButton editablePermissions={editablePermissions} />
+                )}
                 {!isRootAdmin && loggedInPermissions[0] !== '*' && (
                     <div css={tw`mt-4 pl-4 py-2 border-l-4 border-cyan-400`}>
                         <p css={tw`text-sm text-neutral-300`}>

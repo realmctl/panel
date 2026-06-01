@@ -23,6 +23,9 @@ class AllocationTransformer extends BaseClientTransformer
             'port' => $model->port,
             'notes' => $model->notes,
             'is_default' => $model->server->allocation_id === $model->id,
+            'whitelist_enabled' => (bool) $model->whitelist_enabled,
+            'protocol' => $model->protocol ?? 'tcp',
+            'allowed_ips' => $model->allowed_ips ?? [],
         ];
     }
 }

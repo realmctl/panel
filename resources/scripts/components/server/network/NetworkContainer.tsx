@@ -6,12 +6,14 @@ import { ServerContext } from '@/state/server';
 import AllocationRow from '@/components/server/network/AllocationRow';
 import Button from '@/components/elements/Button';
 import createServerAllocation from '@/api/server/network/createServerAllocation';
-import tw from 'twin.macro';
 import Can from '@/components/elements/Can';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import getServerAllocations from '@/api/swr/getServerAllocations';
 import isEqual from 'react-fast-compare';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+
 
 const NetworkContainer = () => {
     const [loading, setLoading] = useState(false);
@@ -33,13 +35,11 @@ const NetworkContainer = () => {
 
     useDeepCompareEffect(() => {
         if (!data) return;
-
         setServerFromState((state) => ({ ...state, allocations: data }));
     }, [data]);
 
     const onCreateAllocation = () => {
         clearFlashes();
-
         setLoading(true);
         createServerAllocation(uuid)
             .then((allocation) => {
@@ -52,30 +52,31 @@ const NetworkContainer = () => {
 
     return (
         <ServerContentBlock showFlashKey={'server:network'} title={'Network'}>
+            <SpinnerOverlay visible={loading} />
+
+            {allocationLimit > 0 && data && allocationLimit > data.length && (
+                <Can action={'allocation.create'}>
+                    <div className={'flex justify-end mb-4'}>
+                        <Button
+                            color={'primary'}
+                            className={'flex items-center gap-2 whitespace-nowrap'}
+                            onClick={onCreateAllocation}
+                        >
+                            <FontAwesomeIcon icon={faPlus} className={'text-xs'} />
+                            Add Allocation
+                        </Button>
+                    </div>
+                </Can>
+            )}
+
             {!data ? (
                 <Spinner size={'large'} centered />
             ) : (
-                <>
+                <div className={'grid grid-cols-1 lg:grid-cols-2 gap-4'}>
                     {data.map((allocation) => (
                         <AllocationRow key={`${allocation.ip}:${allocation.port}`} allocation={allocation} />
                     ))}
-                    {allocationLimit > 0 && (
-                        <Can action={'allocation.create'}>
-                            <SpinnerOverlay visible={loading} />
-                            <div css={tw`mt-6 sm:flex items-center justify-end`}>
-                                <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
-                                    You are currently using {data.length} of {allocationLimit} allowed allocations for
-                                    this server.
-                                </p>
-                                {allocationLimit > data.length && (
-                                    <Button css={tw`w-full sm:w-auto`} color={'primary'} onClick={onCreateAllocation}>
-                                        Create Allocation
-                                    </Button>
-                                )}
-                            </div>
-                        </Can>
-                    )}
-                </>
+                </div>
             )}
         </ServerContentBlock>
     );
