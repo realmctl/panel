@@ -126,6 +126,7 @@ Route::group(['prefix' => 'servers'], function () {
     Route::get('/view/{server:id}/delete', [Admin\Servers\ServerViewController::class, 'delete'])->name('admin.servers.view.delete');
 
     Route::post('/new', [Admin\Servers\CreateServerController::class, 'store']);
+    Route::post('/view/{server:id}/duplicate', [Admin\Servers\DuplicateServerController::class, 'store'])->name('admin.servers.view.duplicate');
     Route::post('/view/{server:id}/build', [Admin\ServersController::class, 'updateBuild']);
     Route::post('/view/{server:id}/startup', [Admin\ServersController::class, 'saveStartup']);
     Route::post('/view/{server:id}/database', [Admin\ServersController::class, 'newDatabase']);

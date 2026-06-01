@@ -11,6 +11,29 @@ import Spinner from '@/components/elements/Spinner';
 import styled from 'styled-components/macro';
 import isEqual from 'react-fast-compare';
 
+const getServerBackground = (server: Server): string => {
+    if (server.eggBackground) return `/assets/backgrounds/${server.eggBackground}`;
+    const egg = server.eggName.toLowerCase();
+    if (egg.includes('minecraft')) return '/assets/backgrounds/minecraft.png';
+    if (egg.includes('rust')) return '/assets/backgrounds/rust.jpg';
+    if (egg.includes('valheim')) return '/assets/backgrounds/valheim.jpeg';
+    if (egg.includes('ark')) return '/assets/backgrounds/ark.webp';
+    if (egg.includes('terraria')) return '/assets/backgrounds/terraria.jpg';
+    if (egg.includes('csgo') || egg.includes('cs2') || egg.includes('counter-strike') || egg.includes('counter strike')) return '/assets/backgrounds/csgo.jpg';
+    if (egg.includes('gmod') || egg.includes('garry')) return '/assets/backgrounds/gmod.jpeg';
+    if (egg.includes('fivem')) return '/assets/backgrounds/fivem.jpeg';
+    const image = server.dockerImage.toLowerCase();
+    if (image.includes('minecraft')) return '/assets/backgrounds/minecraft.png';
+    if (image.includes('rust')) return '/assets/backgrounds/rust.jpg';
+    if (image.includes('valheim')) return '/assets/backgrounds/valheim.jpeg';
+    if (image.includes('ark')) return '/assets/backgrounds/ark.webp';
+    if (image.includes('terraria')) return '/assets/backgrounds/terraria.jpg';
+    if (image.includes('csgo') || image.includes('cs2')) return '/assets/backgrounds/csgo.jpg';
+    if (image.includes('gmod')) return '/assets/backgrounds/gmod.jpeg';
+    if (image.includes('fivem')) return '/assets/backgrounds/fivem.jpeg';
+    return '/assets/backgrounds/minecraft.png';
+};
+
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
 const isAlarmState = (current: number, limit: number): boolean => limit > 0 && current / (limit * 1024 * 1024) >= 0.9;
@@ -24,7 +47,7 @@ const Icon = memo(
 
 const IconDescription = styled.p<{ $alarm: boolean }>`
     ${tw`text-sm ml-2`};
-    ${(props) => (props.$alarm ? tw`text-white` : tw`text-neutral-400`)};
+    ${(props) => (props.$alarm ? tw`text-white` : tw`text-neutral-100`)};
 `;
 
 const StatusIndicatorBox = styled(GreyRowBox)<{ $status: ServerPowerState | undefined }>`
@@ -88,23 +111,32 @@ export default ({ server, className }: { server: Server; className?: string }) =
     const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Unlimited';
     const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : 'Unlimited';
 
+    const backgroundImage = getServerBackground(server);
+
     return (
         <StatusIndicatorBox as={Link} to={`/server/${server.id}`} className={className} $status={stats?.status}>
-            <div css={tw`flex items-center col-span-12 sm:col-span-5 lg:col-span-6`}>
-                <div className={'icon mr-4'}>
-                    <FontAwesomeIcon icon={faServer} />
-                </div>
+            {/* Background image fading in from the right */}
+            <div
+                className={'absolute inset-0 bg-cover bg-center pointer-events-none'}
+                style={{ backgroundImage: `url(${backgroundImage})` }}
+            />
+            <div
+                className={'absolute inset-0 pointer-events-none'}
+                style={{ background: 'linear-gradient(to right, #192024 30%, rgba(25,32,36,0.85) 55%, rgba(25,32,36,0.4) 80%, rgba(25,32,36,0.1) 100%)' }}
+            />
+            <div css={tw`flex items-center col-span-12 sm:col-span-5 lg:col-span-6 relative`}>
+                <FontAwesomeIcon icon={faServer} css={tw`text-neutral-300 mr-4 text-lg flex-shrink-0`} />
                 <div>
-                    <p css={tw`text-lg break-words`}>{server.name}</p>
+                    <p css={tw`text-lg break-words text-white font-semibold`}>{server.name}</p>
                     {!!server.description && (
-                        <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
+                        <p css={tw`text-sm text-neutral-200 break-words line-clamp-2`}>{server.description}</p>
                     )}
                 </div>
             </div>
-            <div css={tw`flex-1 ml-4 lg:block lg:col-span-2 hidden`}>
+            <div css={tw`flex-1 ml-4 lg:block lg:col-span-2 hidden relative`}>
                 <div css={tw`flex justify-center`}>
-                    <FontAwesomeIcon icon={faEthernet} css={tw`text-neutral-500`} />
-                    <p css={tw`text-sm text-neutral-400 ml-2`}>
+                    <FontAwesomeIcon icon={faEthernet} css={tw`text-neutral-300`} />
+                    <p css={tw`text-sm text-neutral-100 ml-2`}>
                         {server.allocations
                             .filter((alloc) => alloc.isDefault)
                             .map((allocation) => (
@@ -115,7 +147,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                     </p>
                 </div>
             </div>
-            <div css={tw`hidden col-span-7 lg:col-span-4 sm:flex items-baseline justify-center`}>
+            <div css={tw`hidden col-span-7 lg:col-span-4 sm:flex items-baseline justify-center relative`}>
                 {!stats || isSuspended ? (
                     isSuspended ? (
                         <div css={tw`flex-1 text-center`}>
@@ -147,7 +179,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                                     {stats.cpuUsagePercent.toFixed(2)} %
                                 </IconDescription>
                             </div>
-                            <p css={tw`text-xs text-neutral-600 text-center mt-1`}>of {cpuLimit}</p>
+                            <p css={tw`text-xs text-neutral-300 text-center mt-1`}>of {cpuLimit}</p>
                         </div>
                         <div css={tw`flex-1 ml-4 sm:block hidden`}>
                             <div css={tw`flex justify-center`}>
@@ -156,7 +188,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                                     {bytesToString(stats.memoryUsageInBytes)}
                                 </IconDescription>
                             </div>
-                            <p css={tw`text-xs text-neutral-600 text-center mt-1`}>of {memoryLimit}</p>
+                            <p css={tw`text-xs text-neutral-300 text-center mt-1`}>of {memoryLimit}</p>
                         </div>
                         <div css={tw`flex-1 ml-4 sm:block hidden`}>
                             <div css={tw`flex justify-center`}>
@@ -165,7 +197,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                                     {bytesToString(stats.diskUsageInBytes)}
                                 </IconDescription>
                             </div>
-                            <p css={tw`text-xs text-neutral-600 text-center mt-1`}>of {diskLimit}</p>
+                            <p css={tw`text-xs text-neutral-300 text-center mt-1`}>of {diskLimit}</p>
                         </div>
                     </React.Fragment>
                 )}

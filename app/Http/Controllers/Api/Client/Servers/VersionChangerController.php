@@ -1,5 +1,29 @@
 <?php
 
+// TODO(developers): This entire version changer system needs a thorough review before it can be considered stable.
+// Known issues and things to verify:
+//
+// 1. ASYNC PULL — Wings' pull() may return before the file is actually downloaded.
+//    The install() response currently says "success" while the download is still in progress.
+//    Solution: poll Wings for the file's existence after pull(), or use a job/queue with websocket feedback.
+//
+// 2. OVERWRITE BEHAVIOUR — It is not confirmed whether Wings' pull() overwrites an existing server.jar.
+//    If it does not, the download will silently fail (or error) when the file already exists.
+//    The old code deleted the jar first (causing data loss on failure). Current code skips the delete —
+//    verify Wings behaviour and handle accordingly.
+//
+// 3. SPIGOT — Spigot has no public download API and requires BuildTools. Currently returns an error.
+//    Either remove Spigot from the UI or implement a BuildTools-based workflow.
+//
+// 4. ERROR PROPAGATION — getDownloadUrl() is called with a plain new Request() inside install().
+//    This bypasses Laravel's request lifecycle. Refactor to extract URL resolution into a separate service class.
+//
+// 5. NO INTEGRITY CHECK — Downloaded jars are not checksum-verified (e.g. SHA256).
+//    Paper and Mojang both expose checksums in their API responses — use them.
+//
+// 6. SERVER_JARFILE VARIABLE — updateOrCreate on the egg variable assumes the egg always uses SERVER_JARFILE.
+//    This will silently do nothing for eggs that use a different variable name.
+
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
 use Pterodactyl\Models\Server;
@@ -188,6 +212,24 @@ class VersionChangerController extends ClientApiController
                     }
                 }
                 break;
+
+            case 'snapshot':
+                $manifestResponse = Http::get('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json');
+                if ($manifestResponse->successful()) {
+                    $versionData = collect($manifestResponse->json('versions', []))
+                        ->firstWhere('id', $version);
+                    if ($versionData) {
+                        $versionDetailResponse = Http::get($versionData['url']);
+                        if ($versionDetailResponse->successful()) {
+                            $url = $versionDetailResponse->json('downloads.server.url');
+                            $filename = "server.jar";
+                        }
+                    }
+                }
+                break;
+
+            case 'spigot':
+                return ['error' => 'Spigot cannot be downloaded automatically. Use the Spigot BuildTools or upload the jar manually.'];
         }
 
         if (!$url) {
@@ -223,18 +265,21 @@ class VersionChangerController extends ClientApiController
         $url = $downloadData['url'];
         $filename = $downloadData['filename'];
 
-        // Delete existing server.jar before downloading new one
         try {
-            $this->fileRepository->setServer($server)->deleteFiles('/', ['server.jar']);
-        } catch (\Exception $e) {
-            // File might not exist, that's fine
-        }
-
-        try {
-            // Use Wings to pull the file to the server (always save as server.jar for consistency)
+            // Download the new jar first, then clean up the old one only on success.
+            // Deleting first caused the jar to disappear permanently when the download failed.
             $this->fileRepository->setServer($server)->pull($url, '/', ['filename' => 'server.jar']);
         } catch (\Exception $e) {
             return ['success' => false, 'error' => 'Failed to download: ' . $e->getMessage()];
+        }
+
+        // Remove any leftover jar with the original versioned filename (e.g. paper-1.20.4-123.jar)
+        if ($filename !== 'server.jar') {
+            try {
+                $this->fileRepository->setServer($server)->deleteFiles('/', [$filename]);
+            } catch (\Exception $e) {
+                // File might not exist, that's fine
+            }
         }
 
         // Update the SERVER_JARFILE variable to server.jar

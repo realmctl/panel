@@ -164,6 +164,13 @@
                         More info <i class="ti ti-arrow-right ms-auto"></i>
                     </a>
                 </div>
+
+                <form action="{{ route('admin.servers.view.duplicate', $server->id) }}" method="POST">
+                    {!! csrf_field() !!}
+                    <button type="submit" class="btn btn-secondary w-100">
+                        <i class="ti ti-copy me-1"></i> Duplicate Server
+                    </button>
+                </form>
             </div>
         </div>
     </div>

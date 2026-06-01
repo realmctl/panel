@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Server } from '@/api/server/getServer';
 import getServers from '@/api/getServers';
 import ServerCard from '@/components/dashboard/ServerCard';
+import ServerRow from '@/components/dashboard/ServerRow';
 import Spinner from '@/components/elements/Spinner';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import useFlash from '@/plugins/useFlash';
@@ -22,6 +23,7 @@ export default () => {
     const uuid = useStoreState((state) => state.user.data!.uuid);
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [showOnlyAdmin, setShowOnlyAdmin] = usePersistedState(`${uuid}:show_all_servers`, false);
+    const [layout, setLayout] = usePersistedState<'grid' | 'list'>(`${uuid}:server_layout`, 'grid');
 
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
         ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
@@ -53,8 +55,8 @@ export default () => {
 
     return (
         <PageContentBlock title={'Dashboard'} showFlashKey={'dashboard'}>
-            {rootAdmin && (
-                <div className={'mb-4 flex justify-end items-center'}>
+            <div className={'mb-4 flex justify-end items-center gap-3'}>
+                {rootAdmin && (
                     <div
                         className={'flex items-center gap-2 px-3 py-1.5 rounded-md border border-[#2d3338]/50 cursor-pointer select-none transition-colors duration-150 hover:border-[#3d4348]'}
                         style={{ backgroundColor: '#192024' }}
@@ -75,19 +77,54 @@ export default () => {
                             />
                         </div>
                     </div>
+                )}
+                <div
+                    className={'flex items-center rounded-md border border-[#2d3338]/50 overflow-hidden'}
+                    style={{ backgroundColor: '#192024' }}
+                >
+                    <button
+                        onClick={() => setLayout('grid')}
+                        title={'Card view'}
+                        className={`p-1.5 transition-colors duration-150 border-0 cursor-pointer ${
+                            layout === 'grid' ? 'text-neutral-100 bg-white/10' : 'text-neutral-500 hover:text-neutral-300 bg-transparent'
+                        }`}
+                    >
+                        <svg xmlns={'http://www.w3.org/2000/svg'} className={'w-4 h-4'} viewBox={'0 0 24 24'} fill={'currentColor'}>
+                            <path d={'M3 3h8v8H3V3zm0 10h8v8H3v-8zm10-10h8v8h-8V3zm0 10h8v8h-8v-8z'} />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={() => setLayout('list')}
+                        title={'List view'}
+                        className={`p-1.5 transition-colors duration-150 border-0 cursor-pointer ${
+                            layout === 'list' ? 'text-neutral-100 bg-white/10' : 'text-neutral-500 hover:text-neutral-300 bg-transparent'
+                        }`}
+                    >
+                        <svg xmlns={'http://www.w3.org/2000/svg'} className={'w-4 h-4'} viewBox={'0 0 24 24'} fill={'currentColor'}>
+                            <path d={'M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z'} />
+                        </svg>
+                    </button>
                 </div>
-            )}
+            </div>
             {!servers ? (
                 <Spinner centered size={'large'} />
             ) : (
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) =>
                         items.length > 0 ? (
-                            <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
-                                {items.map((server) => (
-                                    <ServerCard key={server.uuid} server={server} />
-                                ))}
-                            </div>
+                            layout === 'grid' ? (
+                                <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
+                                    {items.map((server) => (
+                                        <ServerCard key={server.uuid} server={server} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className={'flex flex-col gap-2'}>
+                                    {items.map((server) => (
+                                        <ServerRow key={server.uuid} server={server} />
+                                    ))}
+                                </div>
+                            )
                         ) : (
                             <p css={tw`text-center text-sm text-neutral-400`}>
                                 {showOnlyAdmin

@@ -1,3 +1,21 @@
+// TODO(developers): Frontend also needs review:
+//
+// 1. FAKE PROGRESS — DownloadProgress shows a fake animated bar with no relation to actual download progress.
+//    Wings doesn't push progress events to the panel, so either implement a real polling mechanism
+//    (check if server.jar exists/changed on disk) or replace the bar with a simple spinner + "downloading…" text.
+//
+// 2. NO INSTALL LOCK — A user can navigate away and come back while a download is still in progress.
+//    Installing state is lost on unmount, so a second install can be triggered mid-download.
+//    Consider persisting install state server-side or disabling the page while Wings is working.
+//
+// 3. SUCCESS TOO EARLY — install() resolves as soon as the API responds, not when the file is on disk.
+//    The success message is therefore misleading — the server will fail to start if restarted immediately.
+//    Show a warning like "Download in progress, wait before restarting."
+//
+// 4. TS ERRORS (pre-existing) — .finally() is used on Promise but tsconfig lib does not include es2018+.
+//    Fix: add "ES2018" (or later) to the lib array in tsconfig.json, or refactor to use .then()/.catch() without .finally().
+//    Affected lines: getVersions chain (~line 76) and installVersion chain (~line 96).
+
 import React, { useEffect, useState } from 'react';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { ServerContext } from '@/state/server';

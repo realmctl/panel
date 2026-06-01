@@ -10,13 +10,39 @@ import getServerBackups, { Context as ServerBackupContext } from '@/api/swr/getS
 import { ServerContext } from '@/state/server';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Pagination from '@/components/elements/Pagination';
+import { Dialog } from '@/components/elements/dialog';
+import deleteAllBackups from '@/api/server/backups/deleteAllBackups';
 
 const BackupContainer = () => {
     const { page, setPage } = useContext(ServerBackupContext);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
-    const { data: backups, error, isValidating } = getServerBackups();
+    const { data: backups, error, isValidating, mutate } = getServerBackups();
+    const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+    const [deletingAll, setDeletingAll] = useState(false);
 
+    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const backupLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backups);
+
+    const doDeleteAll = () => {
+        setDeletingAll(true);
+        clearFlashes('backups');
+        deleteAllBackups(uuid)
+            .then(() =>
+                mutate(
+                    (data) => ({
+                        ...data,
+                        items: data.items.filter((b) => b.isLocked),
+                        backupCount: data.items.filter((b) => b.isLocked).length,
+                    }),
+                    false
+                )
+            )
+            .catch((error) => clearAndAddHttpError({ error, key: 'backups' }))
+            .then(() => {
+                setDeletingAll(false);
+                setShowDeleteAllDialog(false);
+            });
+    };
 
     useEffect(() => {
         if (!error) {
@@ -34,6 +60,16 @@ const BackupContainer = () => {
 
     return (
         <ServerContentBlock title={'Backups'}>
+            <Dialog.Confirm
+                open={showDeleteAllDialog}
+                onClose={() => setShowDeleteAllDialog(false)}
+                title={'Delete All Backups'}
+                confirm={'Delete All'}
+                onConfirmed={doDeleteAll}
+            >
+                This will permanently delete all unlocked backups for this server. Locked backups will not be removed.
+                This action cannot be undone.
+            </Dialog.Confirm>
             <FlashMessageRender byKey={'backups'} css={tw`mb-4`} />
             <Pagination data={backups} onPageSelect={setPage}>
                 {({ items }) =>
@@ -67,18 +103,31 @@ const BackupContainer = () => {
                     Backups cannot be created for this server because the backup limit is set to 0.
                 </p>
             )}
-            <Can action={'backup.create'}>
-                <div css={tw`mt-6 sm:flex items-center justify-end`}>
-                    {backupLimit > 0 && backups.backupCount > 0 && (
-                        <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
-                            {backups.backupCount} of {backupLimit} backups have been created for this server.
-                        </p>
+            <div css={tw`mt-6 sm:flex items-center justify-end gap-3`}>
+                <Can action={'backup.create'}>
+                    <>
+                        {backupLimit > 0 && backups.backupCount > 0 && (
+                            <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
+                                {backups.backupCount} of {backupLimit} backups have been created for this server.
+                            </p>
+                        )}
+                        {backupLimit > 0 && backups.backupCount > 0 && backupLimit > backups.backupCount && (
+                            <CreateBackupButton css={tw`w-full sm:w-auto`} />
+                        )}
+                    </>
+                </Can>
+                <Can action={'backup.delete'}>
+                    {backups.backupCount > 0 && (
+                        <button
+                            disabled={deletingAll}
+                            onClick={() => setShowDeleteAllDialog(true)}
+                            css={tw`w-full sm:w-auto px-4 py-2 text-sm font-medium rounded border border-red-500/40 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                            {deletingAll ? 'Deleting...' : 'Delete All'}
+                        </button>
                     )}
-                    {backupLimit > 0 && backups.backupCount > 0 && backupLimit > backups.backupCount && (
-                        <CreateBackupButton css={tw`w-full sm:w-auto`} />
-                    )}
-                </div>
-            </Can>
+                </Can>
+            </div>
         </ServerContentBlock>
     );
 };

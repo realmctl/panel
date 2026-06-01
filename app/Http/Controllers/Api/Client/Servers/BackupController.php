@@ -160,6 +160,31 @@ class BackupController extends ClientApiController
     }
 
     /**
+     * Deletes all unlocked backups for a server.
+     *
+     * @throws Throwable
+     */
+    public function deleteAll(Request $request, Server $server): JsonResponse
+    {
+        if (!$request->user()->can(Permission::ACTION_BACKUP_DELETE, $server)) {
+            throw new AuthorizationException();
+        }
+
+        $backups = $server->backups()->where('is_locked', false)->get();
+
+        foreach ($backups as $backup) {
+            $this->deleteBackupService->handle($backup);
+
+            Activity::event('server:backup.delete')
+                ->subject($backup)
+                ->property(['name' => $backup->name, 'failed' => !$backup->is_successful])
+                ->log();
+        }
+
+        return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    /**
      * Download the backup for a given server instance. For daemon local files, the file
      * will be streamed back through the Panel. For AWS S3 files, a signed URL will be generated
      * which the user is redirected to.
