@@ -153,6 +153,12 @@ Route::group([
         Route::put('/variable', [Client\Servers\StartupController::class, 'update']);
     });
 
+    Route::group(['prefix' => '/versions'], function () {
+        Route::get('/', [Client\Servers\VersionChangerController::class, 'listVersions']);
+        Route::get('/download', [Client\Servers\VersionChangerController::class, 'getDownloadUrl']);
+        Route::post('/install', [Client\Servers\VersionChangerController::class, 'install']);
+    });
+
     Route::group(['prefix' => '/settings'], function () {
         Route::post('/rename', [Client\Servers\SettingsController::class, 'rename']);
         Route::post('/reinstall', [Client\Servers\SettingsController::class, 'reinstall']);

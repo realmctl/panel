@@ -20,6 +20,26 @@ import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
 import 'xterm/css/xterm.css';
 import styles from './style.module.css';
 
+const settings = {
+    prefix: '\x1B[33m\x1B[1m[Realm]:\x1B[39m ',
+    diskusagecheck: 'Checking server disk space usage, this could take a few seconds...',
+    processconfiguration: 'Updating process configuration files...',
+    permcheck: 'Ensuring file permissions are set correctly, this could take a few seconds...',
+    dockerpull: 'Pulling Docker container image, this could take a few minutes to complete...',
+    finishpull: 'Finished pulling Docker container image',
+};
+
+const powersettings = {
+    starting: 'Server marked as starting',
+    started: 'Server marked as started',
+    offline: 'Server marked as offline',
+};
+
+const customsettings: Record<string, string> = {
+    // Add custom replacements here, e.g.:
+    // 'Starting minecraft server version': 'Starting Realm server version',
+};
+
 const theme = {
     background: '#192024',
     cursor: 'transparent',
@@ -53,7 +73,7 @@ const terminalProps: ITerminalOptions = {
 };
 
 export default () => {
-    const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@realm~ \u001b[0m';
+    const TERMINAL_PRELUDE = settings.prefix;
     const ref = useRef<HTMLDivElement>(null);
     const terminal = useMemo(() => new Terminal({ ...terminalProps }), []);
     const fitAddon = new FitAddon();
@@ -74,8 +94,24 @@ export default () => {
         z-index: 10;
     }`;
 
-    const handleConsoleOutput = (line: string, prelude = false) =>
-        terminal.writeln((prelude ? TERMINAL_PRELUDE : '') + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m');
+    const handleConsoleOutput = (line: string, prelude = false) => {
+        Object.keys(customsettings).forEach((element) => {
+            line = line.replace(element, customsettings[element]);
+        });
+        terminal.writeln(
+            (prelude ? TERMINAL_PRELUDE : '') +
+                line
+                    .replace('\x1B[1m\x1B[33mcontainer@pterodactyl~ \x1B[0m', TERMINAL_PRELUDE)
+                    .replace('\x1B[33m\x1B[1m[Pterodactyl Daemon]:\x1B[39m', TERMINAL_PRELUDE)
+                    .replace('Checking server disk space usage, this could take a few seconds...', settings.diskusagecheck)
+                    .replace('Updating process configuration files...', settings.processconfiguration)
+                    .replace('Ensuring file permissions are set correctly, this could take a few seconds...', settings.permcheck)
+                    .replace('Pulling Docker container image, this could take a few minutes to complete...', settings.dockerpull)
+                    .replace('Finished pulling Docker container image', settings.finishpull)
+                    .replace(/(?:\r\n|\r|\n)$/im, '') +
+                '\u001b[0m'
+        );
+    };
 
     const handleTransferStatus = (status: string) => {
         switch (status) {
@@ -91,8 +127,15 @@ export default () => {
             '\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
         );
 
-    const handlePowerChangeEvent = (state: string) =>
-        terminal.writeln(TERMINAL_PRELUDE + 'Server marked as ' + state + '...\u001b[0m');
+    const handlePowerChangeEvent = (state: string) => {
+        if (state === 'starting') {
+            terminal.writeln(TERMINAL_PRELUDE + powersettings.starting);
+        } else if (state === 'started') {
+            terminal.writeln(TERMINAL_PRELUDE + powersettings.started);
+        } else if (state === 'offline') {
+            terminal.writeln(TERMINAL_PRELUDE + powersettings.offline);
+        }
+    };
 
     const handleCommandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'ArrowUp') {

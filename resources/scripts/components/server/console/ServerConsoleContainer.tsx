@@ -6,7 +6,6 @@ import isEqual from 'react-fast-compare';
 import Spinner from '@/components/elements/Spinner';
 import Features from '@feature/Features';
 import Console from '@/components/server/console/Console';
-import StatGraphs from '@/components/server/console/StatGraphs';
 import PowerButtons from '@/components/server/console/PowerButtons';
 import { Alert } from '@/components/elements/alert';
 import { ip } from '@/lib/formatters';
@@ -84,6 +83,7 @@ const ServerConsoleContainer = () => {
     const nodeName = ServerContext.useStoreState((state) => state.server.data!.node);
     const eggName = ServerContext.useStoreState((state) => state.server.data!.eggName);
     const [uptime, setUptime] = useState<number>(0);
+    const [errorCount, setErrorCount] = useState<number>(0);
 
     const allocation = ServerContext.useStoreState((state) => {
         const match = state.server.data!.allocations.find((a) => a.isDefault);
@@ -97,6 +97,10 @@ const ServerConsoleContainer = () => {
         } catch (e) {
             // ignore
         }
+    });
+
+    useWebsocketEvent(SocketEvent.DAEMON_ERROR, () => {
+        setErrorCount((prev) => prev + 1);
     });
 
     return (
@@ -119,7 +123,8 @@ const ServerConsoleContainer = () => {
                         className={'rounded-md border border-[#2d3338]/50 p-5'}
                         style={{ backgroundColor: '#192024' }}
                     >
-                        <h2 className={'text-lg font-semibold text-neutral-100 m-0 mb-5'}>Server</h2>
+                        <h2 className={'text-lg font-semibold text-neutral-100 m-0 mb-4'}>Server</h2>
+                        <div className={'border-t border-[#2d3338]/50 mb-4'}></div>
 
                         <div className={'space-y-4'}>
                             <div className={'flex items-center'}>
@@ -143,6 +148,7 @@ const ServerConsoleContainer = () => {
                         style={{ backgroundColor: '#192024' }}
                     >
                         <h2 className={'text-lg font-semibold text-neutral-100 m-0 mb-4'}>Runtime</h2>
+                        <div className={'border-t border-[#2d3338]/50 mb-4'}></div>
 
                         <div className={'space-y-3'}>
                             <div className={'flex items-center justify-between'}>
@@ -167,14 +173,19 @@ const ServerConsoleContainer = () => {
                     </div>
                 </div>
 
-                {/* Right: Console */}
+                {/* Middle: Console */}
                 <div className={'lg:col-span-2'}>
                     <div
                         className={'rounded-md border border-[#2d3338]/50 overflow-hidden h-full flex flex-col'}
                         style={{ backgroundColor: '#192024' }}
                     >
-                        <div className={'px-5 py-3 flex items-center'}>
+                        <div className={'px-5 py-3 flex items-center justify-between'}>
                             <h2 className={'text-lg font-semibold text-neutral-100 m-0'}>Console</h2>
+                            {errorCount > 0 && (
+                                <span className={'flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30'}>
+                                    ⚠ {errorCount} {errorCount === 1 ? 'Error' : 'Errors'}
+                                </span>
+                            )}
                         </div>
                         <div className={'flex-1'}>
                             <Spinner.Suspense>
@@ -185,11 +196,6 @@ const ServerConsoleContainer = () => {
                 </div>
             </div>
 
-            <div className={'grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4'}>
-                <Spinner.Suspense>
-                    <StatGraphs />
-                </Spinner.Suspense>
-            </div>
             <Features enabled={eggFeatures} />
         </ServerContentBlock>
     );
