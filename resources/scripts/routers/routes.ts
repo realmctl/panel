@@ -15,6 +15,7 @@ import AccountSSHContainer from '@/components/dashboard/ssh/AccountSSHContainer'
 import ActivityLogContainer from '@/components/dashboard/activity/ActivityLogContainer';
 import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer';
 import VersionChangerContainer from '@/components/server/versions/VersionChangerContainer';
+import PluginInstallerContainer from '@/components/server/plugins/PluginInstallerContainer';
 
 // Each of the router files is already code split out appropriately — so
 // all of the items above will only be loaded in when that router is loaded.
@@ -100,6 +101,13 @@ export default {
             permission: 'startup.*',
             name: 'Versions',
             component: VersionChangerContainer,
+            exact: true,
+        },
+        {
+            path: '/plugins',
+            permission: 'file.*',
+            name: 'Plugins',
+            component: PluginInstallerContainer,
             exact: true,
         },
         {
