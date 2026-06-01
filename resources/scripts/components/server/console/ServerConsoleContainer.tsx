@@ -54,7 +54,7 @@ const ServerCardPowerButtons = () => {
                     Start
                 </button>
             )}
-            {status === 'running' && (
+            {(status === 'running' || status === 'starting') && (
                 <button
                     onClick={() => sendAction('stop')}
                     className={'px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md border-0 cursor-pointer transition-colors duration-150'}
@@ -62,7 +62,7 @@ const ServerCardPowerButtons = () => {
                     Shut down
                 </button>
             )}
-            {(status === 'running' || status === 'stopping') && (
+            {(status === 'running' || status === 'starting' || status === 'stopping') && (
                 <button
                     onClick={() => sendAction('kill')}
                     className={'px-4 py-2 text-sm font-medium text-neutral-200 bg-neutral-700/60 hover:bg-neutral-700 rounded-md border border-[#2d3338] cursor-pointer transition-colors duration-150'}

@@ -68,5 +68,8 @@
 }
 
 .chart_container {
-    @apply bg-gray-600 rounded shadow-lg pt-2 border-b-4 border-gray-700 relative;
+    @apply rounded shadow-lg pt-2 relative;
+    background-color: #192024;
+    border: 1px solid rgba(45, 51, 56, 0.5);
+    border-bottom: 4px solid #2d3338;
 }
