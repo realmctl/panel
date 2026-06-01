@@ -42,7 +42,9 @@
                     @foreach ($nodes as $node)
                         <tr>
                             <td class="text-center" data-action="ping" data-secret="{{ $node->getDecryptedKey() }}" data-location="{{ $node->scheme }}://{{ $node->fqdn }}:{{ $node->daemonListen }}/api/system">
-                                <span class="status-dot status-dot-animated bg-secondary"></span>
+                                <span class="node-health-icon" style="font-size:1.15rem; color:#94a3b8; display:inline-block;">
+                            <i class="ti ti-heart-filled node-heart"></i>
+                        </span>
                             </td>
                             <td>
                                 @if($node->maintenance_mode)
@@ -82,22 +84,46 @@
 @endsection
 
 @section('admin-js')
+    <style>
+        @keyframes heartbeat {
+            0%   { transform: scale(1); }
+            14%  { transform: scale(1.25); }
+            28%  { transform: scale(1); }
+            42%  { transform: scale(1.15); }
+            56%  { transform: scale(1); }
+        }
+        .node-heart-online {
+            color: #22c55e;
+            animation: heartbeat 1.6s ease-in-out infinite;
+            display: inline-block;
+        }
+        .node-heart-offline {
+            color: #ef4444;
+        }
+        .node-heart-loading {
+            color: #94a3b8;
+            animation: heartbeat 2s ease-in-out infinite;
+            display: inline-block;
+        }
+    </style>
     <script>
     (function pingNodes() {
         $('td[data-action="ping"]').each(function(i, element) {
+            var $icon = $(element).find('.node-heart');
+            $icon.removeClass('node-heart-online node-heart-offline').addClass('node-heart-loading');
+            $icon.removeClass('ti-heart-broken').addClass('ti-heart-filled');
+
             $.ajax({
                 type: 'GET',
                 url: $(element).data('location'),
-                headers: {
-                    'Authorization': 'Bearer ' + $(element).data('secret'),
-                },
-                timeout: 5000
+                headers: { 'Authorization': 'Bearer ' + $(element).data('secret') },
+                timeout: 5000,
             }).done(function (data) {
-                $(element).find('.status-dot').removeClass('bg-secondary').addClass('bg-success');
-                $(element).attr('title', 'v' + data.version);
+                $icon.removeClass('node-heart-loading node-heart-offline ti-heart-broken').addClass('node-heart-online ti-heart-filled');
+                $(element).attr('title', 'Online · v' + data.version);
             }).fail(function (error) {
-                $(element).find('.status-dot').removeClass('bg-secondary status-dot-animated').addClass('bg-danger');
-                var errorText = 'Error connecting to node!';
+                $icon.removeClass('node-heart-loading node-heart-online ti-heart-filled').addClass('node-heart-offline ti-heart-broken');
+                var errorText = 'Offline — could not connect';
                 try { errorText = error.responseJSON.errors[0].detail || errorText; } catch (ex) {}
                 $(element).attr('title', errorText);
             });
