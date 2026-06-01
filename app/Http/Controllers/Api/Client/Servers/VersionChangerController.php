@@ -244,15 +244,15 @@ class VersionChangerController extends ClientApiController
         $url = $downloadData['url'];
         $filename = $downloadData['filename'];
 
-        // Use Wings to pull the file to the server
-        $this->fileRepository->setServer($server)->pull($url, '/', ['filename' => $filename]);
+        // Use Wings to pull the file to the server (always save as server.jar for consistency)
+        $this->fileRepository->setServer($server)->pull($url, '/', ['filename' => 'server.jar']);
 
-        // Update the SERVER_JARFILE variable if it exists
-        $jarVariable = $server->variables()->where('env_variable', 'SERVER_JARFILE')->first();
-        if ($jarVariable) {
+        // Update the SERVER_JARFILE variable to server.jar
+        $eggVariable = $server->egg->variables()->where('env_variable', 'SERVER_JARFILE')->first();
+        if ($eggVariable) {
             \Pterodactyl\Models\ServerVariable::updateOrCreate(
-                ['server_id' => $server->id, 'variable_id' => $jarVariable->id],
-                ['variable_value' => $filename]
+                ['server_id' => $server->id, 'variable_id' => $eggVariable->id],
+                ['variable_value' => 'server.jar']
             );
         }
 
@@ -262,7 +262,7 @@ class VersionChangerController extends ClientApiController
 
         return [
             'success' => true,
-            'filename' => $filename,
+            'filename' => 'server.jar',
             'version' => "{$type} {$version}",
         ];
     }

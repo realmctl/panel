@@ -6,15 +6,44 @@ import installVersion, { InstallResponse } from '@/api/server/versions/installVe
 import Spinner from '@/components/elements/Spinner';
 
 const SERVER_TYPES = [
-    { id: 'paper', name: 'Paper', description: 'High performance Minecraft server' },
-    { id: 'purpur', name: 'Purpur', description: 'Paper fork with extra features' },
-    { id: 'vanilla', name: 'Vanilla', description: 'Official Mojang server' },
-    { id: 'spigot', name: 'Spigot', description: 'Modified Minecraft server' },
-    { id: 'fabric', name: 'Fabric', description: 'Lightweight modding platform' },
-    { id: 'velocity', name: 'Velocity', description: 'Modern proxy server' },
-    { id: 'waterfall', name: 'Waterfall', description: 'BungeeCord fork by PaperMC' },
-    { id: 'snapshot', name: 'Snapshot', description: 'Vanilla development versions' },
+    { id: 'paper', name: 'Paper', description: 'High performance Minecraft server', icon: 'https://docs.papermc.io/img/paper.png' },
+    { id: 'purpur', name: 'Purpur', description: 'Paper fork with extra features', icon: 'https://purpurmc.org/docs/images/purpur-small.png' },
+    { id: 'vanilla', name: 'Vanilla', description: 'Official Mojang server', icon: 'https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-32x32.png' },
+    { id: 'spigot', name: 'Spigot', description: 'Modified Minecraft server', icon: 'https://static.spigotmc.org/img/spigot.png' },
+    { id: 'fabric', name: 'Fabric', description: 'Lightweight modding platform', icon: 'https://fabricmc.net/assets/logo.png' },
+    { id: 'velocity', name: 'Velocity', description: 'Modern proxy server', icon: 'https://docs.papermc.io/img/velocity.png' },
+    { id: 'waterfall', name: 'Waterfall', description: 'BungeeCord fork by PaperMC', icon: 'https://docs.papermc.io/img/waterfall.png' },
+    { id: 'snapshot', name: 'Snapshot', description: 'Vanilla development versions', icon: 'https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-32x32.png' },
 ];
+
+const DownloadProgress = () => {
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setProgress((prev) => {
+                if (prev >= 95) return prev;
+                const remaining = 95 - prev;
+                const increment = Math.max(0.5, remaining * 0.04);
+                return Math.min(95, prev + increment);
+            });
+        }, 300);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className={'flex items-center gap-3 w-full'}>
+            <div className={'flex-1 h-1.5 rounded-full overflow-hidden'} style={{ backgroundColor: '#2d3338' }}>
+                <div
+                    className={'h-full rounded-full transition-all duration-300 ease-out bg-blue-500'}
+                    style={{ width: `${progress}%` }}
+                />
+            </div>
+            <span className={'text-xs text-neutral-400 font-mono w-8 text-right'}>{Math.round(progress)}%</span>
+        </div>
+    );
+};
 
 export default () => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -81,14 +110,17 @@ export default () => {
                                 <button
                                     key={type.id}
                                     onClick={() => setSelectedType(type.id)}
-                                    className={`w-full text-left px-3 py-2.5 rounded-md text-sm border-0 cursor-pointer transition-colors duration-150 ${
+                                    className={`w-full text-left px-3 py-2.5 rounded-md text-sm border-0 cursor-pointer transition-colors duration-150 flex items-center gap-3 ${
                                         selectedType === type.id
                                             ? 'bg-blue-500/20 text-blue-300'
                                             : 'bg-transparent text-neutral-300 hover:bg-neutral-700/40 hover:text-neutral-100'
                                     }`}
                                 >
-                                    <div className={'font-medium'}>{type.name}</div>
-                                    <div className={'text-xs text-neutral-500 mt-0.5'}>{type.description}</div>
+                                    <img src={type.icon} alt={type.name} className={'w-5 h-5 rounded-sm object-contain'} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                    <div>
+                                        <div className={'font-medium'}>{type.name}</div>
+                                        <div className={'text-xs text-neutral-500 mt-0.5'}>{type.description}</div>
+                                    </div>
                                 </button>
                             ))}
                         </div>
@@ -119,18 +151,20 @@ export default () => {
                                         key={version}
                                         className={'flex items-center justify-between px-4 py-3 rounded-md border border-[#2d3338]/50 bg-[#0f1518]/50'}
                                     >
-                                        <span className={'text-sm text-neutral-200 font-mono'}>{version}</span>
-                                        <button
-                                            onClick={() => handleInstall(version)}
-                                            disabled={installing !== null}
-                                            className={`px-3 py-1.5 text-xs font-medium rounded border-0 cursor-pointer transition-colors duration-150 ${
-                                                installing === version
-                                                    ? 'bg-blue-500/30 text-blue-300'
-                                                    : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/40'
-                                            } disabled:opacity-50 disabled:cursor-not-allowed`}
-                                        >
-                                            {installing === version ? 'Installing...' : 'Install'}
-                                        </button>
+                                        {installing === version ? (
+                                            <DownloadProgress />
+                                        ) : (
+                                            <>
+                                                <span className={'text-sm text-neutral-200 font-mono'}>{version}</span>
+                                                <button
+                                                    onClick={() => handleInstall(version)}
+                                                    disabled={installing !== null}
+                                                    className={'px-3 py-1.5 text-xs font-medium rounded border-0 cursor-pointer transition-colors duration-150 bg-blue-500/20 text-blue-300 hover:bg-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed'}
+                                                >
+                                                    Install
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 ))}
                             </div>
