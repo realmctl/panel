@@ -8,19 +8,18 @@ import Spinner from '@/components/elements/Spinner';
 import CreateDatabaseButton from '@/components/server/databases/CreateDatabaseButton';
 import Can from '@/components/elements/Can';
 import useFlash from '@/plugins/useFlash';
-import tw from 'twin.macro';
 import Fade from '@/components/elements/Fade';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { useDeepMemoize } from '@/plugins/useDeepMemoize';
 
 export default () => {
-    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
+    const uuid          = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const databaseLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.databases);
 
     const { addError, clearFlashes } = useFlash();
     const [loading, setLoading] = useState(true);
 
-    const databases = useDeepMemoize(ServerContext.useStoreState((state) => state.databases.data));
+    const databases    = useDeepMemoize(ServerContext.useStoreState((state) => state.databases.data));
     const setDatabases = ServerContext.useStoreActions((state) => state.databases.setDatabases);
 
     useEffect(() => {
@@ -38,53 +37,57 @@ export default () => {
 
     return (
         <ServerContentBlock title={'Databases'}>
-            <FlashMessageRender byKey={'databases'} css={tw`mb-4`} />
+            <FlashMessageRender byKey={'databases'} className={'mb-4'} />
+
             {!databases.length && loading ? (
                 <Spinner size={'large'} centered />
             ) : (
                 <Fade timeout={150}>
                     <>
+                        {/* Top bar */}
+                        <div className={'flex items-center justify-between mb-6'}>
+                            <div className={'flex items-center gap-3'}>
+                                {databaseLimit > 0 && databases.length > 0 && (
+                                    <span className={'text-sm text-neutral-400'}>
+                                        <span className={'text-neutral-100 font-semibold'}>{databases.length}</span>
+                                        <span className={'text-neutral-600'}> / </span>
+                                        {databaseLimit} databases used
+                                    </span>
+                                )}
+                            </div>
+                            <Can action={'database.create'}>
+                                {databaseLimit > 0 && databaseLimit !== databases.length && (
+                                    <CreateDatabaseButton />
+                                )}
+                            </Can>
+                        </div>
+
                         {databases.length > 0 ? (
-                            <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'}>
+                            <div className={'grid grid-cols-1 md:grid-cols-2 gap-3'}>
                                 {databases.map((database) => (
-                                    <DatabaseRow
-                                        key={database.id}
-                                        database={database}
-                                    />
+                                    <DatabaseRow key={database.id} database={database} />
                                 ))}
                             </div>
                         ) : (
-                            <div className={'flex flex-col items-center justify-center py-16'}>
-                                <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>
+                            <div
+                                className={'rounded-lg p-12 flex flex-col items-center justify-center'}
+                                style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
+                            >
+                                <h3 className={'text-base font-semibold text-neutral-100 mb-1'}>
                                     {databaseLimit > 0 ? 'No databases yet' : 'Databases unavailable'}
                                 </h3>
-                                <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                                <p className={'text-sm text-neutral-500 text-center max-w-sm mb-6'}>
                                     {databaseLimit > 0
-                                        ? 'Create a database to store your server data. You can manage connections and credentials here.'
-                                        : 'Database creation is not enabled for this server. Contact an administrator if you need database access.'}
+                                        ? 'Create a database to store your server data.'
+                                        : 'Database creation is not enabled for this server.'}
                                 </p>
                                 {databaseLimit > 0 && (
                                     <Can action={'database.create'}>
-                                        <div className={'mt-6'}>
-                                            <CreateDatabaseButton />
-                                        </div>
+                                        <CreateDatabaseButton />
                                     </Can>
                                 )}
                             </div>
                         )}
-                        <Can action={'database.create'}>
-                            {databases.length > 0 && (
-                                <div css={tw`mt-6 flex items-center justify-end`}>
-                                    <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
-                                        {databases.length} of {databaseLimit} databases have been allocated to this
-                                        server.
-                                    </p>
-                                    {databaseLimit > 0 && databaseLimit !== databases.length && (
-                                        <CreateDatabaseButton css={tw`flex justify-end mt-6`} />
-                                    )}
-                                </div>
-                            )}
-                        </Can>
                     </>
                 </Fade>
             )}
