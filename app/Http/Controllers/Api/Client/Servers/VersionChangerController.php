@@ -47,13 +47,6 @@ class VersionChangerController extends ClientApiController
                 }
                 break;
 
-            case 'waterfall':
-                $response = Http::get('https://api.papermc.io/v2/projects/waterfall');
-                if ($response->successful()) {
-                    $versions = array_reverse($response->json('versions', []));
-                }
-                break;
-
             case 'vanilla':
                 $response = Http::get('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json');
                 if ($response->successful()) {
@@ -167,20 +160,6 @@ class VersionChangerController extends ClientApiController
                 }
                 break;
 
-            case 'waterfall':
-                $buildsResponse = Http::get("https://api.papermc.io/v2/projects/waterfall/versions/{$version}/builds");
-                if ($buildsResponse->successful()) {
-                    $builds = $buildsResponse->json('builds', []);
-                    $latestBuild = end($builds);
-                    if ($latestBuild) {
-                        $buildNumber = $latestBuild['build'];
-                        $downloadName = $latestBuild['downloads']['application']['name'] ?? "waterfall-{$version}-{$buildNumber}.jar";
-                        $url = "https://api.papermc.io/v2/projects/waterfall/versions/{$version}/builds/{$buildNumber}/downloads/{$downloadName}";
-                        $filename = $downloadName;
-                    }
-                }
-                break;
-
             case 'vanilla':
                 $manifestResponse = Http::get('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json');
                 if ($manifestResponse->successful()) {
@@ -227,7 +206,7 @@ class VersionChangerController extends ClientApiController
     public function install(Request $request, Server $server): array
     {
         $request->validate([
-            'type' => 'required|string|in:paper,purpur,velocity,waterfall,vanilla,snapshot,spigot,fabric',
+            'type' => 'required|string|in:paper,purpur,velocity,vanilla,snapshot,spigot,fabric',
             'version' => 'required|string',
         ]);
 
@@ -244,8 +223,15 @@ class VersionChangerController extends ClientApiController
         $url = $downloadData['url'];
         $filename = $downloadData['filename'];
 
+        // Delete existing server.jar before downloading new one
+        try {
+            $this->fileRepository->setServer($server)->deleteFiles('/', ['server.jar']);
+        } catch (\Exception $e) {
+            // File might not exist, that's fine
+        }
+
         // Use Wings to pull the file to the server (always save as server.jar for consistency)
-        $this->fileRepository->setServer($server)->pull($url, '/', ['filename' => 'server.jar']);
+        $this->fileRepository->setServer($server)->pull($url, '/', ['filename' => 'server.jar', 'foreground' => true]);
 
         // Update the SERVER_JARFILE variable to server.jar
         $eggVariable = $server->egg->variables()->where('env_variable', 'SERVER_JARFILE')->first();

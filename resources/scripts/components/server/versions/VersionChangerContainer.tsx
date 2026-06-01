@@ -6,14 +6,13 @@ import installVersion, { InstallResponse } from '@/api/server/versions/installVe
 import Spinner from '@/components/elements/Spinner';
 
 const SERVER_TYPES = [
-    { id: 'paper', name: 'Paper', description: 'High performance Minecraft server', icon: 'https://docs.papermc.io/img/paper.png' },
-    { id: 'purpur', name: 'Purpur', description: 'Paper fork with extra features', icon: 'https://purpurmc.org/docs/images/purpur-small.png' },
-    { id: 'vanilla', name: 'Vanilla', description: 'Official Mojang server', icon: 'https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-32x32.png' },
-    { id: 'spigot', name: 'Spigot', description: 'Modified Minecraft server', icon: 'https://static.spigotmc.org/img/spigot.png' },
-    { id: 'fabric', name: 'Fabric', description: 'Lightweight modding platform', icon: 'https://fabricmc.net/assets/logo.png' },
-    { id: 'velocity', name: 'Velocity', description: 'Modern proxy server', icon: 'https://docs.papermc.io/img/velocity.png' },
-    { id: 'waterfall', name: 'Waterfall', description: 'BungeeCord fork by PaperMC', icon: 'https://docs.papermc.io/img/waterfall.png' },
-    { id: 'snapshot', name: 'Snapshot', description: 'Vanilla development versions', icon: 'https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-32x32.png' },
+    { id: 'paper', name: 'Paper', description: 'High performance Minecraft server', icon: '/assets/icons/paper.png' },
+    { id: 'purpur', name: 'Purpur', description: 'Paper fork with extra features', icon: '/assets/icons/purpur.png' },
+    { id: 'vanilla', name: 'Vanilla', description: 'Official Mojang server', icon: '/assets/icons/vanilla.png' },
+    { id: 'spigot', name: 'Spigot', description: 'Modified Minecraft server', icon: '/assets/icons/spigot.png' },
+    { id: 'fabric', name: 'Fabric', description: 'Lightweight modding platform', icon: '/assets/icons/fabric.png' },
+    { id: 'velocity', name: 'Velocity', description: 'Modern proxy server', icon: '/assets/icons/velocity.png' },
+    { id: 'snapshot', name: 'Snapshot', description: 'Vanilla development versions', icon: '/assets/icons/vanilla.png' },
 ];
 
 const DownloadProgress = () => {

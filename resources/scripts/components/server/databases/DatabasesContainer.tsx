@@ -53,11 +53,24 @@ export default () => {
                                 />
                             ))
                         ) : (
-                            <p css={tw`text-center text-sm text-neutral-300`}>
-                                {databaseLimit > 0
-                                    ? 'It looks like you have no databases.'
-                                    : 'Databases cannot be created for this server.'}
-                            </p>
+                            <div className={'flex flex-col items-center justify-center py-16'}>
+                                <div className={'text-4xl mb-4'}>🗄️</div>
+                                <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>
+                                    {databaseLimit > 0 ? 'No databases yet' : 'Databases unavailable'}
+                                </h3>
+                                <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                                    {databaseLimit > 0
+                                        ? 'Create a database to store your server data. You can manage connections and credentials here.'
+                                        : 'Database creation is not enabled for this server. Contact an administrator if you need database access.'}
+                                </p>
+                                {databaseLimit > 0 && (
+                                    <Can action={'database.create'}>
+                                        <div className={'mt-6'}>
+                                            <CreateDatabaseButton />
+                                        </div>
+                                    </Can>
+                                )}
+                            </div>
                         )}
                         <Can action={'database.create'}>
                             <div css={tw`mt-6 flex items-center justify-end`}>
