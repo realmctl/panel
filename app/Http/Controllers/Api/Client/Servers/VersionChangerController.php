@@ -230,8 +230,12 @@ class VersionChangerController extends ClientApiController
             // File might not exist, that's fine
         }
 
-        // Use Wings to pull the file to the server (always save as server.jar for consistency)
-        $this->fileRepository->setServer($server)->pull($url, '/', ['filename' => 'server.jar', 'foreground' => true]);
+        try {
+            // Use Wings to pull the file to the server (always save as server.jar for consistency)
+            $this->fileRepository->setServer($server)->pull($url, '/', ['filename' => 'server.jar']);
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => 'Failed to download: ' . $e->getMessage()];
+        }
 
         // Update the SERVER_JARFILE variable to server.jar
         $eggVariable = $server->egg->variables()->where('env_variable', 'SERVER_JARFILE')->first();

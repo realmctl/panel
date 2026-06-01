@@ -75,7 +75,10 @@ export default () => {
                     setError(data.error || 'Installation failed');
                 }
             })
-            .catch((err) => setError('Installation failed. Make sure the server is offline.'))
+            .catch((err) => {
+                const message = err?.response?.data?.error || err?.response?.data?.errors?.[0]?.detail || 'Installation failed. Check server logs for details.';
+                setError(message);
+            })
             .finally(() => setInstalling(null));
     };
 
