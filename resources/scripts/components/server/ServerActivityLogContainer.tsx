@@ -177,7 +177,7 @@ export default () => {
                                     style={{ backgroundColor: '#1e2d38', color: '#94a3b8', border: '1px solid #2d3338' }}
                                 >
                                     Event: {activeEvent}
-                                    <button onClick={() => { setEventInput(''); applyFilters('', activeIp); }} className={'hover:text-red-400 transition-colors'}>
+                                    <button onClick={() => { setEventInput(''); applyFilters('', activeIp as string | undefined); }} className={'hover:text-red-400 transition-colors'}>
                                         <XCircleIcon className={'w-3 h-3'} />
                                     </button>
                                 </span>
@@ -188,7 +188,7 @@ export default () => {
                                     style={{ backgroundColor: '#1e2d38', color: '#94a3b8', border: '1px solid #2d3338' }}
                                 >
                                     IP: {activeIp}
-                                    <button onClick={() => { setIpInput(''); applyFilters(activeEvent, ''); }} className={'hover:text-red-400 transition-colors'}>
+                                    <button onClick={() => { setIpInput(''); applyFilters(activeEvent as string | undefined, ''); }} className={'hover:text-red-400 transition-colors'}>
                                         <XCircleIcon className={'w-3 h-3'} />
                                     </button>
                                 </span>

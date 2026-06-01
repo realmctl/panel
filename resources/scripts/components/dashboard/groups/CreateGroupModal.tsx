@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import { Actions, useStoreActions, useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import {
     createServerGroup,
@@ -20,9 +20,9 @@ interface Props {
 const COLOR_KEYS = Object.keys(GROUP_COLORS);
 
 export default ({ servers, editing, onClose }: Props) => {
-    const appendGroup = useStoreActions((a: ApplicationStore) => a.serverGroups.appendGroup);
-    const updateGroupInStore = useStoreActions((a: ApplicationStore) => a.serverGroups.updateGroup);
-    const removeGroup = useStoreActions((a: ApplicationStore) => a.serverGroups.removeGroup);
+    const appendGroup = useStoreActions((a: Actions<ApplicationStore>) => a.serverGroups.appendGroup);
+    const updateGroupInStore = useStoreActions((a: Actions<ApplicationStore>) => a.serverGroups.updateGroup);
+    const removeGroup = useStoreActions((a: Actions<ApplicationStore>) => a.serverGroups.removeGroup);
 
     const [name, setName] = useState(editing?.name ?? '');
     const [color, setColor] = useState(editing?.color ?? 'blue');

@@ -9,7 +9,7 @@ import { ServerGroup } from '@/api/account/serverGroups';
 import Spinner from '@/components/elements/Spinner';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import useFlash from '@/plugins/useFlash';
-import { useStoreState, useStoreActions } from 'easy-peasy';
+import { Actions, useStoreState, useStoreActions } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import tw from 'twin.macro';
@@ -27,10 +27,11 @@ export default () => {
     const uuid = useStoreState((state: ApplicationStore) => state.user.data!.uuid);
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
     const groups = useStoreState((state: ApplicationStore) => state.serverGroups.data);
-    const fetchGroups = useStoreActions((a: ApplicationStore) => a.serverGroups.fetchGroups);
+    const fetchGroups = useStoreActions((a: Actions<ApplicationStore>) => a.serverGroups.fetchGroups);
 
     const [showOnlyAdmin, setShowOnlyAdmin] = usePersistedState(`${uuid}:show_all_servers`, false);
-    const [layout, setLayout] = usePersistedState<'grid' | 'list'>(`${uuid}:server_layout`, 'grid');
+    const [layoutRaw, setLayout] = usePersistedState<'grid' | 'list'>(`${uuid}:server_layout`, 'grid');
+    const layout: 'grid' | 'list' = layoutRaw ?? 'grid';
     const [collapsed, setCollapsed] = usePersistedState<Record<string, boolean>>(`${uuid}:group_collapsed`, {});
     const [modal, setModal] = useState<'create' | ServerGroup | null>(null);
 
