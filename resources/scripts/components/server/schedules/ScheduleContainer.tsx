@@ -45,9 +45,20 @@ export default () => {
             ) : (
                 <>
                     {schedules.length === 0 ? (
-                        <p css={tw`text-sm text-center text-neutral-300`}>
-                            There are no schedules configured for this server.
-                        </p>
+                        <div className={'flex flex-col items-center justify-center py-16'}>
+                            <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No schedules yet</h3>
+                            <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                                Schedules allow you to automate tasks like restarts, backups, and commands at specific times.
+                            </p>
+                            <Can action={'schedule.create'}>
+                                <div className={'mt-6'}>
+                                    <EditScheduleModal visible={visible} onModalDismissed={() => setVisible(false)} />
+                                    <Button type={'button'} onClick={() => setVisible(true)}>
+                                        Create schedule
+                                    </Button>
+                                </div>
+                            </Can>
+                        </div>
                     ) : (
                         schedules.map((schedule) => (
                             <GreyRowBox
@@ -65,12 +76,14 @@ export default () => {
                         ))
                     )}
                     <Can action={'schedule.create'}>
-                        <div css={tw`mt-8 flex justify-end`}>
-                            <EditScheduleModal visible={visible} onModalDismissed={() => setVisible(false)} />
-                            <Button type={'button'} onClick={() => setVisible(true)}>
-                                Create schedule
-                            </Button>
-                        </div>
+                        {schedules.length > 0 && (
+                            <div css={tw`mt-8 flex justify-end`}>
+                                <EditScheduleModal visible={visible} onModalDismissed={() => setVisible(false)} />
+                                <Button type={'button'} onClick={() => setVisible(true)}>
+                                    Create schedule
+                                </Button>
+                            </div>
+                        )}
                     </Can>
                 </>
             )}

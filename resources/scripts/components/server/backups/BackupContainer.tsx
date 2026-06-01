@@ -38,14 +38,22 @@ const BackupContainer = () => {
             <Pagination data={backups} onPageSelect={setPage}>
                 {({ items }) =>
                     !items.length ? (
-                        // Don't show any error messages if the server has no backups and the user cannot
-                        // create additional ones for the server.
                         !backupLimit ? null : (
-                            <p css={tw`text-center text-sm text-neutral-300`}>
-                                {page > 1
-                                    ? "Looks like we've run out of backups to show you, try going back a page."
-                                    : 'It looks like there are no backups currently stored for this server.'}
-                            </p>
+                            <div className={'flex flex-col items-center justify-center py-16'}>
+                                <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No backups yet</h3>
+                                <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                                    {page > 1
+                                        ? "Looks like we've run out of backups to show you, try going back a page."
+                                        : 'Create backups to protect your server data. You can restore from any backup at any time.'}
+                                </p>
+                                <Can action={'backup.create'}>
+                                    {backupLimit > backups.backupCount && (
+                                        <div className={'mt-6'}>
+                                            <CreateBackupButton />
+                                        </div>
+                                    )}
+                                </Can>
+                            </div>
                         )
                     ) : (
                         items.map((backup, index) => (
@@ -66,7 +74,7 @@ const BackupContainer = () => {
                             {backups.backupCount} of {backupLimit} backups have been created for this server.
                         </p>
                     )}
-                    {backupLimit > 0 && backupLimit > backups.backupCount && (
+                    {backupLimit > 0 && backups.backupCount > 0 && backupLimit > backups.backupCount && (
                         <CreateBackupButton css={tw`w-full sm:w-auto`} />
                     )}
                 </div>

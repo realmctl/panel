@@ -45,16 +45,16 @@ export default () => {
                 <Fade timeout={150}>
                     <>
                         {databases.length > 0 ? (
-                            databases.map((database, index) => (
-                                <DatabaseRow
-                                    key={database.id}
-                                    database={database}
-                                    className={index > 0 ? 'mt-1' : undefined}
-                                />
-                            ))
+                            <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'}>
+                                {databases.map((database) => (
+                                    <DatabaseRow
+                                        key={database.id}
+                                        database={database}
+                                    />
+                                ))}
+                            </div>
                         ) : (
                             <div className={'flex flex-col items-center justify-center py-16'}>
-                                <div className={'text-4xl mb-4'}>🗄️</div>
                                 <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>
                                     {databaseLimit > 0 ? 'No databases yet' : 'Databases unavailable'}
                                 </h3>
@@ -73,17 +73,17 @@ export default () => {
                             </div>
                         )}
                         <Can action={'database.create'}>
-                            <div css={tw`mt-6 flex items-center justify-end`}>
-                                {databaseLimit > 0 && databases.length > 0 && (
+                            {databases.length > 0 && (
+                                <div css={tw`mt-6 flex items-center justify-end`}>
                                     <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
                                         {databases.length} of {databaseLimit} databases have been allocated to this
                                         server.
                                     </p>
-                                )}
-                                {databaseLimit > 0 && databaseLimit !== databases.length && (
-                                    <CreateDatabaseButton css={tw`flex justify-end mt-6`} />
-                                )}
-                            </div>
+                                    {databaseLimit > 0 && databaseLimit !== databases.length && (
+                                        <CreateDatabaseButton css={tw`flex justify-end mt-6`} />
+                                    )}
+                                </div>
+                            )}
                         </Can>
                     </>
                 </Fade>

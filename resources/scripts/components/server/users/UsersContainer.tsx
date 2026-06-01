@@ -51,14 +51,26 @@ export default () => {
         <ServerContentBlock title={'Users'}>
             <FlashMessageRender byKey={'users'} css={tw`mb-4`} />
             {!subusers.length ? (
-                <p css={tw`text-center text-sm text-neutral-300`}>It looks like you don&apos;t have any subusers.</p>
+                <div className={'flex flex-col items-center justify-center py-16'}>
+                    <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No subusers yet</h3>
+                    <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                        Add subusers to give other people access to your server with specific permissions.
+                    </p>
+                    <Can action={'user.create'}>
+                        <div className={'mt-6'}>
+                            <AddSubuserButton />
+                        </div>
+                    </Can>
+                </div>
             ) : (
                 subusers.map((subuser) => <UserRow key={subuser.uuid} subuser={subuser} />)
             )}
             <Can action={'user.create'}>
-                <div css={tw`flex justify-end mt-6`}>
-                    <AddSubuserButton />
-                </div>
+                {subusers.length > 0 && (
+                    <div css={tw`flex justify-end mt-6`}>
+                        <AddSubuserButton />
+                    </div>
+                )}
             </Can>
         </ServerContentBlock>
     );

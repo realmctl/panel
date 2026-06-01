@@ -139,42 +139,58 @@ export default ({ database, className }: Props) => {
                     </Button>
                 </div>
             </Modal>
-            <GreyRowBox $hoverable={false} className={className} css={tw`mb-2`}>
-                <div css={tw`hidden md:block`}>
-                    <FontAwesomeIcon icon={faDatabase} fixedWidth />
+            <div className={className} style={{ backgroundColor: '#192024' }}>
+                <div className={'rounded-md border border-[#2d3338]/50 p-5'}>
+                    <div className={'flex items-center gap-3 mb-4'}>
+                        <div className={'flex items-center justify-center w-9 h-9 rounded-lg bg-blue-500/20'}>
+                            <FontAwesomeIcon icon={faDatabase} className={'text-blue-400'} />
+                        </div>
+                        <div>
+                            <CopyOnClick text={database.name}>
+                                <p className={'text-sm font-semibold text-neutral-100 m-0'}>{database.name}</p>
+                            </CopyOnClick>
+                        </div>
+                    </div>
+                    <div className={'space-y-2.5 mb-4'}>
+                        <div className={'flex items-center'}>
+                            <span className={'text-xs text-neutral-500 uppercase w-28'}>Username</span>
+                            <CopyOnClick text={database.username}>
+                                <span className={'text-xs text-neutral-200 font-mono'}>{database.username}</span>
+                            </CopyOnClick>
+                        </div>
+                        <div className={'flex items-center'}>
+                            <span className={'text-xs text-neutral-500 uppercase w-28'}>Endpoint</span>
+                            <CopyOnClick text={database.connectionString}>
+                                <span className={'text-xs text-neutral-200 font-mono'}>{database.connectionString}</span>
+                            </CopyOnClick>
+                        </div>
+                        <div className={'flex items-center'}>
+                            <span className={'text-xs text-neutral-500 uppercase w-28'}>Connections</span>
+                            <span className={'text-xs text-neutral-200'}>{database.allowConnectionsFrom}</span>
+                        </div>
+                    </div>
+                    <div className={'flex items-center justify-between pt-3 border-t border-[#2d3338]/50'}>
+                        <div className={'flex items-center gap-1'}>
+                            <button
+                                onClick={() => setConnectionVisible(true)}
+                                className={'flex items-center justify-center w-8 h-8 rounded-md text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50 bg-transparent border-0 cursor-pointer transition-colors duration-150'}
+                                title={'View details'}
+                            >
+                                <FontAwesomeIcon icon={faEye} size={'sm'} />
+                            </button>
+                        </div>
+                        <Can action={'database.delete'}>
+                            <button
+                                onClick={() => setVisible(true)}
+                                className={'flex items-center gap-2 px-3 py-1.5 rounded-md text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-transparent border-0 cursor-pointer transition-colors duration-150'}
+                            >
+                                <FontAwesomeIcon icon={faTrashAlt} size={'sm'} />
+                                Delete
+                            </button>
+                        </Can>
+                    </div>
                 </div>
-                <div css={tw`flex-1 ml-4`}>
-                    <CopyOnClick text={database.name}>
-                        <p css={tw`text-lg`}>{database.name}</p>
-                    </CopyOnClick>
-                </div>
-                <div css={tw`ml-8 text-center hidden md:block`}>
-                    <CopyOnClick text={database.connectionString}>
-                        <p css={tw`text-sm`}>{database.connectionString}</p>
-                    </CopyOnClick>
-                    <p css={tw`mt-1 text-2xs text-neutral-500 uppercase select-none`}>Endpoint</p>
-                </div>
-                <div css={tw`ml-8 text-center hidden md:block`}>
-                    <p css={tw`text-sm`}>{database.allowConnectionsFrom}</p>
-                    <p css={tw`mt-1 text-2xs text-neutral-500 uppercase select-none`}>Connections from</p>
-                </div>
-                <div css={tw`ml-8 text-center hidden md:block`}>
-                    <CopyOnClick text={database.username}>
-                        <p css={tw`text-sm`}>{database.username}</p>
-                    </CopyOnClick>
-                    <p css={tw`mt-1 text-2xs text-neutral-500 uppercase select-none`}>Username</p>
-                </div>
-                <div css={tw`ml-8`}>
-                    <Button isSecondary css={tw`mr-2`} onClick={() => setConnectionVisible(true)}>
-                        <FontAwesomeIcon icon={faEye} fixedWidth />
-                    </Button>
-                    <Can action={'database.delete'}>
-                        <Button color={'red'} isSecondary onClick={() => setVisible(true)}>
-                            <FontAwesomeIcon icon={faTrashAlt} fixedWidth />
-                        </Button>
-                    </Can>
-                </div>
-            </GreyRowBox>
+            </div>
         </>
     );
 };
