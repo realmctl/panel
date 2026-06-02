@@ -123,14 +123,29 @@ const EnhancedForm = withFormik<Props, Values>({
 
 export default ({ history, location, ...props }: OwnProps) => {
     const { clearAndAddHttpError } = useFlash();
+    const queryToken = new URLSearchParams(location.search).get('token') || '';
+    const token = location.state?.token || queryToken;
 
-    if (!location.state?.token) {
+    if (!token) {
         history.replace('/auth/login');
 
         return null;
     }
 
+    const locationWithToken = {
+        ...location,
+        state: {
+            ...(location.state || {}),
+            token,
+        },
+    };
+
     return (
-        <EnhancedForm clearAndAddHttpError={clearAndAddHttpError} history={history} location={location} {...props} />
+        <EnhancedForm
+            clearAndAddHttpError={clearAndAddHttpError}
+            history={history}
+            location={locationWithToken}
+            {...props}
+        />
     );
 };

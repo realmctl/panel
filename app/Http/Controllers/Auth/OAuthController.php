@@ -2,13 +2,17 @@
 
 namespace Pterodactyl\Http\Controllers\Auth;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Pterodactyl\Facades\Activity;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\UserOAuthLink;
 use Pterodactyl\Services\Users\UserCreationService;
 
 class OAuthController extends Controller
@@ -55,39 +59,51 @@ class OAuthController extends Controller
             return redirect('/auth/login');
         }
 
-        $isRegister = session()->pull('oauth_register', false);
+        session()->pull('oauth_register', false);
 
-        // Try to find existing user by email
-        $user = User::where('email', $oauthUser->getEmail())->first();
+        $providerId = (string) $oauthUser->getId();
+        $email = $oauthUser->getEmail();
 
-        if ($user) {
-            Auth::login($user, true);
-
-            return redirect('/');
+        if (!$email || $providerId === '') {
+            return redirect('/auth/login');
         }
 
-        // No existing user — check if registration is enabled
+        $existingLink = UserOAuthLink::query()
+            ->where('provider', $provider)
+            ->where('provider_id', $providerId)
+            ->first();
+
+        if ($existingLink) {
+            return $this->loginOAuthUser(User::findOrFail($existingLink->user_id), $request);
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if ($user) {
+            session([
+                'oauth_link_pending' => [
+                    'provider' => $provider,
+                    'provider_id' => $providerId,
+                    'email' => $email,
+                ],
+            ]);
+
+            return redirect('/auth/login')->with('error', trans('auth.oauth.link_required'));
+        }
+
         if (!config('pterodactyl.auth.registration_enabled', false)) {
             return redirect('/auth/login');
         }
 
-        // Extract user info from provider
         $name = $oauthUser->getName() ?? '';
         $nameParts = explode(' ', $name, 2);
         $firstName = $nameParts[0] ?? '';
         $lastName = $nameParts[1] ?? '';
         $nickname = $oauthUser->getNickname();
-        $email = $oauthUser->getEmail();
 
-        if (!$email) {
-            return redirect('/auth/login');
-        }
-
-        // Determine what's missing
         $needsUsername = empty($nickname) || User::where('username', preg_replace('/[^a-zA-Z0-9_.-]/', '_', $nickname))->exists();
         $needsName = empty($firstName);
 
-        // If nothing is missing, create account directly
         if (!$needsUsername && !$needsName) {
             $username = preg_replace('/[^a-zA-Z0-9_.-]/', '_', $nickname);
 
@@ -99,12 +115,11 @@ class OAuthController extends Controller
                 'name_last' => $lastName ?: $firstName,
             ]);
 
-            Auth::login($user, true);
+            $this->createOAuthLink($user, $provider, $providerId);
 
-            return redirect('/');
+            return $this->loginOAuthUser($user, $request);
         }
 
-        // Store what we have and what's missing
         session([
             'oauth_pending' => [
                 'email' => $email,
@@ -114,6 +129,7 @@ class OAuthController extends Controller
                 'needs_username' => $needsUsername,
                 'needs_name' => $needsName,
                 'provider' => $provider,
+                'provider_id' => $providerId,
             ],
         ]);
 
@@ -149,6 +165,10 @@ class OAuthController extends Controller
             'name_last' => $request->input('name_last', $pending['name_last']) ?: 'User',
         ]);
 
+        if (!empty($pending['provider']) && !empty($pending['provider_id'])) {
+            $this->createOAuthLink($user, $pending['provider'], $pending['provider_id']);
+        }
+
         session()->forget('oauth_pending');
         Auth::login($user, true);
 
@@ -171,6 +191,35 @@ class OAuthController extends Controller
             'email' => $pending['email'] ?? '',
             'provider' => $pending['provider'] ?? '',
         ]);
+    }
+
+    private function loginOAuthUser(User $user, Request $request): RedirectResponse
+    {
+        if ($user->use_totp) {
+            Activity::event('auth:checkpoint')->withRequestMetadata()->subject($user)->log();
+
+            $token = Str::random(64);
+            $request->session()->put('auth_confirmation_token', [
+                'user_id' => $user->id,
+                'token_value' => $token,
+                'expires_at' => CarbonImmutable::now()->addMinutes(5),
+            ]);
+
+            return redirect('/auth/login/checkpoint?token=' . urlencode($token));
+        }
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        return redirect('/');
+    }
+
+    private function createOAuthLink(User $user, string $provider, string $providerId): void
+    {
+        UserOAuthLink::firstOrCreate(
+            ['provider' => $provider, 'provider_id' => $providerId],
+            ['user_id' => $user->id],
+        );
     }
 
     /**

@@ -19,7 +19,7 @@ else
   if [ -z $APP_KEY ]; then
      echo -e "Generating key."
      APP_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-     echo -e "Generated app key: $APP_KEY"
+     echo -e "Generated app key."
      echo -e "APP_KEY=$APP_KEY" > /app/var/.env
   else
     echo -e "APP_KEY exists in environment, using that."
@@ -30,7 +30,7 @@ else
   if [ -z $HASHIDS_SALT ]; then
      echo -e "Generating hashids salt."
      HASHIDS_SALT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&*()_+?><~' | fold -w 20 | head -n 1)
-     echo -e "Generated hashids salt: $HASHIDS_SALT"
+     echo -e "Generated hashids salt."
      echo -e "HASHIDS_SALT=$HASHIDS_SALT" >> /app/var/.env
   else
     echo -e "HASHIDS_SALT exists in environment, using that."
@@ -88,8 +88,13 @@ do
 done
 
 ## make sure the db is set up
-echo -e "Migrating and Seeding D.B"
-php artisan migrate --seed --force
+echo -e "Migrating database."
+php artisan migrate --force
+
+if [ "$SEED_DATABASE" = "true" ]; then
+  echo -e "Seeding database."
+  php artisan db:seed --force
+fi
 
 ## start cronjobs for the queue
 echo -e "Starting cron jobs."

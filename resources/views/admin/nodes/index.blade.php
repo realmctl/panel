@@ -41,7 +41,7 @@
                 <tbody>
                     @foreach ($nodes as $node)
                         <tr>
-                            <td class="text-center" data-action="ping" data-secret="{{ $node->getDecryptedKey() }}" data-location="{{ $node->scheme }}://{{ $node->fqdn }}:{{ $node->daemonListen }}/api/system">
+                            <td class="text-center" data-action="ping" data-url="{{ route('admin.nodes.health', $node->id) }}">
                                 <span class="node-health-icon" style="font-size:1.15rem; color:#94a3b8; display:inline-block;">
                             <i class="ti ti-heart-filled node-heart"></i>
                         </span>
@@ -115,8 +115,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: $(element).data('location'),
-                headers: { 'Authorization': 'Bearer ' + $(element).data('secret') },
+                url: $(element).data('url'),
                 timeout: 5000,
             }).done(function (data) {
                 $icon.removeClass('node-heart-loading node-heart-offline ti-heart-broken').addClass('node-heart-online ti-heart-filled');
@@ -124,7 +123,7 @@
             }).fail(function (error) {
                 $icon.removeClass('node-heart-loading node-heart-online ti-heart-filled').addClass('node-heart-offline ti-heart-broken');
                 var errorText = 'Offline — could not connect';
-                try { errorText = error.responseJSON.errors[0].detail || errorText; } catch (ex) {}
+                try { errorText = error.responseJSON.error || errorText; } catch (ex) {}
                 $(element).attr('title', errorText);
             });
         }).promise().done(function () {

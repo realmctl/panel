@@ -32,6 +32,9 @@ use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\ListVersionsRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\GetDownloadUrlRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\InstallVersionRequest;
 
 class VersionChangerController extends ClientApiController
 {
@@ -44,7 +47,7 @@ class VersionChangerController extends ClientApiController
     /**
      * List available versions for a given server type.
      */
-    public function listVersions(Request $request): array
+    public function listVersions(ListVersionsRequest $request): array
     {
         $type = $request->get('type', 'paper');
         $versions = [];
@@ -137,7 +140,7 @@ class VersionChangerController extends ClientApiController
     /**
      * Get the download URL for a specific version.
      */
-    public function getDownloadUrl(Request $request): array
+    public function getDownloadUrl(GetDownloadUrlRequest $request): array
     {
         $type = $request->get('type', 'paper');
         $version = $request->get('version');
@@ -245,13 +248,8 @@ class VersionChangerController extends ClientApiController
     /**
      * Install a specific version on the server.
      */
-    public function install(Request $request, Server $server): array
+    public function install(InstallVersionRequest $request, Server $server): array
     {
-        $request->validate([
-            'type' => 'required|string|in:paper,purpur,velocity,vanilla,snapshot,spigot,fabric',
-            'version' => 'required|string',
-        ]);
-
         $type = $request->input('type');
         $version = $request->input('version');
 

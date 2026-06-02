@@ -8,6 +8,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\UserOAuthLink;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
 use Illuminate\Contracts\View\View;
@@ -53,6 +54,15 @@ class LoginController extends AbstractLoginController
         // can proceed to the next step in the login process.
         if (!password_verify($request->input('password'), $user->password)) {
             $this->sendFailedLoginResponse($request, $user);
+        }
+
+        if ($link = $request->session()->pull('oauth_link_pending')) {
+            if ($link['email'] === $user->email) {
+                UserOAuthLink::firstOrCreate(
+                    ['provider' => $link['provider'], 'provider_id' => $link['provider_id']],
+                    ['user_id' => $user->id],
+                );
+            }
         }
 
         if (!$user->use_totp) {
