@@ -45,22 +45,15 @@ export default () => {
                 <Fade timeout={150}>
                     <>
                         {/* Top bar */}
-                        <div className={'flex items-center justify-between mb-6'}>
-                            <div className={'flex items-center gap-3'}>
-                                {databaseLimit > 0 && databases.length > 0 && (
-                                    <span className={'text-sm text-neutral-400'}>
-                                        <span className={'text-neutral-100 font-semibold'}>{databases.length}</span>
-                                        <span className={'text-neutral-600'}> / </span>
-                                        {databaseLimit} databases used
-                                    </span>
-                                )}
+                        {databaseLimit > 0 && databases.length > 0 && (
+                            <div className={'flex items-center gap-3 mb-6'}>
+                                <span className={'text-sm text-neutral-400'}>
+                                    <span className={'text-neutral-100 font-semibold'}>{databases.length}</span>
+                                    <span className={'text-neutral-600'}> / </span>
+                                    {databaseLimit} databases used
+                                </span>
                             </div>
-                            <Can action={'database.create'}>
-                                {databaseLimit > 0 && databaseLimit !== databases.length && (
-                                    <CreateDatabaseButton />
-                                )}
-                            </Can>
-                        </div>
+                        )}
 
                         {databases.length > 0 ? (
                             <div className={'grid grid-cols-1 md:grid-cols-2 gap-3'}>
