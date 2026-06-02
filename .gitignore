@@ -34,3 +34,12 @@ resources/lang/locales.js
 
 /public/hot
 result
+
+# Local Lima/Wings dev setup
+/lima-wings.yaml
+/wings
+
+# Local-only seeders (Test Node, Test Server, dev locations)
+/database/Seeders/LocationSeeder.php
+/database/Seeders/NodeSeeder.php
+/database/Seeders/ServerSeeder.php
