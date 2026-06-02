@@ -13,6 +13,9 @@ import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
 import useLocationHash from '@/plugins/useLocationHash';
 
+const cardStyle = { backgroundColor: '#192024', border: '1px solid #2d3338' } as React.CSSProperties;
+const cardHeaderStyle = { backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' } as React.CSSProperties;
+
 export default () => {
     const { hash } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('account');
@@ -34,7 +37,7 @@ export default () => {
         <PageContentBlock title={'Account Activity Log'}>
             <FlashMessageRender byKey={'account'} />
             {(filters.filters?.event || filters.filters?.ip) && (
-                <div className={'flex justify-end mb-2'}>
+                <div className={'flex justify-end mb-4'}>
                     <Link
                         to={'#'}
                         className={classNames(btnStyles.button, btnStyles.text, 'w-full sm:w-auto')}
@@ -44,23 +47,28 @@ export default () => {
                     </Link>
                 </div>
             )}
-            {!data && isValidating ? (
-                <Spinner centered />
-            ) : (
-                <div className={'bg-gray-700'}>
-                    {data?.items.map((activity) => (
-                        <ActivityLogEntry key={activity.id} activity={activity}>
-                            {typeof activity.properties.useragent === 'string' && (
-                                <Tooltip content={activity.properties.useragent} placement={'top'}>
-                                    <span>
-                                        <DesktopComputerIcon />
-                                    </span>
-                                </Tooltip>
-                            )}
-                        </ActivityLogEntry>
-                    ))}
+            <div className={'rounded-lg overflow-hidden'} style={cardStyle}>
+                <div className={'px-4 py-3'} style={cardHeaderStyle}>
+                    <h3 className={'text-sm font-semibold text-neutral-100'}>Activity Log</h3>
                 </div>
-            )}
+                <div>
+                    {!data && isValidating ? (
+                        <div className={'py-8'}><Spinner centered /></div>
+                    ) : (
+                        data?.items.map((activity) => (
+                            <ActivityLogEntry key={activity.id} activity={activity}>
+                                {typeof activity.properties.useragent === 'string' && (
+                                    <Tooltip content={activity.properties.useragent} placement={'top'}>
+                                        <span>
+                                            <DesktopComputerIcon />
+                                        </span>
+                                    </Tooltip>
+                                )}
+                            </ActivityLogEntry>
+                        ))
+                    )}
+                </div>
+            </div>
             {data && (
                 <PaginationFooter
                     pagination={data.pagination}
