@@ -26,7 +26,7 @@ const SubNavigation = styled.div`
                     content: '';
                     ${tw`absolute bottom-0 left-0 w-full`};
                     height: 2px;
-                    background-color: #3b82f6;
+                    background-color: #34d399;
                 }
             }
         }
