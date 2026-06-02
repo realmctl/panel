@@ -33,6 +33,7 @@ Route::group(['prefix' => 'api'], function () {
 */
 Route::group(['prefix' => 'locations'], function () {
     Route::get('/', [Admin\LocationController::class, 'index'])->name('admin.locations');
+    Route::get('/new', [Admin\LocationController::class, 'createLocation'])->name('admin.locations.new');
     Route::get('/view/{location:id}', [Admin\LocationController::class, 'view'])->name('admin.locations.view');
 
     Route::post('/', [Admin\LocationController::class, 'create']);

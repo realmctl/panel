@@ -20,6 +20,8 @@ return [
         'details_updated' => 'Server details have been successfully updated.',
         'docker_image_updated' => 'Successfully changed the default Docker image to use for this server. A reboot is required to apply this change.',
         'node_required' => 'You must have at least one node configured before you can add a server to this panel.',
+        'setup_complete' => 'Setup complete! You can now create your server.',
+        'location_ready' => 'Location created! You can now create a node.',
         'transfer_nodes_required' => 'You must have at least two nodes configured before you can transfer servers.',
         'transfer_started' => 'Server transfer has been started.',
         'transfer_not_viable' => 'The node you selected does not have the required disk space or memory available to accommodate this server.',

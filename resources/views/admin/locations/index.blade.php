@@ -76,6 +76,9 @@
                     </div>
                     <div class="modal-footer">
                         {!! csrf_field() !!}
+                        @if(isset($intended_action) && $intended_action === 'create_server')
+                            <input type="hidden" name="intended_action" value="create_server" />
+                        @endif
                         <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="ti ti-plus me-1"></i> Create

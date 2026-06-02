@@ -63,11 +63,13 @@ class NodesController extends Controller
     {
         $locations = $this->locationRepository->all();
         if (count($locations) < 1) {
+            session()->put('intended_action', 'create_server');
             $this->alert->warning(trans('admin/node.notices.location_required'))->flash();
 
             return redirect()->route('admin.locations');
         }
 
+        session()->keep('intended_action');
         return view('admin.nodes.new', ['locations' => $locations]);
     }
 
@@ -80,6 +82,11 @@ class NodesController extends Controller
     {
         $node = $this->creationService->handle($request->normalize());
         $this->alert->info(trans('admin/node.notices.node_created'))->flash();
+
+        if (session()->pull('intended_action') === 'create_server') {
+            return redirect()->route('admin.servers.new')
+                ->with('success', trans('admin/server.alerts.setup_complete'));
+        }
 
         return redirect()->route('admin.nodes.view.allocation', $node->id);
     }

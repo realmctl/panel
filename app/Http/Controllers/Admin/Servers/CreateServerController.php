@@ -41,11 +41,15 @@ class CreateServerController extends Controller
      */
     public function index(): View|RedirectResponse
     {
+        $locations = Location::all();
         $nodes = Node::all();
-        if (count($nodes) < 1) {
-            $this->alert->warning(trans('admin/server.alerts.node_required'))->flash();
 
-            return redirect()->route('admin.nodes');
+        if (count($nodes) < 1) {
+            session()->put('intended_action', 'create_server');
+            return view('admin.servers.setup_required', [
+                'hasLocations' => count($locations) > 0,
+                'hasNodes' => false,
+            ]);
         }
 
         $nests = $this->nestRepository->getWithEggs();
@@ -60,7 +64,7 @@ class CreateServerController extends Controller
         ]);
 
         return view('admin.servers.new', [
-            'locations' => Location::all(),
+            'locations' => $locations,
             'nests' => $nests,
         ]);
     }

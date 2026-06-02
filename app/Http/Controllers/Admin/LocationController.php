@@ -38,9 +38,21 @@ class LocationController extends Controller
      */
     public function index(): View
     {
+        $intendedAction = request()->input('intended_action');
+        if ($intendedAction === 'create_server') {
+            session()->put('intended_action', 'create_server');
+        }
+
         return view('admin.locations.index', [
             'locations' => $this->repository->getAllWithDetails(),
+            'intended_action' => $intendedAction,
         ]);
+    }
+
+    public function createLocation(): View
+    {
+        session()->put('intended_action', 'create_server');
+        return view('admin.locations.new');
     }
 
     /**
@@ -62,8 +74,15 @@ class LocationController extends Controller
      */
     public function create(LocationFormRequest $request): RedirectResponse
     {
+        $intendedAction = $request->input('intended_action') ?? session('intended_action');
         $location = $this->creationService->handle($request->normalize());
         $this->alert->success('Location was created successfully.')->flash();
+
+        if ($intendedAction === 'create_server') {
+            session()->forget('intended_action');
+            return redirect()->route('admin.nodes.new')
+                ->with('success', trans('admin/server.alerts.location_ready'));
+        }
 
         return redirect()->route('admin.locations.view', $location->id);
     }
