@@ -3,6 +3,7 @@ import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { ServerContext } from '@/state/server';
 import pullFile from '@/api/server/files/pullFile';
 import { useFlashKey } from '@/plugins/useFlash';
+import useFlash from '@/plugins/useFlash';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import Spinner from '@/components/elements/Spinner';
 import { debounce } from 'debounce';
@@ -53,7 +54,8 @@ const formatNumber = (n: number) =>
 
 export default () => {
     const uuid = ServerContext.useStoreState((s) => s.server.data!.uuid);
-    const { clearFlashes, addFlash, clearAndAddHttpError } = useFlashKey('plugins');
+    const { clearFlashes, addError, clearAndAddHttpError } = useFlashKey('plugins');
+    const { addFlash } = useFlash();
 
     const [source, setSource] = useState<Source>('hangar');
     const [query, setQuery] = useState('');
@@ -174,10 +176,10 @@ export default () => {
         try {
             await pullFile(uuid, installing.downloadUrl, '/plugins');
             setInstalledSlugs((prev) => new Set([...prev, installing.slug]));
-            addFlash({ type: 'success', message: `Plugin installed to /plugins. Restart your server to load it.`, key: 'plugins' });
+            addFlash({ type: 'success', message: 'Plugin installed to /plugins. Restart your server to load it.', key: 'plugins' });
             setInstalling(null);
         } catch (error) {
-            clearAndAddHttpError(error);
+            clearAndAddHttpError(error instanceof Error ? error : error instanceof String ? String(error) : null);
             setInstalling((prev) => prev ? { ...prev, loading: false } : null);
         }
     };
