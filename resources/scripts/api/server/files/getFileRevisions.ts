@@ -1,4 +1,5 @@
 import http from '@/api/http';
+import { encodePathSegments } from '@/helpers';
 
 export interface FileRevision {
     uuid: string;
@@ -12,7 +13,7 @@ export interface FileRevision {
 
 export default async (uuid: string, file: string): Promise<FileRevision[]> => {
     const { data } = await http.get(`/api/client/servers/${uuid}/files/revisions`, {
-        params: { file },
+        params: { file: encodePathSegments(file) },
     });
 
     return (data.data || []).map((item: any) => ({

@@ -28,7 +28,7 @@ class FileRevisionController extends ClientApiController
      */
     public function index(ListRevisionsRequest $request, Server $server): array
     {
-        $filePath = $request->get('file');
+        $filePath = rawurldecode($request->get('file'));
         $revisions = $this->revisionService->getRevisions(
             $server,
             $filePath,

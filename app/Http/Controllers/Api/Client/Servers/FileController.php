@@ -64,12 +64,14 @@ class FileController extends ClientApiController
      */
     public function contents(GetFileContentsRequest $request, Server $server): Response
     {
+        $file = rawurldecode($request->get('file'));
+
         $response = $this->fileRepository->setServer($server)->getContent(
-            $request->get('file'),
+            $file,
             config('pterodactyl.files.max_edit_size')
         );
 
-        Activity::event('server:file.read')->property('file', $request->get('file'))->log();
+        Activity::event('server:file.read')->property('file', $file)->log();
 
         return new Response($response, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
@@ -82,17 +84,19 @@ class FileController extends ClientApiController
      */
     public function download(GetFileContentsRequest $request, Server $server): array
     {
+        $file = rawurldecode($request->get('file'));
+
         $token = $this->jwtService
             ->setExpiresAt(CarbonImmutable::now()->addMinutes(15))
             ->setUser($request->user())
             ->setClaims([
-                'file_path' => rawurldecode($request->get('file')),
+                'file_path' => $file,
                 'server_uuid' => $server->uuid,
             ])
             ->setScopes(JwtScope::FileDownload)
             ->handle($server->node, $request->user()->id . $server->uuid);
 
-        Activity::event('server:file.download')->property('file', $request->get('file'))->log();
+        Activity::event('server:file.download')->property('file', $file)->log();
 
         return [
             'object' => 'signed_url',
@@ -113,7 +117,7 @@ class FileController extends ClientApiController
      */
     public function write(WriteFileContentRequest $request, Server $server): JsonResponse
     {
-        $filePath = $request->get('file');
+        $filePath = rawurldecode($request->get('file'));
 
         // Automatically create a revision of the current file before overwriting
         $this->revisionService->createRevisionBeforeWrite(
