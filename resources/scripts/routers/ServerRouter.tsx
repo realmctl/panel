@@ -48,9 +48,19 @@ const ServerPowerHeader = () => {
         setMoreOpen(false);
     };
 
+    const canRestart = status === 'running';
+
     return (
         <div className={'flex items-center gap-2'}>
-            {status === 'running' && (
+            {(status === 'offline' || status === null) && (
+                <button
+                    onClick={() => sendPowerAction('start')}
+                    className={'px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md border-0 cursor-pointer transition-colors duration-150'}
+                >
+                    Start
+                </button>
+            )}
+            {(status === 'running' || status === 'starting') && (
                 <button
                     onClick={() => sendPowerAction('stop')}
                     className={'px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md border-0 cursor-pointer transition-colors duration-150'}
@@ -58,12 +68,12 @@ const ServerPowerHeader = () => {
                     Shut down
                 </button>
             )}
-            {(status === 'offline' || status === null) && (
+            {(status === 'running' || status === 'starting' || status === 'stopping') && (
                 <button
-                    onClick={() => sendPowerAction('start')}
-                    className={'px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md border-0 cursor-pointer transition-colors duration-150'}
+                    onClick={() => sendPowerAction('kill')}
+                    className={'px-4 py-2 text-sm font-medium text-neutral-200 bg-neutral-700/60 hover:bg-neutral-700 rounded-md border border-[#2d3338] cursor-pointer transition-colors duration-150'}
                 >
-                    Start
+                    Kill Server
                 </button>
             )}
             <div className={'relative'} ref={moreRef}>
@@ -80,17 +90,10 @@ const ServerPowerHeader = () => {
                     >
                         <button
                             onClick={() => sendPowerAction('restart')}
-                            disabled={status === 'offline' || status === null}
+                            disabled={!canRestart}
                             className={'flex items-center w-full px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 border-0 bg-transparent cursor-pointer transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'}
                         >
                             Restart
-                        </button>
-                        <button
-                            onClick={() => sendPowerAction('kill')}
-                            disabled={status === 'offline' || status === null}
-                            className={'flex items-center w-full px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-neutral-700/50 border-0 bg-transparent cursor-pointer transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'}
-                        >
-                            Kill Server
                         </button>
                     </div>
                 )}
