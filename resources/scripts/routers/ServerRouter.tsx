@@ -23,6 +23,7 @@ import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import ServerPowerControls from '@/components/server/console/ServerPowerControls';
 import routes from '@/routers/routes';
+import { isNavRouteActive, toNavigationPath } from '@/lib/routePaths';
 
 const INSIGHT_NAV_PATHS = new Set(['/metrics', '/activity']);
 
@@ -70,12 +71,7 @@ export default () => {
 
     const activeRoute = routes.server
         .filter((r) => !!r.name)
-        .find((r) => {
-            const routePath = to(r.path);
-            return r.exact
-                ? location.pathname === routePath
-                : location.pathname.startsWith(routePath.replace(/\/$/, ''));
-        });
+        .find((r) => isNavRouteActive(r.path, location.pathname, match.url, r.exact));
 
     const serverBreadcrumbs = [
         { label: 'Home', to: '/' },
@@ -104,19 +100,22 @@ export default () => {
                                 <div>
                                     {routes.server
                                         .filter((route) => !!route.name && !INSIGHT_NAV_PATHS.has(route.path))
-                                        .map((route) =>
-                                            route.permission ? (
+                                        .map((route) => {
+                                            const navTo = to(toNavigationPath(route.path), true);
+                                            const navExact = route.path.includes(':') ? false : route.exact;
+
+                                            return route.permission ? (
                                                 <Can key={route.path} action={route.permission} matchAny>
-                                                    <NavLink to={to(route.path, true)} exact={route.exact}>
+                                                    <NavLink to={navTo} exact={navExact}>
                                                         {route.name}
                                                     </NavLink>
                                                 </Can>
                                             ) : (
-                                                <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
+                                                <NavLink key={route.path} to={navTo} exact={navExact}>
                                                     {route.name}
                                                 </NavLink>
-                                            )
-                                        )}
+                                            );
+                                        })}
                                     <ServerInsightsNav to={to} />
                                     {rootAdmin && (
                                         // eslint-disable-next-line react/jsx-no-target-blank
