@@ -52,9 +52,9 @@ export default () => {
             <FlashMessageRender byKey={'users'} css={tw`mb-4`} />
             {!subusers.length ? (
                 <div className={'flex flex-col items-center justify-center py-16'}>
-                    <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No subusers yet</h3>
+                    <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No users yet</h3>
                     <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
-                        Add subusers to give other people access to your server with specific permissions.
+                        Invite users to give others access to this server with specific permissions.
                     </p>
                     <Can action={'user.create'}>
                         <div className={'mt-6'}>

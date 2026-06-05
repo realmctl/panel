@@ -18,6 +18,7 @@ export interface ModalProps extends RequiredModalProps {
     closeOnEscape?: boolean;
     closeOnBackground?: boolean;
     showSpinnerOverlay?: boolean;
+    wide?: boolean;
 }
 
 export const ModalMask = styled.div<{ center?: boolean }>`
@@ -26,13 +27,21 @@ export const ModalMask = styled.div<{ center?: boolean }>`
     background: rgba(0, 0, 0, 0.7);
 `;
 
-const ModalContainer = styled.div<{ alignTop?: boolean }>`
+const ModalContainer = styled.div<{ alignTop?: boolean; wide?: boolean }>`
     max-width: 95%;
     max-height: calc(100vh - 8rem);
     ${breakpoint('md')`max-width: 75%`};
     ${breakpoint('lg')`max-width: 50%`};
+    ${(props) =>
+        props.wide &&
+        css`
+            ${breakpoint('md')`max-width: 90%`};
+            ${breakpoint('lg')`max-width: 42rem`};
+            ${breakpoint('xl')`max-width: 52rem`};
+        `};
 
     ${tw`relative flex flex-col w-full m-auto`};
+    ${(props) => props.wide && tw`overflow-hidden`};
     ${(props) =>
         props.alignTop &&
         css`
@@ -62,6 +71,7 @@ const Modal: React.FC<ModalProps> = ({
     dismissable,
     showSpinnerOverlay,
     top = true,
+    wide = false,
     closeOnBackground = true,
     closeOnEscape = true,
     onDismissed,
@@ -103,7 +113,7 @@ const Modal: React.FC<ModalProps> = ({
                     }
                 }}
             >
-                <ModalContainer alignTop={top}>
+                <ModalContainer alignTop={top} wide={wide}>
                     {isDismissable && (
                         <div className={'close-icon'} onClick={() => setRender(false)}>
                             <svg
@@ -132,7 +142,12 @@ const Modal: React.FC<ModalProps> = ({
                         </Fade>
                     )}
                     <div
-                        css={tw`p-3 sm:p-4 md:p-6 rounded shadow-md overflow-y-scroll transition-all duration-150`}
+                        css={[
+                            tw`rounded shadow-md transition-all duration-150`,
+                            wide
+                                ? tw`flex flex-col flex-1 min-h-0 overflow-hidden`
+                                : tw`p-3 sm:p-4 md:p-6 overflow-y-scroll`,
+                        ]}
                         style={{ backgroundColor: '#192024' }}
                     >
                         {children}

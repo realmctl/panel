@@ -17,8 +17,12 @@ const Container = styled.label`
         }
     }
 
-    &:not(:first-of-type) {
+    &:not(:first-of-type):not(.compact) {
         ${tw`mt-4 sm:mt-2`};
+    }
+
+    &.compact {
+        ${tw`rounded-md`};
     }
 
     &.disabled {
@@ -33,14 +37,18 @@ const Container = styled.label`
 interface Props {
     permission: string;
     disabled: boolean;
+    compact?: boolean;
 }
 
-const PermissionRow = ({ permission, disabled }: Props) => {
+const PermissionRow = ({ permission, disabled, compact }: Props) => {
     const [key, pkey] = permission.split('.', 2);
     const permissions = useStoreState((state) => state.permissions.data);
 
     return (
-        <Container htmlFor={`permission_${permission}`} className={disabled ? 'disabled' : undefined}>
+        <Container
+            htmlFor={`permission_${permission}`}
+            className={[disabled ? 'disabled' : undefined, compact ? 'compact' : undefined].filter(Boolean).join(' ')}
+        >
             <div css={tw`p-2`}>
                 <Checkbox
                     id={`permission_${permission}`}
