@@ -43,9 +43,9 @@ class ProcessScheduleService
         });
 
         $job = new RunTaskJob($task, $now);
-        if ($schedule->only_when_online) {
+        if ($schedule->only_when_online && !$now) {
             // Check that the server is currently in a starting or running state before executing
-            // this schedule if this option has been set.
+            // this schedule if this option has been set. Manual "Run Now" requests skip this check.
             try {
                 $details = $this->serverRepository->setServer($schedule->server)->getDetails();
                 $state = $details['state'] ?? 'offline';
