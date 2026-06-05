@@ -154,10 +154,11 @@ export default {
             component: UsersContainer,
         },
         {
-            path: '/settings',
+            path: '/settings/:tab(general|details|danger|startup|variables)?',
             permission: ['settings.*', 'file.sftp', 'startup.*'],
             name: 'Settings',
             component: SettingsContainer,
+            exact: true,
         },
         {
             path: '/activity',

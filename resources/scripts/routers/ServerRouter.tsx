@@ -206,8 +206,8 @@ export default () => {
                         <ErrorBoundary>
                             <TransitionRouter>
                                 <Switch location={location}>
-                                    {routes.server.map(({ path, permission, component: Component }) => (
-                                        <PermissionRoute key={path} permission={permission} path={to(path)} exact>
+                                    {routes.server.map(({ path, permission, component: Component, exact }) => (
+                                        <PermissionRoute key={path} permission={permission} path={to(path)} exact={exact ?? true}>
                                             <Spinner.Suspense>
                                                 <Component />
                                             </Spinner.Suspense>
