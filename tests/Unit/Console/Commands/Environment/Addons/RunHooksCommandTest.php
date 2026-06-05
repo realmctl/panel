@@ -5,6 +5,7 @@ namespace Pterodactyl\Tests\Unit\Console\Commands\Environment\Addons;
 use Illuminate\Console\Command;
 use Pterodactyl\Tests\TestCase;
 use Illuminate\Support\Facades\File;
+use Illuminate\Testing\PendingCommand;
 use Illuminate\Support\Facades\Process;
 
 class RunHooksCommandTest extends TestCase
@@ -107,7 +108,7 @@ class RunHooksCommandTest extends TestCase
         Process::assertNothingRan();
     }
 
-    private function runHooks(string $event = 'post-install'): \Illuminate\Testing\PendingCommand
+    private function runHooks(string $event = 'post-install'): PendingCommand
     {
         return $this->artisan('p:environment:addons:run-hooks', ['event' => $event, '--no-interaction' => true]);
     }
