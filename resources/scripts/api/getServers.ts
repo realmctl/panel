@@ -4,14 +4,16 @@ import http, { getPaginationSet, PaginatedResult } from '@/api/http';
 interface QueryParams {
     query?: string;
     page?: number;
+    perPage?: number;
     type?: string;
 }
 
-export default ({ query, ...params }: QueryParams): Promise<PaginatedResult<Server>> => {
+const getServers = ({ query, perPage, ...params }: QueryParams): Promise<PaginatedResult<Server>> => {
     return new Promise((resolve, reject) => {
         http.get('/api/client', {
             params: {
                 'filter[*]': query,
+                ...(perPage !== undefined ? { per_page: perPage } : {}),
                 ...params,
             },
         })
@@ -23,4 +25,27 @@ export default ({ query, ...params }: QueryParams): Promise<PaginatedResult<Serv
             )
             .catch(reject);
     });
+};
+
+export default getServers;
+
+const MAX_PER_PAGE = 100;
+
+export const getAllServers = async (params: Omit<QueryParams, 'page' | 'perPage'> = {}): Promise<Server[]> => {
+    const firstPage = await getServers({ ...params, page: 1, perPage: MAX_PER_PAGE });
+
+    if (firstPage.pagination.totalPages <= 1) {
+        return firstPage.items;
+    }
+
+    const remainingPages = await Promise.all(
+        Array.from({ length: firstPage.pagination.totalPages - 1 }, (_, index) =>
+            getServers({ ...params, page: index + 2, perPage: MAX_PER_PAGE })
+        )
+    );
+
+    return remainingPages.reduce<Server[]>(
+        (servers, page) => servers.concat(page.items),
+        [...firstPage.items]
+    );
 };

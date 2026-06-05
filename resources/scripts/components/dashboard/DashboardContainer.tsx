@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Server } from '@/api/server/getServer';
-import getServers from '@/api/getServers';
+import getServers, { getAllServers } from '@/api/getServers';
 import ServerCard from '@/components/dashboard/ServerCard';
 import ServerRow from '@/components/dashboard/ServerRow';
 import GroupSection from '@/components/dashboard/groups/GroupSection';
@@ -35,9 +35,18 @@ export default () => {
     const [collapsed, setCollapsed] = usePersistedState<Record<string, boolean>>(`${uuid}:group_collapsed`, {});
     const [modal, setModal] = useState<'create' | ServerGroup | null>(null);
 
+    const serverType = showOnlyAdmin && rootAdmin ? 'admin' : undefined;
+    const hasGroups = groups.length > 0;
+    const needsAllServers = hasGroups || modal !== null;
+
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
-        ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
-        () => getServers({ page, type: showOnlyAdmin && rootAdmin ? 'admin' : undefined })
+        hasGroups ? null : ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
+        () => getServers({ page, type: serverType })
+    );
+
+    const { data: allServersList, error: allServersError } = useSWR<Server[]>(
+        needsAllServers ? ['/api/client/servers/all', showOnlyAdmin && rootAdmin] : null,
+        () => getAllServers({ type: serverType })
     );
 
     useEffect(() => {
@@ -60,15 +69,19 @@ export default () => {
     }, [page]);
 
     useEffect(() => {
-        if (error) clearAndAddHttpError({ key: 'dashboard', error });
-        if (!error) clearFlashes('dashboard');
-    }, [error]);
+        const activeError = hasGroups ? allServersError : error;
+
+        if (activeError) clearAndAddHttpError({ key: 'dashboard', error: activeError });
+        if (!activeError) clearFlashes('dashboard');
+    }, [error, allServersError, hasGroups]);
 
     const toggleCollapse = (groupUuid: string) => {
         setCollapsed((prev) => ({ ...(prev ?? {}), [groupUuid]: !(prev ?? {})[groupUuid] }));
     };
 
-    const allServers = servers?.items ?? [];
+    const allServers = hasGroups ? (allServersList ?? []) : (servers?.items ?? []);
+    const modalServers = needsAllServers ? (allServersList ?? servers?.items ?? []) : (servers?.items ?? []);
+    const isLoading = hasGroups ? !allServersList : !servers;
 
     // Partition servers into groups + ungrouped.
     const groupedServers = groups.map((group) => ({
@@ -78,8 +91,6 @@ export default () => {
 
     const groupedUuids = new Set(groups.flatMap((g) => g.serverUuids));
     const ungrouped = allServers.filter((s) => !groupedUuids.has(s.uuid));
-
-    const hasGroups = groups.length > 0;
 
     const renderServers = (items: Server[], color?: string) =>
         layout === 'grid' ? (
@@ -96,7 +107,7 @@ export default () => {
         <PageContentBlock title={'Dashboard'} showFlashKey={'dashboard'}>
             {modal && (
                 <CreateGroupModal
-                    servers={allServers}
+                    servers={modalServers}
                     editing={modal === 'create' ? undefined : modal}
                     onClose={() => setModal(null)}
                 />
@@ -179,7 +190,7 @@ export default () => {
                 </div>
             </div>
 
-            {!servers ? (
+            {isLoading ? (
                 <Spinner centered size={'large'} />
             ) : allServers.length === 0 ? (
                 <p css={tw`text-center text-sm text-neutral-400`}>
@@ -213,11 +224,13 @@ export default () => {
                         />
                     )}
                 </>
-            ) : (
+            ) : servers ? (
                 /* No groups — use pagination as before */
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) => renderServers(items)}
                 </Pagination>
+            ) : (
+                <Spinner centered size={'large'} />
             )}
         </PageContentBlock>
     );
