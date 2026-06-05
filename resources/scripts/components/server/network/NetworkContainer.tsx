@@ -11,10 +11,6 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import getServerAllocations from '@/api/swr/getServerAllocations';
 import isEqual from 'react-fast-compare';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-
-
 const NetworkContainer = () => {
     const [loading, setLoading] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -57,12 +53,7 @@ const NetworkContainer = () => {
             {allocationLimit > 0 && data && allocationLimit > data.length && (
                 <Can action={'allocation.create'}>
                     <div className={'flex justify-end mb-4'}>
-                        <Button
-                            color={'primary'}
-                            className={'flex items-center gap-2 whitespace-nowrap'}
-                            onClick={onCreateAllocation}
-                        >
-                            <FontAwesomeIcon icon={faPlus} className={'text-xs'} />
+                        <Button color={'primary'} onClick={onCreateAllocation}>
                             Add Allocation
                         </Button>
                     </div>

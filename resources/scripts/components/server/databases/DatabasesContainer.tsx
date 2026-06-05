@@ -46,12 +46,15 @@ export default () => {
                     <>
                         {/* Top bar */}
                         {databaseLimit > 0 && databases.length > 0 && (
-                            <div className={'flex items-center gap-3 mb-6'}>
+                            <div className={'flex items-center justify-between mb-6'}>
                                 <span className={'text-sm text-neutral-400'}>
                                     <span className={'text-neutral-100 font-semibold'}>{databases.length}</span>
                                     <span className={'text-neutral-600'}> / </span>
                                     {databaseLimit} databases used
                                 </span>
+                                <Can action={'database.create'}>
+                                    {databases.length < databaseLimit && <CreateDatabaseButton />}
+                                </Can>
                             </div>
                         )}
 

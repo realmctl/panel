@@ -12,15 +12,18 @@ import { NotFound, ServerError } from '@/components/elements/ScreenBlock';
 import { httpErrorToHuman } from '@/api/http';
 import { useStoreState } from 'easy-peasy';
 import SubNavigation from '@/components/elements/SubNavigation';
+import ServerInsightsNav from '@/components/server/ServerInsightsNav';
 import PageHeader from '@/components/elements/PageHeader';
 import InstallListener from '@/components/server/InstallListener';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExternalLinkAlt, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisH, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from 'react-router';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
+
+const INSIGHT_NAV_PATHS = new Set(['/metrics', '/activity']);
 
 const ServerPowerHeader = () => {
     const status = ServerContext.useStoreState((state) => state.status.value);
@@ -169,7 +172,7 @@ export default () => {
                             <SubNavigation>
                                 <div>
                                     {routes.server
-                                        .filter((route) => !!route.name)
+                                        .filter((route) => !!route.name && !INSIGHT_NAV_PATHS.has(route.path))
                                         .map((route) =>
                                             route.permission ? (
                                                 <Can key={route.path} action={route.permission} matchAny>
@@ -183,6 +186,7 @@ export default () => {
                                                 </NavLink>
                                             )
                                         )}
+                                    <ServerInsightsNav to={to} />
                                     {rootAdmin && (
                                         // eslint-disable-next-line react/jsx-no-target-blank
                                         <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>

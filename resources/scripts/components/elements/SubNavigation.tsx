@@ -11,7 +11,7 @@ const SubNavigation = styled.div`
         gap: 1.25rem;
 
         & > a,
-        & > div {
+        & > div.nav-item-dropdown > button {
             ${tw`inline-block py-3 text-neutral-400 no-underline whitespace-nowrap transition-all duration-150 relative`};
 
             &:hover {
@@ -29,6 +29,15 @@ const SubNavigation = styled.div`
                     background-color: #3b82f6;
                 }
             }
+        }
+
+        & > div.nav-item-dropdown {
+            ${tw`relative inline-block flex-shrink-0`};
+        }
+
+        & > div.nav-item-dropdown > button {
+            ${tw`inline-flex items-center gap-1 border-0 bg-transparent cursor-pointer text-sm`};
+            font: inherit;
         }
     }
 `;

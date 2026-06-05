@@ -62,20 +62,15 @@ const BackupContainer = () => {
                 This action cannot be undone.
             </Dialog.Confirm>
 
-            {/* Top bar */}
-            <div className={'flex items-center justify-between mb-6'}>
-                <div className={'flex items-center gap-3'}>
-                    {backupLimit > 0 && (
-                        <span className={'text-sm text-neutral-400'}>
-                            <span className={'text-neutral-100 font-semibold'}>{backups.backupCount}</span>
-                            <span className={'text-neutral-600'}> / </span>
-                            {backupLimit} backups used
-                        </span>
-                    )}
-                </div>
-                <div className={'flex items-center gap-2'}>
-                    <Can action={'backup.delete'}>
-                        {backups.backupCount > 0 && (
+            {backupLimit > 0 && backups.backupCount > 0 && (
+                <div className={'flex items-center justify-between mb-6'}>
+                    <span className={'text-sm text-neutral-400'}>
+                        <span className={'text-neutral-100 font-semibold'}>{backups.backupCount}</span>
+                        <span className={'text-neutral-600'}> / </span>
+                        {backupLimit} backups used
+                    </span>
+                    <div className={'flex items-center gap-2'}>
+                        <Can action={'backup.delete'}>
                             <button
                                 disabled={deletingAll}
                                 onClick={() => setShowDeleteAllDialog(true)}
@@ -88,15 +83,13 @@ const BackupContainer = () => {
                             >
                                 {deletingAll ? 'Deleting…' : 'Delete All'}
                             </button>
-                        )}
-                    </Can>
-                    <Can action={'backup.create'}>
-                        {backupLimit > 0 && backupLimit > backups.backupCount && (
-                            <CreateBackupButton />
-                        )}
-                    </Can>
+                        </Can>
+                        <Can action={'backup.create'}>
+                            {backupLimit > backups.backupCount && <CreateBackupButton />}
+                        </Can>
+                    </div>
                 </div>
-            </div>
+            )}
 
             <FlashMessageRender byKey={'backups'} className={'mb-4'} />
 

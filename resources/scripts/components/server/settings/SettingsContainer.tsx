@@ -1,52 +1,147 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ServerContext } from '@/state/server';
 import { useStoreState } from 'easy-peasy';
 import RenameServerBox from '@/components/server/settings/RenameServerBox';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import Can from '@/components/elements/Can';
 import ReinstallServerBox from '@/components/server/settings/ReinstallServerBox';
+import StartupSettingsPanel from '@/components/server/settings/StartupSettingsPanel';
 import Input from '@/components/elements/Input';
 import Label from '@/components/elements/Label';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
+import Spinner from '@/components/elements/Spinner';
 import isEqual from 'react-fast-compare';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import { ip } from '@/lib/formatters';
 import { Button } from '@/components/elements/button/index';
 
-type Tab = 'general' | 'details' | 'danger';
+const TAB_SWITCH_DELAY_MS = 200;
 
-const TABS: { id: Tab; label: string }[] = [
-    { id: 'general', label: 'General'        },
-    { id: 'details', label: 'Server Details' },
-    { id: 'danger',  label: 'Danger Zone'    },
+type Tab = 'general' | 'details' | 'danger' | 'startup' | 'variables';
+
+const ALL_TABS: { id: Tab; label: string; permission: string | string[] | null }[] = [
+    { id: 'general', label: 'General', permission: null },
+    { id: 'details', label: 'Server Details', permission: 'settings.rename' },
+    { id: 'danger', label: 'Danger Zone', permission: 'settings.reinstall' },
+    { id: 'startup', label: 'Startup & Docker', permission: 'startup.*' },
+    { id: 'variables', label: 'Variables', permission: 'startup.*' },
 ];
 
 const card = { backgroundColor: '#192024', border: '1px solid #2d3338' } as React.CSSProperties;
 const cardHeader = { backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' } as React.CSSProperties;
 
+const canAccessTab = (permission: string | string[] | null, userPermissions: string[]): boolean => {
+    if (!permission) {
+        return true;
+    }
+
+    if (userPermissions[0] === '*') {
+        return true;
+    }
+
+    const actions = Array.isArray(permission) ? permission : [permission];
+
+    return actions.some(
+        (action) =>
+            (action.endsWith('.*') &&
+                userPermissions.some((value) => value.startsWith(action.split('.')[0]))) ||
+            userPermissions.indexOf(action) >= 0
+    );
+};
+
+const tabFromSearch = (search: string): Tab | null => {
+    const value = new URLSearchParams(search).get('tab');
+
+    if (value === 'general' || value === 'details' || value === 'danger' || value === 'startup' || value === 'variables') {
+        return value;
+    }
+
+    return null;
+};
+
 export default () => {
-    const [activeTab, setActiveTab] = useState<Tab>('general');
+    const location = useLocation();
+    const userPermissions = ServerContext.useStoreState((state) => state.server.permissions);
+
+    const visibleTabs = useMemo(
+        () => ALL_TABS.filter((tab) => canAccessTab(tab.permission, userPermissions)),
+        [userPermissions]
+    );
+
+    const initialTab = (() => {
+        const requested = tabFromSearch(location.search);
+        return requested ?? 'general';
+    })();
+
+    const [activeTab, setActiveTab] = useState<Tab>(initialTab);
+    const [renderedTab, setRenderedTab] = useState<Tab>(initialTab);
+    const [isTabLoading, setIsTabLoading] = useState(false);
+
+    const switchTab = useCallback(
+        (tab: Tab) => {
+            if (activeTab === tab) {
+                return;
+            }
+
+            setIsTabLoading(true);
+            setActiveTab(tab);
+        },
+        [activeTab]
+    );
+
+    useEffect(() => {
+        if (!isTabLoading) {
+            return;
+        }
+
+        const timer = window.setTimeout(() => {
+            setRenderedTab(activeTab);
+            setIsTabLoading(false);
+        }, TAB_SWITCH_DELAY_MS);
+
+        return () => window.clearTimeout(timer);
+    }, [activeTab, isTabLoading]);
+
+    useEffect(() => {
+        const requested = tabFromSearch(location.search);
+        if (!requested) {
+            return;
+        }
+
+        if (visibleTabs.some((tab) => tab.id === requested)) {
+            switchTab(requested);
+        }
+    }, [location.search, visibleTabs, switchTab]);
+
+    useEffect(() => {
+        if (!visibleTabs.some((tab) => tab.id === activeTab)) {
+            switchTab(visibleTabs[0]?.id ?? 'general');
+        }
+    }, [activeTab, visibleTabs, switchTab]);
 
     const username = useStoreState((state) => state.user.data!.username);
-    const id       = ServerContext.useStoreState((state) => state.server.data!.id);
-    const uuid     = ServerContext.useStoreState((state) => state.server.data!.uuid);
-    const node     = ServerContext.useStoreState((state) => state.server.data!.node);
-    const sftp     = ServerContext.useStoreState((state) => state.server.data!.sftpDetails, isEqual);
+    const id = ServerContext.useStoreState((state) => state.server.data!.id);
+    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
+    const node = ServerContext.useStoreState((state) => state.server.data!.node);
+    const sftp = ServerContext.useStoreState((state) => state.server.data!.sftpDetails, isEqual);
+
+    const showStartupFlash = renderedTab === 'startup' || renderedTab === 'variables';
 
     return (
         <ServerContentBlock title={'Settings'}>
             <FlashMessageRender byKey={'settings'} className={'mb-4'} />
+            {showStartupFlash && <FlashMessageRender byKey={'startup:image'} className={'mb-4'} />}
 
-            {/* Tab bar */}
             <div
-                className={'flex items-center gap-1 p-1 rounded-lg mb-6 w-fit'}
+                className={'flex items-center gap-1 p-1 rounded-lg mb-6 w-fit max-w-full overflow-x-auto'}
                 style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
             >
-                {TABS.map((tab) => (
+                {visibleTabs.map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors duration-150'}
+                        onClick={() => switchTab(tab.id)}
+                        className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors duration-150 whitespace-nowrap'}
                         style={
                             activeTab === tab.id
                                 ? { backgroundColor: '#192024', color: '#e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }
@@ -58,8 +153,12 @@ export default () => {
                 ))}
             </div>
 
-            {/* General tab: SFTP + Debug */}
-            {activeTab === 'general' && (
+            <div className={'relative min-h-[12rem]'}>
+                {isTabLoading ? (
+                    <Spinner centered size={Spinner.Size.LARGE} />
+                ) : (
+                    <>
+            {renderedTab === 'general' && (
                 <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
                     <Can action={'file.sftp'}>
                         <div className={'rounded-lg overflow-hidden'} style={card}>
@@ -126,8 +225,7 @@ export default () => {
                 </div>
             )}
 
-            {/* Details tab: rename */}
-            {activeTab === 'details' && (
+            {renderedTab === 'details' && (
                 <div className={'max-w-xl'}>
                     <Can action={'settings.rename'}>
                         <div className={'rounded-lg overflow-hidden'} style={card}>
@@ -142,8 +240,7 @@ export default () => {
                 </div>
             )}
 
-            {/* Danger tab: reinstall */}
-            {activeTab === 'danger' && (
+            {renderedTab === 'danger' && (
                 <div className={'max-w-xl'}>
                     <Can action={'settings.reinstall'}>
                         <div className={'rounded-lg overflow-hidden'} style={card}>
@@ -159,6 +256,12 @@ export default () => {
                     </Can>
                 </div>
             )}
+
+            {renderedTab === 'startup' && <StartupSettingsPanel section={'startup'} />}
+            {renderedTab === 'variables' && <StartupSettingsPanel section={'variables'} />}
+                    </>
+                )}
+            </div>
         </ServerContentBlock>
     );
 };

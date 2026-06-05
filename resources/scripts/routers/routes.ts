@@ -6,7 +6,7 @@ import UsersContainer from '@/components/server/users/UsersContainer';
 import MetricsContainer from '@/components/server/metrics/MetricsContainer';
 import BackupContainer from '@/components/server/backups/BackupContainer';
 import NetworkContainer from '@/components/server/network/NetworkContainer';
-import StartupContainer from '@/components/server/startup/StartupContainer';
+import StartupSettingsRedirect from '@/components/server/settings/StartupSettingsRedirect';
 import FileManagerContainer from '@/components/server/files/FileManagerContainer';
 import SettingsContainer from '@/components/server/settings/SettingsContainer';
 import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
@@ -97,6 +97,13 @@ export default {
             component: FileEditContainer,
         },
         {
+            path: '/plugins',
+            permission: 'file.*',
+            name: 'Plugins',
+            component: PluginInstallerContainer,
+            exact: true,
+        },
+        {
             path: '/versions',
             permission: 'startup.*',
             name: 'Versions',
@@ -104,11 +111,17 @@ export default {
             exact: true,
         },
         {
-            path: '/plugins',
-            permission: 'file.*',
-            name: 'Plugins',
-            component: PluginInstallerContainer,
+            path: '/startup',
+            permission: 'startup.*',
+            name: undefined,
+            component: StartupSettingsRedirect,
             exact: true,
+        },
+        {
+            path: '/network',
+            permission: 'allocation.*',
+            name: 'Networking',
+            component: NetworkContainer,
         },
         {
             path: '/databases',
@@ -117,9 +130,15 @@ export default {
             component: DatabasesContainer,
         },
         {
+            path: '/backups',
+            permission: 'backup.*',
+            name: 'Backups',
+            component: BackupContainer,
+        },
+        {
             path: '/schedules',
             permission: 'schedule.*',
-            name: 'Schedules',
+            name: 'Tasks',
             component: ScheduleContainer,
         },
         {
@@ -131,37 +150,19 @@ export default {
         {
             path: '/users',
             permission: 'user.*',
-            name: 'Users',
+            name: 'Team',
             component: UsersContainer,
         },
         {
-            path: '/backups',
-            permission: 'backup.*',
-            name: 'Backups',
-            component: BackupContainer,
-        },
-        {
-            path: '/network',
-            permission: 'allocation.*',
-            name: 'Network',
-            component: NetworkContainer,
-        },
-        {
-            path: '/startup',
-            permission: 'startup.*',
-            name: 'Startup',
-            component: StartupContainer,
-        },
-        {
             path: '/settings',
-            permission: ['settings.*', 'file.sftp'],
+            permission: ['settings.*', 'file.sftp', 'startup.*'],
             name: 'Settings',
             component: SettingsContainer,
         },
         {
             path: '/activity',
             permission: 'activity.*',
-            name: 'Activity',
+            name: 'History',
             component: ServerActivityLogContainer,
         },
     ],
