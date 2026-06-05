@@ -20,8 +20,9 @@ export interface ModalProps extends RequiredModalProps {
     showSpinnerOverlay?: boolean;
 }
 
-export const ModalMask = styled.div`
+export const ModalMask = styled.div<{ center?: boolean }>`
     ${tw`fixed z-50 overflow-auto flex w-full inset-0`};
+    ${(props) => props.center && tw`items-center justify-center`};
     background: rgba(0, 0, 0, 0.7);
 `;
 
@@ -90,6 +91,7 @@ const Modal: React.FC<ModalProps> = ({
     return (
         <Fade in={render} timeout={150} appear={appear || true} unmountOnExit onExited={() => onDismissed()}>
             <ModalMask
+                center={!top}
                 onClick={(e) => e.stopPropagation()}
                 onContextMenu={(e) => e.stopPropagation()}
                 onMouseDown={(e) => {

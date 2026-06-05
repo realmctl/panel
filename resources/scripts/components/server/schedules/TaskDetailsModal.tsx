@@ -194,4 +194,4 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
     );
 };
 
-export default asModal<Props>()(TaskDetailsModal);
+export default asModal<Props>({ top: false })(TaskDetailsModal);
