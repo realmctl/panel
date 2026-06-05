@@ -1,20 +1,17 @@
 import React, { memo, useState } from 'react';
 import { ServerContext } from '@/state/server';
-import Can from '@/components/elements/Can';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import isEqual from 'react-fast-compare';
 import Spinner from '@/components/elements/Spinner';
 import Features from '@feature/Features';
 import Console from '@/components/server/console/Console';
-import PowerButtons from '@/components/server/console/PowerButtons';
+import ServerPowerControls from '@/components/server/console/ServerPowerControls';
 import { Alert } from '@/components/elements/alert';
 import { ip } from '@/lib/formatters';
 import { capitalize } from '@/lib/strings';
 import UptimeDuration from '@/components/server/UptimeDuration';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { SocketEvent } from '@/components/server/events';
-
-export type PowerAction = 'start' | 'stop' | 'restart' | 'kill';
 
 const StatusIndicator = ({ status }: { status: string | null }) => {
     const color = status === 'running'
@@ -29,46 +26,6 @@ const StatusIndicator = ({ status }: { status: string | null }) => {
         <div className={'flex items-center gap-2'}>
             <div className={`w-2.5 h-2.5 rounded-full ${color}`} />
             <span className={'text-sm text-neutral-200'}>{label}</span>
-        </div>
-    );
-};
-
-const ServerCardPowerButtons = () => {
-    const status = ServerContext.useStoreState((state) => state.status.value);
-    const instance = ServerContext.useStoreState((state) => state.socket.instance);
-
-    const sendAction = (action: string) => {
-        if (instance) {
-            instance.send('set state', action);
-        }
-    };
-
-    return (
-        <div className={'mt-6 flex gap-2'}>
-            {(status === 'offline' || status === null) && (
-                <button
-                    onClick={() => sendAction('start')}
-                    className={'px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md border-0 cursor-pointer transition-colors duration-150'}
-                >
-                    Start
-                </button>
-            )}
-            {(status === 'running' || status === 'starting') && (
-                <button
-                    onClick={() => sendAction('stop')}
-                    className={'px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md border-0 cursor-pointer transition-colors duration-150'}
-                >
-                    Shut down
-                </button>
-            )}
-            {(status === 'running' || status === 'starting' || status === 'stopping') && (
-                <button
-                    onClick={() => sendAction('kill')}
-                    className={'px-4 py-2 text-sm font-medium text-neutral-200 bg-neutral-700/60 hover:bg-neutral-700 rounded-md border border-[#2d3338] cursor-pointer transition-colors duration-150'}
-                >
-                    Kill Server
-                </button>
-            )}
         </div>
     );
 };
@@ -137,9 +94,7 @@ const ServerConsoleContainer = () => {
                             </div>
                         </div>
 
-                        <Can action={['control.start', 'control.stop', 'control.restart']} matchAny>
-                            <ServerCardPowerButtons />
-                        </Can>
+                        <ServerPowerControls variant={'card'} />
                     </div>
 
                     {/* Runtime card */}
