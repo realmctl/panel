@@ -81,15 +81,16 @@ const AllocationRow = ({ allocation }: Props) => {
                         <div className={'flex items-center gap-2 flex-wrap'}>
                             {allocation.isDefault && (
                                 <span
-                                    className={'text-xs font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide'}
-                                    style={{ backgroundColor: '#0e4a5c', color: '#22d3ee' }}
+                                    className={'flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide'}
+                                    style={{ backgroundColor: '#252a30', color: '#cbd5e1', border: '1px solid #3d454d' }}
                                 >
+                                    <FontAwesomeIcon icon={faStar} className={'text-xs'} style={{ color: '#d4a853' }} />
                                     Primary
                                 </span>
                             )}
                             <span
-                                className={'text-xs px-2 py-0.5 rounded-full uppercase tracking-wide font-medium'}
-                                style={{ backgroundColor: '#1e2d38', color: '#94a3b8' }}
+                                className={'text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide'}
+                                style={{ backgroundColor: '#252a30', color: '#cbd5e1', border: '1px solid #3d454d' }}
                             >
                                 {PROTOCOL_LABEL[allocation.protocol] ?? 'TCP'}
                             </span>
@@ -126,27 +127,21 @@ const AllocationRow = ({ allocation }: Props) => {
                     </div>
                 </div>
 
-                {/* IP : Port */}
+                {/* Address */}
                 <div className={'px-4 pt-4 pb-3'}>
+                    <p className={'text-xs uppercase tracking-wide text-neutral-500 mb-2'}>Address</p>
                     <CopyOnClick text={`${allocation.alias ?? ip(allocation.ip)}:${allocation.port}`}>
-                        <div className={'flex items-baseline gap-1 cursor-pointer group'}>
-                            <span
-                                className={'text-xl font-mono font-semibold group-hover:text-cyan-300 transition-colors duration-150'}
-                                style={{ color: '#e2e8f0' }}
-                            >
-                                {allocation.alias ?? ip(allocation.ip)}
-                            </span>
-                            <span className={'text-neutral-500 font-mono text-lg'}>:</span>
-                            <span
-                                className={'text-xl font-mono font-bold group-hover:text-cyan-300 transition-colors duration-150'}
-                                style={{ color: '#22d3ee' }}
-                            >
-                                {allocation.port}
-                            </span>
+                        <div
+                            className={'inline-flex items-center rounded-md px-3 py-2 font-mono text-sm cursor-pointer transition-colors duration-150 hover:border-neutral-600'}
+                            style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
+                        >
+                            <span className={'text-neutral-200'}>{allocation.alias ?? ip(allocation.ip)}</span>
+                            <span className={'text-neutral-600 mx-0.5'}>:</span>
+                            <span className={'text-neutral-200'}>{allocation.port}</span>
                         </div>
                     </CopyOnClick>
                     {allocation.alias && (
-                        <p className={'text-xs text-neutral-500 mt-0.5 font-mono'}>{ip(allocation.ip)}</p>
+                        <p className={'text-xs text-neutral-500 mt-1.5 font-mono'}>{ip(allocation.ip)}</p>
                     )}
                 </div>
 

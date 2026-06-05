@@ -65,10 +65,27 @@ export default () => {
         return dashboardGreeting;
     };
 
+    const getAccountBreadcrumbs = () => {
+        if (!location.pathname.startsWith('/account')) return undefined;
+
+        const activeRoute = routes.account
+            .filter((r) => !!r.name)
+            .find((r) => {
+                const fullPath = `/account/${r.path}`.replace('//', '/');
+                return r.exact ? location.pathname === fullPath : location.pathname.startsWith(fullPath);
+            });
+
+        return [
+            { label: 'Home', to: '/' },
+            { label: 'Account', to: '/account' },
+            ...(activeRoute?.name && activeRoute.path !== '/' ? [{ label: activeRoute.name }] : []),
+        ];
+    };
+
     return (
         <>
             <NavigationBar />
-            <PageHeader title={getPageTitle()}>
+            <PageHeader title={getPageTitle()} breadcrumbs={getAccountBreadcrumbs()}>
                 {location.pathname.startsWith('/account') && (
                     <SubNavigation>
                         <div>

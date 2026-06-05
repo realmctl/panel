@@ -82,7 +82,7 @@ const AllocationWhitelistForm = ({ allocation, onClose }: Props) => {
         <div css={tw`mt-4 p-4 rounded bg-neutral-900 border border-neutral-700`}>
             <div css={tw`flex items-center justify-between mb-4`}>
                 <div css={tw`flex items-center space-x-2`}>
-                    <FontAwesomeIcon icon={faShieldAlt} css={tw`text-cyan-400`} />
+                    <FontAwesomeIcon icon={faShieldAlt} css={tw`text-neutral-400`} />
                     <span css={tw`text-sm font-medium text-neutral-200`}>IP Whitelist</span>
                 </div>
                 <button css={tw`text-neutral-400 hover:text-neutral-200 transition-colors`} onClick={onClose}>

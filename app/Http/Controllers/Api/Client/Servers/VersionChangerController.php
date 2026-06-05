@@ -29,7 +29,6 @@ namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\ListVersionsRequest;
@@ -142,8 +141,15 @@ class VersionChangerController extends ClientApiController
      */
     public function getDownloadUrl(GetDownloadUrlRequest $request): array
     {
-        $type = $request->get('type', 'paper');
-        $version = $request->get('version');
+        return $this->resolveDownloadUrl($request->get('type', 'paper'), $request->get('version'));
+    }
+
+    /**
+     * Resolve the download URL for a version without requiring an HTTP request.
+     */
+    protected function resolveDownloadUrl(?string $type, ?string $version): array
+    {
+        $type = $type ?: 'paper';
 
         if (!$version) {
             return ['error' => 'Version is required'];
@@ -254,7 +260,7 @@ class VersionChangerController extends ClientApiController
         $version = $request->input('version');
 
         // Get the download URL
-        $downloadData = $this->getDownloadUrl(new Request(['type' => $type, 'version' => $version]));
+        $downloadData = $this->resolveDownloadUrl($type, $version);
 
         if (isset($downloadData['error'])) {
             return ['success' => false, 'error' => $downloadData['error']];

@@ -138,6 +138,21 @@ export default () => {
         };
     }, [match.params.id]);
 
+    const activeRoute = routes.server
+        .filter((r) => !!r.name)
+        .find((r) => {
+            const routePath = to(r.path);
+            return r.exact
+                ? location.pathname === routePath
+                : location.pathname.startsWith(routePath.replace(/\/$/, ''));
+        });
+
+    const serverBreadcrumbs = [
+        { label: 'Home', to: '/' },
+        ...(serverName ? [{ label: serverName }] : []),
+        ...(activeRoute?.name ? [{ label: activeRoute.name }] : []),
+    ];
+
     return (
         <React.Fragment key={'server-router'}>
             <NavigationBar />
@@ -149,7 +164,7 @@ export default () => {
                 )
             ) : (
                 <>
-                    <PageHeader title={serverName || 'Server'} rightActions={<ServerPowerHeader />}>
+                    <PageHeader title={serverName || 'Server'} rightActions={<ServerPowerHeader />} breadcrumbs={serverBreadcrumbs}>
                         <CSSTransition timeout={150} classNames={'fade'} appear in>
                             <SubNavigation>
                                 <div>

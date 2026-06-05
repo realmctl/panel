@@ -10,8 +10,8 @@
 
 @section('admin-content')
 @include('admin.servers.partials.navigation')
-<form action="{{ route('admin.servers.view.startup', $server->id) }}" method="POST">
-    <div class="row row-cards">
+<form action="{{ route('admin.servers.view.startup', $server->id) }}" method="POST" class="d-flex flex-column gap-3">
+    <div class="row row-deck row-cards">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
@@ -35,7 +35,7 @@
             </div>
         </div>
     </div>
-    <div class="row row-cards">
+    <div class="row row-deck row-cards">
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
@@ -87,11 +87,7 @@
             </div>
         </div>
     </div>
-    <div class="row row-cards">
-        <div class="col-lg-12">
-            <div class="row row-cards" id="appendVariablesTo"></div>
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-3" id="appendVariablesTo"></div>
 </form>
 @endsection
 
@@ -143,19 +139,17 @@
                 var setValue = _.get(Pterodactyl.server_variables, item.env_variable, item.default_value);
                 var isRequired = (item.required === 1) ? '<span class="badge bg-danger">Required</span> ' : '';
                 var dataAppend = ' \
-                    <div class="col-lg-12"> \
-                        <div class="card"> \
-                            <div class="card-header"> \
-                                <h3 class="card-title">' + isRequired + escapeHtml(item.name) + '</h3> \
-                            </div> \
-                            <div class="card-body"> \
-                                <input name="environment[' + escapeHtml(item.env_variable) + ']" class="form-control" type="text" id="egg_variable_' + escapeHtml(item.env_variable) + '" /> \
-                                <span class="form-hint">' + escapeHtml(item.description) + '</span> \
-                            </div> \
-                            <div class="card-footer"> \
-                                <span class="form-hint"><strong>Startup Command Variable:</strong> <code>' + escapeHtml(item.env_variable) + '</code></span> \
-                                <span class="form-hint"><strong>Input Rules:</strong> <code>' + escapeHtml(item.rules) + '</code></span> \
-                            </div> \
+                    <div class="card"> \
+                        <div class="card-header"> \
+                            <h3 class="card-title">' + isRequired + escapeHtml(item.name) + '</h3> \
+                        </div> \
+                        <div class="card-body"> \
+                            <input name="environment[' + escapeHtml(item.env_variable) + ']" class="form-control" type="text" id="egg_variable_' + escapeHtml(item.env_variable) + '" /> \
+                            <span class="form-hint">' + escapeHtml(item.description) + '</span> \
+                        </div> \
+                        <div class="card-footer"> \
+                            <span class="form-hint"><strong>Startup Command Variable:</strong> <code>' + escapeHtml(item.env_variable) + '</code></span> \
+                            <span class="form-hint"><strong>Input Rules:</strong> <code>' + escapeHtml(item.rules) + '</code></span> \
                         </div> \
                     </div>';
                 $('#appendVariablesTo').append(dataAppend).find('#egg_variable_' + item.env_variable).val(setValue);

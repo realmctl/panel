@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { ServerContext } from '@/state/server';
 import pullFile from '@/api/server/files/pullFile';
@@ -43,18 +43,40 @@ interface InstallingState {
 const card = { backgroundColor: '#192024', border: '1px solid #2d3338' } as React.CSSProperties;
 const cardHeader = { backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' } as React.CSSProperties;
 const inputStyle = { backgroundColor: '#0e1417', border: '1px solid #2d3338', color: '#e2e8f0' } as React.CSSProperties;
+const rowStyle = { backgroundColor: '#0e1417', border: '1px solid #2d3338' } as React.CSSProperties;
 
-const SOURCES: { id: Source; label: string }[] = [
-    { id: 'hangar', label: 'Hangar' },
-    { id: 'modrinth', label: 'Modrinth' },
+const installBtn = {
+    backgroundColor: '#1e3a5f',
+    color: '#60a5fa',
+    border: '1px solid rgba(96,165,250,0.2)',
+} as React.CSSProperties;
+
+const installedBtn = {
+    backgroundColor: '#0d2f2a',
+    color: '#34d399',
+    border: '1px solid rgba(52,211,153,0.2)',
+} as React.CSSProperties;
+
+const SOURCES: { id: Source; label: string; description: string; icon: string }[] = [
+    { id: 'hangar', label: 'Hangar', description: 'PaperMC plugin repository', icon: '/assets/icons/papermc.webp' },
+    { id: 'modrinth', label: 'Modrinth', description: 'Open source plugin platform', icon: '/assets/icons/modrinth.svg' },
 ];
 
 const formatNumber = (n: number) =>
     n >= 1_000_000 ? (n / 1_000_000).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
 
+const PluginFallbackIcon = () => (
+    <div
+        className={'w-8 h-8 rounded flex items-center justify-center flex-shrink-0 text-xs font-bold'}
+        style={{ backgroundColor: '#1e2d38', color: '#64748b' }}
+    >
+        ?
+    </div>
+);
+
 export default () => {
     const uuid = ServerContext.useStoreState((s) => s.server.data!.uuid);
-    const { clearFlashes, addError, clearAndAddHttpError } = useFlashKey('plugins');
+    const { clearFlashes, clearAndAddHttpError } = useFlashKey('plugins');
     const { addFlash } = useFlash();
 
     const [source, setSource] = useState<Source>('hangar');
@@ -64,43 +86,60 @@ export default () => {
     const [installing, setInstalling] = useState<InstallingState | null>(null);
     const [installedSlugs, setInstalledSlugs] = useState<Set<string>>(new Set());
 
-    const search = useCallback(
-        debounce(async (q: string, src: Source) => {
-            if (!q.trim()) { setResults([]); return; }
-            setSearching(true);
-            try {
-                if (src === 'hangar') {
-                    const res = await fetch(
-                        `https://hangar.papermc.io/api/v1/projects?limit=20&offset=0&query=${encodeURIComponent(q)}&platform=PAPER`
-                    );
-                    const data = await res.json();
-                    setResults(data.result ?? []);
+    const activeSource = SOURCES.find((s) => s.id === source)!;
+
+    const loadPlugins = useCallback(async (src: Source, q: string) => {
+        setSearching(true);
+        try {
+            if (src === 'hangar') {
+                const params = new URLSearchParams({ limit: '20', offset: '0', platform: 'PAPER' });
+                if (q.trim()) {
+                    params.set('query', q.trim());
                 } else {
-                    const res = await fetch(
-                        `https://api.modrinth.com/v2/search?query=${encodeURIComponent(q)}&facets=[[%22project_type:plugin%22]]&limit=20`
-                    );
-                    const data = await res.json();
-                    setResults(data.hits ?? []);
+                    params.set('sort', '-stars');
                 }
-            } catch (e) {
-                console.error(e);
-                setResults([]);
-            } finally {
-                setSearching(false);
+                const res = await fetch(`https://hangar.papermc.io/api/v1/projects?${params}`);
+                const data = await res.json();
+                setResults(data.result ?? []);
+            } else {
+                const params = new URLSearchParams({
+                    limit: '20',
+                    facets: '[["project_type:plugin"]]',
+                    index: q.trim() ? 'relevance' : 'downloads',
+                });
+                if (q.trim()) {
+                    params.set('query', q.trim());
+                }
+                const res = await fetch(`https://api.modrinth.com/v2/search?${params}`);
+                const data = await res.json();
+                setResults(data.hits ?? []);
             }
-        }, 500),
-        []
+        } catch (e) {
+            console.error(e);
+            setResults([]);
+        } finally {
+            setSearching(false);
+        }
+    }, []);
+
+    const debouncedSearch = useCallback(
+        debounce((q: string, src: Source) => loadPlugins(src, q), 500),
+        [loadPlugins]
     );
+
+    useEffect(() => {
+        loadPlugins(source, '');
+    }, [source, loadPlugins]);
 
     const onQueryChange = (value: string) => {
         setQuery(value);
-        search(value, source);
+        debouncedSearch(value, source);
     };
 
     const onSourceChange = (src: Source) => {
         setSource(src);
-        setResults([]);
         setQuery('');
+        setInstalling(null);
     };
 
     const openInstall = async (plugin: HangarPlugin | ModrinthPlugin) => {
@@ -190,150 +229,167 @@ export default () => {
 
             {/* Source tabs */}
             <div
-                className={'flex items-center gap-1 p-1 rounded-lg mb-6 w-fit'}
+                className={'flex items-center gap-1 p-1 rounded-lg mb-6 flex-wrap'}
                 style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
             >
-                {SOURCES.map((s) => (
-                    <button
-                        key={s.id}
-                        onClick={() => onSourceChange(s.id)}
-                        className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors duration-150'}
-                        style={
-                            source === s.id
-                                ? { backgroundColor: '#192024', color: '#e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }
-                                : { color: '#64748b' }
-                        }
-                    >
-                        {s.label}
-                    </button>
-                ))}
+                {SOURCES.map((s) => {
+                    const active = source === s.id;
+                    return (
+                        <button
+                            key={s.id}
+                            onClick={() => onSourceChange(s.id)}
+                            className={'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150'}
+                            style={
+                                active
+                                    ? { backgroundColor: '#192024', color: '#e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }
+                                    : { color: '#64748b' }
+                            }
+                        >
+                            <img src={s.icon} alt={s.label} className={'w-4 h-4 object-contain flex-shrink-0'} />
+                            {s.label}
+                        </button>
+                    );
+                })}
             </div>
 
-            {/* Search card */}
-            <div className={'rounded-lg overflow-hidden mb-4'} style={card}>
-                <div className={'px-4 py-3'} style={cardHeader}>
-                    <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
-                        Search {source === 'hangar' ? 'Hangar (Paper)' : 'Modrinth'}
-                    </span>
+            {/* Main card */}
+            <div className={'rounded-lg overflow-hidden'} style={card}>
+                {/* Card header */}
+                <div className={'flex items-center gap-3 px-5 py-3 flex-wrap'} style={cardHeader}>
+                    <img src={activeSource.icon} alt={activeSource.label} className={'w-4 h-4 object-contain flex-shrink-0'} />
+                    <span className={'text-xs uppercase tracking-wide text-neutral-400'}>{activeSource.label}</span>
+                    <span className={'text-neutral-600 text-xs'}>—</span>
+                    <span className={'text-xs text-neutral-500'}>{activeSource.description}</span>
+                    {results.length > 0 && !searching && (
+                        <span
+                            className={'ml-auto text-xs px-2 py-0.5 rounded-full font-mono'}
+                            style={{ backgroundColor: '#1e2d38', color: '#64748b' }}
+                        >
+                            {query.trim() ? `${results.length} results` : `${results.length} popular`}
+                        </span>
+                    )}
                 </div>
-                <div className={'px-4 py-4'}>
+
+                {/* Search */}
+                <div className={'px-5 py-4'} style={{ borderBottom: '1px solid #2d3338' }}>
                     <input
-                        className={'w-full rounded text-sm px-3 py-2 focus:outline-none transition-colors'}
+                        className={'w-full rounded text-sm px-3 py-2.5 focus:outline-none transition-colors'}
                         style={inputStyle}
-                        placeholder={`Search for plugins... e.g. WorldEdit, EssentialsX`}
+                        placeholder={`Search ${activeSource.label}… e.g. WorldEdit, EssentialsX`}
                         value={query}
                         onChange={(e) => onQueryChange(e.target.value)}
                         autoFocus
                     />
                 </div>
-            </div>
 
-            {/* Results */}
-            {searching ? (
-                <div className={'py-12'}><Spinner centered size={'large'} /></div>
-            ) : results.length > 0 ? (
-                <div className={'grid grid-cols-1 md:grid-cols-2 gap-3'}>
-                    {results.map((plugin) => {
-                        const isHangar = 'namespace' in plugin;
-                        const slug = isHangar ? (plugin as HangarPlugin).namespace.slug : (plugin as ModrinthPlugin).slug;
-                        const name = isHangar ? (plugin as HangarPlugin).name : (plugin as ModrinthPlugin).title;
-                        const desc = plugin.description;
-                        const downloads = isHangar
-                            ? (plugin as HangarPlugin).stats.downloads
-                            : (plugin as ModrinthPlugin).downloads;
-                        const avatar = isHangar
-                            ? (plugin as HangarPlugin).avatarUrl
-                            : (plugin as ModrinthPlugin).icon_url;
-                        const isInstalled = installedSlugs.has(slug);
-                        const isInstalling = installing?.slug === slug && installing.source === source;
+                {/* Content */}
+                <div className={'p-5'}>
+                    {searching ? (
+                        <div className={'py-12'}>
+                            <Spinner centered size={'large'} />
+                        </div>
+                    ) : results.length > 0 ? (
+                        <div className={'flex flex-col gap-2'}>
+                            {results.map((plugin) => {
+                                const isHangar = 'namespace' in plugin;
+                                const slug = isHangar ? (plugin as HangarPlugin).namespace.slug : (plugin as ModrinthPlugin).slug;
+                                const name = isHangar ? (plugin as HangarPlugin).name : (plugin as ModrinthPlugin).title;
+                                const desc = plugin.description;
+                                const downloads = isHangar
+                                    ? (plugin as HangarPlugin).stats.downloads
+                                    : (plugin as ModrinthPlugin).downloads;
+                                const avatar = isHangar
+                                    ? (plugin as HangarPlugin).avatarUrl
+                                    : (plugin as ModrinthPlugin).icon_url;
+                                const isInstalled = installedSlugs.has(slug);
+                                const isInstalling = installing?.slug === slug && installing.source === source;
 
-                        return (
-                            <div key={slug} className={'rounded-lg overflow-hidden'} style={card}>
-                                {/* Card header */}
-                                <div className={'flex items-center justify-between px-4 py-3'} style={cardHeader}>
-                                    <div className={'flex items-center gap-2 min-w-0'}>
-                                        {avatar && (
-                                            <img src={avatar} alt={name} className={'w-5 h-5 rounded object-contain flex-shrink-0'} />
-                                        )}
-                                        <span className={'text-sm font-medium text-neutral-200 truncate'}>{name}</span>
-                                    </div>
-                                    <span
-                                        className={'text-xs font-mono ml-2 flex-shrink-0'}
-                                        style={{ color: '#64748b' }}
+                                return (
+                                    <div
+                                        key={slug}
+                                        className={'rounded-md px-3 py-3 transition-colors duration-100'}
+                                        style={rowStyle}
                                     >
-                                        {formatNumber(downloads)} dl
-                                    </span>
-                                </div>
+                                        <div className={'flex items-start gap-3'}>
+                                            {avatar ? (
+                                                <img
+                                                    src={avatar}
+                                                    alt={name}
+                                                    className={'w-8 h-8 rounded object-contain flex-shrink-0'}
+                                                    style={{ backgroundColor: '#1e2d38' }}
+                                                />
+                                            ) : (
+                                                <PluginFallbackIcon />
+                                            )}
 
-                                {/* Body */}
-                                <div className={'px-4 py-3'}>
-                                    <p className={'text-xs text-neutral-500 line-clamp-2 mb-3'}>{desc}</p>
+                                            <div className={'flex-1 min-w-0'}>
+                                                <div className={'flex items-center justify-between gap-2 mb-1'}>
+                                                    <span className={'text-sm font-medium text-neutral-200 truncate'}>{name}</span>
+                                                    <span className={'text-xs font-mono flex-shrink-0'} style={{ color: '#64748b' }}>
+                                                        {formatNumber(downloads)} downloads
+                                                    </span>
+                                                </div>
+                                                <p className={'text-xs text-neutral-500 line-clamp-2 mb-2'}>{desc}</p>
 
-                                    {/* Version picker / install button */}
-                                    {isInstalling ? (
-                                        installing.loading ? (
-                                            <div className={'flex items-center gap-2 text-xs text-neutral-400'}>
-                                                <Spinner size={'small'} />
-                                                <span>Loading versions…</span>
+                                                {isInstalling ? (
+                                                    installing.loading ? (
+                                                        <div className={'flex items-center gap-2 text-xs text-neutral-400'}>
+                                                            <Spinner size={'small'} />
+                                                            <span>Loading versions…</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className={'flex items-center gap-2 flex-wrap'}>
+                                                            <select
+                                                                className={'rounded text-xs px-2 py-1.5 focus:outline-none'}
+                                                                style={{ ...inputStyle, minWidth: '8rem' }}
+                                                                value={installing.selectedVersion}
+                                                                onChange={(e) => onVersionChange(e.target.value)}
+                                                            >
+                                                                {installing.versions.map((v) => (
+                                                                    <option key={v} value={v}>{v}</option>
+                                                                ))}
+                                                            </select>
+                                                            <button
+                                                                onClick={install}
+                                                                disabled={!installing.downloadUrl || installing.loading}
+                                                                className={'px-2.5 py-1 text-xs font-medium rounded transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'}
+                                                                style={installBtn}
+                                                            >
+                                                                {installing.loading ? 'Installing…' : 'Install'}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setInstalling(null)}
+                                                                className={'px-2 py-1 text-xs text-neutral-500 hover:text-neutral-300 transition-colors'}
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    )
+                                                ) : (
+                                                    <button
+                                                        onClick={() => openInstall(plugin)}
+                                                        disabled={isInstalled}
+                                                        className={'px-2.5 py-1 text-xs font-medium rounded transition-colors duration-150 disabled:opacity-50 disabled:cursor-default'}
+                                                        style={isInstalled ? installedBtn : installBtn}
+                                                    >
+                                                        {isInstalled ? 'Installed ✓' : 'Install'}
+                                                    </button>
+                                                )}
                                             </div>
-                                        ) : (
-                                            <div className={'flex items-center gap-2'}>
-                                                <select
-                                                    className={'flex-1 rounded text-xs px-2 py-1.5 focus:outline-none'}
-                                                    style={inputStyle}
-                                                    value={installing.selectedVersion}
-                                                    onChange={(e) => onVersionChange(e.target.value)}
-                                                >
-                                                    {installing.versions.map((v) => (
-                                                        <option key={v} value={v}>{v}</option>
-                                                    ))}
-                                                </select>
-                                                <button
-                                                    onClick={install}
-                                                    disabled={!installing.downloadUrl}
-                                                    className={'px-3 py-1.5 text-xs font-medium rounded transition-colors duration-150 disabled:opacity-40'}
-                                                    style={{ backgroundColor: '#0d2f2a', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
-                                                >
-                                                    Install
-                                                </button>
-                                                <button
-                                                    onClick={() => setInstalling(null)}
-                                                    className={'px-2 py-1.5 text-xs text-neutral-500 hover:text-neutral-300 transition-colors'}
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        )
-                                    ) : (
-                                        <button
-                                            onClick={() => openInstall(plugin)}
-                                            disabled={isInstalled}
-                                            className={'text-xs px-3 py-1.5 rounded font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-default'}
-                                            style={
-                                                isInstalled
-                                                    ? { backgroundColor: '#0d2f2a', color: '#34d399' }
-                                                    : { backgroundColor: '#1e2d38', color: '#94a3b8', border: '1px solid #2d3338' }
-                                            }
-                                        >
-                                            {isInstalled ? 'Installed ✓' : 'Install'}
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className={'flex flex-col items-center justify-center py-12'}>
+                            <img src={activeSource.icon} alt={''} className={'w-8 h-8 object-contain opacity-30 mb-3'} />
+                            <h3 className={'text-base font-semibold text-neutral-100 mb-1'}>No plugins found</h3>
+                            <p className={'text-sm text-neutral-500'}>Try a different search term or switch source.</p>
+                        </div>
+                    )}
                 </div>
-            ) : query.trim() ? (
-                <div className={'flex flex-col items-center justify-center py-16'}>
-                    <h3 className={'text-base font-semibold text-neutral-100 mb-1'}>No plugins found</h3>
-                    <p className={'text-sm text-neutral-500'}>Try a different search term or switch source.</p>
-                </div>
-            ) : (
-                <div className={'flex flex-col items-center justify-center py-16'}>
-                    <h3 className={'text-base font-semibold text-neutral-100 mb-1'}>Search for plugins</h3>
-                    <p className={'text-sm text-neutral-500'}>Plugins will be installed directly to your server's <code className={'font-mono text-neutral-400'}>/plugins</code> folder.</p>
-                </div>
-            )}
+            </div>
         </ServerContentBlock>
     );
 };
