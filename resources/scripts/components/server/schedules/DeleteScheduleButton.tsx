@@ -21,7 +21,7 @@ export default ({ scheduleId, onDeleted }: Props) => {
 
     const onDelete = () => {
         setIsLoading(true);
-        clearFlashes('schedules');
+        clearFlashes('automation');
         deleteSchedule(uuid, scheduleId)
             .then(() => {
                 setIsLoading(false);
@@ -30,7 +30,7 @@ export default ({ scheduleId, onDeleted }: Props) => {
             .catch((error) => {
                 console.error(error);
 
-                addError({ key: 'schedules', message: httpErrorToHuman(error) });
+                addError({ key: 'automation', message: httpErrorToHuman(error) });
                 setIsLoading(false);
                 setVisible(false);
             });
@@ -41,7 +41,7 @@ export default ({ scheduleId, onDeleted }: Props) => {
             <Dialog.Confirm
                 open={visible}
                 onClose={() => setVisible(false)}
-                title={'Delete Schedule'}
+                title={'Delete automation'}
                 confirm={'Delete'}
                 onConfirmed={onDelete}
             >

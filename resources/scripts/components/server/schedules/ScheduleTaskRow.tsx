@@ -49,7 +49,7 @@ export default ({ schedule, task }: Props) => {
 
     const onConfirmDeletion = () => {
         setIsLoading(true);
-        clearFlashes('schedules');
+        clearFlashes('automation');
         deleteScheduleTask(uuid, schedule.id, task.id)
             .then(() =>
                 appendSchedule({
@@ -60,7 +60,7 @@ export default ({ schedule, task }: Props) => {
             .catch((error) => {
                 console.error(error);
                 setIsLoading(false);
-                addError({ message: httpErrorToHuman(error), key: 'schedules' });
+                addError({ message: httpErrorToHuman(error), key: 'automation' });
             });
     };
 

@@ -7,6 +7,7 @@ import MetricsContainer from '@/components/server/metrics/MetricsContainer';
 import BackupContainer from '@/components/server/backups/BackupContainer';
 import NetworkContainer from '@/components/server/network/NetworkContainer';
 import StartupSettingsRedirect from '@/components/server/settings/StartupSettingsRedirect';
+import AutomationLegacyRedirect from '@/components/server/schedules/AutomationLegacyRedirect';
 import FileManagerContainer from '@/components/server/files/FileManagerContainer';
 import SettingsContainer from '@/components/server/settings/SettingsContainer';
 import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
@@ -136,16 +137,22 @@ export default {
             component: BackupContainer,
         },
         {
-            path: '/schedules',
+            path: '/automation',
             permission: 'schedule.*',
-            name: 'Tasks',
+            name: 'Automation',
             component: ScheduleContainer,
         },
         {
-            path: '/schedules/:id',
+            path: '/automation/:id',
             permission: 'schedule.*',
             name: undefined,
             component: ScheduleEditContainer,
+        },
+        {
+            path: '/schedules/:id?',
+            permission: 'schedule.*',
+            name: undefined,
+            component: AutomationLegacyRedirect,
         },
         {
             path: '/users',

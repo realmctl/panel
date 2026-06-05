@@ -27,34 +27,34 @@ export default () => {
     const setSchedules = ServerContext.useStoreActions((actions) => actions.schedules.setSchedules);
 
     useEffect(() => {
-        clearFlashes('schedules');
+        clearFlashes('automation');
         getServerSchedules(uuid)
             .then((schedules) => setSchedules(schedules))
             .catch((error) => {
-                addError({ message: httpErrorToHuman(error), key: 'schedules' });
+                addError({ message: httpErrorToHuman(error), key: 'automation' });
                 console.error(error);
             })
             .then(() => setLoading(false));
     }, []);
 
     return (
-        <ServerContentBlock title={'Schedules'}>
-            <FlashMessageRender byKey={'schedules'} css={tw`mb-4`} />
+        <ServerContentBlock title={'Automation'}>
+            <FlashMessageRender byKey={'automation'} css={tw`mb-4`} />
             {!schedules.length && loading ? (
                 <Spinner size={'large'} centered />
             ) : (
                 <>
                     {schedules.length === 0 ? (
                         <div className={'flex flex-col items-center justify-center py-16'}>
-                            <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No schedules yet</h3>
+                            <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No automations yet</h3>
                             <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
-                                Schedules allow you to automate tasks like restarts, backups, and commands at specific times.
+                                Automations let you run restarts, backups, and commands at specific times.
                             </p>
                             <Can action={'schedule.create'}>
                                 <div className={'mt-6'}>
                                     <EditScheduleModal visible={visible} onModalDismissed={() => setVisible(false)} />
                                     <Button type={'button'} onClick={() => setVisible(true)}>
-                                        Create schedule
+                                        Create automation
                                     </Button>
                                 </div>
                             </Can>
@@ -80,7 +80,7 @@ export default () => {
                             <div css={tw`mt-8 flex justify-end`}>
                                 <EditScheduleModal visible={visible} onModalDismissed={() => setVisible(false)} />
                                 <Button type={'button'} onClick={() => setVisible(true)}>
-                                    Create schedule
+                                    Create automation
                                 </Button>
                             </div>
                         )}

@@ -74,7 +74,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
 
     useEffect(() => {
         return () => {
-            clearFlashes('schedule:task');
+            clearFlashes('automation:task');
         };
     }, []);
 
@@ -84,7 +84,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
             setSubmitting(false);
             addError({
                 message: "A backup task cannot be created when the server's backup limit is set to 0.",
-                key: 'schedule:task',
+                key: 'automation:task',
             });
         } else {
             createOrUpdateScheduleTask(uuid, schedule.id, task?.id, values)
@@ -100,7 +100,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                 .catch((error) => {
                     console.error(error);
                     setSubmitting(false);
-                    addError({ message: httpErrorToHuman(error), key: 'schedule:task' });
+                    addError({ message: httpErrorToHuman(error), key: 'automation:task' });
                 });
         }
     };
@@ -118,7 +118,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
         >
             {({ isSubmitting, values }) => (
                 <Form css={tw`m-0`}>
-                    <FlashMessageRender byKey={'schedule:task'} css={tw`mb-4`} />
+                    <FlashMessageRender byKey={'automation:task'} css={tw`mb-4`} />
                     <h2 css={tw`text-2xl mb-6`}>{task ? 'Edit Task' : 'Create Task'}</h2>
                     <div css={tw`flex`}>
                         <div css={tw`mr-2 w-1/3`}>
@@ -137,7 +137,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                                 name={'timeOffset'}
                                 label={'Time offset (in seconds)'}
                                 description={
-                                    'The amount of time to wait after the previous task executes before running this one. If this is the first task on a schedule this will not be applied.'
+                                    'The amount of time to wait after the previous task executes before running this one. If this is the first task in an automation this will not be applied.'
                                 }
                             />
                         </div>

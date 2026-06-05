@@ -74,7 +74,7 @@ return [
     'admin' => 'Admin',
     'subuser' => 'Subuser',
     'captcha_invalid' => 'The provided captcha is invalid.',
-    'tasks' => 'Tasks',
+    'tasks' => 'Automation',
     'seconds' => 'Seconds',
     'minutes' => 'Minutes',
     'under_maintenance' => 'Under Maintenance',

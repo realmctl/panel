@@ -14,7 +14,7 @@ const RunScheduleButton = ({ schedule }: { schedule: Schedule }) => {
     const appendSchedule = ServerContext.useStoreActions((actions) => actions.schedules.appendSchedule);
 
     const onTriggerExecute = useCallback(() => {
-        clearFlashes('schedule');
+        clearFlashes('automation');
         setLoading(true);
         triggerScheduleExecution(id, schedule.id)
             .then(() => {
@@ -23,7 +23,7 @@ const RunScheduleButton = ({ schedule }: { schedule: Schedule }) => {
             })
             .catch((error) => {
                 console.error(error);
-                clearAndAddHttpError({ error, key: 'schedules' });
+                clearAndAddHttpError({ error, key: 'automation' });
             })
             .then(() => setLoading(false));
     }, []);

@@ -63,12 +63,12 @@ export default () => {
             return;
         }
 
-        clearFlashes('schedules');
+        clearFlashes('automation');
         getServerSchedule(uuid, Number(scheduleId))
             .then((schedule) => appendSchedule(schedule))
             .catch((error) => {
                 console.error(error);
-                clearAndAddHttpError({ error, key: 'schedules' });
+                clearAndAddHttpError({ error, key: 'automation' });
             })
             .then(() => setIsLoading(false));
     }, [scheduleId]);
@@ -78,8 +78,8 @@ export default () => {
     }, []);
 
     return (
-        <PageContentBlock title={'Schedules'}>
-            <FlashMessageRender byKey={'schedules'} css={tw`mb-4`} />
+        <PageContentBlock title={'Automation'}>
+            <FlashMessageRender byKey={'automation'} css={tw`mb-4`} />
             {!schedule || isLoading ? (
                 <Spinner size={'large'} centered />
             ) : (
@@ -157,7 +157,7 @@ export default () => {
                         <Can action={'schedule.delete'}>
                             <DeleteScheduleButton
                                 scheduleId={schedule.id}
-                                onDeleted={() => history.push(`/server/${id}/schedules`)}
+                                onDeleted={() => history.push(`/server/${id}/automation`)}
                             />
                         </Can>
                         {schedule.tasks.length > 0 && (
