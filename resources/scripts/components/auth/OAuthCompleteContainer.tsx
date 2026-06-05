@@ -4,6 +4,7 @@ import useFlash from '@/plugins/useFlash';
 import AuthToast from '@/components/auth/AuthToast';
 import AuthFooter from '@/components/auth/AuthFooter';
 import http from '@/api/http';
+import { REALM_LOGO } from '@/lib/branding';
 
 const Spinner = () => (
     <svg className={'animate-spin h-4 w-4 text-white'} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -132,7 +133,7 @@ const OAuthCompleteContainer = ({ history }: RouteComponentProps) => {
             <div className={'w-full max-w-md px-6'}>
                 <div className={'mb-8'}>
                     <img
-                        src={'https://cdn.ordnary.com/realmctl/logo.png'}
+                        src={REALM_LOGO}
                         className={'h-8 mb-6'}
                         alt={'Logo'}
                         style={{ filter: 'brightness(0) invert(1)' }}

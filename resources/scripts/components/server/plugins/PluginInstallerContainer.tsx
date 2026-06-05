@@ -65,6 +65,11 @@ const SOURCES: { id: Source; label: string; description: string; icon: string }[
 const formatNumber = (n: number) =>
     n >= 1_000_000 ? (n / 1_000_000).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
 
+const PLUGIN_SEARCH_CACHE_TTL_MS = 5 * 60 * 1000;
+const pluginSearchCache = new Map<string, { data: (HangarPlugin | ModrinthPlugin)[]; cachedAt: number }>();
+
+const getPluginSearchCacheKey = (src: Source, q: string) => `${src}:${q.trim().toLowerCase()}`;
+
 const PluginFallbackIcon = () => (
     <div
         className={'w-8 h-8 rounded flex items-center justify-center flex-shrink-0 text-xs font-bold'}
@@ -89,8 +94,19 @@ export default () => {
     const activeSource = SOURCES.find((s) => s.id === source)!;
 
     const loadPlugins = useCallback(async (src: Source, q: string) => {
+        const cacheKey = getPluginSearchCacheKey(src, q);
+        const cached = pluginSearchCache.get(cacheKey);
+
+        if (cached && Date.now() - cached.cachedAt < PLUGIN_SEARCH_CACHE_TTL_MS) {
+            setResults(cached.data);
+            setSearching(false);
+            return;
+        }
+
         setSearching(true);
         try {
+            let nextResults: (HangarPlugin | ModrinthPlugin)[] = [];
+
             if (src === 'hangar') {
                 const params = new URLSearchParams({ limit: '20', offset: '0', platform: 'PAPER' });
                 if (q.trim()) {
@@ -100,7 +116,7 @@ export default () => {
                 }
                 const res = await fetch(`https://hangar.papermc.io/api/v1/projects?${params}`);
                 const data = await res.json();
-                setResults(data.result ?? []);
+                nextResults = data.result ?? [];
             } else {
                 const params = new URLSearchParams({
                     limit: '20',
@@ -112,8 +128,11 @@ export default () => {
                 }
                 const res = await fetch(`https://api.modrinth.com/v2/search?${params}`);
                 const data = await res.json();
-                setResults(data.hits ?? []);
+                nextResults = data.hits ?? [];
             }
+
+            pluginSearchCache.set(cacheKey, { data: nextResults, cachedAt: Date.now() });
+            setResults(nextResults);
         } catch (e) {
             console.error(e);
             setResults([]);

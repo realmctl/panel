@@ -5,6 +5,7 @@ export type { ServerGroup };
 
 export interface ServerGroupStore {
     data: ServerGroup[];
+    loaded: boolean;
     setGroups: Action<ServerGroupStore, ServerGroup[]>;
     appendGroup: Action<ServerGroupStore, ServerGroup>;
     updateGroup: Action<ServerGroupStore, ServerGroup>;
@@ -14,9 +15,11 @@ export interface ServerGroupStore {
 
 const serverGroups: ServerGroupStore = {
     data: [],
+    loaded: false,
 
     setGroups: action((state, payload) => {
         state.data = payload;
+        state.loaded = true;
     }),
 
     appendGroup: action((state, payload) => {
@@ -31,7 +34,11 @@ const serverGroups: ServerGroupStore = {
         state.data = state.data.filter((g) => g.uuid !== uuid);
     }),
 
-    fetchGroups: thunk(async (actions) => {
+    fetchGroups: thunk(async (actions, _, { getState }) => {
+        if (getState().loaded) {
+            return;
+        }
+
         const groups = await getServerGroups();
         actions.setGroups(groups);
     }),

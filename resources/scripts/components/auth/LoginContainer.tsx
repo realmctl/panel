@@ -8,6 +8,7 @@ import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import AuthToast from '@/components/auth/AuthToast';
 import AuthFooter from '@/components/auth/AuthFooter';
+import { REALM_LOGO } from '@/lib/branding';
 
 interface Values {
     username: string;
@@ -133,7 +134,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
             <div className={'w-full max-w-md px-6'}>
                 <div className={'mb-8'}>
                     <img
-                        src={'https://cdn.ordnary.com/realmctl/logo.png'}
+                        src={REALM_LOGO}
                         className={'h-8 mb-6'}
                         alt={name}
                         style={{ filter: 'brightness(0) invert(1)' }}

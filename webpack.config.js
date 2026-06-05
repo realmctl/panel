@@ -24,7 +24,9 @@ module.exports = {
     mode: isProduction ? 'production' : 'development',
     devtool: process.env.DEVTOOL || (isProduction ? false : 'eval-source-map'),
     performance: {
-        hints: false,
+        hints: isProduction ? 'warning' : false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000,
     },
     entry: ['react-hot-loader/patch', './resources/scripts/index.tsx'],
     output: {

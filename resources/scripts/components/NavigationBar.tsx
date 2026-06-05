@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useHistory, useRouteMatch } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentDots, faQuestionCircle, faChevronDown, faCogs, faSignOutAlt, faUser, faSearch, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
-import { useStoreState } from 'easy-peasy';
+import { Actions, useStoreActions, useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import debounce from 'debounce';
+import useSWR from 'swr';
 import getServers from '@/api/getServers';
 import { Server } from '@/api/server/getServer';
 import http from '@/api/http';
@@ -13,15 +14,27 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import Avatar from '@/components/Avatar';
 import { ip } from '@/lib/formatters';
 import { ServerContext } from '@/state/server';
+import { REALM_LOGO } from '@/lib/branding';
+
+const SERVER_SWITCHER_CACHE_KEY = '/api/client/servers/switcher';
+const SERVER_SWITCHER_CACHE_MS = 5 * 60 * 1000;
 
 const ServerSwitcher = () => {
     const history = useHistory();
     const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
     const currentServerName = ServerContext.useStoreState((state) => state.server.data?.name) || 'Switch Server';
     const [open, setOpen] = useState(false);
-    const [servers, setServers] = useState<Server[]>([]);
-    const [loaded, setLoaded] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+
+    const { data: servers = [], isValidating } = useSWR<Server[]>(
+        open ? SERVER_SWITCHER_CACHE_KEY : null,
+        async () => (await getServers({ perPage: 50 })).items,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            dedupingInterval: SERVER_SWITCHER_CACHE_MS,
+        }
+    );
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -32,17 +45,6 @@ const ServerSwitcher = () => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-
-    useEffect(() => {
-        if (open && !loaded) {
-            getServers({})
-                .then((result) => {
-                    setServers(result.items);
-                    setLoaded(true);
-                })
-                .catch(() => setServers([]));
-        }
-    }, [open]);
 
     return (
         <div className={'relative ml-4'} ref={ref}>
@@ -60,7 +62,7 @@ const ServerSwitcher = () => {
                     className={'absolute left-0 top-full mt-2 w-72 rounded-lg shadow-lg py-2 z-50 border border-[#2d3338] max-h-80 overflow-y-auto'}
                     style={{ backgroundColor: '#1e2a2f' }}
                 >
-                    {!loaded ? (
+                    {isValidating && servers.length === 0 ? (
                         <div className={'px-4 py-3 text-sm text-neutral-400 text-center'}>Loading...</div>
                     ) : servers.length === 0 ? (
                         <div className={'px-4 py-3 text-sm text-neutral-400 text-center'}>No servers found</div>
@@ -103,6 +105,7 @@ const ServerSwitcher = () => {
 };
 
 export default () => {
+    const fetchGroups = useStoreActions((actions: Actions<ApplicationStore>) => actions.serverGroups.fetchGroups);
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
     const userName = useStoreState((state: ApplicationStore) => state.user.data!.username);
@@ -120,6 +123,10 @@ export default () => {
     // Detect if we're on a server page
     const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
     const isOnServerPage = !!serverMatch;
+
+    useEffect(() => {
+        fetchGroups();
+    }, [fetchGroups]);
 
     const onTriggerLogout = () => {
         setIsLoggingOut(true);
@@ -193,7 +200,7 @@ export default () => {
                         className={'flex items-center no-underline'}
                     >
                         <img
-                            src={'https://cdn.ordnary.com/realmctl/logo.png'}
+                            src={REALM_LOGO}
                             className={'h-6'}
                             alt={name}
                             style={{ filter: 'brightness(0) invert(1)' }}

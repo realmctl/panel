@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'logo' => '<img src="https://cdn.ordnary.com/realmctl/logo.png" alt="Realm" height="32">',
+    'logo' => '<img src="/assets/images/realm-logo.png" alt="Realm" height="32">',
     'logo_img_alt' => 'Realm Panel',
 
     /*

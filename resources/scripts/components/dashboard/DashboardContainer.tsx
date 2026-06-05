@@ -9,7 +9,7 @@ import { ServerGroup } from '@/api/account/serverGroups';
 import Spinner from '@/components/elements/Spinner';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import useFlash from '@/plugins/useFlash';
-import { Actions, useStoreState, useStoreActions } from 'easy-peasy';
+import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import tw from 'twin.macro';
@@ -27,7 +27,6 @@ export default () => {
     const uuid = useStoreState((state: ApplicationStore) => state.user.data!.uuid);
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
     const groups = useStoreState((state: ApplicationStore) => state.serverGroups.data);
-    const fetchGroups = useStoreActions((a: Actions<ApplicationStore>) => a.serverGroups.fetchGroups);
 
     const [showOnlyAdmin, setShowOnlyAdmin] = usePersistedState(`${uuid}:show_all_servers`, false);
     const [layoutRaw, setLayout] = usePersistedState<'grid' | 'list'>(`${uuid}:server_layout`, 'grid');
@@ -40,18 +39,15 @@ export default () => {
     const needsAllServers = hasGroups || modal !== null;
 
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
-        hasGroups ? null : ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
+        ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
         () => getServers({ page, type: serverType })
     );
 
     const { data: allServersList, error: allServersError } = useSWR<Server[]>(
         needsAllServers ? ['/api/client/servers/all', showOnlyAdmin && rootAdmin] : null,
-        () => getAllServers({ type: serverType })
+        () => getAllServers({ type: serverType }),
+        { revalidateOnFocus: false, dedupingInterval: 60_000 }
     );
-
-    useEffect(() => {
-        fetchGroups();
-    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -79,9 +75,10 @@ export default () => {
         setCollapsed((prev) => ({ ...(prev ?? {}), [groupUuid]: !(prev ?? {})[groupUuid] }));
     };
 
-    const allServers = hasGroups ? (allServersList ?? []) : (servers?.items ?? []);
+    const allServers = hasGroups ? (allServersList ?? servers?.items ?? []) : (servers?.items ?? []);
     const modalServers = needsAllServers ? (allServersList ?? servers?.items ?? []) : (servers?.items ?? []);
-    const isLoading = hasGroups ? !allServersList : !servers;
+    const isLoading = !servers;
+    const isLoadingAllServers = hasGroups && !allServersList;
 
     // Partition servers into groups + ungrouped.
     const groupedServers = groups.map((group) => ({
@@ -197,8 +194,12 @@ export default () => {
                     {showOnlyAdmin ? 'There are no other servers to display.' : 'There are no servers associated with your account.'}
                 </p>
             ) : hasGroups ? (
-                /* Grouped view — no pagination wrapper, all servers already loaded */
                 <>
+                    {isLoadingAllServers && (
+                        <p css={tw`text-center text-xs text-neutral-500 mb-4`}>
+                            Loading all servers for groups…
+                        </p>
+                    )}
                     {groupedServers
                         .filter(({ servers }) => servers.length > 0)
                         .map(({ group, servers }) => (

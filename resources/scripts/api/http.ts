@@ -17,9 +17,40 @@ if (process.env.MOCK_SERVERS === 'true') {
     enableMockServers(http);
 }
 
-http.interceptors.request.use((req) => {
-    if (!req.url?.endsWith('/resources')) {
+let pendingRequests = 0;
+
+const shouldTrackProgress = (url?: string, method?: string) => {
+    if (!url || url.endsWith('/resources')) {
+        return false;
+    }
+
+    // Background server-list fetches should not animate the global progress bar.
+    if (method?.toLowerCase() === 'get' && (url === '/api/client' || url.startsWith('/api/client?'))) {
+        return false;
+    }
+
+    return true;
+};
+
+const startProgress = () => {
+    pendingRequests++;
+
+    if (pendingRequests === 1) {
         store.getActions().progress.startContinuous();
+    }
+};
+
+const finishProgress = () => {
+    pendingRequests = Math.max(0, pendingRequests - 1);
+
+    if (pendingRequests === 0) {
+        store.getActions().progress.setComplete();
+    }
+};
+
+http.interceptors.request.use((req) => {
+    if (shouldTrackProgress(req.url, req.method)) {
+        startProgress();
     }
 
     return req;
@@ -27,14 +58,16 @@ http.interceptors.request.use((req) => {
 
 http.interceptors.response.use(
     (resp) => {
-        if (!resp.request?.url?.endsWith('/resources')) {
-            store.getActions().progress.setComplete();
+        if (shouldTrackProgress(resp.config?.url, resp.config?.method)) {
+            finishProgress();
         }
 
         return resp;
     },
     (error) => {
-        store.getActions().progress.setComplete();
+        if (shouldTrackProgress(error.config?.url, error.config?.method)) {
+            finishProgress();
+        }
 
         throw error;
     }
