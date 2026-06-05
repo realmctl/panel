@@ -29,6 +29,7 @@ export interface Task {
     timeOffset: number;
     isQueued: boolean;
     continueOnFailure: boolean;
+    condition: string | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -41,6 +42,7 @@ export const rawDataToServerTask = (data: any): Task => ({
     timeOffset: data.time_offset,
     isQueued: data.is_queued,
     continueOnFailure: data.continue_on_failure,
+    condition: data.condition || null,
     createdAt: new Date(data.created_at),
     updatedAt: new Date(data.updated_at),
 });

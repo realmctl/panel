@@ -33,6 +33,7 @@ use Pterodactyl\Contracts\Extensions\HashidsInterface;
  * @property string $hashid
  * @property Server $server
  * @property Collection<int, Task> $tasks
+ * @property Collection<int, ScheduleRun> $runs
  */
 class Schedule extends Model
 {
@@ -143,6 +144,14 @@ class Schedule extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
+    }
+
+    /**
+     * @return HasMany<ScheduleRun, $this>
+     */
+    public function runs(): HasMany
+    {
+        return $this->hasMany(ScheduleRun::class)->orderByDesc('created_at');
     }
 
     /**

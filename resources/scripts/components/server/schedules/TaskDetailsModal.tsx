@@ -20,8 +20,6 @@ import FormikSwitch from '@/components/elements/FormikSwitch';
 
 interface Props {
     schedule: Schedule;
-    // If a task is provided we can assume we're editing it. If not provided,
-    // we are creating a new one.
     task?: Task;
 }
 
@@ -30,16 +28,18 @@ interface Values {
     payload: string;
     timeOffset: string;
     continueOnFailure: boolean;
+    condition: string;
 }
 
 const schema = object().shape({
-    action: string().required().oneOf(['command', 'power', 'backup']),
+    action: string().required(),
     payload: string().when('action', {
-        is: (v) => v !== 'backup',
+        is: (v: string) => !['backup', 'delete_files'].includes(v),
         then: string().required('A task payload must be provided.'),
         otherwise: string(),
     }),
     continueOnFailure: boolean(),
+    condition: string().nullable(),
     timeOffset: number()
         .typeError('The time offset must be a valid number between 0 and 900.')
         .required('A time offset value must be provided.')
@@ -53,7 +53,15 @@ const ActionListener = () => {
 
     useEffect(() => {
         if (value !== initialAction) {
-            setValue(value === 'power' ? 'start' : '');
+            const defaults: Record<string, string> = {
+                power: 'start',
+                webhook: JSON.stringify({ url: '', method: 'POST', body: { content: 'Automation task completed.' } }, null, 2),
+                email: JSON.stringify({ subject: 'Automation notification', body: 'An automation task ran on your server.' }, null, 2),
+                command: '',
+                backup: '',
+                delete_files: '',
+            };
+            setValue(defaults[value] ?? '');
             setTouched(false);
         } else {
             setValue(initialPayload || '');
@@ -79,29 +87,116 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
     }, []);
 
     const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
-        clearFlashes('schedule:task');
+        clearFlashes('automation:task');
         if (backupLimit === 0 && values.action === 'backup') {
             setSubmitting(false);
             addError({
                 message: "A backup task cannot be created when the server's backup limit is set to 0.",
                 key: 'automation:task',
             });
-        } else {
-            createOrUpdateScheduleTask(uuid, schedule.id, task?.id, values)
-                .then((task) => {
-                    let tasks = schedule.tasks.map((t) => (t.id === task.id ? task : t));
-                    if (!schedule.tasks.find((t) => t.id === task.id)) {
-                        tasks = [...tasks, task];
-                    }
+            return;
+        }
 
-                    appendSchedule({ ...schedule, tasks });
-                    dismiss();
-                })
-                .catch((error) => {
-                    console.error(error);
-                    setSubmitting(false);
-                    addError({ message: httpErrorToHuman(error), key: 'automation:task' });
-                });
+        createOrUpdateScheduleTask(uuid, schedule.id, task?.id, {
+            action: values.action,
+            payload: values.payload,
+            timeOffset: values.timeOffset,
+            continueOnFailure: values.continueOnFailure,
+            condition: values.condition || null,
+        })
+            .then((savedTask) => {
+                let tasks = schedule.tasks.map((t) => (t.id === savedTask.id ? savedTask : t));
+                if (!schedule.tasks.find((t) => t.id === savedTask.id)) {
+                    tasks = [...tasks, savedTask];
+                }
+
+                appendSchedule({ ...schedule, tasks });
+                dismiss();
+            })
+            .catch((error) => {
+                console.error(error);
+                setSubmitting(false);
+                addError({ message: httpErrorToHuman(error), key: 'automation:task' });
+            });
+    };
+
+    const renderPayload = (action: string) => {
+        switch (action) {
+            case 'command':
+                return (
+                    <div>
+                        <Label>Payload</Label>
+                        <FormikFieldWrapper name={'payload'}>
+                            <FormikField as={Textarea} name={'payload'} rows={6} />
+                        </FormikFieldWrapper>
+                    </div>
+                );
+            case 'power':
+                return (
+                    <div>
+                        <Label>Payload</Label>
+                        <FormikFieldWrapper name={'payload'}>
+                            <FormikField as={Select} name={'payload'}>
+                                <option value={'start'}>Start the server</option>
+                                <option value={'restart'}>Restart the server</option>
+                                <option value={'stop'}>Stop the server</option>
+                                <option value={'kill'}>Terminate the server</option>
+                            </FormikField>
+                        </FormikFieldWrapper>
+                    </div>
+                );
+            case 'backup':
+                return (
+                    <div>
+                        <Label>Ignored Files</Label>
+                        <FormikFieldWrapper
+                            name={'payload'}
+                            description={
+                                'Optional. Include the files and folders to be excluded in this backup. By default, the contents of your .pteroignore file will be used. If you have reached your backup limit, the oldest backup will be rotated.'
+                            }
+                        >
+                            <FormikField as={Textarea} name={'payload'} rows={6} />
+                        </FormikFieldWrapper>
+                    </div>
+                );
+            case 'webhook':
+                return (
+                    <div>
+                        <Label>Webhook JSON</Label>
+                        <FormikFieldWrapper
+                            name={'payload'}
+                            description={'JSON with url (required), optional method, headers, and body fields.'}
+                        >
+                            <FormikField as={Textarea} name={'payload'} rows={8} />
+                        </FormikFieldWrapper>
+                    </div>
+                );
+            case 'email':
+                return (
+                    <div>
+                        <Label>Email JSON</Label>
+                        <FormikFieldWrapper
+                            name={'payload'}
+                            description={'JSON with subject and body fields. Sent to the server owner.'}
+                        >
+                            <FormikField as={Textarea} name={'payload'} rows={6} />
+                        </FormikFieldWrapper>
+                    </div>
+                );
+            case 'delete_files':
+                return (
+                    <div>
+                        <Label>File paths</Label>
+                        <FormikFieldWrapper
+                            name={'payload'}
+                            description={'One file or folder path per line, relative to /.'}
+                        >
+                            <FormikField as={Textarea} name={'payload'} rows={6} />
+                        </FormikFieldWrapper>
+                    </div>
+                );
+            default:
+                return null;
         }
     };
 
@@ -114,6 +209,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                 payload: task?.payload || '',
                 timeOffset: task?.timeOffset.toString() || '0',
                 continueOnFailure: task?.continueOnFailure || false,
+                condition: task?.condition || '',
             }}
         >
             {({ isSubmitting, values }) => (
@@ -129,6 +225,9 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                                     <option value={'command'}>Send command</option>
                                     <option value={'power'}>Send power action</option>
                                     <option value={'backup'}>Create backup</option>
+                                    <option value={'webhook'}>Send webhook</option>
+                                    <option value={'email'}>Send email</option>
+                                    <option value={'delete_files'}>Delete files</option>
                                 </FormikField>
                             </FormikFieldWrapper>
                         </div>
@@ -143,39 +242,19 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                         </div>
                     </div>
                     <div css={tw`mt-6`}>
-                        {values.action === 'command' ? (
-                            <div>
-                                <Label>Payload</Label>
-                                <FormikFieldWrapper name={'payload'}>
-                                    <FormikField as={Textarea} name={'payload'} rows={6} />
-                                </FormikFieldWrapper>
-                            </div>
-                        ) : values.action === 'power' ? (
-                            <div>
-                                <Label>Payload</Label>
-                                <FormikFieldWrapper name={'payload'}>
-                                    <FormikField as={Select} name={'payload'}>
-                                        <option value={'start'}>Start the server</option>
-                                        <option value={'restart'}>Restart the server</option>
-                                        <option value={'stop'}>Stop the server</option>
-                                        <option value={'kill'}>Terminate the server</option>
-                                    </FormikField>
-                                </FormikFieldWrapper>
-                            </div>
-                        ) : (
-                            <div>
-                                <Label>Ignored Files</Label>
-                                <FormikFieldWrapper
-                                    name={'payload'}
-                                    description={
-                                        'Optional. Include the files and folders to be excluded in this backup. By default, the contents of your .pteroignore file will be used. If you have reached your backup limit, the oldest backup will be rotated.'
-                                    }
-                                >
-                                    <FormikField as={Textarea} name={'payload'} rows={6} />
-                                </FormikFieldWrapper>
-                            </div>
-                        )}
+                        <Label>Condition</Label>
+                        <FormikFieldWrapper
+                            name={'condition'}
+                            description={'Optional. Skip this task when the condition is not met.'}
+                        >
+                            <FormikField as={Select} name={'condition'}>
+                                <option value={''}>No condition</option>
+                                <option value={'require_online'}>Only when server is online</option>
+                                <option value={'require_backup_capacity'}>Only when backup capacity available</option>
+                            </FormikField>
+                        </FormikFieldWrapper>
                     </div>
+                    <div css={tw`mt-6`}>{renderPayload(values.action)}</div>
                     <div css={tw`mt-6 bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
                         <FormikSwitch
                             name={'continueOnFailure'}

@@ -17,14 +17,21 @@ use Pterodactyl\Helpers\Utilities;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Repositories\Eloquent\ScheduleRepository;
 use Pterodactyl\Services\Schedules\ProcessScheduleService;
+use Pterodactyl\Models\Task;
+use Pterodactyl\Services\Schedules\TaskActionRegistry;
 use Pterodactyl\Transformers\Api\Client\ScheduleTransformer;
+use Pterodactyl\Transformers\Api\Client\ScheduleRunTransformer;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\ViewScheduleRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\StoreScheduleRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\ImportScheduleRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\DuplicateScheduleRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\DeleteScheduleRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\UpdateScheduleRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\TriggerScheduleRequest;
+use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
 
 class ScheduleController extends ClientApiController
 {
@@ -164,6 +171,168 @@ class ScheduleController extends ClientApiController
         Activity::event('server:schedule.delete')->subject($schedule)->property('name', $schedule->name)->log();
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    public function actions(ViewScheduleRequest $request, Server $server): array
+    {
+        return ['data' => app(TaskActionRegistry::class)->toArray()];
+    }
+
+    public function runs(ViewScheduleRequest $request, Server $server, Schedule $schedule): array
+    {
+        if ($schedule->server_id !== $server->id) {
+            throw new NotFoundHttpException();
+        }
+
+        $runs = $schedule->runs()
+            ->with('runTasks')
+            ->paginate(15);
+
+        return $this->fractal->collection($runs)
+            ->transformWith($this->getTransformer(ScheduleRunTransformer::class))
+            ->toArray();
+    }
+
+    public function export(ViewScheduleRequest $request, Server $server, Schedule $schedule): JsonResponse
+    {
+        if ($schedule->server_id !== $server->id) {
+            throw new NotFoundHttpException();
+        }
+
+        $schedule->loadMissing('tasks');
+
+        return new JsonResponse([
+            'name' => $schedule->name,
+            'cron' => [
+                'minute' => $schedule->cron_minute,
+                'hour' => $schedule->cron_hour,
+                'day_of_month' => $schedule->cron_day_of_month,
+                'month' => $schedule->cron_month,
+                'day_of_week' => $schedule->cron_day_of_week,
+            ],
+            'only_when_online' => $schedule->only_when_online,
+            'is_active' => $schedule->is_active,
+            'tasks' => $schedule->tasks->map(fn (Task $task) => [
+                'action' => $task->action,
+                'payload' => $task->payload,
+                'time_offset' => $task->time_offset,
+                'continue_on_failure' => $task->continue_on_failure,
+                'condition' => $task->condition,
+            ])->values(),
+        ]);
+    }
+
+    public function duplicate(DuplicateScheduleRequest $request, Server $server, Schedule $schedule): array
+    {
+        if ($schedule->server_id !== $server->id) {
+            throw new NotFoundHttpException();
+        }
+
+        $schedule->loadMissing('tasks');
+
+        /** @var Schedule $model */
+        $model = $this->repository->create([
+            'server_id' => $server->id,
+            'name' => $schedule->name . ' (copy)',
+            'cron_day_of_week' => $schedule->cron_day_of_week,
+            'cron_month' => $schedule->cron_month,
+            'cron_day_of_month' => $schedule->cron_day_of_month,
+            'cron_hour' => $schedule->cron_hour,
+            'cron_minute' => $schedule->cron_minute,
+            'is_active' => false,
+            'only_when_online' => $schedule->only_when_online,
+            'next_run_at' => $schedule->getNextRunDate(),
+        ]);
+
+        foreach ($schedule->tasks as $task) {
+            $model->tasks()->create([
+                'sequence_id' => $task->sequence_id,
+                'action' => $task->action,
+                'payload' => $task->payload,
+                'time_offset' => $task->time_offset,
+                'continue_on_failure' => $task->continue_on_failure,
+                'condition' => $task->condition,
+            ]);
+        }
+
+        Activity::event('server:schedule.create')->subject($model)->property('name', $model->name)->log();
+
+        return $this->fractal->item($model->load('tasks'))
+            ->transformWith($this->getTransformer(ScheduleTransformer::class))
+            ->toArray();
+    }
+
+    public function import(ImportScheduleRequest $request, Server $server): array
+    {
+        $template = $request->input('template', []);
+        if (!is_array($template) || empty($template['name']) || empty($template['cron']) || empty($template['tasks'])) {
+            throw new DisplayException('Invalid automation template provided.');
+        }
+
+        $cron = $template['cron'];
+
+        /** @var Schedule $model */
+        $model = $this->repository->create([
+            'server_id' => $server->id,
+            'name' => $template['name'],
+            'cron_day_of_week' => $cron['day_of_week'] ?? '*',
+            'cron_month' => $cron['month'] ?? '*',
+            'cron_day_of_month' => $cron['day_of_month'] ?? '*',
+            'cron_hour' => $cron['hour'] ?? '*',
+            'cron_minute' => $cron['minute'] ?? '*/5',
+            'is_active' => (bool) ($template['is_active'] ?? false),
+            'only_when_online' => (bool) ($template['only_when_online'] ?? true),
+            'next_run_at' => Utilities::getScheduleNextRunDate(
+                $cron['minute'] ?? '*/5',
+                $cron['hour'] ?? '*',
+                $cron['day_of_month'] ?? '*',
+                $cron['month'] ?? '*',
+                $cron['day_of_week'] ?? '*',
+            ),
+        ]);
+
+        foreach (array_values($template['tasks']) as $index => $taskData) {
+            $model->tasks()->create([
+                'sequence_id' => $index + 1,
+                'action' => $taskData['action'],
+                'payload' => $taskData['payload'] ?? '',
+                'time_offset' => $taskData['time_offset'] ?? 0,
+                'continue_on_failure' => (bool) ($taskData['continue_on_failure'] ?? false),
+                'condition' => $taskData['condition'] ?? null,
+            ]);
+        }
+
+        Activity::event('server:schedule.create')->subject($model)->property('name', $model->name)->log();
+
+        return $this->fractal->item($model->load('tasks'))
+            ->transformWith($this->getTransformer(ScheduleTransformer::class))
+            ->toArray();
+    }
+
+    public function bulkUpdate(ClientApiRequest $request, Server $server): JsonResponse
+    {
+        if (!$request->user()->can(\Pterodactyl\Models\Permission::ACTION_SCHEDULE_UPDATE, $server)) {
+            throw new HttpForbiddenException('You do not have permission to perform this action.');
+        }
+
+        $ids = $request->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            throw new DisplayException('At least one schedule ID must be provided.');
+        }
+
+        $data = [];
+        if ($request->has('is_active')) {
+            $data['is_processing'] = false;
+            $data['is_active'] = (bool) $request->input('is_active');
+        }
+
+        if (empty($data)) {
+            throw new DisplayException('No valid bulk update fields were provided.');
+        }
+
+        $server->schedules()->whereIn('id', $ids)->update($data);
+
+        return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
 
     /**

@@ -19,6 +19,7 @@ use Pterodactyl\Contracts\Extensions\HashidsInterface;
  * @property int $time_offset
  * @property bool $is_queued
  * @property bool $continue_on_failure
+ * @property string|null $condition
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $hashid
@@ -43,6 +44,12 @@ class Task extends Model
     public const ACTION_POWER = 'power';
     public const ACTION_COMMAND = 'command';
     public const ACTION_BACKUP = 'backup';
+    public const ACTION_WEBHOOK = 'webhook';
+    public const ACTION_EMAIL = 'email';
+    public const ACTION_DELETE_FILES = 'delete_files';
+
+    public const CONDITION_REQUIRE_ONLINE = 'require_online';
+    public const CONDITION_REQUIRE_BACKUP_CAPACITY = 'require_backup_capacity';
 
     /**
      * The table associated with the model.
@@ -65,6 +72,7 @@ class Task extends Model
         'time_offset',
         'is_queued',
         'continue_on_failure',
+        'condition',
     ];
 
     /**
@@ -92,7 +100,8 @@ class Task extends Model
         'schedule_id' => 'required|numeric|exists:schedules,id',
         'sequence_id' => 'required|numeric|min:1',
         'action' => 'required|string',
-        'payload' => 'required_unless:action,backup|string',
+        'payload' => 'nullable|string',
+        'condition' => 'nullable|string|in:require_online,require_backup_capacity',
         'time_offset' => 'required|numeric|between:0,900',
         'is_queued' => 'boolean',
         'continue_on_failure' => 'boolean',

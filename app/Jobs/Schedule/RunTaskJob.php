@@ -2,18 +2,19 @@
 
 namespace Pterodactyl\Jobs\Schedule;
 
-use InvalidArgumentException;
 use Exception;
 use Throwable;
 use Carbon\CarbonImmutable;
 use Pterodactyl\Models\Task;
 use Illuminate\Bus\Queueable;
+use Pterodactyl\Models\ScheduleRun;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Pterodactyl\Services\Backups\InitiateBackupService;
-use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
-use Pterodactyl\Repositories\Wings\DaemonCommandRepository;
+use Pterodactyl\Events\Schedule\ScheduleTaskExecuted;
+use Pterodactyl\Services\Schedules\ScheduleRunService;
+use Pterodactyl\Services\Schedules\TaskActionRegistry;
+use Pterodactyl\Services\Schedules\TaskConditionEvaluator;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 class RunTaskJob implements ShouldQueue
@@ -22,62 +23,69 @@ class RunTaskJob implements ShouldQueue
     use DispatchesJobs;
     use SerializesModels;
 
-    /**
-     * RunTaskJob constructor.
-     */
-    public function __construct(public Task $task, public bool $manualRun = false)
-    {
+    public function __construct(
+        public Task $task,
+        public bool $manualRun = false,
+        public ?int $scheduleRunId = null,
+    ) {
         $this->queue = 'standard';
     }
 
     /**
-     * Run the job and send actions to the daemon running the server.
-     *
      * @throws Throwable
      */
     public function handle(
-        DaemonCommandRepository $commandRepository,
-        InitiateBackupService $backupService,
-        DaemonPowerRepository $powerRepository,
-    ) {
-        // Do not process a task that is not set to active, unless it's been manually triggered.
+        TaskActionRegistry $actionRegistry,
+        TaskConditionEvaluator $conditionEvaluator,
+        ScheduleRunService $runService,
+    ): void {
         if (!$this->task->schedule->is_active && !$this->manualRun) {
             $this->markTaskNotQueued();
-            $this->markScheduleComplete();
+            $this->markScheduleComplete($runService, ScheduleRun::STATUS_SKIPPED);
 
             return;
         }
 
         $server = $this->task->server;
-        // If we made it to this point and the server status is not null it means the
-        // server was likely suspended or marked as reinstalling after the schedule
-        // was queued up. Just end the task right now — this should be a very rare
-        // condition.
         if (!is_null($server->status)) {
             $this->failed();
 
             return;
         }
 
-        // Perform the provided task against the daemon.
+        $run = $this->scheduleRunId ? ScheduleRun::query()->find($this->scheduleRunId) : null;
+        $runTask = $run ? $runService->markTaskRunning($run, $this->task->id) : null;
+
+        $skipReason = $conditionEvaluator->shouldSkip($server, $this->task);
+        if ($skipReason) {
+            if ($runTask) {
+                $runService->markTaskSkipped($runTask, $skipReason);
+                event(new ScheduleTaskExecuted($runTask->refresh(), true));
+            }
+
+            $this->markTaskNotQueued();
+            $this->queueNextTask();
+
+            return;
+        }
+
         try {
-            switch ($this->task->action) {
-                case Task::ACTION_POWER:
-                    $powerRepository->setServer($server)->send($this->task->payload);
-                    break;
-                case Task::ACTION_COMMAND:
-                    $commandRepository->setServer($server)->send($this->task->payload);
-                    break;
-                case Task::ACTION_BACKUP:
-                    $backupService->setIgnoredFiles(explode(PHP_EOL, $this->task->payload))->handle($server, null, true);
-                    break;
-                default:
-                    throw new InvalidArgumentException('Invalid task action provided: ' . $this->task->action);
+            $actionRegistry->get($this->task->action)->execute($server, $this->task);
+
+            if ($runTask) {
+                $runService->markTaskCompleted($runTask);
+                event(new ScheduleTaskExecuted($runTask->refresh(), true));
             }
         } catch (Exception $exception) {
-            // If this isn't a DaemonConnectionException on a task that allows for failures
-            // throw the exception back up the chain so that the task is stopped.
+            if ($runTask) {
+                $runService->markTaskFailed($runTask, $exception->getMessage());
+                event(new ScheduleTaskExecuted($runTask->refresh(), false));
+            }
+
             if (!($this->task->continue_on_failure && $exception instanceof DaemonConnectionException)) {
+                $this->markTaskNotQueued();
+                $this->markScheduleComplete($runService, ScheduleRun::STATUS_FAILED, $exception->getMessage());
+
                 throw $exception;
             }
         }
@@ -86,19 +94,30 @@ class RunTaskJob implements ShouldQueue
         $this->queueNextTask();
     }
 
-    /**
-     * Handle a failure while sending the action to the daemon or otherwise processing the job.
-     */
-    public function failed(?Exception $exception = null)
+    public function failed(?Exception $exception = null): void
     {
+        $runService = app(ScheduleRunService::class);
+
+        if ($this->scheduleRunId) {
+            $run = ScheduleRun::query()->find($this->scheduleRunId);
+            if ($run) {
+                $runTask = $run->runTasks()->where('task_id', $this->task->id)->first();
+                if ($runTask && $runTask->status === \Pterodactyl\Models\ScheduleRunTask::STATUS_RUNNING) {
+                    $runService->markTaskFailed($runTask, $exception?->getMessage() ?? 'Task failed.');
+                }
+
+                $runService->completeRun($run, ScheduleRun::STATUS_FAILED, $exception?->getMessage());
+            }
+        }
+
         $this->markTaskNotQueued();
-        $this->markScheduleComplete();
+        $this->task->schedule()->update([
+            'is_processing' => false,
+            'last_run_at' => CarbonImmutable::now()->toDateTimeString(),
+        ]);
     }
 
-    /**
-     * Get the next task in the schedule and queue it for running after the defined period of wait time.
-     */
-    private function queueNextTask()
+    private function queueNextTask(): void
     {
         /** @var Task|null $nextTask */
         $nextTask = Task::query()->where('schedule_id', $this->task->schedule_id)
@@ -107,31 +126,38 @@ class RunTaskJob implements ShouldQueue
             ->first();
 
         if (is_null($nextTask)) {
-            $this->markScheduleComplete();
+            $runService = app(ScheduleRunService::class);
+            $this->markScheduleComplete($runService);
 
             return;
         }
 
         $nextTask->update(['is_queued' => true]);
 
-        $this->dispatch((new self($nextTask, $this->manualRun))->delay($nextTask->time_offset));
+        $this->dispatch((new self($nextTask, $this->manualRun, $this->scheduleRunId))->delay($nextTask->time_offset));
     }
 
-    /**
-     * Marks the parent schedule as being complete.
-     */
-    private function markScheduleComplete()
-    {
+    private function markScheduleComplete(
+        ?ScheduleRunService $runService = null,
+        string $status = ScheduleRun::STATUS_COMPLETED,
+        ?string $error = null,
+    ): void {
+        $runService ??= app(ScheduleRunService::class);
+
+        if ($this->scheduleRunId) {
+            $run = ScheduleRun::query()->find($this->scheduleRunId);
+            if ($run) {
+                $runService->completeRun($run, $status, $error);
+            }
+        }
+
         $this->task->schedule()->update([
             'is_processing' => false,
             'last_run_at' => CarbonImmutable::now()->toDateTimeString(),
         ]);
     }
 
-    /**
-     * Mark a specific task as no longer being queued.
-     */
-    private function markTaskNotQueued()
+    private function markTaskNotQueued(): void
     {
         $this->task->update(['is_queued' => false]);
     }

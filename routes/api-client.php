@@ -115,13 +115,21 @@ Route::group([
 
     Route::group(['prefix' => '/schedules'], function () {
         Route::get('/', [Client\Servers\ScheduleController::class, 'index']);
+        Route::get('/actions', [Client\Servers\ScheduleController::class, 'actions']);
+        Route::post('/bulk', [Client\Servers\ScheduleController::class, 'bulkUpdate']);
         Route::middleware([ResourceLimit::Schedule->middleware()])
             ->post('/', [Client\Servers\ScheduleController::class, 'store']);
+        Route::middleware([ResourceLimit::Schedule->middleware()])
+            ->post('/import', [Client\Servers\ScheduleController::class, 'import']);
         Route::get('/{schedule}', [Client\Servers\ScheduleController::class, 'view']);
         Route::post('/{schedule}', [Client\Servers\ScheduleController::class, 'update']);
         Route::post('/{schedule}/execute', [Client\Servers\ScheduleController::class, 'execute']);
         Route::delete('/{schedule}', [Client\Servers\ScheduleController::class, 'delete']);
+        Route::get('/{schedule}/runs', [Client\Servers\ScheduleController::class, 'runs']);
+        Route::get('/{schedule}/export', [Client\Servers\ScheduleController::class, 'export']);
+        Route::post('/{schedule}/duplicate', [Client\Servers\ScheduleController::class, 'duplicate']);
 
+        Route::post('/{schedule}/tasks/reorder', [Client\Servers\ScheduleTaskController::class, 'reorder']);
         Route::post('/{schedule}/tasks', [Client\Servers\ScheduleTaskController::class, 'store']);
         Route::post('/{schedule}/tasks/{task}', [Client\Servers\ScheduleTaskController::class, 'update']);
         Route::delete('/{schedule}/tasks/{task}', [Client\Servers\ScheduleTaskController::class, 'delete']);

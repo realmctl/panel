@@ -82,6 +82,7 @@ class ScheduleTaskController extends ClientApiController
                 'payload' => $request->input('payload') ?? '',
                 'time_offset' => $request->input('time_offset'),
                 'continue_on_failure' => $request->boolean('continue_on_failure'),
+                'condition' => $request->input('condition'),
             ]);
         });
 
@@ -137,6 +138,7 @@ class ScheduleTaskController extends ClientApiController
                 'payload' => $request->input('payload') ?? '',
                 'time_offset' => $request->input('time_offset'),
                 'continue_on_failure' => $request->boolean('continue_on_failure'),
+                'condition' => $request->input('condition'),
             ]);
         });
 
@@ -174,5 +176,43 @@ class ScheduleTaskController extends ClientApiController
         Activity::event('server:task.delete')->subject($schedule, $task)->property('name', $schedule->name)->log();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Reorder tasks in a schedule by providing task IDs in the desired sequence.
+     */
+    public function reorder(ClientApiRequest $request, Server $server, Schedule $schedule): array
+    {
+        if ($schedule->server_id !== $server->id) {
+            throw new NotFoundHttpException();
+        }
+
+        if (!$request->user()->can(Permission::ACTION_SCHEDULE_UPDATE, $server)) {
+            throw new HttpForbiddenException('You do not have permission to perform this action.');
+        }
+
+        $order = $request->input('order', []);
+        if (!is_array($order) || empty($order)) {
+            throw new HttpForbiddenException('A valid task order array must be provided.');
+        }
+
+        $tasks = $schedule->tasks()->get()->keyBy('id');
+        if ($tasks->count() !== count($order) || $tasks->keys()->diff($order)->isNotEmpty()) {
+            throw new HttpForbiddenException('Task order must include every task in the schedule exactly once.');
+        }
+
+        $this->connection->transaction(function () use ($order, $tasks) {
+            foreach (array_values($order) as $index => $taskId) {
+                /** @var Task $task */
+                $task = $tasks->get((int) $taskId);
+                $task->update(['sequence_id' => $index + 1]);
+            }
+        });
+
+        $schedule->load('tasks');
+
+        return $this->fractal->collection($schedule->tasks)
+            ->transformWith($this->getTransformer(TaskTransformer::class))
+            ->toArray();
     }
 }

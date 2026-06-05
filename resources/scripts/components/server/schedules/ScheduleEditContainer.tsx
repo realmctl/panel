@@ -17,6 +17,11 @@ import isEqual from 'react-fast-compare';
 import { format } from 'date-fns';
 import ScheduleCronRow from '@/components/server/schedules/ScheduleCronRow';
 import RunScheduleButton from '@/components/server/schedules/RunScheduleButton';
+import ScheduleRunHistory from '@/components/server/schedules/ScheduleRunHistory';
+import useSchedulePolling from '@/components/server/schedules/useSchedulePolling';
+import duplicateSchedule from '@/api/server/schedules/duplicateSchedule';
+import exportSchedule from '@/api/server/schedules/exportSchedule';
+import { httpErrorToHuman } from '@/api/http';
 
 interface Params {
     id: string;
@@ -47,15 +52,25 @@ export default () => {
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
 
-    const { clearFlashes, clearAndAddHttpError } = useFlash();
+    const { clearFlashes, clearAndAddHttpError, addError, addFlash } = useFlash();
     const [isLoading, setIsLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [activeTab, setActiveTab] = useState<'tasks' | 'history'>('tasks');
 
     const schedule = ServerContext.useStoreState(
         (st) => st.schedules.data.find((s) => s.id === Number(scheduleId)),
         isEqual
     );
     const appendSchedule = ServerContext.useStoreActions((actions) => actions.schedules.appendSchedule);
+
+    const onScheduleUpdate = useCallback(
+        (updated: NonNullable<typeof schedule>) => {
+            appendSchedule(updated);
+        },
+        [appendSchedule]
+    );
+
+    useSchedulePolling(uuid, Number(scheduleId), !!schedule?.isProcessing, onScheduleUpdate);
 
     useEffect(() => {
         if (schedule?.id === Number(scheduleId)) {
@@ -76,6 +91,32 @@ export default () => {
     const toggleEditModal = useCallback(() => {
         setShowEditModal((s) => !s);
     }, []);
+
+    const onDuplicate = () => {
+        duplicateSchedule(uuid, Number(scheduleId))
+            .then((copy) => {
+                appendSchedule(copy);
+                history.push(`/server/${id}/automation/${copy.id}`);
+            })
+            .catch((error) => addError({ message: httpErrorToHuman(error), key: 'automation' }));
+    };
+
+    const onExport = () => {
+        exportSchedule(uuid, Number(scheduleId))
+            .then((template) => {
+                const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${schedule?.name || 'automation'}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                addFlash({ type: 'success', key: 'automation', message: 'Automation exported.' });
+            })
+            .catch((error) => addError({ message: httpErrorToHuman(error), key: 'automation' }));
+    };
+
+    const sortedTasks = schedule ? [...schedule.tasks].sort((a, b) => a.sequenceId - b.sequenceId) : [];
 
     return (
         <PageContentBlock title={'Automation'}>
@@ -120,10 +161,16 @@ export default () => {
                                     </span>
                                 </p>
                             </div>
-                            <div css={tw`flex sm:block mt-3 sm:mt-0`}>
+                            <div css={tw`flex sm:block mt-3 sm:mt-0 gap-2`}>
                                 <Can action={'schedule.update'}>
                                     <Button.Text className={'flex-1 mr-4'} onClick={toggleEditModal}>
                                         Edit
+                                    </Button.Text>
+                                    <Button.Text className={'mr-4'} onClick={onDuplicate}>
+                                        Duplicate
+                                    </Button.Text>
+                                    <Button.Text className={'mr-4'} onClick={onExport}>
+                                        Export
                                     </Button.Text>
                                     <NewTaskButton schedule={schedule} />
                                 </Can>
@@ -136,21 +183,47 @@ export default () => {
                             <CronBox title={'Month'} value={schedule.cron.month} />
                             <CronBox title={'Day (Week)'} value={schedule.cron.dayOfWeek} />
                         </div>
-                        <div css={tw`bg-neutral-700 rounded-b`}>
-                            {schedule.tasks.length > 0
-                                ? schedule.tasks
-                                      .sort((a, b) =>
-                                          a.sequenceId === b.sequenceId ? 0 : a.sequenceId > b.sequenceId ? 1 : -1
-                                      )
-                                      .map((task) => (
+                        <div css={tw`flex border-b border-neutral-800 px-4`}>
+                            <button
+                                type={'button'}
+                                css={[
+                                    tw`px-4 py-3 text-sm border-0 bg-transparent cursor-pointer transition-colors duration-150`,
+                                    activeTab === 'tasks' ? tw`text-neutral-100 border-b-2 border-blue-500` : tw`text-neutral-400`,
+                                ]}
+                                onClick={() => setActiveTab('tasks')}
+                            >
+                                Tasks
+                            </button>
+                            <button
+                                type={'button'}
+                                css={[
+                                    tw`px-4 py-3 text-sm border-0 bg-transparent cursor-pointer transition-colors duration-150`,
+                                    activeTab === 'history' ? tw`text-neutral-100 border-b-2 border-blue-500` : tw`text-neutral-400`,
+                                ]}
+                                onClick={() => setActiveTab('history')}
+                            >
+                                History
+                            </button>
+                        </div>
+                        {activeTab === 'tasks' ? (
+                            <div css={tw`bg-neutral-700 rounded-b`}>
+                                {sortedTasks.length > 0
+                                    ? sortedTasks.map((task, index) => (
                                           <ScheduleTaskRow
                                               key={`${schedule.id}_${task.id}`}
                                               task={task}
                                               schedule={schedule}
+                                              isFirst={index === 0}
+                                              isLast={index === sortedTasks.length - 1}
                                           />
                                       ))
-                                : null}
-                        </div>
+                                    : null}
+                            </div>
+                        ) : (
+                            <div css={tw`bg-neutral-700 rounded-b p-4`}>
+                                <ScheduleRunHistory uuid={uuid} scheduleId={schedule.id} />
+                            </div>
+                        )}
                     </div>
                     <EditScheduleModal visible={showEditModal} schedule={schedule} onModalDismissed={toggleEditModal} />
                     <div css={tw`mt-6 flex sm:justify-end`}>

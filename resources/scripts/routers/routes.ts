@@ -157,7 +157,7 @@ export default {
         {
             path: '/users',
             permission: 'user.*',
-            name: 'Team',
+            name: 'Users',
             component: UsersContainer,
         },
         {
