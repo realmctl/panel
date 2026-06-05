@@ -1,5 +1,6 @@
 import tw from 'twin.macro';
 import { createGlobalStyle } from 'styled-components/macro';
+import { realmColors } from '@/lib/realmTokens';
 // @ts-expect-error untyped font file
 import font from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2';
 
@@ -15,7 +16,7 @@ export default createGlobalStyle`
 
     body {
         ${tw`font-sans text-neutral-200`};
-        background-color: #0b0f10 !important;
+        background-color: ${realmColors.page} !important;
         letter-spacing: 0.015em;
     }
 
@@ -57,7 +58,7 @@ export default createGlobalStyle`
         border-right-width: 4px;
         border-left-width: 4px;
         -webkit-border-radius: 9px 4px;
-        -webkit-box-shadow: inset 0 0 0 1px #2d3338, inset 0 0 0 4px #192024;
+        -webkit-box-shadow: inset 0 0 0 1px ${realmColors.border}, inset 0 0 0 4px ${realmColors.card};
     }
 
     ::-webkit-scrollbar-track-piece {

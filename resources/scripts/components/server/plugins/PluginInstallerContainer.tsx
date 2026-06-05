@@ -7,6 +7,9 @@ import useFlash from '@/plugins/useFlash';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import Spinner from '@/components/elements/Spinner';
 import { debounce } from 'debounce';
+import classNames from 'classnames';
+import RealmCard from '@/components/elements/realm/RealmCard';
+import { realmClasses } from '@/lib/realmTokens';
 
 type Source = 'hangar' | 'modrinth';
 
@@ -40,11 +43,6 @@ interface InstallingState {
     loading: boolean;
 }
 
-const card = { backgroundColor: '#192024', border: '1px solid #2d3338' } as React.CSSProperties;
-const cardHeader = { backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' } as React.CSSProperties;
-const inputStyle = { backgroundColor: '#0e1417', border: '1px solid #2d3338', color: '#e2e8f0' } as React.CSSProperties;
-const rowStyle = { backgroundColor: '#0e1417', border: '1px solid #2d3338' } as React.CSSProperties;
-
 const installBtn = {
     backgroundColor: '#1e3a5f',
     color: '#60a5fa',
@@ -71,10 +69,7 @@ const pluginSearchCache = new Map<string, { data: (HangarPlugin | ModrinthPlugin
 const getPluginSearchCacheKey = (src: Source, q: string) => `${src}:${q.trim().toLowerCase()}`;
 
 const PluginFallbackIcon = () => (
-    <div
-        className={'w-8 h-8 rounded flex items-center justify-center flex-shrink-0 text-xs font-bold'}
-        style={{ backgroundColor: '#1e2d38', color: '#64748b' }}
-    >
+    <div className={'w-8 h-8 rounded flex items-center justify-center flex-shrink-0 text-xs font-bold bg-realm-surface-raised text-realm-muted'}>
         ?
     </div>
 );
@@ -247,22 +242,17 @@ export default () => {
             <FlashMessageRender byKey={'plugins'} className={'mb-4'} />
 
             {/* Source tabs */}
-            <div
-                className={'flex items-center gap-1 p-1 rounded-lg mb-6 flex-wrap'}
-                style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
-            >
+            <div className={classNames('flex items-center gap-1 p-1 rounded-lg mb-6 flex-wrap', realmClasses.tabBar)}>
                 {SOURCES.map((s) => {
                     const active = source === s.id;
                     return (
                         <button
                             key={s.id}
                             onClick={() => onSourceChange(s.id)}
-                            className={'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150'}
-                            style={
-                                active
-                                    ? { backgroundColor: '#192024', color: '#e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }
-                                    : { color: '#64748b' }
-                            }
+                            className={classNames(
+                                'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150 border-0 cursor-pointer',
+                                active ? realmClasses.tabActive : realmClasses.tabInactive
+                            )}
                         >
                             <img src={s.icon} alt={s.label} className={'w-4 h-4 object-contain flex-shrink-0'} />
                             {s.label}
@@ -272,28 +262,23 @@ export default () => {
             </div>
 
             {/* Main card */}
-            <div className={'rounded-lg overflow-hidden'} style={card}>
-                {/* Card header */}
-                <div className={'flex items-center gap-3 px-5 py-3 flex-wrap'} style={cardHeader}>
+            <RealmCard bodyClassName={'p-0'}>
+                <div className={'flex items-center gap-3 px-5 py-3 flex-wrap border-b border-realm-border bg-realm-surface'}>
                     <img src={activeSource.icon} alt={activeSource.label} className={'w-4 h-4 object-contain flex-shrink-0'} />
                     <span className={'text-xs uppercase tracking-wide text-neutral-400'}>{activeSource.label}</span>
                     <span className={'text-neutral-600 text-xs'}>—</span>
                     <span className={'text-xs text-neutral-500'}>{activeSource.description}</span>
                     {results.length > 0 && !searching && (
-                        <span
-                            className={'ml-auto text-xs px-2 py-0.5 rounded-full font-mono'}
-                            style={{ backgroundColor: '#1e2d38', color: '#64748b' }}
-                        >
+                        <span className={classNames('ml-auto text-xs px-2 py-0.5 rounded-full font-mono', realmClasses.badge)}>
                             {query.trim() ? `${results.length} results` : `${results.length} popular`}
                         </span>
                     )}
                 </div>
 
                 {/* Search */}
-                <div className={'px-5 py-4'} style={{ borderBottom: '1px solid #2d3338' }}>
+                <div className={'px-5 py-4 border-b border-realm-border'}>
                     <input
-                        className={'w-full rounded text-sm px-3 py-2.5 focus:outline-none transition-colors'}
-                        style={inputStyle}
+                        className={`w-full rounded text-sm px-3 py-2.5 focus:outline-none transition-colors ${realmClasses.input}`}
                         placeholder={`Search ${activeSource.label}… e.g. WorldEdit, EssentialsX`}
                         value={query}
                         onChange={(e) => onQueryChange(e.target.value)}
@@ -326,16 +311,14 @@ export default () => {
                                 return (
                                     <div
                                         key={slug}
-                                        className={'rounded-md px-3 py-3 transition-colors duration-100'}
-                                        style={rowStyle}
+                                        className={classNames('rounded-md px-3 py-3 transition-colors duration-100', realmClasses.row)}
                                     >
                                         <div className={'flex items-start gap-3'}>
                                             {avatar ? (
                                                 <img
                                                     src={avatar}
                                                     alt={name}
-                                                    className={'w-8 h-8 rounded object-contain flex-shrink-0'}
-                                                    style={{ backgroundColor: '#1e2d38' }}
+                                                    className={'w-8 h-8 rounded object-contain flex-shrink-0 bg-realm-surface-raised'}
                                                 />
                                             ) : (
                                                 <PluginFallbackIcon />
@@ -344,7 +327,7 @@ export default () => {
                                             <div className={'flex-1 min-w-0'}>
                                                 <div className={'flex items-center justify-between gap-2 mb-1'}>
                                                     <span className={'text-sm font-medium text-neutral-200 truncate'}>{name}</span>
-                                                    <span className={'text-xs font-mono flex-shrink-0'} style={{ color: '#64748b' }}>
+                                                    <span className={'text-xs font-mono flex-shrink-0 text-realm-muted'}>
                                                         {formatNumber(downloads)} downloads
                                                     </span>
                                                 </div>
@@ -359,8 +342,7 @@ export default () => {
                                                     ) : (
                                                         <div className={'flex items-center gap-2 flex-wrap'}>
                                                             <select
-                                                                className={'rounded text-xs px-2 py-1.5 focus:outline-none'}
-                                                                style={{ ...inputStyle, minWidth: '8rem' }}
+                                                                className={classNames('rounded text-xs px-2 py-1.5 focus:outline-none min-w-[8rem]', realmClasses.input)}
                                                                 value={installing.selectedVersion}
                                                                 onChange={(e) => onVersionChange(e.target.value)}
                                                             >
@@ -408,7 +390,7 @@ export default () => {
                         </div>
                     )}
                 </div>
-            </div>
+            </RealmCard>
         </ServerContentBlock>
     );
 };

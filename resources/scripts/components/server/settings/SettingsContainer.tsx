@@ -15,7 +15,8 @@ import isEqual from 'react-fast-compare';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import { ip } from '@/lib/formatters';
 import { Button } from '@/components/elements/button/index';
-
+import RealmCard from '@/components/elements/realm/RealmCard';
+import RealmTabBar from '@/components/elements/realm/RealmTabBar';
 const TAB_SWITCH_DELAY_MS = 200;
 
 type Tab = 'general' | 'details' | 'danger' | 'startup' | 'variables';
@@ -29,9 +30,6 @@ const ALL_TABS: { id: Tab; label: string; permission: string | string[] | null }
     { id: 'variables', label: 'Variables', permission: 'startup.*' },
     { id: 'danger', label: 'Danger Zone', permission: 'settings.reinstall' },
 ];
-
-const card = { backgroundColor: '#192024', border: '1px solid #2d3338' } as React.CSSProperties;
-const cardHeader = { backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' } as React.CSSProperties;
 
 const canAccessTab = (permission: string | string[] | null, userPermissions: string[]): boolean => {
     if (!permission) {
@@ -162,25 +160,12 @@ export default () => {
             <FlashMessageRender byKey={'settings'} className={'mb-4'} />
             {showStartupFlash && <FlashMessageRender byKey={'startup:image'} className={'mb-4'} />}
 
-            <div
-                className={'flex items-center gap-1 p-1 rounded-lg mb-6 w-fit max-w-full overflow-x-auto'}
-                style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
-            >
-                {visibleTabs.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => switchTab(tab.id)}
-                        className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors duration-150 whitespace-nowrap'}
-                        style={
-                            activeTab === tab.id
-                                ? { backgroundColor: '#192024', color: '#e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }
-                                : { color: '#64748b' }
-                        }
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
+            <RealmTabBar
+                className={'mb-6'}
+                tabs={visibleTabs}
+                activeTab={activeTab}
+                onTabChange={switchTab}
+            />
 
             <div className={'relative min-h-[12rem]'}>
                 {isTabLoading ? (
@@ -190,13 +175,14 @@ export default () => {
                         {renderedTab === 'general' && (
                             <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
                                 <Can action={'file.sftp'}>
-                                    <div className={'rounded-lg overflow-hidden'} style={card}>
-                                        <div className={'px-4 py-3'} style={cardHeader}>
+                                    <RealmCard
+                                        header={
                                             <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
                                                 SFTP Details
                                             </span>
-                                        </div>
-                                        <div className={'px-4 py-4 space-y-4'}>
+                                        }
+                                        bodyClassName={'space-y-4'}
+                                    >
                                             <div>
                                                 <Label>Server Address</Label>
                                                 <CopyOnClick text={`sftp://${ip(sftp.ip)}:${sftp.port}`}>
@@ -215,9 +201,8 @@ export default () => {
                                             </div>
                                             <div
                                                 className={
-                                                    'flex items-center justify-between gap-4 p-3 rounded-md'
+                                                    'flex items-center justify-between gap-4 p-3 rounded-md bg-realm-surface border border-realm-border'
                                                 }
-                                                style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
                                             >
                                                 <p className={'text-xs text-neutral-400 flex-1'}>
                                                     Your SFTP password is the same as your panel password.
@@ -231,55 +216,47 @@ export default () => {
                                                     </Button.Text>
                                                 </a>
                                             </div>
-                                        </div>
-                                    </div>
+                                    </RealmCard>
                                 </Can>
 
-                                <div className={'rounded-lg overflow-hidden'} style={card}>
-                                    <div className={'px-4 py-3'} style={cardHeader}>
+                                <RealmCard
+                                    header={
                                         <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
                                             Debug Information
                                         </span>
-                                    </div>
-                                    <div className={'px-4 py-4 space-y-3'}>
+                                    }
+                                    bodyClassName={'space-y-3'}
+                                >
                                         <div className={'flex items-center justify-between text-sm'}>
                                             <span className={'text-neutral-400'}>Node</span>
-                                            <code
-                                                className={'font-mono text-xs px-2 py-1 rounded'}
-                                                style={{ backgroundColor: '#0e1417', color: '#94a3b8' }}
-                                            >
+                                            <code className={'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'}>
                                                 {node}
                                             </code>
                                         </div>
                                         <CopyOnClick text={uuid}>
                                             <div className={'flex items-center justify-between text-sm cursor-pointer'}>
                                                 <span className={'text-neutral-400'}>Server ID</span>
-                                                <code
-                                                    className={'font-mono text-xs px-2 py-1 rounded'}
-                                                    style={{ backgroundColor: '#0e1417', color: '#94a3b8' }}
-                                                >
+                                                <code className={'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'}>
                                                     {uuid}
                                                 </code>
                                             </div>
                                         </CopyOnClick>
-                                    </div>
-                                </div>
+                                </RealmCard>
                             </div>
                         )}
 
                         {renderedTab === 'details' && (
                             <div className={'max-w-xl'}>
                                 <Can action={'settings.rename'}>
-                                    <div className={'rounded-lg overflow-hidden'} style={card}>
-                                        <div className={'px-4 py-3'} style={cardHeader}>
+                                    <RealmCard
+                                        header={
                                             <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
                                                 Server Details
                                             </span>
-                                        </div>
-                                        <div className={'px-4 py-4'}>
-                                            <RenameServerBox />
-                                        </div>
-                                    </div>
+                                        }
+                                    >
+                                        <RenameServerBox />
+                                    </RealmCard>
                                 </Can>
                             </div>
                         )}
@@ -287,16 +264,15 @@ export default () => {
                         {renderedTab === 'danger' && (
                             <div className={'max-w-xl'}>
                                 <Can action={'settings.reinstall'}>
-                                    <div className={'rounded-lg overflow-hidden'} style={card}>
-                                        <div className={'px-4 py-3'} style={cardHeader}>
+                                    <RealmCard
+                                        header={
                                             <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
                                                 Reinstall Server
                                             </span>
-                                        </div>
-                                        <div className={'px-4 py-4'}>
-                                            <ReinstallServerBox />
-                                        </div>
-                                    </div>
+                                        }
+                                    >
+                                        <ReinstallServerBox />
+                                    </RealmCard>
                                 </Can>
                             </div>
                         )}

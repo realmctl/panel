@@ -50,7 +50,7 @@ const ServerSwitcher = () => {
         <div className={'relative ml-4'} ref={ref}>
             <button
                 onClick={() => setOpen(!open)}
-                className={'flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-100 transition-colors duration-150 bg-neutral-800/50 border border-[#2d3338] rounded-lg px-3 py-1.5 cursor-pointer'}
+                className={'flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-100 transition-colors duration-150 bg-neutral-800/50 border border-realm-border rounded-lg px-3 py-1.5 cursor-pointer'}
             >
                 <FontAwesomeIcon icon={faExchangeAlt} className={'text-xs'} />
                 <span className={'max-w-[160px] truncate'}>{currentServerName}</span>
@@ -59,8 +59,7 @@ const ServerSwitcher = () => {
 
             {open && (
                 <div
-                    className={'absolute left-0 top-full mt-2 w-72 rounded-lg shadow-lg py-2 z-50 border border-[#2d3338] max-h-80 overflow-y-auto'}
-                    style={{ backgroundColor: '#1e2a2f' }}
+                    className={'absolute left-0 top-full mt-2 w-72 rounded-lg shadow-lg py-2 z-50 border border-realm-border bg-realm-popover max-h-80 overflow-y-auto'}
                 >
                     {isValidating && servers.length === 0 ? (
                         <div className={'px-4 py-3 text-sm text-neutral-400 text-center'}>Loading...</div>
@@ -190,7 +189,7 @@ export default () => {
     };
 
     return (
-        <div className={'w-full border-b border-[#2d3338]/50'} style={{ backgroundColor: '#192024' }}>
+        <div className={'w-full border-b border-realm-border/50 bg-realm-card'}>
             <SpinnerOverlay visible={isLoggingOut} />
             <div className={'w-full flex items-center h-[3.5rem] max-w-[1200px] mx-4 xl:mx-auto'}>
                 {/* Brand / Logo */}
@@ -226,7 +225,7 @@ export default () => {
                                 value={searchTerm}
                                 onChange={handleSearchChange}
                                 placeholder={'Search servers...'}
-                                className={'w-full h-8 px-3 text-sm text-neutral-100 bg-neutral-800/60 border border-[#2d3338] rounded-lg outline-none focus:border-blue-500 transition-colors duration-150 placeholder-neutral-500'}
+                                className={'w-full h-8 px-3 text-sm text-neutral-100 bg-neutral-800/60 border border-realm-border rounded-lg outline-none focus:border-blue-500 transition-colors duration-150 placeholder-neutral-500'}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Escape') {
                                         setSearchOpen(false);
@@ -246,8 +245,7 @@ export default () => {
                         {/* Search results dropdown */}
                         {searchOpen && searchResults.length > 0 && (
                             <div
-                                className={'absolute right-0 top-full mt-2 w-80 rounded-lg shadow-lg py-2 z-50 border border-[#2d3338]'}
-                                style={{ backgroundColor: '#1e2a2f' }}
+                                className={'absolute right-0 top-full mt-2 w-80 rounded-lg shadow-lg py-2 z-50 border border-realm-border bg-realm-popover'}
                             >
                                 {searchResults.map((server) => (
                                     <button
@@ -278,8 +276,7 @@ export default () => {
                         {/* Loading indicator */}
                         {searchOpen && isSearching && (
                             <div
-                                className={'absolute right-0 top-full mt-2 w-80 rounded-lg shadow-lg py-3 z-50 border border-[#2d3338] text-center text-sm text-neutral-400'}
-                                style={{ backgroundColor: '#1e2a2f' }}
+                                className={'absolute right-0 top-full mt-2 w-80 rounded-lg shadow-lg py-3 z-50 border border-realm-border bg-realm-popover text-center text-sm text-neutral-400'}
                             >
                                 Searching...
                             </div>
@@ -318,7 +315,7 @@ export default () => {
                         </button>
 
                         {dropdownOpen && (
-                            <div className={'absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg py-1 z-50 border border-[#2d3338]'} style={{ backgroundColor: '#1e2a2f' }}>
+                            <div className={'absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg py-1 z-50 border border-realm-border bg-realm-popover'}>
                                 <Link
                                     to={'/account'}
                                     className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 no-underline transition-colors duration-150'}

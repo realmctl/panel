@@ -116,9 +116,8 @@ export default () => {
                     <button
                         onClick={() => setModal('create')}
                         className={
-                            'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded border border-[#2d3338]/50 text-neutral-400 hover:text-neutral-200 hover:border-[#3d4348] transition-colors cursor-pointer bg-transparent'
+                            'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded border border-realm-border/50 text-neutral-400 hover:text-neutral-200 hover:border-[#3d4348] transition-colors cursor-pointer bg-realm-card'
                         }
-                        style={{ backgroundColor: '#192024' }}
                     >
                         <svg xmlns={'http://www.w3.org/2000/svg'} className={'w-3.5 h-3.5'} viewBox={'0 0 24 24'} fill={'currentColor'}>
                             <path d={'M12 5v14M5 12h14'} stroke={'currentColor'} strokeWidth={2} strokeLinecap={'round'} fill={'none'} />
@@ -132,7 +131,7 @@ export default () => {
                                 <button
                                     key={g.uuid}
                                     onClick={() => setModal(g)}
-                                    className={'flex items-center gap-1.5 px-2 py-1 rounded text-xs text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer border border-transparent hover:border-[#2d3338] bg-transparent'}
+                                    className={'flex items-center gap-1.5 px-2 py-1 rounded text-xs text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer border border-transparent hover:border-realm-border bg-transparent'}
                                 >
                                     <span
                                         className={'w-2 h-2 rounded-full inline-block flex-shrink-0'}
@@ -148,8 +147,7 @@ export default () => {
                 <div className={'flex items-center gap-3'}>
                     {rootAdmin && (
                         <div
-                            className={'flex items-center gap-2 px-3 py-1.5 rounded-md border border-[#2d3338]/50 cursor-pointer select-none transition-colors duration-150 hover:border-[#3d4348]'}
-                            style={{ backgroundColor: '#192024' }}
+                            className={'flex items-center gap-2 px-3 py-1.5 rounded-md border border-realm-border/50 bg-realm-card cursor-pointer select-none transition-colors duration-150 hover:border-[#3d4348]'}
                             onClick={() => setShowOnlyAdmin((s) => !s)}
                         >
                             <span className={'text-xs text-neutral-400'}>
@@ -162,8 +160,7 @@ export default () => {
                     )}
 
                     <div
-                        className={'flex items-center rounded-md border border-[#2d3338]/50 overflow-hidden'}
-                        style={{ backgroundColor: '#192024' }}
+                        className={'flex items-center rounded-md border border-realm-border/50 bg-realm-card overflow-hidden'}
                     >
                         <button
                             onClick={() => setLayout('grid')}

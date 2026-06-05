@@ -28,6 +28,17 @@ module.exports = {
                 black: '#0b0f10',
                 gray: gray,
                 neutral: gray,
+                realm: {
+                    page: '#0b0f10',
+                    surface: '#0e1417',
+                    'surface-raised': '#1e2d38',
+                    card: '#192024',
+                    border: '#2d3338',
+                    popover: '#1e2a2f',
+                    muted: '#64748b',
+                    text: '#e2e8f0',
+                    code: '#94a3b8',
+                },
                 cyan: colors.cyan,
                 // shadcn CSS variable colors
                 input: "hsl(var(--input))",

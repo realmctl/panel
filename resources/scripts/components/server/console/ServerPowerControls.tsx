@@ -15,7 +15,7 @@ const btnBase =
     'px-4 py-2 text-sm font-medium rounded-md border-0 cursor-pointer transition-colors duration-150';
 const btnStart = `${btnBase} text-white bg-green-600 hover:bg-green-700`;
 const btnStop = `${btnBase} text-white bg-red-500 hover:bg-red-600`;
-const btnKill = `${btnBase} text-neutral-200 bg-neutral-700/60 hover:bg-neutral-700 border border-[#2d3338]`;
+const btnKill = `${btnBase} text-neutral-200 bg-neutral-700/60 hover:bg-neutral-700 border border-realm-border`;
 
 export default ({ variant }: ServerPowerControlsProps) => {
     const status = ServerContext.useStoreState((state) => state.status.value);
@@ -111,9 +111,8 @@ export default ({ variant }: ServerPowerControlsProps) => {
                         {moreOpen && (
                             <div
                                 className={
-                                    'absolute right-0 top-full mt-2 w-44 rounded-lg shadow-lg py-1 z-50 border border-[#2d3338]'
+                                    'absolute right-0 top-full mt-2 w-44 rounded-lg shadow-lg py-1 z-50 border border-realm-border bg-realm-popover'
                                 }
-                                style={{ backgroundColor: '#1e2a2f' }}
                             >
                                 <button
                                     type={'button'}

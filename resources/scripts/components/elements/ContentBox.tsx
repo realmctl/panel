@@ -18,7 +18,7 @@ const ContentBox = ({ title, borderColor, showFlashes, showLoadingOverlay, child
         {showFlashes && (
             <FlashMessageRender byKey={typeof showFlashes === 'string' ? showFlashes : undefined} css={tw`mb-4`} />
         )}
-        <div css={[tw`p-4 rounded shadow-lg relative`, !!borderColor && tw`border-t-4`]} style={{ backgroundColor: '#192024' }}>
+        <div css={[tw`p-4 rounded shadow-lg relative bg-realm-card`, !!borderColor && tw`border-t-4`]}>
             <SpinnerOverlay visible={showLoadingOverlay || false} />
             {children}
         </div>

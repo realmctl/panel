@@ -22,7 +22,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, children, rightActions, 
     const supportId = uuid.split('-')[0].toUpperCase();
 
     return (
-        <div className={'w-full'} style={{ backgroundColor: '#192024' }}>
+        <div className={'w-full bg-realm-card'}>
             <div className={'w-full max-w-[1200px] mx-4 xl:mx-auto pt-6' + (children ? ' pb-4' : ' pb-6')}>
                 {breadcrumbs && breadcrumbs.length > 0 && (
                     <nav className={'flex items-center gap-1.5 mb-2 text-xs text-neutral-500'} aria-label={'Breadcrumb'}>
