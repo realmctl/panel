@@ -19,21 +19,27 @@
 }
 
 .terminal {
-    @apply flex flex-col w-full h-full;
+    @apply flex flex-col w-full h-full min-h-0;
 
     & .overflows_container {
-        @apply sm:ml-0;
+        @apply sm:ml-0 flex-shrink-0;
         width: 100%;
     }
 
     & > .container {
-        @apply p-2 font-mono text-sm flex-1;
+        @apply px-2 py-1.5 font-mono text-sm flex-1 min-h-0;
         background-color: #192024;
-        min-height: 200px;
+        min-height: 16rem;
         overflow: hidden;
 
+        & .terminal_shell {
+            height: 100%;
+            min-height: 0;
+        }
+
         & #terminal {
-            @apply h-full;
+            height: 100%;
+            min-height: 0;
 
             &::-webkit-scrollbar-track {
                 @apply w-2;

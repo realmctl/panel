@@ -66,9 +66,9 @@ const terminalProps: ITerminalOptions = {
     disableStdin: true,
     cursorStyle: 'underline',
     allowTransparency: true,
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: th('fontFamily.mono'),
-    rows: 16,
+    rows: 24,
     theme: theme,
 };
 
@@ -166,6 +166,12 @@ export default () => {
         }
     };
 
+    const fitTerminal = () => {
+        if (terminal.element) {
+            fitAddon.fit();
+        }
+    };
+
     useEffect(() => {
         if (connected && ref.current && !terminal.element) {
             terminal.loadAddon(fitAddon);
@@ -180,7 +186,8 @@ export default () => {
             // Activate Unicode 11 for proper emoji and special character width handling
             terminal.unicode.activeVersion = '11';
 
-            fitAddon.fit();
+            fitTerminal();
+            window.requestAnimationFrame(fitTerminal);
             searchBar.addNewStyle(zIndex);
 
             // Add support for capturing keys
@@ -200,14 +207,18 @@ export default () => {
         }
     }, [terminal, connected]);
 
-    useEventListener(
-        'resize',
-        debounce(() => {
-            if (terminal.element) {
-                fitAddon.fit();
-            }
-        }, 100)
-    );
+    useEventListener('resize', debounce(fitTerminal, 100));
+
+    useEffect(() => {
+        if (!connected || !ref.current || !terminal.element) {
+            return;
+        }
+
+        const observer = new ResizeObserver(debounce(fitTerminal, 50));
+        observer.observe(ref.current);
+
+        return () => observer.disconnect();
+    }, [connected]);
 
     useEffect(() => {
         const listeners: Record<string, (s: string) => void> = {
@@ -245,7 +256,7 @@ export default () => {
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
             <div className={classNames(styles.container, styles.overflows_container)}>
-                <div className={'h-full'}>
+                <div className={styles.terminal_shell}>
                     <div id={styles.terminal} ref={ref} />
                 </div>
             </div>

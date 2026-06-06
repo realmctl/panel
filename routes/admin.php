@@ -71,6 +71,7 @@ Route::group(['prefix' => 'settings'], function () {
     Route::get('/mail', [Admin\Settings\MailController::class, 'index'])->name('admin.settings.mail');
     Route::get('/security', [Admin\Settings\SecurityController::class, 'index'])->name('admin.settings.security');
     Route::get('/advanced', [Admin\Settings\AdvancedController::class, 'index'])->name('admin.settings.advanced');
+    Route::get('/mappings', [Admin\Settings\MappingsController::class, 'index'])->name('admin.settings.mappings');
     Route::get('/oauth', [Admin\Settings\OAuthController::class, 'index'])->name('admin.settings.oauth');
 
     Route::post('/mail/test', [Admin\Settings\MailController::class, 'test'])->name('admin.settings.mail.test');
@@ -79,6 +80,7 @@ Route::group(['prefix' => 'settings'], function () {
     Route::patch('/mail', [Admin\Settings\MailController::class, 'update']);
     Route::patch('/security', [Admin\Settings\SecurityController::class, 'update']);
     Route::patch('/advanced', [Admin\Settings\AdvancedController::class, 'update']);
+    Route::patch('/mappings', [Admin\Settings\MappingsController::class, 'update']);
     Route::patch('/oauth', [Admin\Settings\OAuthController::class, 'update']);
 });
 

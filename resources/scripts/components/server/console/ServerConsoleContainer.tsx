@@ -13,6 +13,7 @@ import UptimeDuration from '@/components/server/UptimeDuration';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { SocketEvent } from '@/components/server/events';
 import RealmCard from '@/components/elements/realm/RealmCard';
+import { countryFlagUrl, formatGeoLocationLabel } from '@/lib/countryFlag';
 
 const StatusIndicator = ({ status }: { status: string | null }) => {
     const color = status === 'running'
@@ -39,6 +40,9 @@ const ServerConsoleContainer = () => {
     const isNodeUnderMaintenance = ServerContext.useStoreState((state) => state.server.data!.isNodeUnderMaintenance);
     const status = ServerContext.useStoreState((state) => state.status.value);
     const nodeName = ServerContext.useStoreState((state) => state.server.data!.node);
+    const nodeLocation = ServerContext.useStoreState((state) => state.server.data!.nodeLocation);
+    const nodeFlagUrl = countryFlagUrl(nodeLocation?.countryCode);
+    const nodeLocationLabel = formatGeoLocationLabel(nodeLocation);
     const eggName = ServerContext.useStoreState((state) => state.server.data!.eggName);
     const [uptime, setUptime] = useState<number>(0);
     const [errorCount, setErrorCount] = useState<number>(0);
@@ -73,10 +77,16 @@ const ServerConsoleContainer = () => {
                 </Alert>
             )}
 
-            <div className={'grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4'}>
+            <div className={'grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 lg:items-stretch'}>
                 {/* Left: Server info + Runtime cards */}
                 <div className={'lg:col-span-1 flex flex-col gap-4'}>
-                    <RealmCard title={'Server'} rounded={'md'} border={'soft'} bodyClassName={'space-y-3'}>
+                    <RealmCard
+                        rounded={'md'}
+                        border={'soft'}
+                        header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Server</h2>}
+                        headerClassName={'!py-2.5'}
+                        bodyClassName={'!p-4 space-y-3'}
+                    >
                         <div className={'flex items-center justify-between'}>
                             <span className={'text-sm text-neutral-400'}>Status</span>
                             <StatusIndicator status={status} />
@@ -85,49 +95,72 @@ const ServerConsoleContainer = () => {
                             <span className={'text-sm text-neutral-400'}>IP</span>
                             <span className={'text-sm text-neutral-200 font-mono'}>{allocation}</span>
                         </div>
-                        <div className={'pt-4 border-t border-realm-border/50'}>
+                        <div className={'pt-3 border-t border-realm-border/50'}>
                             <ServerPowerControls variant={'card'} />
                         </div>
                     </RealmCard>
 
-                    <RealmCard title={'Runtime'} rounded={'md'} border={'soft'} bodyClassName={'space-y-3'}>
-                            <div className={'flex items-center justify-between'}>
-                                <span className={'text-sm text-neutral-400'}>Type</span>
-                                <span className={'text-sm text-neutral-200'}>{eggName || 'Unknown'}</span>
-                            </div>
-                            <div className={'flex items-center justify-between'}>
-                                <span className={'text-sm text-neutral-400'}>Node</span>
-                                <span className={'text-sm text-neutral-200'}>{nodeName}</span>
-                            </div>
-                            <div className={'flex items-center justify-between'}>
-                                <span className={'text-sm text-neutral-400'}>Uptime</span>
-                                <span className={'text-sm text-neutral-200'}>
-                                    {status === 'running' && uptime > 0 ? (
-                                        <UptimeDuration uptime={uptime / 1000} />
-                                    ) : (
-                                        '--'
-                                    )}
-                                </span>
-                            </div>
-                    </RealmCard>
-                </div>
-
-                <div className={'lg:col-span-2'}>
                     <RealmCard
                         rounded={'md'}
                         border={'soft'}
-                        className={'h-full flex flex-col'}
-                        bodyClassName={'p-0 flex-1 flex flex-col'}
+                        header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Runtime</h2>}
+                        headerClassName={'!py-2.5'}
+                        bodyClassName={'!p-4 space-y-3'}
                     >
-                        <div className={'px-5 py-3 flex items-center justify-between'}>
-                            <h2 className={'text-lg font-semibold text-neutral-100 m-0'}>Console</h2>
-                            {errorCount > 0 && (
-                                <span className={'flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30'}>
-                                    ⚠ {errorCount} {errorCount === 1 ? 'Error' : 'Errors'}
-                                </span>
-                            )}
+                        <div className={'flex items-center justify-between'}>
+                            <span className={'text-sm text-neutral-400'}>Type</span>
+                            <span className={'text-sm text-neutral-200'}>{eggName || 'Unknown'}</span>
                         </div>
-                        <div className={'flex-1'}>
+                        <div className={'flex items-center justify-between'}>
+                            <span className={'text-sm text-neutral-400'}>Node</span>
+                            <span className={'flex items-center gap-1.5 text-sm text-neutral-200'}>
+                                {nodeFlagUrl && (
+                                    <img
+                                        src={nodeFlagUrl}
+                                        alt={nodeLocationLabel || nodeLocation?.country || ''}
+                                        title={nodeLocationLabel || undefined}
+                                        width={20}
+                                        height={15}
+                                        className={'w-5 h-auto rounded-sm object-cover flex-shrink-0'}
+                                        loading={'lazy'}
+                                        decoding={'async'}
+                                    />
+                                )}
+                                <span>{nodeName}</span>
+                            </span>
+                        </div>
+                        <div className={'flex items-center justify-between'}>
+                            <span className={'text-sm text-neutral-400'}>Uptime</span>
+                            <span className={'text-sm text-neutral-200'}>
+                                {status === 'running' && uptime > 0 ? (
+                                    <UptimeDuration uptime={uptime / 1000} />
+                                ) : (
+                                    '--'
+                                )}
+                            </span>
+                        </div>
+                    </RealmCard>
+                </div>
+
+                <div className={'lg:col-span-2 flex min-h-[28rem] lg:min-h-[32rem]'}>
+                    <RealmCard
+                        rounded={'md'}
+                        border={'soft'}
+                        className={'flex flex-col flex-1 min-h-0'}
+                        header={
+                            <div className={'flex items-center justify-between gap-3'}>
+                                <h2 className={'text-base font-semibold text-neutral-100 m-0'}>Console</h2>
+                                {errorCount > 0 && (
+                                    <span className={'flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30'}>
+                                        ⚠ {errorCount} {errorCount === 1 ? 'Error' : 'Errors'}
+                                    </span>
+                                )}
+                            </div>
+                        }
+                        headerClassName={'!py-2.5'}
+                        bodyClassName={'!p-0 flex-1 flex flex-col min-h-0'}
+                    >
+                        <div className={'flex-1 min-h-0'}>
                             <Spinner.Suspense>
                                 <Console />
                             </Spinner.Suspense>

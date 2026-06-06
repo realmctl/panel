@@ -21,6 +21,11 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link{{ $activeTab === 'mappings' ? ' active' : '' }}" href="{{ route('admin.settings.mappings') }}">
+                <i class="ti ti-category me-1"></i> Mappings
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link{{ $activeTab === 'advanced' ? ' active' : '' }}" href="{{ route('admin.settings.advanced') }}">
                 <i class="ti ti-tool me-1"></i> Advanced
             </a>

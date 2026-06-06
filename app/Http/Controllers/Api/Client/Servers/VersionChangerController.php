@@ -29,6 +29,7 @@ namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Pterodactyl\Http\Controllers\Api\Client\Servers\Concerns\ChecksEggCategoryFeature;
 use Illuminate\Support\Facades\Http;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\ListVersionsRequest;
@@ -37,6 +38,8 @@ use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\InstallVersionRequest;
 
 class VersionChangerController extends ClientApiController
 {
+    use ChecksEggCategoryFeature;
+
     public function __construct(
         private DaemonFileRepository $fileRepository,
     ) {
@@ -46,8 +49,10 @@ class VersionChangerController extends ClientApiController
     /**
      * List available versions for a given server type.
      */
-    public function listVersions(ListVersionsRequest $request): array
+    public function listVersions(ListVersionsRequest $request, Server $server): array
     {
+        $this->ensureServerSupportsFeature($server, 'versions');
+
         $type = $request->get('type', 'paper');
         $versions = [];
 
@@ -139,8 +144,10 @@ class VersionChangerController extends ClientApiController
     /**
      * Get the download URL for a specific version.
      */
-    public function getDownloadUrl(GetDownloadUrlRequest $request): array
+    public function getDownloadUrl(GetDownloadUrlRequest $request, Server $server): array
     {
+        $this->ensureServerSupportsFeature($server, 'versions');
+
         return $this->resolveDownloadUrl($request->get('type', 'paper'), $request->get('version'));
     }
 
@@ -256,6 +263,8 @@ class VersionChangerController extends ClientApiController
      */
     public function install(InstallVersionRequest $request, Server $server): array
     {
+        $this->ensureServerSupportsFeature($server, 'versions');
+
         $type = $request->input('type');
         $version = $request->input('version');
 

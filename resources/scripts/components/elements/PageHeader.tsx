@@ -13,9 +13,10 @@ interface PageHeaderProps {
     children?: React.ReactNode;
     rightActions?: React.ReactNode;
     breadcrumbs?: BreadcrumbItem[];
+    belowTitle?: React.ReactNode;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, children, rightActions, breadcrumbs }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ title, children, rightActions, breadcrumbs, belowTitle }) => {
     const email = useStoreState((state: ApplicationStore) => state.user.data!.email);
     const uuid = useStoreState((state: ApplicationStore) => state.user.data!.uuid);
 
@@ -48,15 +49,17 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, children, rightActions, 
                         <h1 className={'text-2xl font-header font-semibold text-neutral-100'}>
                             {title}
                         </h1>
-                        <div className={'flex items-center gap-4 mt-1'}>
-                            <span className={'text-sm text-neutral-400'}>
-                                {email}
-                            </span>
-                            <span className={'text-neutral-600'}>•</span>
-                            <span className={'text-sm text-neutral-400'}>
-                                Support ID: <span className={'text-neutral-300 font-mono'}>{supportId}</span>
-                            </span>
-                        </div>
+                        {belowTitle ?? (
+                            <div className={'flex items-center gap-4 mt-1'}>
+                                <span className={'text-sm text-neutral-400'}>
+                                    {email}
+                                </span>
+                                <span className={'text-neutral-600'}>•</span>
+                                <span className={'text-sm text-neutral-400'}>
+                                    Support ID: <span className={'text-neutral-300 font-mono'}>{supportId}</span>
+                                </span>
+                            </div>
+                        )}
                     </div>
                     {rightActions && (
                         <div className={'flex items-center'}>

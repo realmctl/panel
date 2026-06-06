@@ -36,6 +36,7 @@ interface RouteDefinition {
 
 interface ServerRouteDefinition extends RouteDefinition {
     permission: string | string[] | null;
+    feature?: 'players' | 'plugins' | 'versions';
 }
 
 interface Routes {
@@ -99,6 +100,7 @@ export default {
         {
             path: '/plugins',
             permission: 'file.*',
+            feature: 'plugins',
             name: 'Plugins',
             component: PluginInstallerContainer,
             exact: true,
@@ -106,6 +108,7 @@ export default {
         {
             path: '/versions',
             permission: 'startup.*',
+            feature: 'versions',
             name: 'Versions',
             component: VersionChangerContainer,
             exact: true,

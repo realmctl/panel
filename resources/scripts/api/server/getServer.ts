@@ -5,6 +5,14 @@ import { Identifier } from '@/api/definitions';
 
 export type AllocationProtocol = 'tcp' | 'udp' | 'both';
 
+export interface NodeLocation {
+    ip: string;
+    countryCode: string | null;
+    country: string | null;
+    city: string | null;
+    region: string | null;
+}
+
 export interface Allocation {
     id: number;
     ip: string;
@@ -39,6 +47,7 @@ export interface Server {
     uuid: string;
     name: string;
     node: string;
+    nodeLocation: NodeLocation | null;
     isNodeUnderMaintenance: boolean;
     status: ServerStatus;
     sftpDetails: {
@@ -59,6 +68,7 @@ export interface Server {
     eggFeatures: string[];
     eggName: string;
     eggBackground: string | null;
+    eggCategory: string | null;
     featureLimits: {
         databases: number;
         allocations: number;
@@ -77,6 +87,15 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     uuid: data.uuid,
     name: data.name,
     node: data.node,
+    nodeLocation: data.node_location
+        ? {
+              ip: data.node_location.ip,
+              countryCode: data.node_location.country_code ?? null,
+              country: data.node_location.country ?? null,
+              city: data.node_location.city ?? null,
+              region: data.node_location.region ?? null,
+          }
+        : null,
     isNodeUnderMaintenance: data.is_node_under_maintenance,
     status: data.status,
     invocation: data.invocation,
@@ -90,6 +109,7 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     eggFeatures: data.egg_features || [],
     eggName: data.egg_name || '',
     eggBackground: data.egg_background || null,
+    eggCategory: data.egg_category || null,
     featureLimits: { ...data.feature_limits },
     isTransferring: data.is_transferring,
     variables: ((data.relationships?.variables as FractalResponseList | undefined)?.data || []).map(

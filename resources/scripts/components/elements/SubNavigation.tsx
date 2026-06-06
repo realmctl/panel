@@ -2,7 +2,7 @@ import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 
 const SubNavigation = styled.div`
-    ${tw`w-full overflow-x-auto`};
+    ${tw`relative z-20 w-full overflow-x-auto`};
     background-color: #192024;
 
     & > div {

@@ -29,6 +29,7 @@ interface Props {
     interactions?: Interaction[];
     placement?: Placement;
     className?: string;
+    flip?: boolean;
     children: React.ReactElement;
 }
 
@@ -49,7 +50,7 @@ export default ({ children, ...props }: Props) => {
         placement: props.placement || 'top',
         middleware: [
             offset(props.arrow ? 10 : 6),
-            flip(),
+            ...(props.flip !== false ? [flip()] : []),
             shift({ padding: 6 }),
             arrow({ element: arrowEl, padding: 6 }),
         ],
@@ -89,8 +90,10 @@ export default ({ children, ...props }: Props) => {
                         transition={{ type: 'spring', damping: 20, stiffness: 300, duration: 0.075 }}
                         {...getFloatingProps({
                             ref: floating,
-                            className:
-                                'bg-gray-900 text-sm text-gray-200 px-3 py-2 rounded pointer-events-none max-w-[24rem]',
+                            className: classNames(
+                                'bg-gray-900 text-sm text-gray-200 px-3 py-2 rounded pointer-events-none max-w-[24rem] z-[5]',
+                                props.className
+                            ),
                             style: {
                                 position: strategy,
                                 top: `${y || 0}px`,

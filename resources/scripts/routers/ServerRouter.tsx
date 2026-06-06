@@ -14,6 +14,7 @@ import { useStoreState } from 'easy-peasy';
 import SubNavigation from '@/components/elements/SubNavigation';
 import ServerInsightsNav from '@/components/server/ServerInsightsNav';
 import ServerVersionNav from '@/components/server/ServerVersionNav';
+import ServerOnlinePlayers from '@/components/server/players/ServerOnlinePlayers';
 import PageHeader from '@/components/elements/PageHeader';
 import InstallListener from '@/components/server/InstallListener';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
@@ -25,6 +26,7 @@ import PermissionRoute from '@/components/elements/PermissionRoute';
 import ServerPowerControls from '@/components/server/console/ServerPowerControls';
 import routes from '@/routers/routes';
 import { isNavRouteActive, toNavigationPath } from '@/lib/routePaths';
+import { serverHasEggFeature } from '@/lib/eggCategories';
 
 const HIDDEN_NAV_PATHS = new Set(['/metrics', '/activity', '/versions']);
 
@@ -40,6 +42,7 @@ export default () => {
     const serverName = ServerContext.useStoreState((state) => state.server.data?.name);
     const inConflictState = ServerContext.useStoreState((state) => state.server.inConflictState);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
+    const eggCategory = ServerContext.useStoreState((state) => state.server.data?.eggCategory ?? null);
     const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
     const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
 
@@ -93,6 +96,7 @@ export default () => {
                 <>
                     <PageHeader
                         title={serverName || 'Server'}
+                        belowTitle={<ServerOnlinePlayers />}
                         rightActions={<ServerPowerControls variant={'header'} />}
                         breadcrumbs={serverBreadcrumbs}
                     >
@@ -100,7 +104,17 @@ export default () => {
                             <SubNavigation>
                                 <div>
                                     {routes.server
-                                        .filter((route) => !!route.name && !HIDDEN_NAV_PATHS.has(route.path))
+                                        .filter((route) => {
+                                            if (!route.name || HIDDEN_NAV_PATHS.has(route.path)) {
+                                                return false;
+                                            }
+
+                                            if (route.feature && !serverHasEggFeature(eggCategory, route.feature)) {
+                                                return false;
+                                            }
+
+                                            return true;
+                                        })
                                         .map((route) => {
                                             const navTo = to(toNavigationPath(route.path), true);
                                             const navExact = route.path.includes(':') ? false : route.exact;
@@ -140,8 +154,14 @@ export default () => {
                         <ErrorBoundary>
                             <TransitionRouter>
                                 <Switch location={location}>
-                                    {routes.server.map(({ path, permission, component: Component, exact }) => (
-                                        <PermissionRoute key={path} permission={permission} path={to(path)} exact={exact ?? true}>
+                                    {routes.server.map(({ path, permission, feature, component: Component, exact }) => (
+                                        <PermissionRoute
+                                            key={path}
+                                            permission={permission}
+                                            feature={feature}
+                                            path={to(path)}
+                                            exact={exact ?? true}
+                                        >
                                             <Spinner.Suspense>
                                                 <Component />
                                             </Spinner.Suspense>

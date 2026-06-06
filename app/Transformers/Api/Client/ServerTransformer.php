@@ -13,6 +13,8 @@ use Illuminate\Container\Container;
 use Pterodactyl\Models\EggVariable;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\NullResource;
+use Pterodactyl\Services\Eggs\EggCategoryMappingService;
+use Pterodactyl\Services\Geolocation\IpGeolocationService;
 use Pterodactyl\Services\Servers\StartupCommandService;
 
 class ServerTransformer extends BaseClientTransformer
@@ -24,6 +26,35 @@ class ServerTransformer extends BaseClientTransformer
     public function getResourceName(): string
     {
         return Server::RESOURCE_NAME;
+    }
+
+    private function formatNodeLocation(Server $server): ?array
+    {
+        $allocation = $server->allocation;
+
+        if (!$allocation) {
+            return null;
+        }
+
+        $geo = app(IpGeolocationService::class)->lookup($allocation->ip);
+
+        if (!$geo) {
+            return [
+                'ip' => $allocation->ip,
+                'country_code' => null,
+                'country' => null,
+                'city' => null,
+                'region' => null,
+            ];
+        }
+
+        return [
+            'ip' => $allocation->ip,
+            'country_code' => $geo['country_code'],
+            'country' => $geo['country'] ?: null,
+            'city' => $geo['city'],
+            'region' => $geo['region'],
+        ];
     }
 
     /**
@@ -51,6 +82,7 @@ class ServerTransformer extends BaseClientTransformer
             'uuid' => $server->uuid,
             'name' => $server->name,
             'node' => $server->node->name,
+            'node_location' => $this->formatNodeLocation($server),
             'is_node_under_maintenance' => $server->node->isUnderMaintenance(),
             'sftp_details' => [
                 'ip' => $server->node->fqdn,
@@ -71,6 +103,7 @@ class ServerTransformer extends BaseClientTransformer
             'egg_features' => $server->egg->inherit_features,
             'egg_name' => $server->egg->name,
             'egg_background' => $server->egg->background,
+            'egg_category' => app(EggCategoryMappingService::class)->getCategoryForEgg($server->egg_id),
             'feature_limits' => [
                 'databases' => $server->database_limit,
                 'allocations' => $server->allocation_limit,
