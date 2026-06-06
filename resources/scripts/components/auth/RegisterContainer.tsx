@@ -3,7 +3,6 @@ import { Link, RouteComponentProps } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
-import AuthToast from '@/components/auth/AuthToast';
 import AuthFooter from '@/components/auth/AuthFooter';
 import http from '@/api/http';
 import { REALM_LOGO } from '@/lib/branding';
@@ -219,8 +218,6 @@ const RegisterContainer = ({ history }: RouteComponentProps) => {
                         />
                     ))}
                 </div>
-
-                <AuthToast />
 
                 {/* Step 1: Name & Email */}
                 {step === 1 && (

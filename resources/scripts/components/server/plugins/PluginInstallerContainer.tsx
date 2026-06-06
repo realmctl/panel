@@ -8,9 +8,8 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import Spinner from '@/components/elements/Spinner';
 import { debounce } from 'debounce';
 import classNames from 'classnames';
-import RealmCard from '@/components/elements/realm/RealmCard';
-import RealmCardSourceHeader from '@/components/elements/realm/RealmCardSourceHeader';
 import { realmClasses } from '@/lib/realmTokens';
+import styles from './style.module.css';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -62,18 +61,6 @@ interface InstallingState {
     loading: boolean;
 }
 
-const installBtn = {
-    backgroundColor: '#1e3a5f',
-    color: '#60a5fa',
-    border: '1px solid rgba(96,165,250,0.2)',
-} as React.CSSProperties;
-
-const installedBtn = {
-    backgroundColor: '#0d2f2a',
-    color: '#34d399',
-    border: '1px solid rgba(52,211,153,0.2)',
-} as React.CSSProperties;
-
 const SOURCES: { id: Source; label: string; description: string; icon: string }[] = [
     { id: 'hangar', label: 'Hangar', description: 'PaperMC plugin repository', icon: '/assets/icons/papermc.webp' },
     { id: 'modrinth', label: 'Modrinth', description: 'Open source plugin platform', icon: '/assets/icons/modrinth.svg' },
@@ -117,7 +104,7 @@ const PluginFallbackIcon = ({ large = false }: { large?: boolean }) => (
     <div
         className={classNames(
             'rounded flex items-center justify-center flex-shrink-0 font-bold bg-realm-surface-raised text-realm-muted',
-            large ? 'w-14 h-14 text-lg' : 'w-8 h-8 text-xs'
+            large ? 'w-14 h-14 text-lg' : 'w-9 h-9 text-xs'
         )}
     >
         ?
@@ -380,31 +367,21 @@ export default () => {
                 : `https://modrinth.com/plugin/${selectedPlugin.slug}`);
 
         return (
-            <div className={'flex flex-col gap-5'}>
-                <button
-                    type={'button'}
-                    onClick={closeDetail}
-                    className={
-                        'flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-300 transition-colors self-start border-0 bg-transparent p-0 cursor-pointer'
-                    }
-                >
+            <div className={styles.detail}>
+                <button type={'button'} onClick={closeDetail} className={styles.detail_back}>
                     <FontAwesomeIcon icon={faArrowLeft} />
                     Back to plugins
                 </button>
 
-                <div className={'flex items-start gap-4'}>
+                <div className={styles.detail_header}>
                     {avatar ? (
-                        <img
-                            src={avatar}
-                            alt={name}
-                            className={'w-14 h-14 rounded object-contain flex-shrink-0 bg-realm-surface-raised'}
-                        />
+                        <img src={avatar} alt={name} className={styles.detail_icon} />
                     ) : (
                         <PluginFallbackIcon large />
                     )}
                     <div className={'flex-1 min-w-0'}>
-                        <h3 className={'text-lg font-semibold text-neutral-100 m-0 mb-1'}>{name}</h3>
-                        <div className={'flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500'}>
+                        <h3 className={styles.detail_title}>{name}</h3>
+                        <div className={styles.detail_stats}>
                             {pluginDetail?.owner && <span>by {pluginDetail.owner}</span>}
                             <span>{formatNumber(downloads)} downloads</span>
                             {pluginDetail?.stars != null && <span>{formatNumber(pluginDetail.stars)} stars</span>}
@@ -415,7 +392,7 @@ export default () => {
                     </div>
                 </div>
 
-                <p className={'text-sm text-neutral-400 m-0 leading-relaxed'}>{description}</p>
+                <p className={styles.detail_desc}>{description}</p>
 
                 {detailLoading || installing.loading ? (
                     <div className={'flex items-center gap-2 text-sm text-neutral-400 py-2'}>
@@ -425,14 +402,9 @@ export default () => {
                 ) : installing.versions.length === 0 ? (
                     <p className={'text-sm text-neutral-500 m-0'}>No versions available for Paper.</p>
                 ) : (
-                    <div
-                        className={classNames(
-                            'rounded-md p-4 flex flex-col gap-3',
-                            realmClasses.insetPanel
-                        )}
-                    >
-                        <span className={'text-xs font-medium uppercase tracking-wide text-neutral-400'}>Install version</span>
-                        <div className={'flex items-center gap-2 flex-wrap'}>
+                    <div className={styles.detail_install}>
+                        <span className={styles.detail_install_label}>Install version</span>
+                        <div className={styles.detail_install_row}>
                             <select
                                 className={classNames(
                                     'rounded text-sm px-3 py-2 focus:outline-none min-w-[12rem] max-w-full',
@@ -451,10 +423,11 @@ export default () => {
                             <button
                                 onClick={install}
                                 disabled={!installing.downloadUrl || installing.loading || isInstalled}
-                                className={
-                                    'px-3 py-2 text-sm font-medium rounded transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'
-                                }
-                                style={isInstalled ? installedBtn : installBtn}
+                                className={classNames(
+                                    styles.row_action,
+                                    isInstalled ? styles.row_action_installed : styles.row_action_install,
+                                    'px-3 py-2 text-sm'
+                                )}
                             >
                                 {installing.loading ? 'Installing…' : isInstalled ? 'Installed ✓' : 'Install to server'}
                             </button>
@@ -476,7 +449,7 @@ export default () => {
                     </div>
                 )}
 
-                <div className={'flex flex-wrap gap-4 text-xs'}>
+                <div className={styles.detail_links}>
                     <a
                         href={externalPageUrl}
                         target={'_blank'}
@@ -502,23 +475,24 @@ export default () => {
 
     const renderList = () => (
         <>
-            <div className={'px-5 py-4 border-b border-realm-border'}>
+            <div className={styles.toolbar}>
                 <input
-                    className={`w-full rounded text-sm px-3 py-2.5 focus:outline-none transition-colors ${realmClasses.input}`}
-                    placeholder={`Search ${activeSource.label}… e.g. WorldEdit, EssentialsX`}
+                    className={classNames('rounded text-sm px-3 py-2 focus:outline-none transition-colors', realmClasses.input, styles.search)}
+                    placeholder={`Search ${activeSource.label}…`}
                     value={query}
                     onChange={(e) => onQueryChange(e.target.value)}
                     autoFocus
                 />
+                {listBadge && <span className={styles.count}>{listBadge}</span>}
             </div>
 
-            <div className={'p-5'}>
+            <div className={styles.list}>
                 {searching ? (
-                    <div className={'py-12'}>
+                    <div className={'py-16'}>
                         <Spinner centered size={'large'} />
                     </div>
                 ) : results.length > 0 ? (
-                    <div className={'flex flex-col gap-2'}>
+                    <div className={'divide-y divide-realm-border/60'}>
                         {results.map((plugin) => {
                             const slug = getPluginSlug(plugin);
                             const name = getPluginName(plugin);
@@ -528,58 +502,44 @@ export default () => {
                             const isInstalled = installedSlugs.has(slug);
 
                             return (
-                                <div
-                                    key={slug}
-                                    className={classNames('rounded-md px-3 py-3 transition-colors duration-100', realmClasses.row)}
-                                >
-                                    <div className={'flex items-start gap-3'}>
-                                        {avatar ? (
-                                            <img
-                                                src={avatar}
-                                                alt={name}
-                                                className={'w-8 h-8 rounded object-contain flex-shrink-0 bg-realm-surface-raised'}
-                                            />
-                                        ) : (
-                                            <PluginFallbackIcon />
-                                        )}
+                                <div key={slug} className={styles.row}>
+                                    {avatar ? (
+                                        <img src={avatar} alt={name} className={styles.row_icon} />
+                                    ) : (
+                                        <PluginFallbackIcon />
+                                    )}
 
-                                        <div className={'flex-1 min-w-0'}>
-                                            <div className={'flex items-center justify-between gap-2 mb-1'}>
-                                                <button
-                                                    type={'button'}
-                                                    onClick={() => openDetail(plugin)}
-                                                    className={
-                                                        'text-sm font-medium text-neutral-200 truncate text-left border-0 bg-transparent p-0 cursor-pointer hover:text-blue-400 transition-colors'
-                                                    }
-                                                >
-                                                    {name}
-                                                </button>
-                                                <span className={'text-xs font-mono flex-shrink-0 text-realm-muted'}>
-                                                    {formatNumber(downloads)} downloads
-                                                </span>
-                                            </div>
-                                            <p className={'text-xs text-neutral-500 line-clamp-2 mb-2'}>{desc}</p>
-                                            <button
-                                                onClick={() => openDetail(plugin)}
-                                                disabled={isInstalled}
-                                                className={
-                                                    'px-2.5 py-1 text-xs font-medium rounded transition-colors duration-150 disabled:opacity-50 disabled:cursor-default'
-                                                }
-                                                style={isInstalled ? installedBtn : installBtn}
-                                            >
-                                                {isInstalled ? 'Installed ✓' : 'View & install'}
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <button
+                                        type={'button'}
+                                        onClick={() => openDetail(plugin)}
+                                        className={classNames(styles.row_body, 'border-0 bg-transparent p-0 cursor-pointer text-left')}
+                                    >
+                                        <p className={styles.row_name}>{name}</p>
+                                        <p className={styles.row_desc}>{desc}</p>
+                                    </button>
+
+                                    <span className={styles.row_meta}>{formatNumber(downloads)} dl</span>
+
+                                    <button
+                                        type={'button'}
+                                        onClick={() => openDetail(plugin)}
+                                        disabled={isInstalled}
+                                        className={classNames(
+                                            styles.row_action,
+                                            isInstalled ? styles.row_action_installed : styles.row_action_install
+                                        )}
+                                    >
+                                        {isInstalled ? 'Installed' : 'Install'}
+                                    </button>
                                 </div>
                             );
                         })}
                     </div>
                 ) : (
-                    <div className={'flex flex-col items-center justify-center py-12'}>
+                    <div className={styles.empty}>
                         <img src={activeSource.icon} alt={''} className={'w-8 h-8 object-contain opacity-30 mb-3'} />
-                        <h3 className={'text-base font-semibold text-neutral-100 mb-1'}>No plugins found</h3>
-                        <p className={'text-sm text-neutral-500'}>Try a different search term or switch source.</p>
+                        <h3 className={'text-base font-semibold text-neutral-100 mb-1 m-0'}>No plugins found</h3>
+                        <p className={'text-sm text-neutral-500 m-0'}>Try a different search term or switch source.</p>
                     </div>
                 )}
             </div>
@@ -587,10 +547,10 @@ export default () => {
     );
 
     return (
-        <ServerContentBlock title={'Plugin Installer'}>
+        <ServerContentBlock title={'Plugins'}>
             <FlashMessageRender byKey={'plugins'} className={'mb-4'} />
 
-            <div className={classNames('flex items-center gap-1 p-1 rounded-lg mb-6 flex-wrap', realmClasses.tabBar)}>
+            <div className={classNames('flex items-center gap-1 p-1 rounded-lg mb-4 flex-wrap', realmClasses.tabBar)}>
                 {SOURCES.map((s) => {
                     const active = source === s.id;
                     return (
@@ -609,20 +569,9 @@ export default () => {
                 })}
             </div>
 
-            <RealmCard
-                bodyClassName={'p-0'}
-                header={
-                    <RealmCardSourceHeader
-                        label={activeSource.label}
-                        description={activeSource.description}
-                        icon={activeSource.icon}
-                        badge={listBadge}
-                    />
-                }
-                headerClassName={'px-5 py-3'}
-            >
-                {selectedPlugin ? <div className={'p-5'}>{renderDetail()}</div> : renderList()}
-            </RealmCard>
+            <div className={styles.panel}>
+                {selectedPlugin ? renderDetail() : renderList()}
+            </div>
         </ServerContentBlock>
     );
 };

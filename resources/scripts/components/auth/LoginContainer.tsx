@@ -6,7 +6,6 @@ import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
-import AuthToast from '@/components/auth/AuthToast';
 import AuthFooter from '@/components/auth/AuthFooter';
 import { REALM_LOGO } from '@/lib/branding';
 
@@ -147,8 +146,6 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         }
                     </p>
                 </div>
-
-                <AuthToast />
 
                 <Formik
                     onSubmit={onSubmit}

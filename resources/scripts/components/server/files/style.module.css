@@ -61,14 +61,18 @@
     @apply flex-1 overflow-y-auto py-2 min-h-0;
 }
 
+.tree_row_wrap {
+    @apply px-2 py-px;
+}
+
 .tree_row {
-    @apply flex items-center gap-1.5 w-full border-0 bg-transparent text-left cursor-pointer;
-    @apply text-xs text-neutral-300 py-1 pr-2 min-h-[26px];
+    @apply flex items-center gap-1.5 w-full border-0 bg-transparent text-left cursor-pointer rounded-md;
+    @apply text-xs text-neutral-300 py-1 px-1.5 min-h-[26px];
     @apply hover:bg-neutral-800/80 hover:text-neutral-100 transition-colors duration-75;
 }
 
 .tree_row_active {
-    @apply bg-neutral-800 text-neutral-100;
+    @apply bg-neutral-800/90 text-neutral-100;
 }
 
 .tree_chevron {
@@ -77,6 +81,11 @@
 
 .tree_label {
     @apply truncate flex-1 min-w-0;
+}
+
+.tree_inline_input {
+    @apply flex-1 min-w-0 border-0 bg-transparent text-xs text-neutral-100 outline-none p-0 m-0;
+    @apply placeholder:text-neutral-600;
 }
 
 .tree_file_icon {

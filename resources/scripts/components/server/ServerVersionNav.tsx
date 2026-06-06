@@ -23,7 +23,7 @@ export default () => {
                 <RefreshIcon className={'w-4 h-4 text-blue-500 flex-shrink-0'} />
                 <span>Change Version</span>
             </VersionButton>
-            {visible && <ChangeVersionModal visible appear onDismissed={() => setVisible(false)} />}
+            <ChangeVersionModal visible={visible} onDismissed={() => setVisible(false)} />
         </Can>
     );
 };

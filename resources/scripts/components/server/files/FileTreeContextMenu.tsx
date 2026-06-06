@@ -72,8 +72,8 @@ interface Props {
     target: TreeContextTarget | null;
     onClose: () => void;
     onOpenFile?: (path: string, file: FileObject) => void;
-    onNewFile?: () => void;
-    onNewFolder?: () => void;
+    onNewFile?: (parentPath: string) => void;
+    onNewFolder?: (parentPath: string) => void;
     onTreeChange?: () => void;
     onItemMoved?: (from: string, to: string) => void;
     onItemDeleted?: (path: string) => void;
@@ -308,7 +308,7 @@ export default ({
                         label={'New file'}
                         onClick={() => {
                             dismiss();
-                            onNewFile?.();
+                            onNewFile?.(parentPath);
                         }}
                     />
                     <MenuItem
@@ -316,7 +316,7 @@ export default ({
                         label={'New folder'}
                         onClick={() => {
                             dismiss();
-                            onNewFolder?.();
+                            onNewFolder?.(parentPath);
                         }}
                     />
                 </Can>

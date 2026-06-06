@@ -60,9 +60,9 @@ const AllocationRow = ({ allocation }: Props) => {
     return (
         <>
             <AllocationFirewallModal
-                open={showFirewall}
+                visible={showFirewall}
                 allocation={allocation}
-                onClose={() => setShowFirewall(false)}
+                onDismissed={() => setShowFirewall(false)}
             />
 
             <div
@@ -173,11 +173,9 @@ const AllocationRow = ({ allocation }: Props) => {
                     <Can action={'allocation.update'}>
                         <Button.Text
                             size={Button.Sizes.Small}
-                            className={'flex items-center gap-1.5'}
                             style={allocation.whitelistEnabled ? { color: '#34d399' } : undefined}
                             onClick={() => setShowFirewall(true)}
                         >
-                            <FontAwesomeIcon icon={faShieldAlt} className={'text-xs'} />
                             Firewall
                         </Button.Text>
                     </Can>

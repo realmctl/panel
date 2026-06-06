@@ -8,7 +8,6 @@ import { object, string } from 'yup';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import FlashMessageRender from '@/components/FlashMessageRender';
-import AuthToast from '@/components/auth/AuthToast';
 import AuthFooter from '@/components/auth/AuthFooter';
 
 interface Values {
@@ -128,8 +127,6 @@ export default () => {
                         Enter your email address and we&apos;ll send you instructions to reset your password.
                     </p>
                 </div>
-
-                <AuthToast />
 
                 <Formik
                     onSubmit={handleSubmission}

@@ -71,7 +71,7 @@ export default () => {
                                 </h3>
                                 <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
                                     {databaseLimit > 0
-                                        ? 'Create a database to store your server data.'
+                                        ? 'Databases let your plugins store persistent data like player stats, economy, and ban records.'
                                         : 'Database creation is not enabled for this server.'}
                                 </p>
                                 {databaseLimit > 0 && (

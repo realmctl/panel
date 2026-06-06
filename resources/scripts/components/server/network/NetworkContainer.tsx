@@ -4,6 +4,7 @@ import { useFlashKey } from '@/plugins/useFlash';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { ServerContext } from '@/state/server';
 import AllocationRow from '@/components/server/network/AllocationRow';
+import NetworkDefaultEmptyState from '@/components/server/network/NetworkDefaultEmptyState';
 import Button from '@/components/elements/Button';
 import createServerAllocation from '@/api/server/network/createServerAllocation';
 import Can from '@/components/elements/Can';
@@ -46,28 +47,41 @@ const NetworkContainer = () => {
             .then(() => setLoading(false));
     };
 
+    const hasOnlyDefaultAllocation =
+        data?.length === 1 && data[0].isDefault;
+    const canCreateAllocation =
+        allocationLimit > 0 && !!data && allocationLimit > data.length;
+
     return (
         <ServerContentBlock showFlashKey={'server:network'} title={'Network'}>
             <SpinnerOverlay visible={loading} />
 
-            {allocationLimit > 0 && data && allocationLimit > data.length && (
-                <Can action={'allocation.create'}>
-                    <div className={'flex justify-end mb-4'}>
-                        <Button color={'primary'} onClick={onCreateAllocation}>
-                            Add Allocation
-                        </Button>
-                    </div>
-                </Can>
-            )}
-
             {!data ? (
                 <Spinner size={'large'} centered />
+            ) : hasOnlyDefaultAllocation ? (
+                <NetworkDefaultEmptyState
+                    allocation={data[0]}
+                    onCreateAllocation={onCreateAllocation}
+                    canCreateAllocation={canCreateAllocation}
+                />
             ) : (
-                <div className={'grid grid-cols-1 lg:grid-cols-2 gap-4'}>
-                    {data.map((allocation) => (
-                        <AllocationRow key={`${allocation.ip}:${allocation.port}`} allocation={allocation} />
-                    ))}
-                </div>
+                <>
+                    {canCreateAllocation && (
+                        <Can action={'allocation.create'}>
+                            <div className={'flex justify-end mb-4'}>
+                                <Button color={'primary'} onClick={onCreateAllocation}>
+                                    Add Allocation
+                                </Button>
+                            </div>
+                        </Can>
+                    )}
+
+                    <div className={'grid grid-cols-1 lg:grid-cols-2 gap-4'}>
+                        {data.map((allocation) => (
+                            <AllocationRow key={`${allocation.ip}:${allocation.port}`} allocation={allocation} />
+                        ))}
+                    </div>
+                </>
             )}
         </ServerContentBlock>
     );

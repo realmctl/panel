@@ -23,7 +23,13 @@ import { useExplorerDrag, writeInternalDragData } from '@/components/server/file
 import { getDropFolderForPath } from '@/components/server/files/fileExplorerDrag';
 import { hasExternalFiles } from '@/components/server/files/fileUploadUtils';
 import FileTreeContextMenu, { TreeContextTarget } from '@/components/server/files/FileTreeContextMenu';
+import TreeInlineCreate from '@/components/server/files/TreeInlineCreate';
 import styles from './style.module.css';
+
+export interface InlineCreateState {
+    type: 'file' | 'folder';
+    parentPath: string;
+}
 
 const sortTreeEntries = (entries: FileObject[]) =>
     [...entries]
@@ -68,6 +74,9 @@ interface TreeEntryProps {
     onContextMenu: (event: React.MouseEvent, file: FileObject, parentPath: string) => void;
     activeEditors: FileEditorPresence[];
     currentUserUuid?: string;
+    inlineCreate: InlineCreateState | null;
+    onInlineCreateSubmit: (name: string) => void;
+    onInlineCreateCancel: () => void;
 }
 
 const TreeEntry = ({
@@ -83,6 +92,9 @@ const TreeEntry = ({
     onContextMenu,
     activeEditors,
     currentUserUuid,
+    inlineCreate,
+    onInlineCreateSubmit,
+    onInlineCreateCancel,
 }: TreeEntryProps) => {
     const {
         dragPath,
@@ -127,6 +139,7 @@ const TreeEntry = ({
 
     return (
         <div>
+            <div className={styles.tree_row_wrap} style={{ paddingLeft: `${depth * 12 + 8}px` }}>
             <button
                 type={'button'}
                 draggable={canDrag}
@@ -177,7 +190,6 @@ const TreeEntry = ({
                     isDragging && styles.tree_row_dragging,
                     isDropTarget && styles.tree_row_drop_target
                 )}
-                style={{ paddingLeft: `${depth * 12 + 8}px` }}
                 title={file.name}
             >
                 <span className={styles.tree_chevron} onClick={handleChevronClick}>
@@ -203,9 +215,10 @@ const TreeEntry = ({
                 />
                 <span className={styles.tree_label}>{file.name}</span>
             </button>
-            {isFolder && isExpanded && children && children.length > 0 && (
+            </div>
+            {isFolder && isExpanded && (
                 <div>
-                    {children.map((child) => (
+                    {children?.map((child) => (
                         <TreeEntry
                             key={`${fullPath}:${child.key}`}
                             file={child}
@@ -220,8 +233,19 @@ const TreeEntry = ({
                             onContextMenu={onContextMenu}
                             activeEditors={activeEditors}
                             currentUserUuid={currentUserUuid}
+                            inlineCreate={inlineCreate}
+                            onInlineCreateSubmit={onInlineCreateSubmit}
+                            onInlineCreateCancel={onInlineCreateCancel}
                         />
                     ))}
+                    {inlineCreate?.parentPath === fullPath && (
+                        <TreeInlineCreate
+                            type={inlineCreate.type}
+                            depth={depth + 1}
+                            onSubmit={onInlineCreateSubmit}
+                            onCancel={onInlineCreateCancel}
+                        />
+                    )}
                 </div>
             )}
         </div>
@@ -235,8 +259,12 @@ interface Props {
     currentUserUuid?: string;
     onOpenFile: (path: string, file: FileObject) => void;
     onTreeChange?: () => void;
-    onNewFile?: () => void;
-    onNewFolder?: () => void;
+    onNewFile?: (parentPath: string) => void;
+    onNewFolder?: (parentPath: string) => void;
+    inlineCreate?: InlineCreateState | null;
+    onInlineCreateDismiss?: () => void;
+    onCreateFile?: (parentPath: string, name: string) => void;
+    onCreateFolder?: (parentPath: string, name: string) => void;
     onItemMoved?: (from: string, to: string) => void;
     onItemDeleted?: (path: string) => void;
 }
@@ -250,6 +278,10 @@ export default ({
     onTreeChange,
     onNewFile,
     onNewFolder,
+    inlineCreate = null,
+    onInlineCreateDismiss,
+    onCreateFile,
+    onCreateFolder,
     onItemMoved,
     onItemDeleted,
 }: Props) => {
@@ -368,6 +400,37 @@ export default ({
         });
     }, [activeFilePath, fetchDirectory]);
 
+    useEffect(() => {
+        if (!inlineCreate) {
+            return;
+        }
+
+        const ancestors = getAncestorPaths(inlineCreate.parentPath);
+        setExpandedPaths((prev) => new Set([...prev, ...ancestors]));
+        ancestors.forEach((path) => {
+            void fetchDirectory(path);
+        });
+    }, [inlineCreate, fetchDirectory]);
+
+    const handleInlineCreateSubmit = useCallback(
+        (name: string) => {
+            if (!inlineCreate) {
+                return;
+            }
+
+            if (inlineCreate.type === 'file') {
+                onCreateFile?.(inlineCreate.parentPath, name);
+            } else {
+                onCreateFolder?.(inlineCreate.parentPath, name);
+            }
+        },
+        [inlineCreate, onCreateFile, onCreateFolder]
+    );
+
+    const handleInlineCreateCancel = useCallback(() => {
+        onInlineCreateDismiss?.();
+    }, [onInlineCreateDismiss]);
+
     const onToggleFolder = useCallback(
         (path: string) => {
             const normalized = cleanDirectoryPath(path);
@@ -391,6 +454,7 @@ export default ({
 
     const rootEntries = treeCache['/'] ?? [];
     const canAcceptDrop = canUpdate || canCreate;
+    const showRootInlineCreate = inlineCreate?.parentPath === '/';
 
     return (
         <div className={styles.explorer_tree}>
@@ -442,26 +506,39 @@ export default ({
                     </div>
                 ) : !canRead ? (
                     <p className={'text-xs text-neutral-500 px-3 py-2 m-0'}>No permission to browse files.</p>
-                ) : rootEntries.length === 0 ? (
+                ) : rootEntries.length === 0 && !showRootInlineCreate ? (
                     <p className={'text-xs text-neutral-500 px-3 py-2 m-0'}>This directory is empty.</p>
                 ) : (
-                    rootEntries.map((file) => (
-                        <TreeEntry
-                            key={file.key}
-                            file={file}
-                            parentPath={'/'}
-                            depth={0}
-                            activeFilePath={activeFilePath}
-                            expandedPaths={expandedPaths}
-                            loadingPaths={loadingPaths}
-                            treeCache={treeCache}
-                            onToggleFolder={onToggleFolder}
-                            onOpenFile={onOpenFile}
-                            onContextMenu={openContextMenu}
-                            activeEditors={activeEditors}
-                            currentUserUuid={currentUserUuid}
-                        />
-                    ))
+                    <>
+                        {rootEntries.map((file) => (
+                            <TreeEntry
+                                key={file.key}
+                                file={file}
+                                parentPath={'/'}
+                                depth={0}
+                                activeFilePath={activeFilePath}
+                                expandedPaths={expandedPaths}
+                                loadingPaths={loadingPaths}
+                                treeCache={treeCache}
+                                onToggleFolder={onToggleFolder}
+                                onOpenFile={onOpenFile}
+                                onContextMenu={openContextMenu}
+                                activeEditors={activeEditors}
+                                currentUserUuid={currentUserUuid}
+                                inlineCreate={inlineCreate}
+                                onInlineCreateSubmit={handleInlineCreateSubmit}
+                                onInlineCreateCancel={handleInlineCreateCancel}
+                            />
+                        ))}
+                        {showRootInlineCreate && inlineCreate && (
+                            <TreeInlineCreate
+                                type={inlineCreate.type}
+                                depth={0}
+                                onSubmit={handleInlineCreateSubmit}
+                                onCancel={handleInlineCreateCancel}
+                            />
+                        )}
+                    </>
                 )}
             </div>
             <FileTreeContextMenu

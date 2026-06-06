@@ -1,0 +1,106 @@
+.panel {
+    @apply overflow-hidden bg-realm-card border border-realm-border rounded-lg flex flex-col;
+    min-height: min(28rem, calc(100vh - 14rem));
+}
+
+.toolbar {
+    @apply flex items-center gap-3 px-4 py-3 border-b border-realm-border bg-realm-surface flex-shrink-0;
+}
+
+.search {
+    @apply flex-1 min-w-0;
+}
+
+.count {
+    @apply text-xs font-mono text-realm-muted flex-shrink-0;
+}
+
+.list {
+    @apply flex-1 overflow-y-auto min-h-0;
+}
+
+.row {
+    @apply flex items-center gap-3 px-4 py-2.5 w-full text-left transition-colors duration-75;
+    @apply hover:bg-neutral-800/50;
+}
+
+.row_icon {
+    @apply w-9 h-9 rounded object-contain flex-shrink-0 bg-realm-surface-raised;
+}
+
+.row_body {
+    @apply flex-1 min-w-0;
+}
+
+.row_name {
+    @apply text-sm font-medium text-neutral-200 truncate m-0;
+}
+
+.row_desc {
+    @apply text-xs text-neutral-500 line-clamp-1 m-0 mt-0.5;
+}
+
+.row_meta {
+    @apply text-xs font-mono text-realm-muted flex-shrink-0 hidden sm:block;
+}
+
+.row_action {
+    @apply flex-shrink-0 px-2.5 py-1 text-xs font-medium rounded transition-colors duration-150 border-0 cursor-pointer;
+    @apply disabled:opacity-50 disabled:cursor-default;
+}
+
+.row_action_install {
+    @apply bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300;
+}
+
+.row_action_installed {
+    @apply bg-emerald-500/10 text-emerald-400;
+}
+
+.detail {
+    @apply flex flex-col gap-5 p-5 flex-1 overflow-y-auto min-h-0;
+}
+
+.detail_back {
+    @apply flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-300 transition-colors self-start border-0 bg-transparent p-0 cursor-pointer;
+}
+
+.detail_header {
+    @apply flex items-start gap-4;
+}
+
+.detail_icon {
+    @apply w-14 h-14 rounded object-contain flex-shrink-0 bg-realm-surface-raised;
+}
+
+.detail_title {
+    @apply text-lg font-semibold text-neutral-100 m-0 mb-1;
+}
+
+.detail_stats {
+    @apply flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500;
+}
+
+.detail_desc {
+    @apply text-sm text-neutral-400 m-0 leading-relaxed;
+}
+
+.detail_install {
+    @apply flex flex-col gap-3 pt-4 border-t border-realm-border;
+}
+
+.detail_install_label {
+    @apply text-xs font-medium uppercase tracking-wide text-neutral-400;
+}
+
+.detail_install_row {
+    @apply flex items-center gap-2 flex-wrap;
+}
+
+.detail_links {
+    @apply flex flex-wrap gap-4 text-xs;
+}
+
+.empty {
+    @apply flex flex-col items-center justify-center py-16 px-6 flex-1;
+}

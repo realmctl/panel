@@ -8,7 +8,6 @@ import { ApplicationStore } from '@/state';
 import { Formik, FormikHelpers } from 'formik';
 import { object, ref, string } from 'yup';
 import FlashMessageRender from '@/components/FlashMessageRender';
-import AuthToast from '@/components/auth/AuthToast';
 import AuthFooter from '@/components/auth/AuthFooter';
 
 interface Values {
@@ -49,8 +48,6 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                         Enter your new password below.
                     </p>
                 </div>
-
-                <AuthToast />
 
                 <Formik
                     onSubmit={submit}

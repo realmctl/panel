@@ -10,6 +10,7 @@ import { ServerContext } from '@/state/server';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Pagination from '@/components/elements/Pagination';
 import { Dialog } from '@/components/elements/dialog';
+import Button from '@/components/elements/Button';
 import deleteAllBackups from '@/api/server/backups/deleteAllBackups';
 
 const BackupContainer = () => {
@@ -71,18 +72,14 @@ const BackupContainer = () => {
                     </span>
                     <div className={'flex items-center gap-2'}>
                         <Can action={'backup.delete'}>
-                            <button
+                            <Button
+                                color={'red'}
+                                isSecondary
                                 disabled={deletingAll}
                                 onClick={() => setShowDeleteAllDialog(true)}
-                                className={'px-3 py-1.5 text-xs font-medium rounded transition-colors duration-150 disabled:opacity-50'}
-                                style={{
-                                    border: '1px solid rgba(239,68,68,0.3)',
-                                    backgroundColor: 'rgba(239,68,68,0.08)',
-                                    color: '#f87171',
-                                }}
                             >
                                 {deletingAll ? 'Deleting…' : 'Delete All'}
-                            </button>
+                            </Button>
                         </Can>
                         <Can action={'backup.create'}>
                             {backupLimit > backups.backupCount && <CreateBackupButton />}
@@ -105,7 +102,7 @@ const BackupContainer = () => {
                                     ? 'Backups cannot be created for this server because the backup limit is set to 0.'
                                     : page > 1
                                         ? "Looks like we've run out of backups to show you, try going back a page."
-                                        : 'Create a backup to protect your server data.'}
+                                        : 'Backups let you snapshot your server files and restore them when something goes wrong.'}
                             </p>
                             {backupLimit > 0 && (
                                 <Can action={'backup.create'}>

@@ -19,13 +19,12 @@ import RealmCard from '@/components/elements/realm/RealmCard';
 import RealmTabBar from '@/components/elements/realm/RealmTabBar';
 const TAB_SWITCH_DELAY_MS = 200;
 
-type Tab = 'general' | 'details' | 'danger' | 'startup' | 'variables';
+type Tab = 'general' | 'danger' | 'startup' | 'variables';
 
-const TAB_IDS: Tab[] = ['general', 'details', 'danger', 'startup', 'variables'];
+const TAB_IDS: Tab[] = ['general', 'danger', 'startup', 'variables'];
 
 const ALL_TABS: { id: Tab; label: string; permission: string | string[] | null }[] = [
     { id: 'general', label: 'General', permission: null },
-    { id: 'details', label: 'Server Details', permission: 'settings.rename' },
     { id: 'startup', label: 'Startup & Docker', permission: 'startup.*' },
     { id: 'variables', label: 'Variables', permission: 'startup.*' },
     { id: 'danger', label: 'Danger Zone', permission: 'settings.reinstall' },
@@ -61,6 +60,10 @@ const tabFromSearch = (search: string): Tab | null => {
 };
 
 const tabFromParam = (tab?: string): Tab => {
+    if (tab === 'details') {
+        return 'general';
+    }
+
     if (tab && TAB_IDS.includes(tab as Tab)) {
         return tab as Tab;
     }
@@ -107,13 +110,18 @@ export default () => {
     );
 
     useEffect(() => {
+        if (tabParam === 'details') {
+            history.replace(settingsPath('general'));
+            return;
+        }
+
         const legacyTab = tabFromSearch(location.search);
         if (!legacyTab) {
             return;
         }
 
-        history.replace(settingsPath(legacyTab));
-    }, [history, location.search, settingsPath]);
+        history.replace(settingsPath(legacyTab === 'details' ? 'general' : legacyTab));
+    }, [history, location.search, settingsPath, tabParam]);
 
     useEffect(() => {
         if (!tabParam) {
@@ -174,6 +182,18 @@ export default () => {
                     <>
                         {renderedTab === 'general' && (
                             <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
+                                <Can action={'settings.rename'}>
+                                    <RealmCard
+                                        header={
+                                            <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
+                                                Server Details
+                                            </span>
+                                        }
+                                    >
+                                        <RenameServerBox />
+                                    </RealmCard>
+                                </Can>
+
                                 <Can action={'file.sftp'}>
                                     <RealmCard
                                         header={
@@ -242,22 +262,6 @@ export default () => {
                                             </div>
                                         </CopyOnClick>
                                 </RealmCard>
-                            </div>
-                        )}
-
-                        {renderedTab === 'details' && (
-                            <div className={'max-w-xl'}>
-                                <Can action={'settings.rename'}>
-                                    <RealmCard
-                                        header={
-                                            <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
-                                                Server Details
-                                            </span>
-                                        }
-                                    >
-                                        <RenameServerBox />
-                                    </RealmCard>
-                                </Can>
                             </div>
                         )}
 

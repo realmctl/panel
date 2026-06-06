@@ -3,10 +3,11 @@ import { useHistory, useLocation, useParams } from 'react-router-dom';
 import getFileContents from '@/api/server/files/getFileContents';
 import { httpErrorToHuman } from '@/api/http';
 import { FileObject } from '@/api/server/files/loadDirectory';
-import FileManagerTreeSidebar from '@/components/server/files/FileManagerTreeSidebar';
+import FileManagerTreeSidebar, { InlineCreateState } from '@/components/server/files/FileManagerTreeSidebar';
 import FileManagerExplorerToolbar from '@/components/server/files/FileManagerExplorerToolbar';
 import FileEditorWorkspace from '@/components/server/files/FileEditorWorkspace';
-import FileNameModal from '@/components/server/files/FileNameModal';
+import createDirectory from '@/api/server/files/createDirectory';
+import useFlash from '@/plugins/useFlash';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import RealmCard from '@/components/elements/realm/RealmCard';
 import { useStoreActions } from '@/state/hooks';
@@ -36,9 +37,9 @@ export default () => {
     const [tabs, setTabs] = useState<OpenFileTab[]>([]);
     const [activePath, setActivePath] = useState<string | null>(null);
     const [cursorLine, setCursorLine] = useState(1);
-    const [newFileModalVisible, setNewFileModalVisible] = useState(false);
-    const [newFolderModalVisible, setNewFolderModalVisible] = useState(false);
+    const [inlineCreate, setInlineCreate] = useState<InlineCreateState | null>(null);
     const [treeRefreshToken, setTreeRefreshToken] = useState(0);
+    const { clearAndAddHttpError, clearFlashes } = useFlash();
     const { activeEditors, currentUserUuid } = useFileEditingPresence(uuid, activePath, cursorLine);
     const [canUpdate] = usePermissions(['file.update']);
     const [canCreate] = usePermissions(['file.create']);
@@ -152,6 +153,19 @@ export default () => {
         }
     }, [hash, openFile]);
 
+    const beginInlineCreate = useCallback(
+        (type: 'file' | 'folder', parentPath?: string) => {
+            const target = cleanDirectoryPath(parentPath ?? directory);
+
+            if (target.includes('::')) {
+                return;
+            }
+
+            setInlineCreate({ type, parentPath: target });
+        },
+        [directory]
+    );
+
     const openNewFileTab = useCallback((fullPath: string) => {
         const normalized = cleanDirectoryPath(fullPath);
 
@@ -205,10 +219,30 @@ export default () => {
 
         if (action === 'new') {
             routeHandled.current = true;
-            setNewFileModalVisible(true);
+            beginInlineCreate('file');
             history.replace(`/server/${id}/files${hash}`);
         }
-    }, [action, hash, history, id, openFile]);
+    }, [action, beginInlineCreate, hash, history, id, openFile]);
+
+    const handleCreateFile = useCallback(
+        (parentPath: string, name: string) => {
+            setInlineCreate(null);
+            openNewFileTab(join(parentPath, name));
+        },
+        [openNewFileTab]
+    );
+
+    const handleCreateFolder = useCallback(
+        (parentPath: string, name: string) => {
+            setInlineCreate(null);
+            clearFlashes('files');
+
+            createDirectory(uuid, parentPath, name)
+                .then(() => bumpTree())
+                .catch((error) => clearAndAddHttpError({ key: 'files', error }));
+        },
+        [bumpTree, clearAndAddHttpError, clearFlashes, uuid]
+    );
 
     const handleActivePathChange = useCallback(
         (path: string | null) => {
@@ -286,10 +320,9 @@ export default () => {
                     >
                         <div className={style.explorer_inner}>
                             <FileManagerExplorerToolbar
-                                onNewFile={() => setNewFileModalVisible(true)}
+                                onNewFile={() => beginInlineCreate('file')}
+                                onNewFolder={() => beginInlineCreate('folder')}
                                 onTreeChange={bumpTree}
-                                newFolderOpen={newFolderModalVisible}
-                                onNewFolderOpenChange={setNewFolderModalVisible}
                             />
                             <ErrorBoundary>
                                 <FileManagerTreeSidebar
@@ -299,8 +332,12 @@ export default () => {
                                     currentUserUuid={currentUserUuid}
                                     onOpenFile={handleOpenFileFromTree}
                                     onTreeChange={bumpTree}
-                                    onNewFile={() => setNewFileModalVisible(true)}
-                                    onNewFolder={() => setNewFolderModalVisible(true)}
+                                    onNewFile={(parentPath) => beginInlineCreate('file', parentPath)}
+                                    onNewFolder={(parentPath) => beginInlineCreate('folder', parentPath)}
+                                    inlineCreate={inlineCreate}
+                                    onInlineCreateDismiss={() => setInlineCreate(null)}
+                                    onCreateFile={handleCreateFile}
+                                    onCreateFolder={handleCreateFolder}
                                     onItemMoved={handleItemMoved}
                                     onItemDeleted={handleItemDeleted}
                                 />
@@ -321,14 +358,6 @@ export default () => {
                 />
             </div>
 
-            <FileNameModal
-                visible={newFileModalVisible}
-                onDismissed={() => setNewFileModalVisible(false)}
-                onFileNamed={(name) => {
-                    setNewFileModalVisible(false);
-                    openNewFileTab(join(directory, name));
-                }}
-            />
         </ServerContentBlock>
     );
 };
