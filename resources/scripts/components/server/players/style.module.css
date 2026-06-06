@@ -10,6 +10,14 @@
     @apply text-sm text-neutral-400 whitespace-nowrap;
 }
 
+.players_count_button {
+    @apply text-sm text-neutral-400 whitespace-nowrap bg-transparent border-0 p-0 cursor-pointer transition-colors duration-150;
+}
+
+.players_count_button:hover {
+    @apply text-neutral-200;
+}
+
 .meta_text {
     @apply text-sm text-neutral-400 whitespace-nowrap;
 }

@@ -17,6 +17,7 @@ import {
     getServerConnectionAddress,
     resolveServerDisplayStatus,
 } from '@/components/server/players/serverHeaderMeta';
+import PlayerListModal from '@/components/server/players/PlayerListModal';
 import styles from './style.module.css';
 
 const POLL_INTERVAL_MS = 30_000;
@@ -35,6 +36,7 @@ export default () => {
 
     const [liveStatus, setLiveStatus] = useState<MinecraftServerStatus | null>(null);
     const [loading, setLoading] = useState(true);
+    const [playerModalOpen, setPlayerModalOpen] = useState(false);
 
     const isMinecraft = serverSupportsPlayers(eggName, eggCategory);
     const showPlayers = isMinecraft && canRead;
@@ -115,7 +117,14 @@ export default () => {
             {connectionAddress && hasPlayerContent && <MetaSeparator />}
 
             {showPlayers && loading && !players && (
-                <span className={styles.meta_text}>Loading players...</span>
+                <button
+                    type={'button'}
+                    className={styles.players_count_button}
+                    onClick={() => setPlayerModalOpen(true)}
+                    title={'View online players'}
+                >
+                    Loading players...
+                </button>
             )}
 
             {showPlayers && players && (
@@ -178,10 +187,15 @@ export default () => {
                         </span>
                     )}
 
-                    <span className={styles.players_count}>
+                    <button
+                        type={'button'}
+                        className={styles.players_count_button}
+                        onClick={() => setPlayerModalOpen(true)}
+                        title={'View online players'}
+                    >
                         {players.online}
                         {players.max > 0 ? ` / ${players.max}` : ''} online
-                    </span>
+                    </button>
 
                     {versionLabel && (
                         <>
@@ -201,6 +215,14 @@ export default () => {
                 <span className={classNames(styles.meta_status_dot, statusDotClass)} aria-hidden={'true'} />
                 <span className={classNames(styles.meta_text, statusClass)}>{displayStatus.label}</span>
             </span>
+
+            <PlayerListModal
+                visible={playerModalOpen}
+                onDismissed={() => setPlayerModalOpen(false)}
+                status={liveStatus}
+                loading={loading}
+                onRefresh={fetchPlayers}
+            />
         </div>
     );
 };

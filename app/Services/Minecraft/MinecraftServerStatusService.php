@@ -116,6 +116,8 @@ class MinecraftServerStatusService
                     'name' => $name,
                     'uuid' => $uuid,
                     'avatar' => $this->avatarService->urlsForPlayer($name, $uuid),
+                    'ping' => isset($player['ping']) ? (int) $player['ping'] : null,
+                    'joined_at' => isset($player['joined_at']) ? (string) $player['joined_at'] : null,
                 ];
             }
         }

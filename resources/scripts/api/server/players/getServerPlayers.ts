@@ -11,6 +11,8 @@ export interface MinecraftOnlinePlayer {
     name: string;
     uuid: string | null;
     avatar: MinecraftPlayerAvatarUrls;
+    ping: number | null;
+    joinedAt: string | null;
 }
 
 export interface MinecraftServerMotd {
@@ -50,10 +52,31 @@ export interface GetServerPlayersParams {
     allocation?: number;
 }
 
+const mapPlayer = (player: Record<string, unknown>): MinecraftOnlinePlayer => ({
+    name: String(player.name ?? ''),
+    uuid: typeof player.uuid === 'string' ? player.uuid : null,
+    avatar: player.avatar as MinecraftPlayerAvatarUrls,
+    ping: typeof player.ping === 'number' ? player.ping : null,
+    joinedAt: typeof player.joined_at === 'string' ? player.joined_at : null,
+});
+
+const mapStatus = (attributes: Record<string, unknown>): MinecraftServerStatus => {
+    const players = attributes.players as Record<string, unknown> | undefined;
+
+    return {
+        ...(attributes as unknown as MinecraftServerStatus),
+        players: {
+            online: Number(players?.online ?? 0),
+            max: Number(players?.max ?? 0),
+            list: Array.isArray(players?.list) ? players.list.map((entry) => mapPlayer(entry as Record<string, unknown>)) : [],
+        },
+    };
+};
+
 export default (uuid: string, params?: GetServerPlayersParams): Promise<MinecraftServerStatus> => {
     return new Promise((resolve, reject) => {
         http.get(`/api/client/servers/${uuid}/players`, { params })
-            .then(({ data }) => resolve(data.attributes))
+            .then(({ data }) => resolve(mapStatus(data.attributes)))
             .catch(reject);
     });
 };
