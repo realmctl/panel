@@ -82,6 +82,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('extensions.themes', function () {
             return new Theme();
         });
+
+        // Bind the setup service as a singleton so the per-request setup summary is
+        // only computed once even though the asset view composer runs for every view.
+        $this->app->singleton(\Pterodactyl\Services\Setup\PanelSetupService::class);
     }
 
     /**

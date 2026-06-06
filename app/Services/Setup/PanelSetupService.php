@@ -24,18 +24,42 @@ class PanelSetupService
 
     public const KEY_WELCOME_DONE = 'pterodactyl:setup:welcome_done';
 
+    /**
+     * @var array<string, mixed>|null
+     */
+    private ?array $summaryCache = null;
+
     public function __construct(private SettingsRepositoryInterface $settings)
     {
     }
 
     public function isComplete(): bool
     {
-        return $this->getBooleanSetting(self::KEY_COMPLETE);
+        if ($this->getBooleanSetting(self::KEY_COMPLETE)) {
+            return true;
+        }
+
+        // Installations created before the setup wizard existed should not be forced
+        // through it. If the wizard was never started but the panel already has an
+        // administrator and a node, treat setup as effectively complete.
+        if (!$this->wizardStarted() && User::query()->where('root_admin', true)->exists() && Node::query()->exists()) {
+            return true;
+        }
+
+        return false;
     }
 
     public function isRequired(): bool
     {
         return !$this->isComplete();
+    }
+
+    private function wizardStarted(): bool
+    {
+        return $this->getBooleanSetting(self::KEY_WELCOME_DONE)
+            || $this->getBooleanSetting(self::KEY_SETTINGS_DONE)
+            || $this->getBooleanSetting(self::KEY_WINGS_VERIFIED)
+            || $this->getBooleanSetting(self::KEY_SERVER_SKIPPED);
     }
 
     /**
@@ -60,11 +84,19 @@ class PanelSetupService
 
     public function getCurrentStepId(): string
     {
-        if ($this->isComplete()) {
+        return $this->resolveCurrentStepId($this->getSteps(), $this->isComplete());
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $steps
+     */
+    private function resolveCurrentStepId(array $steps, bool $complete): string
+    {
+        if ($complete) {
             return 'finish';
         }
 
-        foreach ($this->getSteps() as $step) {
+        foreach ($steps as $step) {
             if (!$step['complete']) {
                 return $step['id'];
             }
@@ -74,26 +106,39 @@ class PanelSetupService
     }
 
     /**
+     * Returns the lightweight setup summary (steps + progress) without the more
+     * expensive context payload. Safe to call on every request.
+     *
      * @return array<string, mixed>
      */
-    public function getStatus(): array
+    public function getSummary(): array
     {
         $steps = $this->getSteps();
+        $complete = $this->isComplete();
         $completed = count(array_filter($steps, fn (array $step) => $step['complete']));
         $total = count($steps);
 
-        $node = Node::query()->orderByDesc('id')->first();
-
         return [
-            'required' => $this->isRequired(),
-            'complete' => $this->isComplete(),
-            'currentStep' => $this->getCurrentStepId(),
+            'required' => !$complete,
+            'complete' => $complete,
+            'currentStep' => $this->resolveCurrentStepId($steps, $complete),
             'steps' => $steps,
             'progress' => [
                 'completed' => $completed,
                 'total' => $total,
                 'percent' => $total > 0 ? (int) round(($completed / $total) * 100) : 0,
             ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getStatus(): array
+    {
+        $node = Node::query()->orderByDesc('id')->first();
+
+        return array_merge($this->getSummary(), [
             'context' => [
                 'hasUsers' => User::query()->exists(),
                 'locationId' => Location::query()->value('id'),
@@ -105,7 +150,7 @@ class PanelSetupService
                 'panelName' => config('app.name'),
                 'panelLocale' => config('app.locale'),
             ],
-        ];
+        ]);
     }
 
     /**
@@ -113,8 +158,12 @@ class PanelSetupService
      */
     public function toSiteConfiguration(): array
     {
+        if ($this->summaryCache !== null) {
+            return $this->summaryCache;
+        }
+
         try {
-            $status = $this->getStatus();
+            return $this->summaryCache = $this->getSummary();
         } catch (\Throwable) {
             return [
                 'required' => false,
@@ -124,39 +173,36 @@ class PanelSetupService
                 'progress' => ['completed' => 0, 'total' => 0, 'percent' => 100],
             ];
         }
-
-        return [
-            'required' => $status['required'],
-            'complete' => $status['complete'],
-            'currentStep' => $status['currentStep'],
-            'steps' => $status['steps'],
-            'progress' => $status['progress'],
-        ];
     }
 
     public function markWelcomeComplete(): void
     {
         $this->settings->set('settings::' . self::KEY_WELCOME_DONE, true);
+        $this->summaryCache = null;
     }
 
     public function markSettingsComplete(): void
     {
         $this->settings->set('settings::' . self::KEY_SETTINGS_DONE, true);
+        $this->summaryCache = null;
     }
 
     public function markWingsVerified(): void
     {
         $this->settings->set('settings::' . self::KEY_WINGS_VERIFIED, true);
+        $this->summaryCache = null;
     }
 
     public function markServerSkipped(): void
     {
         $this->settings->set('settings::' . self::KEY_SERVER_SKIPPED, true);
+        $this->summaryCache = null;
     }
 
     public function markComplete(): void
     {
         $this->settings->set('settings::' . self::KEY_COMPLETE, true);
+        $this->summaryCache = null;
     }
 
     private function isWelcomeComplete(): bool
