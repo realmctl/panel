@@ -12,6 +12,9 @@ import Spinner from '@/components/elements/Spinner';
 import FileEditorPresenceAvatars from '@/components/server/files/FileEditorPresenceAvatars';
 import FileTreeIcon from '@/components/server/files/FileTreeIcon';
 import { FileEditorPresence } from '@/api/server/files/fileEditingPresence';
+import { useExplorerDrag, writeInternalDragData } from '@/components/server/files/ExplorerDragContext';
+import { getDropFolderForPath } from '@/components/server/files/fileExplorerDrag';
+import { hasExternalFiles } from '@/components/server/files/fileUploadUtils';
 import styles from './style.module.css';
 
 const sortTreeEntries = (entries: FileObject[]) =>
@@ -68,6 +71,18 @@ const TreeEntry = ({
     activeEditors,
     currentUserUuid,
 }: TreeEntryProps) => {
+    const {
+        dragPath,
+        dropTarget,
+        canUpdate,
+        canCreate,
+        beginInternalDrag,
+        endDrag,
+        handleDragEnter,
+        handleDragLeave,
+        handleDrop,
+    } = useExplorerDrag();
+
     const fullPath = join(parentPath, file.name);
     const isFolder = !file.isFile;
     const isExpanded = isFolder && expandedPaths.has(fullPath);
@@ -75,6 +90,11 @@ const TreeEntry = ({
     const isSelected = isFolder ? directory === fullPath : activeFilePath === fullPath;
     const children = isFolder ? treeCache[fullPath] : undefined;
     const showPresence = !isFolder && activeFilePath === fullPath;
+    const dropFolder = getDropFolderForPath(fullPath, isFolder);
+    const isDropTarget = dropTarget === dropFolder;
+    const isDragging = dragPath === cleanDirectoryPath(fullPath);
+    const canDrag = canUpdate;
+    const canAcceptDrop = canUpdate || canCreate;
 
     const handleClick = () => {
         if (isFolder) {
@@ -99,8 +119,57 @@ const TreeEntry = ({
         <div>
             <button
                 type={'button'}
+                draggable={canDrag}
                 onClick={handleClick}
-                className={classNames(styles.tree_row, isSelected && styles.tree_row_active)}
+                onDragStart={(event) => {
+                    if (!canDrag) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    writeInternalDragData(event.dataTransfer, { path: fullPath, isFile: file.isFile });
+                    beginInternalDrag({ path: fullPath, isFile: file.isFile });
+                }}
+                onDragEnd={() => endDrag()}
+                onDragOver={(event) => {
+                    if (!canAcceptDrop) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.dataTransfer.dropEffect = event.dataTransfer.types.includes('application/x-realm-explorer-path')
+                        ? 'move'
+                        : 'copy';
+                }}
+                onDragEnter={(event) => {
+                    if (!canAcceptDrop) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    handleDragEnter(fullPath, isFolder, event.dataTransfer);
+                }}
+                onDragLeave={(event) => {
+                    event.stopPropagation();
+                    handleDragLeave(fullPath);
+                }}
+                onDrop={(event) => {
+                    if (!canAcceptDrop) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    void handleDrop(fullPath, isFolder, event.dataTransfer);
+                }}
+                className={classNames(
+                    styles.tree_row,
+                    isSelected && styles.tree_row_active,
+                    isDragging && styles.tree_row_dragging,
+                    isDropTarget && styles.tree_row_drop_target
+                )}
                 style={{ paddingLeft: `${depth * 12 + 8}px` }}
                 title={file.name}
             >
@@ -174,6 +243,20 @@ export default ({
     const history = useHistory();
     const [canRead] = usePermissions(['file.read']);
 
+    const {
+        dragPath,
+        dropTarget,
+        isExternalDrag,
+        canUpdate,
+        canCreate,
+        endDrag,
+        handleDragEnter,
+        handleDragLeave,
+        handleDrop,
+        registerExpandHandler,
+        registerCollapseHandler,
+    } = useExplorerDrag();
+
     const [treeCache, setTreeCache] = useState<Record<string, FileObject[]>>({});
     const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['/']));
     const [loadingPaths, setLoadingPaths] = useState<Set<string>>(new Set());
@@ -209,6 +292,34 @@ export default ({
         [uuid]
     );
 
+    const expandFolder = useCallback(
+        (path: string) => {
+            const normalized = cleanDirectoryPath(path);
+
+            setExpandedPaths((prev) => new Set([...prev, normalized]));
+
+            if (!loadedPathsRef.current.has(normalized)) {
+                void fetchDirectory(normalized);
+            }
+        },
+        [fetchDirectory]
+    );
+
+    const collapseFolder = useCallback((path: string) => {
+        const normalized = cleanDirectoryPath(path);
+
+        setExpandedPaths((prev) => {
+            const next = new Set(prev);
+            next.delete(normalized);
+            return next;
+        });
+    }, []);
+
+    useEffect(() => {
+        registerExpandHandler(expandFolder);
+        registerCollapseHandler(collapseFolder);
+    }, [collapseFolder, expandFolder, registerCollapseHandler, registerExpandHandler]);
+
     useEffect(() => {
         setRootLoading(true);
         fetchDirectory('/', true).finally(() => setRootLoading(false));
@@ -219,9 +330,11 @@ export default ({
             return;
         }
 
-        const normalized = cleanDirectoryPath(directory);
-        loadedPathsRef.current.delete(normalized);
-        void fetchDirectory(normalized, true);
+        loadedPathsRef.current.clear();
+        const ancestors = getAncestorPaths(directory);
+        ancestors.forEach((path) => {
+            void fetchDirectory(path, true);
+        });
     }, [refreshToken, directory, fetchDirectory]);
 
     useEffect(() => {
@@ -261,10 +374,29 @@ export default ({
     );
 
     const rootEntries = treeCache['/'] ?? [];
+    const canAcceptDrop = canUpdate || canCreate;
 
     return (
         <div className={styles.explorer_tree}>
-            <div className={styles.tree_body}>
+            <div
+                className={classNames(styles.tree_body, isExternalDrag && styles.tree_body_external_drag)}
+                onDragOver={(event) => {
+                    if (!canAcceptDrop || !hasExternalFiles(event.dataTransfer)) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'copy';
+                }}
+                onDrop={(event) => {
+                    if (!canAcceptDrop || !hasExternalFiles(event.dataTransfer)) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    void handleDrop(directory, true, event.dataTransfer);
+                }}
+            >
                 {rootLoading ? (
                     <div className={'py-6'}>
                         <Spinner size={'small'} centered />
@@ -276,7 +408,46 @@ export default ({
                         <button
                             type={'button'}
                             onClick={() => onNavigateDirectory('/')}
-                            className={classNames(styles.tree_row, directory === '/' && styles.tree_row_active)}
+                            onDragOver={(event) => {
+                                if (!canAcceptDrop) {
+                                    return;
+                                }
+
+                                event.preventDefault();
+                                event.stopPropagation();
+                                event.dataTransfer.dropEffect = event.dataTransfer.types.includes(
+                                    'application/x-realm-explorer-path'
+                                )
+                                    ? 'move'
+                                    : 'copy';
+                            }}
+                            onDragEnter={(event) => {
+                                if (!canAcceptDrop) {
+                                    return;
+                                }
+
+                                event.preventDefault();
+                                event.stopPropagation();
+                                handleDragEnter('/', true, event.dataTransfer);
+                            }}
+                            onDragLeave={(event) => {
+                                event.stopPropagation();
+                                handleDragLeave('/');
+                            }}
+                            onDrop={(event) => {
+                                if (!canAcceptDrop) {
+                                    return;
+                                }
+
+                                event.preventDefault();
+                                event.stopPropagation();
+                                void handleDrop('/', true, event.dataTransfer);
+                            }}
+                            className={classNames(
+                                styles.tree_row,
+                                directory === '/' && styles.tree_row_active,
+                                dropTarget === '/' && styles.tree_row_drop_target
+                            )}
                             style={{ paddingLeft: '8px' }}
                         >
                             <span
@@ -316,6 +487,11 @@ export default ({
                     </>
                 )}
             </div>
+            {(dragPath || isExternalDrag) && (
+                <div className={styles.tree_drop_hint}>
+                    {isExternalDrag ? 'Drop to upload into folder' : 'Drop to move'}
+                </div>
+            )}
         </div>
     );
 };

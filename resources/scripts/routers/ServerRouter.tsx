@@ -13,6 +13,7 @@ import { httpErrorToHuman } from '@/api/http';
 import { useStoreState } from 'easy-peasy';
 import SubNavigation from '@/components/elements/SubNavigation';
 import ServerInsightsNav from '@/components/server/ServerInsightsNav';
+import ServerVersionNav from '@/components/server/ServerVersionNav';
 import PageHeader from '@/components/elements/PageHeader';
 import InstallListener from '@/components/server/InstallListener';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
@@ -25,7 +26,7 @@ import ServerPowerControls from '@/components/server/console/ServerPowerControls
 import routes from '@/routers/routes';
 import { isNavRouteActive, toNavigationPath } from '@/lib/routePaths';
 
-const INSIGHT_NAV_PATHS = new Set(['/metrics', '/activity']);
+const HIDDEN_NAV_PATHS = new Set(['/metrics', '/activity', '/versions']);
 
 export default () => {
     const match = useRouteMatch<{ id: string }>();
@@ -99,7 +100,7 @@ export default () => {
                             <SubNavigation>
                                 <div>
                                     {routes.server
-                                        .filter((route) => !!route.name && !INSIGHT_NAV_PATHS.has(route.path))
+                                        .filter((route) => !!route.name && !HIDDEN_NAV_PATHS.has(route.path))
                                         .map((route) => {
                                             const navTo = to(toNavigationPath(route.path), true);
                                             const navExact = route.path.includes(':') ? false : route.exact;
@@ -123,6 +124,9 @@ export default () => {
                                             <FontAwesomeIcon icon={faExternalLinkAlt} />
                                         </a>
                                     )}
+                                    <div className={'nav-trailing-actions'}>
+                                        <ServerVersionNav />
+                                    </div>
                                 </div>
                             </SubNavigation>
                         </CSSTransition>

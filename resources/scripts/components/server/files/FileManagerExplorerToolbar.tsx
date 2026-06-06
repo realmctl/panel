@@ -11,16 +11,16 @@ import ExplorerIconTooltip from '@/components/server/files/ExplorerIconTooltip';
 
 interface Props {
     onNewFile: () => void;
-    onImported?: () => void;
+    onTreeChange?: () => void;
 }
 
-export default ({ onNewFile, onImported }: Props) => (
+export default ({ onNewFile, onTreeChange }: Props) => (
     <Can action={'file.create'}>
         <nav className={styles.explorer_toolbar} aria-label={'File actions'}>
             <FileManagerStatus />
-            <PullFileButton iconOnly onImported={onImported} />
-            <NewDirectoryButton iconOnly />
-            <UploadButton iconOnly />
+            <PullFileButton iconOnly onImported={onTreeChange} />
+            <NewDirectoryButton iconOnly onCreated={onTreeChange} />
+            <UploadButton iconOnly onUploaded={onTreeChange} />
             <ExplorerIconTooltip label={'New file'}>
                 <button type={'button'} className={styles.explorer_icon_btn} onClick={onNewFile}>
                     <FontAwesomeIcon icon={faFile} className={'text-sm'} />

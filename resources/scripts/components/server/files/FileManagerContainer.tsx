@@ -17,6 +17,8 @@ import { ServerContext } from '@/state/server';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { detectModeFromFilename, getFileName, OpenFileTab } from '@/components/server/files/fileEditorUtils';
 import useFileEditingPresence from '@/plugins/useFileEditingPresence';
+import { usePermissions } from '@/plugins/usePermissions';
+import { ExplorerDragProvider } from '@/components/server/files/ExplorerDragContext';
 import style from './style.module.css';
 
 export default () => {
@@ -36,6 +38,8 @@ export default () => {
     const [newFileModalVisible, setNewFileModalVisible] = useState(false);
     const [treeRefreshToken, setTreeRefreshToken] = useState(0);
     const { activeEditors, currentUserUuid } = useFileEditingPresence(uuid, activePath, cursorLine);
+    const [canUpdate] = usePermissions(['file.update']);
+    const [canCreate] = usePermissions(['file.create']);
     const skipHashSync = useRef(false);
     const tabsRef = useRef(tabs);
 
@@ -225,25 +229,54 @@ export default () => {
         [bumpTree, syncEditorUrl]
     );
 
+    const handleItemMoved = useCallback(
+        (from: string, to: string) => {
+            setTabs((current) =>
+                current.map((tab) =>
+                    tab.path === from
+                        ? {
+                              ...tab,
+                              path: to,
+                              mode: detectModeFromFilename(getFileName(to)),
+                          }
+                        : tab
+                )
+            );
+
+            if (activePath === from) {
+                setActivePath(to);
+                syncEditorUrl(to);
+            }
+        },
+        [activePath, syncEditorUrl]
+    );
+
     return (
         <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
             <div className={style.ide_layout}>
                 <RealmCard className={style.explorer_card} bodyClassName={style.explorer_card_body}>
-                    <div className={style.explorer_inner}>
-                        <FileManagerExplorerToolbar
-                            onNewFile={() => setNewFileModalVisible(true)}
-                            onImported={bumpTree}
-                        />
-                        <ErrorBoundary>
-                            <FileManagerTreeSidebar
-                                refreshToken={treeRefreshToken || files}
-                                activeFilePath={activePath}
-                                activeEditors={activeEditors}
-                                currentUserUuid={currentUserUuid}
-                                onOpenFile={handleOpenFileFromTree}
+                    <ExplorerDragProvider
+                        canUpdate={canUpdate}
+                        canCreate={canCreate}
+                        onTreeChange={bumpTree}
+                        onItemMoved={handleItemMoved}
+                    >
+                        <div className={style.explorer_inner}>
+                            <FileManagerExplorerToolbar
+                                onNewFile={() => setNewFileModalVisible(true)}
+                                onTreeChange={bumpTree}
                             />
-                        </ErrorBoundary>
-                    </div>
+                            <ErrorBoundary>
+                                <FileManagerTreeSidebar
+                                    refreshToken={treeRefreshToken}
+                                    activeFilePath={activePath}
+                                    activeEditors={activeEditors}
+                                    currentUserUuid={currentUserUuid}
+                                    onOpenFile={handleOpenFileFromTree}
+                                />
+                            </ErrorBoundary>
+                        </div>
+                    </ExplorerDragProvider>
                 </RealmCard>
 
                 <FileEditorWorkspace

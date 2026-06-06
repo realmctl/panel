@@ -9,10 +9,24 @@ const SubNavigation = styled.div`
         ${tw`flex items-center text-sm mx-4 xl:mx-auto`};
         max-width: 1200px;
         gap: 1.25rem;
+        width: 100%;
+
+        & > .nav-trailing-actions {
+            ${tw`flex items-center gap-4 ml-auto flex-shrink-0`};
+
+            & > button {
+                ${tw`inline-flex items-center py-3 text-sm text-neutral-300 border-0 bg-transparent cursor-pointer transition-colors duration-150`};
+                font: inherit;
+
+                &:hover {
+                    ${tw`text-neutral-100`};
+                }
+            }
+        }
 
         & > a,
         & > div.nav-item-dropdown > button {
-            ${tw`inline-block py-3 text-neutral-400 no-underline whitespace-nowrap transition-all duration-150 relative`};
+            ${tw`inline-block py-3 text-neutral-300 no-underline whitespace-nowrap transition-all duration-150 relative`};
 
             &:hover {
                 ${tw`text-neutral-100`};

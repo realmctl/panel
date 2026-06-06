@@ -45,7 +45,7 @@ const generateDirectoryData = (name: string): FileObject => ({
 
 const NewDirectoryDialog = asDialog({
     title: 'Create Directory',
-})(() => {
+})(({ onCreated }: { onCreated?: () => void }) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
@@ -62,6 +62,7 @@ const NewDirectoryDialog = asDialog({
     const submit = ({ directoryName }: Values, { setSubmitting }: FormikHelpers<Values>) => {
         createDirectory(uuid, directory, directoryName)
             .then(() => mutate((data) => [...data, generateDirectoryData(directoryName)], false))
+            .then(() => onCreated?.())
             .then(() => close())
             .catch((error) => {
                 setSubmitting(false);
@@ -100,12 +101,12 @@ const NewDirectoryDialog = asDialog({
     );
 });
 
-export default ({ className, iconOnly = false }: WithClassname & { iconOnly?: boolean }) => {
+export default ({ className, iconOnly = false, onCreated }: WithClassname & { iconOnly?: boolean; onCreated?: () => void }) => {
     const [open, setOpen] = useState(false);
 
     return (
         <>
-            <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} />
+            <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} onCreated={onCreated} />
             {iconOnly ? (
                 <ExplorerIconTooltip label={'Create directory'}>
                     <button type={'button'} className={styles.explorer_icon_btn} onClick={() => setOpen(true)}>

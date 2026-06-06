@@ -85,6 +85,22 @@
     height: 16px;
 }
 
+.tree_row_dragging {
+    @apply opacity-40;
+}
+
+.tree_row_drop_target {
+    @apply bg-blue-500/15 outline outline-1 outline-blue-400/40;
+}
+
+.tree_body_external_drag {
+    @apply bg-blue-500/5;
+}
+
+.tree_drop_hint {
+    @apply px-3 py-2 text-[10px] text-blue-300/90 border-t border-neutral-800 bg-[#0b0f10];
+}
+
 .presence_stack {
     @apply inline-flex items-center flex-shrink-0;
 }
