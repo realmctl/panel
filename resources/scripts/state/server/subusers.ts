@@ -28,7 +28,8 @@ export type SubuserPermission =
     | 'schedule.create'
     | 'schedule.read'
     | 'schedule.update'
-    | 'schedule.delete';
+    | 'schedule.delete'
+    | 'players.read';
 
 export interface Subuser {
     uuid: string;

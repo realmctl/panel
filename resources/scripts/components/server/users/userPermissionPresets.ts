@@ -22,6 +22,7 @@ export const PERMISSION_PRESETS: PermissionPreset[] = [
             'allocation.read',
             'startup.read',
             'activity.read',
+            'players.read',
         ],
     },
     {
@@ -45,6 +46,7 @@ export const PERMISSION_PRESETS: PermissionPreset[] = [
             'schedule.read',
             'user.read',
             'activity.read',
+            'players.read',
         ],
     },
     {
@@ -90,6 +92,7 @@ export const PERMISSION_PRESETS: PermissionPreset[] = [
             'startup.docker-image',
             'activity.read',
             'user.read',
+            'players.read',
         ],
     },
 ];
