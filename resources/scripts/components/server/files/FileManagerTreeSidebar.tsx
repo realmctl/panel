@@ -24,11 +24,18 @@ import { getDropFolderForPath } from '@/components/server/files/fileExplorerDrag
 import { hasExternalFiles } from '@/components/server/files/fileUploadUtils';
 import FileTreeContextMenu, { TreeContextTarget } from '@/components/server/files/FileTreeContextMenu';
 import TreeInlineCreate from '@/components/server/files/TreeInlineCreate';
+import TreeInlineRename from '@/components/server/files/TreeInlineRename';
 import styles from './style.module.css';
 
 export interface InlineCreateState {
     type: 'file' | 'folder';
     parentPath: string;
+}
+
+export interface InlineRenameState {
+    parentPath: string;
+    fileName: string;
+    isFile: boolean;
 }
 
 const sortTreeEntries = (entries: FileObject[]) =>
@@ -77,6 +84,9 @@ interface TreeEntryProps {
     inlineCreate: InlineCreateState | null;
     onInlineCreateSubmit: (name: string) => void;
     onInlineCreateCancel: () => void;
+    inlineRename: InlineRenameState | null;
+    onInlineRenameSubmit: (newName: string) => void;
+    onInlineRenameCancel: () => void;
 }
 
 const TreeEntry = ({
@@ -95,6 +105,9 @@ const TreeEntry = ({
     inlineCreate,
     onInlineCreateSubmit,
     onInlineCreateCancel,
+    inlineRename,
+    onInlineRenameSubmit,
+    onInlineRenameCancel,
 }: TreeEntryProps) => {
     const {
         dragPath,
@@ -120,6 +133,9 @@ const TreeEntry = ({
     const isDragging = dragPath === cleanDirectoryPath(fullPath);
     const canDrag = canUpdate;
     const canAcceptDrop = canUpdate || canCreate;
+    const isRenaming =
+        inlineRename?.parentPath === parentPath && inlineRename.fileName === file.name;
+    const showAsFile = !isBrowsableJar && file.isFile;
 
     const handleClick = () => {
         if (isFolder) {
@@ -139,6 +155,15 @@ const TreeEntry = ({
 
     return (
         <div>
+            {isRenaming ? (
+                <TreeInlineRename
+                    initialName={file.name}
+                    isFile={showAsFile}
+                    depth={depth}
+                    onSubmit={onInlineRenameSubmit}
+                    onCancel={onInlineRenameCancel}
+                />
+            ) : (
             <div className={styles.tree_row_wrap} style={{ paddingLeft: `${depth * 12 + 8}px` }}>
             <button
                 type={'button'}
@@ -216,6 +241,7 @@ const TreeEntry = ({
                 <span className={styles.tree_label}>{file.name}</span>
             </button>
             </div>
+            )}
             {isFolder && isExpanded && (
                 <div>
                     {children?.map((child) => (
@@ -236,6 +262,9 @@ const TreeEntry = ({
                             inlineCreate={inlineCreate}
                             onInlineCreateSubmit={onInlineCreateSubmit}
                             onInlineCreateCancel={onInlineCreateCancel}
+                            inlineRename={inlineRename}
+                            onInlineRenameSubmit={onInlineRenameSubmit}
+                            onInlineRenameCancel={onInlineRenameCancel}
                         />
                     ))}
                     {inlineCreate?.parentPath === fullPath && (
@@ -265,6 +294,10 @@ interface Props {
     onInlineCreateDismiss?: () => void;
     onCreateFile?: (parentPath: string, name: string) => void;
     onCreateFolder?: (parentPath: string, name: string) => void;
+    inlineRename?: InlineRenameState | null;
+    onInlineRenameDismiss?: () => void;
+    onRenameFile?: (parentPath: string, oldName: string, newName: string) => void;
+    onBeginRename?: (parentPath: string, fileName: string, isFile: boolean) => void;
     onItemMoved?: (from: string, to: string) => void;
     onItemDeleted?: (path: string) => void;
 }
@@ -282,6 +315,10 @@ export default ({
     onInlineCreateDismiss,
     onCreateFile,
     onCreateFolder,
+    inlineRename = null,
+    onInlineRenameDismiss,
+    onRenameFile,
+    onBeginRename,
     onItemMoved,
     onItemDeleted,
 }: Props) => {
@@ -431,6 +468,21 @@ export default ({
         onInlineCreateDismiss?.();
     }, [onInlineCreateDismiss]);
 
+    const handleInlineRenameSubmit = useCallback(
+        (newName: string) => {
+            if (!inlineRename) {
+                return;
+            }
+
+            onRenameFile?.(inlineRename.parentPath, inlineRename.fileName, newName);
+        },
+        [inlineRename, onRenameFile]
+    );
+
+    const handleInlineRenameCancel = useCallback(() => {
+        onInlineRenameDismiss?.();
+    }, [onInlineRenameDismiss]);
+
     const onToggleFolder = useCallback(
         (path: string) => {
             const normalized = cleanDirectoryPath(path);
@@ -528,6 +580,9 @@ export default ({
                                 inlineCreate={inlineCreate}
                                 onInlineCreateSubmit={handleInlineCreateSubmit}
                                 onInlineCreateCancel={handleInlineCreateCancel}
+                                inlineRename={inlineRename}
+                                onInlineRenameSubmit={handleInlineRenameSubmit}
+                                onInlineRenameCancel={handleInlineRenameCancel}
                             />
                         ))}
                         {showRootInlineCreate && inlineCreate && (
@@ -547,6 +602,7 @@ export default ({
                 onOpenFile={onOpenFile}
                 onNewFile={onNewFile}
                 onNewFolder={onNewFolder}
+                onBeginRename={onBeginRename}
                 onTreeChange={onTreeChange}
                 onItemMoved={onItemMoved}
                 onItemDeleted={onItemDeleted}

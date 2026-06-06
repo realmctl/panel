@@ -3,10 +3,11 @@ import { useHistory, useLocation, useParams } from 'react-router-dom';
 import getFileContents from '@/api/server/files/getFileContents';
 import { httpErrorToHuman } from '@/api/http';
 import { FileObject } from '@/api/server/files/loadDirectory';
-import FileManagerTreeSidebar, { InlineCreateState } from '@/components/server/files/FileManagerTreeSidebar';
+import FileManagerTreeSidebar, { InlineCreateState, InlineRenameState } from '@/components/server/files/FileManagerTreeSidebar';
 import FileManagerExplorerToolbar from '@/components/server/files/FileManagerExplorerToolbar';
 import FileEditorWorkspace from '@/components/server/files/FileEditorWorkspace';
 import createDirectory from '@/api/server/files/createDirectory';
+import renameFiles from '@/api/server/files/renameFiles';
 import useFlash from '@/plugins/useFlash';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import RealmCard from '@/components/elements/realm/RealmCard';
@@ -38,8 +39,9 @@ export default () => {
     const [activePath, setActivePath] = useState<string | null>(null);
     const [cursorLine, setCursorLine] = useState(1);
     const [inlineCreate, setInlineCreate] = useState<InlineCreateState | null>(null);
+    const [inlineRename, setInlineRename] = useState<InlineRenameState | null>(null);
     const [treeRefreshToken, setTreeRefreshToken] = useState(0);
-    const { clearAndAddHttpError, clearFlashes } = useFlash();
+    const { clearAndAddHttpError } = useFlash();
     const { activeEditors, currentUserUuid } = useFileEditingPresence(uuid, activePath, cursorLine);
     const [canUpdate] = usePermissions(['file.update']);
     const [canCreate] = usePermissions(['file.create']);
@@ -161,10 +163,22 @@ export default () => {
                 return;
             }
 
+            setInlineRename(null);
             setInlineCreate({ type, parentPath: target });
         },
         [directory]
     );
+
+    const beginInlineRename = useCallback((parentPath: string, fileName: string, isFile: boolean) => {
+        const target = cleanDirectoryPath(parentPath);
+
+        if (target.includes('::')) {
+            return;
+        }
+
+        setInlineCreate(null);
+        setInlineRename({ parentPath: target, fileName, isFile });
+    }, []);
 
     const openNewFileTab = useCallback((fullPath: string) => {
         const normalized = cleanDirectoryPath(fullPath);
@@ -291,6 +305,21 @@ export default () => {
         [activePath, syncEditorUrl]
     );
 
+    const handleRenameFile = useCallback(
+        (parentPath: string, oldName: string, newName: string) => {
+            setInlineRename(null);
+            clearFlashes('files');
+
+            renameFiles(uuid, parentPath, [{ from: oldName, to: newName }])
+                .then(() => {
+                    handleItemMoved(join(parentPath, oldName), join(parentPath, newName));
+                    bumpTree();
+                })
+                .catch((error) => clearAndAddHttpError({ key: 'files', error }));
+        },
+        [bumpTree, clearAndAddHttpError, clearFlashes, handleItemMoved, uuid]
+    );
+
     const handleItemDeleted = useCallback(
         (path: string) => {
             const normalized = cleanDirectoryPath(path);
@@ -338,6 +367,10 @@ export default () => {
                                     onInlineCreateDismiss={() => setInlineCreate(null)}
                                     onCreateFile={handleCreateFile}
                                     onCreateFolder={handleCreateFolder}
+                                    inlineRename={inlineRename}
+                                    onInlineRenameDismiss={() => setInlineRename(null)}
+                                    onRenameFile={handleRenameFile}
+                                    onBeginRename={beginInlineRename}
                                     onItemMoved={handleItemMoved}
                                     onItemDeleted={handleItemDeleted}
                                 />

@@ -52,7 +52,7 @@ export type TreeContextTarget = FileTreeContextTarget | RootTreeContextTarget;
 
 const isFileTarget = (target: TreeContextTarget): target is FileTreeContextTarget => 'file' in target;
 
-type ModalType = 'rename' | 'move' | 'chmod';
+type ModalType = 'move' | 'chmod';
 
 interface MenuItemProps {
     icon: IconDefinition;
@@ -74,6 +74,7 @@ interface Props {
     onOpenFile?: (path: string, file: FileObject) => void;
     onNewFile?: (parentPath: string) => void;
     onNewFolder?: (parentPath: string) => void;
+    onBeginRename?: (parentPath: string, fileName: string, isFile: boolean) => void;
     onTreeChange?: () => void;
     onItemMoved?: (from: string, to: string) => void;
     onItemDeleted?: (path: string) => void;
@@ -85,6 +86,7 @@ export default ({
     onOpenFile,
     onNewFile,
     onNewFolder,
+    onBeginRename,
     onTreeChange,
     onItemMoved,
     onItemDeleted,
@@ -233,7 +235,14 @@ export default ({
                         </>
                     )}
                     <Can action={'file.update'}>
-                        <MenuItem icon={faPencilAlt} label={'Rename'} onClick={() => openModal('rename')} />
+                        <MenuItem
+                            icon={faPencilAlt}
+                            label={'Rename'}
+                            onClick={() => {
+                                dismiss();
+                                onBeginRename?.(parentPath, file.name, file.isFile);
+                            }}
+                        />
                         <MenuItem icon={faLevelUpAlt} label={'Move'} onClick={() => openModal('move')} />
                         <MenuItem icon={faFileCode} label={'Permissions'} onClick={() => openModal('chmod')} />
                     </Can>
@@ -366,13 +375,13 @@ export default ({
                             }}
                             onCompleted={onTreeChange}
                         />
-                    ) : modal ? (
+                    ) : modal === 'move' ? (
                         <RenameFileModal
                             visible
                             appear
                             directory={parentPath}
                             files={[file.name]}
-                            useMoveTerminology={modal === 'move'}
+                            useMoveTerminology
                             onDismissed={() => {
                                 setModal(null);
                                 dismiss();
