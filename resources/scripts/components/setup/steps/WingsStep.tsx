@@ -103,7 +103,7 @@ export default () => {
             title={'Wings'}
             description={
                 <>
-                    Copy this config to <code>/etc/pterodactyl/config.yml</code>, start Wings, then verify.
+                    Copy this config to <code>/etc/realm/config.yml</code>, start Wings, then verify.
                 </>
             }
         >

@@ -192,7 +192,7 @@ class SetupController extends AbstractLoginController
 
         $data['public'] = true;
         $data['behind_proxy'] = $request->boolean('behind_proxy');
-        $data['daemonBase'] = $data['daemonBase'] ?? '/var/lib/pterodactyl/volumes';
+        $data['daemonBase'] = $data['daemonBase'] ?? '/var/lib/realm/volumes';
         $data['upload_size'] = $data['upload_size'] ?? 100;
 
         $node = $this->nodeCreationService->handle($data);

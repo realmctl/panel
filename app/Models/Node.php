@@ -125,7 +125,7 @@ class Node extends Model implements Identifiable
         'behind_proxy' => false,
         'memory_overallocate' => 0,
         'disk_overallocate' => 0,
-        'daemonBase' => '/var/lib/pterodactyl/volumes',
+        'daemonBase' => '/var/lib/realm/volumes',
         'daemonSFTP' => 2022,
         'daemonListen' => 8080,
         'maintenance_mode' => false,

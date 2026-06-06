@@ -311,7 +311,7 @@
                             <div class="row g-3">
                                 <div class="col-12">
                                     <label for="pDaemonBase" class="form-label">Server files directory</label>
-                                    <input type="text" name="daemonBase" id="pDaemonBase" class="form-control font-monospace" value="{{ old('daemonBase', '/var/lib/pterodactyl/volumes') }}" required />
+                                    <input type="text" name="daemonBase" id="pDaemonBase" class="form-control font-monospace" value="{{ old('daemonBase', '/var/lib/realm/volumes') }}" required />
                                     <span class="form-hint">Path on the host where server volumes are stored. OVH users may need <code>/home/daemon-data</code>.</span>
                                 </div>
                                 <div class="col-md-6">

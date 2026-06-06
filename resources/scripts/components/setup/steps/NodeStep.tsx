@@ -27,7 +27,7 @@ export default () => {
         disk_overallocate: '0',
         daemonListen: '8080',
         daemonSFTP: '2022',
-        daemonBase: '/var/lib/pterodactyl/volumes',
+        daemonBase: '/var/lib/realm/volumes',
         upload_size: '100',
     });
 
