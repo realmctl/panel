@@ -88,8 +88,6 @@ class Mount extends Model implements Identifiable
     public static $invalidSourcePaths = [
         '/etc/realm',
         '/var/lib/realm/volumes',
-        // Legacy Pterodactyl paths are kept blacklisted so nodes upgraded from
-        // an older installation remain protected.
         '/etc/pterodactyl',
         '/var/lib/pterodactyl/volumes',
         '/srv/daemon-data',
