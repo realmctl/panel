@@ -12,8 +12,14 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import getServerAllocations from '@/api/swr/getServerAllocations';
 import isEqual from 'react-fast-compare';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
+import RealmTabBar from '@/components/elements/realm/RealmTabBar';
+import SubdomainsPanel from '@/components/server/network/subdomains/SubdomainsPanel';
+
+type NetworkTab = 'allocations' | 'subdomains';
+
 const NetworkContainer = () => {
     const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState<NetworkTab>('allocations');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const allocationLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.allocations);
     const allocations = ServerContext.useStoreState((state) => state.server.data!.allocations, isEqual);
@@ -47,16 +53,27 @@ const NetworkContainer = () => {
             .then(() => setLoading(false));
     };
 
-    const hasOnlyDefaultAllocation =
-        data?.length === 1 && data[0].isDefault;
-    const canCreateAllocation =
-        allocationLimit > 0 && !!data && allocationLimit > data.length;
+    const hasOnlyDefaultAllocation = data?.length === 1 && data[0].isDefault;
+    const canCreateAllocation = allocationLimit > 0 && !!data && allocationLimit > data.length;
 
     return (
         <ServerContentBlock showFlashKey={'server:network'} title={'Network'}>
             <SpinnerOverlay visible={loading} />
 
-            {!data ? (
+            <div className={'mb-6'}>
+                <RealmTabBar
+                    tabs={[
+                        { id: 'allocations', label: 'Allocations' },
+                        { id: 'subdomains', label: 'Subdomains' },
+                    ]}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                />
+            </div>
+
+            {activeTab === 'subdomains' ? (
+                <SubdomainsPanel />
+            ) : !data ? (
                 <Spinner size={'large'} centered />
             ) : hasOnlyDefaultAllocation ? (
                 <NetworkDefaultEmptyState

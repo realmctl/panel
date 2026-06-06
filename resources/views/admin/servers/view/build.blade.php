@@ -113,6 +113,13 @@
                                     </div>
                                     <span class="form-hint">The total number of backups that can be created for this server.</span>
                                 </div>
+                                <div class="mb-3 col-lg-6">
+                                    <label for="subdomain_limit" class="form-label">Subdomain Limit</label>
+                                    <div>
+                                        <input type="text" name="subdomain_limit" class="form-control" value="{{ old('subdomain_limit', $server->subdomain_limit) }}"/>
+                                    </div>
+                                    <span class="form-hint">The total number of subdomains a user is allowed to create for this server.</span>
+                                </div>
                             </div>
                         </div>
                     </div>

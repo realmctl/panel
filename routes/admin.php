@@ -204,6 +204,30 @@ Route::group(['prefix' => 'mounts'], function () {
 
 /*
 |--------------------------------------------------------------------------
+| Subdomain Controller Routes
+|--------------------------------------------------------------------------
+|
+| Endpoint: /admin/subdomains
+|
+*/
+Route::group(['prefix' => 'subdomains'], function () {
+    Route::get('/records', [Admin\Subdomains\RecordController::class, 'index'])->name('admin.subdomains.records.index');
+    Route::get('/records/create', [Admin\Subdomains\RecordController::class, 'create'])->name('admin.subdomains.records.create');
+    Route::post('/records', [Admin\Subdomains\RecordController::class, 'store'])->name('admin.subdomains.records.store');
+    Route::get('/records/{record:id}/edit', [Admin\Subdomains\RecordController::class, 'edit'])->name('admin.subdomains.records.edit');
+    Route::patch('/records/{record:id}', [Admin\Subdomains\RecordController::class, 'update'])->name('admin.subdomains.records.update');
+    Route::delete('/records/{record:id}', [Admin\Subdomains\RecordController::class, 'destroy'])->name('admin.subdomains.records.delete');
+
+    Route::get('/', [Admin\Subdomains\DomainController::class, 'index'])->name('admin.subdomains.index');
+    Route::get('/create', [Admin\Subdomains\DomainController::class, 'create'])->name('admin.subdomains.create');
+    Route::post('/', [Admin\Subdomains\DomainController::class, 'store'])->name('admin.subdomains.store');
+    Route::get('/{domain:id}/edit', [Admin\Subdomains\DomainController::class, 'edit'])->name('admin.subdomains.edit');
+    Route::patch('/{domain:id}', [Admin\Subdomains\DomainController::class, 'update'])->name('admin.subdomains.update');
+    Route::delete('/{domain:id}', [Admin\Subdomains\DomainController::class, 'destroy'])->name('admin.subdomains.delete');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Nest Controller Routes
 |--------------------------------------------------------------------------
 |

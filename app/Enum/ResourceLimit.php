@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 enum ResourceLimit
 {
     case Allocation;
+    case Subdomain;
     case Backup;
     case Database;
     case Schedule;

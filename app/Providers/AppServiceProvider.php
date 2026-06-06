@@ -13,6 +13,7 @@ use Pterodactyl\Models\Server;
 use Pterodactyl\Models\UserSSHKey;
 use Pterodactyl\Models\Task;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\Subdomain\Subdomain;
 use Pterodactyl\Models;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
@@ -60,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
             'egg' => Egg::class,
             'egg_variable' => EggVariable::class,
             'schedule' => Schedule::class,
+            'subdomain' => Subdomain::class,
             'server' => Server::class,
             'ssh_key' => UserSSHKey::class,
             'task' => Task::class,

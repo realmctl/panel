@@ -164,7 +164,7 @@ return [
             'text' => 'Management',
             'icon' => 'ti ti-layout-grid',
             'url' => '#',
-            'active' => ['admin/databases*', 'admin/locations*', 'admin/nodes*', 'admin/servers*', 'admin/users*'],
+            'active' => ['admin/databases*', 'admin/locations*', 'admin/nodes*', 'admin/servers*', 'admin/subdomains*', 'admin/users*'],
             'submenu' => [
                 [
                     'text' => 'Databases',
@@ -189,6 +189,12 @@ return [
                     'icon' => 'ti ti-server',
                     'route' => 'admin.servers',
                     'active' => ['admin/servers*'],
+                ],
+                [
+                    'text' => 'Subdomains',
+                    'icon' => 'ti ti-world-www',
+                    'route' => 'admin.subdomains.index',
+                    'active' => ['admin/subdomains*'],
                 ],
                 [
                     'text' => 'Users',

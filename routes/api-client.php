@@ -149,6 +149,11 @@ Route::group([
         Route::post('/allocations/{allocation}/primary', [Client\Servers\NetworkAllocationController::class, 'setPrimary']);
         Route::post('/allocations/{allocation}/whitelist', [Client\Servers\NetworkAllocationController::class, 'updateWhitelist']);
         Route::delete('/allocations/{allocation}', [Client\Servers\NetworkAllocationController::class, 'delete']);
+
+        Route::get('/subdomains', [Client\Servers\NetworkSubdomainController::class, 'index']);
+        Route::middleware([ResourceLimit::Subdomain->middleware()])
+            ->post('/subdomains', [Client\Servers\NetworkSubdomainController::class, 'store']);
+        Route::delete('/subdomains/{subdomain}', [Client\Servers\NetworkSubdomainController::class, 'delete']);
     });
 
     Route::group(['prefix' => '/users'], function () {

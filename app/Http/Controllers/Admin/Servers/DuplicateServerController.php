@@ -66,6 +66,7 @@ class DuplicateServerController extends Controller
                 'database_limit' => $server->database_limit,
                 'allocation_limit' => $server->allocation_limit,
                 'backup_limit' => $server->backup_limit,
+                'subdomain_limit' => $server->subdomain_limit,
                 'skip_scripts' => false,
                 'environment' => $environment,
             ]);

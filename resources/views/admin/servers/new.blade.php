@@ -18,7 +18,7 @@
     $initialStep = 1;
     if ($errors->hasAny(['node_id', 'allocation_id', 'allocation_additional', 'allocation_additional.*'])) {
         $initialStep = 2;
-    } elseif ($errors->hasAny(['cpu', 'memory', 'disk', 'swap', 'io', 'threads', 'oom_disabled', 'database_limit', 'allocation_limit', 'backup_limit'])) {
+    } elseif ($errors->hasAny(['cpu', 'memory', 'disk', 'swap', 'io', 'threads', 'oom_disabled', 'database_limit', 'allocation_limit', 'backup_limit', 'subdomain_limit'])) {
         $initialStep = 3;
     } elseif ($errors->hasAny(['nest_id', 'egg_id', 'image', 'custom_image', 'skip_scripts'])) {
         $initialStep = 4;
@@ -247,6 +247,10 @@
                                 <div class="col-md-4">
                                     <label for="pBackupLimit" class="form-label">Backups</label>
                                     <input type="text" id="pBackupLimit" name="backup_limit" class="form-control" value="{{ old('backup_limit', 0) }}"/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="pSubdomainLimit" class="form-label">Subdomains</label>
+                                    <input type="text" id="pSubdomainLimit" name="subdomain_limit" class="form-control" value="{{ old('subdomain_limit', 0) }}"/>
                                 </div>
                             </div>
 
