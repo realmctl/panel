@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import SetupField, { inputClassName } from '@/components/setup/SetupField';
 import { createSetupAllocations } from '@/api/setup/setup';
@@ -51,11 +51,10 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'Allocations'}>
-            <p className={styles.stepIntro}>
-                Assign ports on {status?.context.nodeName || 'your node'} for new servers.
-            </p>
-
+        <SetupStepPanel
+            title={'Allocations'}
+            description={`Assign ports on ${status?.context.nodeName || 'your node'} for new servers.`}
+        >
             <form onSubmit={onSubmit}>
                 <SetupField id={'allocationIp'} label={'IP address'}>
                     <input
@@ -85,6 +84,6 @@ export default () => {
                     </Button>
                 </div>
             </form>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

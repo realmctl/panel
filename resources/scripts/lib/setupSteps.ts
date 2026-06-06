@@ -2,6 +2,7 @@ import { SetupStep } from '@/state/settings';
 
 export const SETUP_STEP_ORDER = [
     'welcome',
+    'environment',
     'admin',
     'settings',
     'location',

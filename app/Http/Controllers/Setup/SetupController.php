@@ -5,10 +5,12 @@ namespace Pterodactyl\Http\Controllers\Setup;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\Location;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Services\Setup\PanelSetupService;
+use Pterodactyl\Services\Setup\SetupEnvironmentService;
 use Pterodactyl\Services\Users\UserCreationService;
 use Pterodactyl\Services\Nodes\NodeCreationService;
 use Pterodactyl\Http\Controllers\Auth\AbstractLoginController;
@@ -32,6 +34,7 @@ class SetupController extends AbstractLoginController
 
     public function __construct(
         private PanelSetupService $setupService,
+        private SetupEnvironmentService $environmentService,
         private UserCreationService $userCreationService,
         private LocationCreationService $locationCreationService,
         private NodeCreationService $nodeCreationService,
@@ -56,7 +59,38 @@ class SetupController extends AbstractLoginController
     {
         $this->setupService->markWelcomeComplete();
 
-        return new JsonResponse(['data' => $this->setupService->getStatus()]);
+        return $this->status();
+    }
+
+    public function configureEnvironment(Request $request): JsonResponse
+    {
+        $request->validate([
+            'author' => 'required|email',
+            'url' => 'required|url',
+            'timezone' => 'required|string',
+            'cache' => 'sometimes|in:redis,memcached,file',
+            'session' => 'sometimes|in:redis,memcached,database,file,cookie',
+            'queue' => 'sometimes|in:redis,database,sync',
+            'redisHost' => 'sometimes|string',
+            'redisPort' => 'sometimes|integer|min:1|max:65535',
+            'redisPassword' => 'sometimes|nullable|string',
+        ]);
+
+        if (!in_array($request->input('timezone'), \DateTimeZone::listIdentifiers(), true)) {
+            throw new DisplayException('The selected timezone is invalid.');
+        }
+
+        try {
+            $this->environmentService->configure($request->only([
+                'author', 'url', 'timezone', 'cache', 'session', 'queue', 'redisHost', 'redisPort', 'redisPassword',
+            ]));
+        } catch (\Pterodactyl\Exceptions\PterodactylException $exception) {
+            throw new DisplayException($exception->getMessage());
+        }
+
+        $this->setupService->markEnvironmentComplete();
+
+        return $this->status();
     }
 
     public function createAdmin(Request $request): JsonResponse
@@ -116,6 +150,7 @@ class SetupController extends AbstractLoginController
         ]);
 
         $location = $this->locationCreationService->handle($request->only(['short', 'long']));
+        $this->setupService->markLocationComplete();
 
         return new JsonResponse([
             'data' => array_merge($this->setupService->getStatus(), [
@@ -234,6 +269,19 @@ class SetupController extends AbstractLoginController
             'allocation_alias' => $request->input('allocation_alias'),
             'allocation_ports' => $request->input('allocation_ports'),
         ]);
+
+        return new JsonResponse(['data' => $this->setupService->getStatus()]);
+    }
+
+    public function continueLocation(Request $request): JsonResponse
+    {
+        $this->ensureRootAdmin($request);
+
+        if (!Location::query()->exists()) {
+            throw new DisplayException('Create a location before continuing.');
+        }
+
+        $this->setupService->markLocationComplete();
 
         return new JsonResponse(['data' => $this->setupService->getStatus()]);
     }

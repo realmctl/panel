@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import { completeSetup } from '@/api/setup/setup';
 import { useSetup } from '@/components/setup/SetupContext';
@@ -24,14 +24,20 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'Done'}>
-            <p className={styles.stepIntro}>Your panel is ready.</p>
-
+        <SetupStepPanel
+            title={'All set'}
+            description={
+                <>
+                    Your panel is ready. When you want to host game servers, add a node from{' '}
+                    <strong>Admin → Nodes</strong> and install Wings on that machine.
+                </>
+            }
+        >
             <div className={styles.actions}>
                 <Button type={'button'} onClick={onFinish} disabled={submitting}>
                     {submitting ? 'Loading...' : 'Open dashboard'}
                 </Button>
             </div>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

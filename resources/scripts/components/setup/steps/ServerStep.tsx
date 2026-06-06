@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import { skipSetupServer } from '@/api/setup/setup';
 import { useSetup } from '@/components/setup/SetupContext';
@@ -27,16 +27,15 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'First server'}>
-            <p className={styles.stepIntro}>
-                Create your first server from the admin area after setup, or skip for now.
-            </p>
-
+        <SetupStepPanel
+            title={'First server'}
+            description={'Create your first server from the admin area after setup, or skip for now.'}
+        >
             <div className={styles.actions}>
                 <Button type={'button'} onClick={onContinue} disabled={submitting}>
                     {submitting ? 'Loading...' : 'Skip and finish'}
                 </Button>
             </div>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import SetupField, { inputClassName } from '@/components/setup/SetupField';
 import { createSetupAdmin } from '@/api/setup/setup';
@@ -75,9 +75,7 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'Administrator'}>
-            <p className={styles.stepIntro}>Create the first admin account.</p>
-
+        <SetupStepPanel title={'Administrator'} description={'Create the first admin account for this panel.'}>
             <form onSubmit={onSubmit}>
                 <div className={'grid grid-cols-1 gap-4 sm:grid-cols-2'}>
                     <SetupField id={'nameFirst'} label={'First name'} error={errors.nameFirst}>
@@ -155,6 +153,6 @@ export default () => {
                     </Button>
                 </div>
             </form>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

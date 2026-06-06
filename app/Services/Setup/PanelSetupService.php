@@ -24,29 +24,77 @@ class PanelSetupService
 
     public const KEY_WELCOME_DONE = 'pterodactyl:setup:welcome_done';
 
+    public const KEY_ENVIRONMENT_DONE = SetupEnvironmentService::KEY_ENVIRONMENT_DONE;
+
+    public const KEY_LOCATION_DONE = 'pterodactyl:setup:location_done';
+
+    public const KEY_FORCE_REOPEN = 'pterodactyl:setup:force_reopen';
+
+    /**
+     * @var array<int, string>
+     */
+    private const SETUP_SETTING_KEYS = [
+        self::KEY_COMPLETE,
+        self::KEY_WINGS_VERIFIED,
+        self::KEY_SERVER_SKIPPED,
+        self::KEY_SETTINGS_DONE,
+        self::KEY_WELCOME_DONE,
+        self::KEY_ENVIRONMENT_DONE,
+        self::KEY_LOCATION_DONE,
+        self::KEY_FORCE_REOPEN,
+    ];
+
     /**
      * @var array<string, mixed>|null
      */
     private ?array $summaryCache = null;
 
-    public function __construct(private SettingsRepositoryInterface $settings)
-    {
+    public function __construct(
+        private SettingsRepositoryInterface $settings,
+        private SetupEnvironmentService $environmentService,
+    ) {
     }
 
     public function isComplete(): bool
     {
+        if ($this->isTestingMode()) {
+            return false;
+        }
+
         if ($this->getBooleanSetting(self::KEY_COMPLETE)) {
             return true;
         }
 
         // Installations created before the setup wizard existed should not be forced
         // through it. If the wizard was never started but the panel already has an
-        // administrator and a node, treat setup as effectively complete.
-        if (!$this->wizardStarted() && User::query()->where('root_admin', true)->exists() && Node::query()->exists()) {
+        // administrator, treat setup as effectively complete.
+        if (!$this->wizardStarted() && User::query()->where('root_admin', true)->exists()) {
             return true;
         }
 
         return false;
+    }
+
+    public function isTestingMode(): bool
+    {
+        return $this->getBooleanSetting(self::KEY_FORCE_REOPEN);
+    }
+
+    public function resetForTesting(): void
+    {
+        foreach (self::SETUP_SETTING_KEYS as $key) {
+            $this->settings->forget('settings::' . $key);
+        }
+
+        $this->settings->set('settings::' . self::KEY_FORCE_REOPEN, true);
+        $this->summaryCache = null;
+    }
+
+    public function restoreAfterTesting(): void
+    {
+        $this->settings->forget('settings::' . self::KEY_FORCE_REOPEN);
+        $this->settings->set('settings::' . self::KEY_COMPLETE, true);
+        $this->summaryCache = null;
     }
 
     public function isRequired(): bool
@@ -56,7 +104,12 @@ class PanelSetupService
 
     private function wizardStarted(): bool
     {
+        if ($this->isTestingMode()) {
+            return true;
+        }
+
         return $this->getBooleanSetting(self::KEY_WELCOME_DONE)
+            || $this->getBooleanSetting(self::KEY_ENVIRONMENT_DONE)
             || $this->getBooleanSetting(self::KEY_SETTINGS_DONE)
             || $this->getBooleanSetting(self::KEY_WINGS_VERIFIED)
             || $this->getBooleanSetting(self::KEY_SERVER_SKIPPED);
@@ -69,13 +122,14 @@ class PanelSetupService
     {
         $steps = [
             $this->step('welcome', 'Welcome', 'Get started with your panel', $this->isWelcomeComplete()),
+            $this->step('environment', 'Environment', 'Configure application URL and drivers', $this->isEnvironmentComplete()),
             $this->step('admin', 'Admin account', 'Create your administrator', $this->isAdminComplete(), User::query()->exists()),
             $this->step('settings', 'Panel settings', 'Configure basic panel options', $this->isSettingsComplete()),
             $this->step('location', 'Location', 'Add your first location', $this->isLocationComplete()),
-            $this->step('node', 'Node', 'Connect a Wings node', $this->isNodeComplete()),
-            $this->step('wings', 'Wings', 'Install and verify Wings', $this->isWingsComplete()),
-            $this->step('allocations', 'Allocations', 'Assign IP addresses and ports', $this->isAllocationsComplete()),
-            $this->step('server', 'First server', 'Create your first game server', $this->isServerComplete(), false),
+            $this->step('node', 'Node', 'Connect a Wings node', $this->isNodeComplete(), true),
+            $this->step('wings', 'Wings', 'Install and verify Wings', $this->isWingsComplete(), true),
+            $this->step('allocations', 'Allocations', 'Assign IP addresses and ports', $this->isAllocationsComplete(), true),
+            $this->step('server', 'First server', 'Create your first game server', $this->isServerComplete(), true),
             $this->step('finish', 'Finish', 'Setup complete', $this->isComplete()),
         ];
 
@@ -149,6 +203,8 @@ class PanelSetupService
                 'locales' => $this->getAvailableLanguages(true),
                 'panelName' => config('app.name'),
                 'panelLocale' => config('app.locale'),
+                'environment' => $this->environmentService->getDefaults(request()),
+                'testingMode' => $this->isTestingMode(),
             ],
         ]);
     }
@@ -181,6 +237,12 @@ class PanelSetupService
         $this->summaryCache = null;
     }
 
+    public function markEnvironmentComplete(): void
+    {
+        $this->settings->set('settings::' . self::KEY_ENVIRONMENT_DONE, true);
+        $this->summaryCache = null;
+    }
+
     public function markSettingsComplete(): void
     {
         $this->settings->set('settings::' . self::KEY_SETTINGS_DONE, true);
@@ -199,17 +261,39 @@ class PanelSetupService
         $this->summaryCache = null;
     }
 
+    public function markLocationComplete(): void
+    {
+        $this->settings->set('settings::' . self::KEY_LOCATION_DONE, true);
+        $this->summaryCache = null;
+    }
+
     public function markComplete(): void
     {
+        $this->settings->forget('settings::' . self::KEY_FORCE_REOPEN);
         $this->settings->set('settings::' . self::KEY_COMPLETE, true);
         $this->summaryCache = null;
     }
 
     private function isWelcomeComplete(): bool
     {
+        if ($this->isTestingMode()) {
+            return $this->getBooleanSetting(self::KEY_WELCOME_DONE);
+        }
+
         return $this->getBooleanSetting(self::KEY_WELCOME_DONE)
+            || $this->isEnvironmentComplete()
             || User::query()->exists()
             || $this->isSettingsComplete();
+    }
+
+    private function isEnvironmentComplete(): bool
+    {
+        if ($this->isTestingMode()) {
+            return $this->getBooleanSetting(self::KEY_ENVIRONMENT_DONE);
+        }
+
+        return $this->getBooleanSetting(self::KEY_ENVIRONMENT_DONE)
+            || $this->environmentService->isConfigured();
     }
 
     private function isAdminComplete(): bool
@@ -224,6 +308,10 @@ class PanelSetupService
 
     private function isLocationComplete(): bool
     {
+        if ($this->isTestingMode()) {
+            return $this->getBooleanSetting(self::KEY_LOCATION_DONE);
+        }
+
         return Location::query()->exists();
     }
 

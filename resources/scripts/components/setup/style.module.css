@@ -1,60 +1,95 @@
 .page {
-    @apply min-h-screen px-4 py-6 sm:px-6;
+    @apply relative min-h-screen overflow-hidden px-4 py-8 sm:px-8 sm:py-10;
     background-color: #0b0f10;
 }
 
-.shell {
-    @apply mx-auto w-full max-w-5xl;
+.page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 70% 45% at 50% -10%, rgba(59, 130, 246, 0.09), transparent 55%),
+        radial-gradient(ellipse 40% 30% at 100% 0%, rgba(14, 165, 233, 0.05), transparent 50%);
+    pointer-events: none;
 }
 
-.header {
-    @apply mb-6 flex items-center gap-3;
+.shell {
+    @apply relative mx-auto w-full max-w-6xl;
+}
+
+.brand {
+    @apply mb-10 flex items-center justify-between;
 }
 
 .logo {
-    @apply h-7;
+    @apply h-6 opacity-90;
     filter: brightness(0) invert(1);
 }
 
-.headerTitle {
-    @apply m-0 text-base font-medium text-neutral-200;
+.brandMeta {
+    @apply text-xs font-medium text-neutral-600;
 }
 
 .layout {
     display: grid;
-    grid-template-columns: 200px minmax(0, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 3rem;
     align-items: start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .layout {
         grid-template-columns: 1fr;
+        gap: 2rem;
     }
 }
 
 .sidebar {
-    @apply flex flex-col gap-3;
+    @apply sticky top-8 flex flex-col gap-5;
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        position: static;
+    }
+}
+
+.progressBlock {
+    @apply flex flex-col gap-2;
 }
 
 .progressLine {
-    @apply m-0 text-xs text-neutral-500;
+    @apply m-0 flex items-center justify-between text-xs font-medium text-neutral-600;
+}
+
+.progressValue {
+    @apply text-neutral-500;
 }
 
 .progressBar {
-    @apply mt-2 h-1 w-full overflow-hidden rounded-full bg-neutral-800;
+    @apply h-px w-full overflow-hidden bg-neutral-800/80;
 }
 
 .progressFill {
-    @apply h-full rounded-full bg-primary-500 transition-all duration-300;
+    @apply h-full bg-gradient-to-r from-primary-600 to-primary-400 transition-all duration-500 ease-out;
 }
 
 .stepList {
-    @apply flex flex-col gap-0.5;
+    @apply relative flex flex-col gap-1;
+}
+
+.stepList::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 14px;
+    bottom: 14px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, #243041 12%, #243041 88%, transparent);
 }
 
 .stepButton {
-    @apply flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left text-sm transition-colors duration-150;
+    @apply relative flex w-full items-center gap-3 rounded-lg py-2.5 pl-9 pr-2 text-left text-sm transition-all duration-200;
     background: transparent;
     color: #64748b;
     cursor: pointer;
@@ -62,33 +97,42 @@
 }
 
 .stepButton:hover:not(:disabled) {
-    @apply text-neutral-300;
+    color: #cbd5e1;
 }
 
 .stepButton:disabled {
-    @apply cursor-default opacity-40;
+    @apply cursor-default opacity-35;
 }
 
 .stepButtonActive {
-    @apply text-neutral-100;
+    color: #f8fafc;
 }
 
 .stepButtonComplete {
-    @apply text-neutral-400;
+    color: #94a3b8;
 }
 
 .stepIndex {
-    @apply flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-semibold;
-    background: #1a2228;
+    @apply absolute left-0 flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-full text-[10px] font-semibold;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #12181d;
+    border: 1px solid #243041;
     color: #64748b;
+    transition: all 0.2s ease;
 }
 
 .stepButtonActive .stepIndex {
-    @apply bg-primary-500 text-white;
+    background: #3b82f6;
+    border-color: #60a5fa;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
 }
 
 .stepButtonComplete .stepIndex {
-    @apply bg-neutral-800 text-neutral-400;
+    background: #151c22;
+    border-color: #334155;
+    color: #64748b;
 }
 
 .stepLabel {
@@ -96,50 +140,180 @@
 }
 
 .content {
+    @apply min-w-0 pb-8;
+}
+
+.stepPanel {
     @apply min-w-0;
+    animation: setupStepIn 0.35s ease-out;
+}
+
+@keyframes setupStepIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stepHeader {
+    @apply max-w-2xl;
+}
+
+.stepEyebrow {
+    @apply m-0 mb-2 text-sm font-medium text-primary-400/90;
+}
+
+.stepTitle {
+    @apply m-0 text-3xl font-semibold tracking-tight text-neutral-50;
+    letter-spacing: -0.03em;
+}
+
+.stepDescription {
+    @apply mt-3 text-[15px] leading-relaxed text-neutral-400;
+}
+
+.stepDescription code {
+    @apply rounded bg-neutral-900/80 px-1.5 py-0.5 font-mono text-xs text-neutral-300;
+}
+
+.stepBody {
+    @apply mt-8 max-w-2xl;
 }
 
 .stepIntro {
-    @apply m-0 mb-5 text-sm leading-relaxed text-neutral-400;
+    @apply m-0 mb-6 text-[15px] leading-relaxed text-neutral-400;
 }
 
 .field {
-    @apply mb-3.5;
+    @apply mb-5;
 }
 
 .fieldLabel {
-    @apply mb-1 block text-xs font-medium text-neutral-400;
+    @apply mb-2 block text-sm font-medium text-neutral-500;
 }
 
 .fieldInput,
 .fieldSelect,
 .fieldTextarea {
-    @apply w-full rounded-md border border-neutral-800 bg-neutral-900/80 px-3 text-sm text-neutral-100 placeholder-neutral-600 focus:border-neutral-600 focus:outline-none focus:ring-1 focus:ring-neutral-600 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-3.5 text-sm text-neutral-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] placeholder-neutral-600 transition-all duration-150 focus:border-primary-500/40 focus:bg-white/[0.04] focus:outline-none focus:ring-2 focus:ring-primary-500/15 disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 .fieldInput,
 .fieldSelect {
-    @apply h-9;
+    @apply h-11;
 }
 
 .fieldTextarea {
-    @apply min-h-[140px] py-2 font-mono text-xs;
+    @apply min-h-[160px] py-3 font-mono text-xs leading-relaxed;
 }
 
 .fieldError {
-    @apply mt-1 text-xs text-red-400;
+    @apply mt-1.5 text-xs text-red-400;
 }
 
 .fieldHelp {
-    @apply mt-1 text-xs text-neutral-600;
+    @apply mt-1.5 text-xs leading-relaxed text-neutral-600;
 }
 
 .actions {
-    @apply mt-5 flex flex-wrap items-center gap-2;
+    @apply mt-8 flex flex-wrap items-center gap-3;
+}
+
+.advancedSection {
+    @apply mt-2 border-t border-white/[0.05] pt-5;
+}
+
+.advancedToggle {
+    @apply flex w-full items-start gap-3 rounded-lg px-1 py-2 text-left transition-colors duration-150;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.advancedToggle:hover {
+    @apply text-neutral-200;
+}
+
+.advancedToggleIcon {
+    @apply mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center text-neutral-500 transition-transform duration-200;
+}
+
+.advancedToggleIconOpen {
+    @apply rotate-90 text-neutral-300;
+}
+
+.advancedToggleContent {
+    @apply min-w-0 flex-1;
+}
+
+.advancedToggleLabel {
+    @apply block text-sm font-medium text-neutral-300;
+}
+
+.advancedToggleHint {
+    @apply mt-0.5 block text-xs leading-relaxed text-neutral-600;
+}
+
+.advancedPanel {
+    @apply mt-4 overflow-hidden;
+    animation: setupStepIn 0.25s ease-out;
+}
+
+.driverGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 720px) {
+    .driverGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.driverGrid .field {
+    @apply mb-0;
+}
+
+.redisGroup {
+    @apply mt-5 rounded-lg border border-white/[0.05] bg-white/[0.02] p-4;
+}
+
+.redisGroupTitle {
+    @apply m-0 mb-4 text-sm font-medium text-neutral-400;
+}
+
+.redisGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 720px) {
+    .redisGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.redisGrid .field:last-child {
+    grid-column: 1 / -1;
+}
+
+.redisGrid .field {
+    @apply mb-0;
+}
+
+.actionsDivider {
+    @apply my-2 h-px w-full bg-white/[0.04];
 }
 
 .codeBlock {
-    @apply overflow-x-auto rounded-md border border-neutral-800 bg-neutral-950/80 p-3;
+    @apply overflow-x-auto rounded-lg border border-white/[0.05] bg-black/30 p-4 backdrop-blur-sm;
 }
 
 .codeBlock pre {
@@ -147,11 +321,11 @@
 }
 
 .inlineMessage {
-    @apply mt-3 text-xs;
+    @apply mt-4 text-sm;
 }
 
 .inlineMessageSuccess {
-    @apply text-green-400;
+    @apply text-emerald-400;
 }
 
 .inlineMessageError {

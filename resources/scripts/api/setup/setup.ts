@@ -12,7 +12,21 @@ export interface SetupStatus extends SetupConfiguration {
         locales: Record<string, string>;
         panelName: string;
         panelLocale: string;
+        environment: SetupEnvironmentDefaults;
+        testingMode: boolean;
     };
+}
+
+export interface SetupEnvironmentDefaults {
+    author: string;
+    url: string;
+    timezone: string;
+    cache: string;
+    session: string;
+    queue: string;
+    redisHost: string;
+    redisPort: number;
+    configured: boolean;
 }
 
 export interface CreateAdminData {
@@ -48,6 +62,19 @@ export const getSetupStatus = (): Promise<SetupStatus> =>
 export const acknowledgeWelcome = (): Promise<SetupStatus> =>
     http.post('/setup/welcome').then((response) => unwrap<SetupStatus>(response));
 
+export const configureSetupEnvironment = (data: {
+    author: string;
+    url: string;
+    timezone: string;
+    cache?: string;
+    session?: string;
+    queue?: string;
+    redisHost?: string;
+    redisPort?: number;
+    redisPassword?: string;
+}): Promise<SetupStatus> =>
+    http.post('/setup/environment', data).then((response) => unwrap<SetupStatus>(response));
+
 export const createSetupAdmin = (data: CreateAdminData): Promise<CreateAdminResponse> =>
     http.get('/sanctum/csrf-cookie').then(() =>
         http.post('/setup/admin', {
@@ -73,6 +100,9 @@ export const updateSetupSettings = (data: {
 
 export const createSetupLocation = (data: { short: string; long: string }): Promise<SetupStatus> =>
     http.post('/setup/location', data).then((response) => unwrap<SetupStatus>(response));
+
+export const continueSetupLocation = (): Promise<SetupStatus> =>
+    http.post('/setup/location/continue').then((response) => unwrap<SetupStatus>(response));
 
 export const createSetupNode = (data: Record<string, unknown>): Promise<SetupStatus> =>
     http.post('/setup/node', data).then((response) => unwrap<SetupStatus>(response));

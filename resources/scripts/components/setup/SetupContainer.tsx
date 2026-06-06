@@ -7,6 +7,7 @@ import { canAccessStep, getStepPath } from '@/lib/setupSteps';
 import { SetupProvider, useSetup } from '@/components/setup/SetupContext';
 import SetupSidebar from '@/components/setup/SetupSidebar';
 import WelcomeStep from '@/components/setup/steps/WelcomeStep';
+import EnvironmentStep from '@/components/setup/steps/EnvironmentStep';
 import AdminStep from '@/components/setup/steps/AdminStep';
 import SettingsStep from '@/components/setup/steps/SettingsStep';
 import LocationStep from '@/components/setup/steps/LocationStep';
@@ -56,21 +57,23 @@ const SetupRoutes = () => {
     }
 
     if (AUTHENTICATED_STEPS.has(resolvedStepId) && !isAuthenticated) {
-        return (
-            <Redirect
-                to={getStepPath(
-                    status.steps.some((step) => step.id === 'admin' && !step.skipped) ? 'admin' : 'welcome'
-                )}
-            />
-        );
+        const adminAvailable = status.steps.some((step) => step.id === 'admin' && !step.skipped);
+
+        if (adminAvailable) {
+            return <Redirect to={getStepPath('admin')} />;
+        }
+
+        window.location.assign('/auth/login');
+
+        return null;
     }
 
     return (
         <div className={styles.page}>
             <div className={styles.shell}>
-                <div className={styles.header}>
+                <div className={styles.brand}>
                     <img src={REALM_LOGO} className={styles.logo} alt={panelName} />
-                    <h1 className={styles.headerTitle}>Setup</h1>
+                    <span className={styles.brandMeta}>Installation</span>
                 </div>
 
                 <div className={styles.layout}>
@@ -83,6 +86,7 @@ const SetupRoutes = () => {
                     <div className={styles.content}>
                         <Switch>
                             <Route path={`${path}/welcome`} component={WelcomeStep} exact />
+                            <Route path={`${path}/environment`} component={EnvironmentStep} exact />
                             <Route path={`${path}/admin`} component={AdminStep} exact />
                             <Route path={`${path}/settings`} component={SettingsStep} exact />
                             <Route path={`${path}/location`} component={LocationStep} exact />

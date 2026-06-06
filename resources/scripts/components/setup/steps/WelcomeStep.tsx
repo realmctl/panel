@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import { acknowledgeWelcome } from '@/api/setup/setup';
 import { useSetup } from '@/components/setup/SetupContext';
@@ -28,16 +28,20 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'Welcome'}>
-            <p className={styles.stepIntro}>
-                Configure your panel, connect Wings, and get ready to host servers.
-            </p>
-
+        <SetupStepPanel
+            title={'Welcome'}
+            description={
+                <>
+                    Configure your panel environment, create your administrator account, and add your first location.
+                    You can connect Wings later from the admin area.
+                </>
+            }
+        >
             <div className={styles.actions}>
                 <Button onClick={onContinue} disabled={submitting}>
                     {submitting ? 'Loading...' : 'Continue'}
                 </Button>
             </div>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

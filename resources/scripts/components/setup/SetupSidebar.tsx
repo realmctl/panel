@@ -20,16 +20,19 @@ export default ({ steps, currentStepId, progress }: Props) => {
 
     return (
         <aside className={styles.sidebar}>
-            <div>
+            <div className={styles.progressBlock}>
                 <p className={styles.progressLine}>
-                    {progress.completed} / {progress.total} complete
+                    <span>Progress</span>
+                    <span className={styles.progressValue}>
+                        {progress.completed}/{progress.total}
+                    </span>
                 </p>
                 <div className={styles.progressBar}>
                     <div className={styles.progressFill} style={{ width: `${progress.percent}%` }} />
                 </div>
             </div>
 
-            <nav className={styles.stepList}>
+            <nav className={styles.stepList} aria-label={'Setup steps'}>
                 {visibleSteps.map((step, index) => {
                     const accessible = canAccessStep(steps, step.id);
                     const isActive = step.id === currentStepId;
@@ -39,11 +42,14 @@ export default ({ steps, currentStepId, progress }: Props) => {
                             key={step.id}
                             type={'button'}
                             disabled={!accessible}
+                            aria-current={isActive ? 'step' : undefined}
                             className={[
                                 styles.stepButton,
                                 isActive ? styles.stepButtonActive : '',
                                 step.complete ? styles.stepButtonComplete : '',
-                            ].filter(Boolean).join(' ')}
+                            ]
+                                .filter(Boolean)
+                                .join(' ')}
                             onClick={() => accessible && history.push(getStepPath(step.id))}
                         >
                             <span className={styles.stepIndex}>{step.complete ? '✓' : index + 1}</span>

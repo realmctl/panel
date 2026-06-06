@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import SetupField, { inputClassName, selectClassName } from '@/components/setup/SetupField';
 import { updateSetupSettings } from '@/api/setup/setup';
@@ -47,9 +47,7 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'Settings'}>
-            <p className={styles.stepIntro}>Basic panel configuration.</p>
-
+        <SetupStepPanel title={'Panel settings'} description={'How your panel appears to users.'}>
             <form onSubmit={onSubmit}>
                 <SetupField id={'panelName'} label={'Panel name'}>
                     <input
@@ -106,6 +104,6 @@ export default () => {
                     </Button>
                 </div>
             </form>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

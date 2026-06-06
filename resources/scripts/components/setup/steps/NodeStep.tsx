@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import SetupField, { inputClassName, selectClassName } from '@/components/setup/SetupField';
 import { createSetupNode } from '@/api/setup/setup';
@@ -57,9 +57,7 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'Node'}>
-            <p className={styles.stepIntro}>Add your first Wings node.</p>
-
+        <SetupStepPanel title={'Node'} description={'Connect your first Wings daemon to the panel.'}>
             <form onSubmit={onSubmit}>
                 <SetupField id={'nodeName'} label={'Node name'}>
                     <input
@@ -139,6 +137,6 @@ export default () => {
                     </Button>
                 </div>
             </form>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

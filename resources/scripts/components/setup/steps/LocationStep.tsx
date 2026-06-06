@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import SetupField, { inputClassName } from '@/components/setup/SetupField';
-import { createSetupLocation } from '@/api/setup/setup';
+import { continueSetupLocation, createSetupLocation } from '@/api/setup/setup';
 import { useSetup } from '@/components/setup/SetupContext';
 import { getNextStepId, getStepPath } from '@/lib/setupSteps';
 import useFlash from '@/plugins/useFlash';
@@ -11,10 +11,11 @@ import styles from '@/components/setup/style.module.css';
 
 export default () => {
     const history = useHistory();
-    const { updateStatus } = useSetup();
+    const { status, updateStatus } = useSetup();
     const { clearAndAddHttpError } = useFlash();
     const [submitting, setSubmitting] = useState(false);
     const [form, setForm] = useState({ short: '', long: '' });
+    const hasExistingLocation = !!status?.context.locationId;
 
     const onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -30,10 +31,36 @@ export default () => {
             .finally(() => setSubmitting(false));
     };
 
-    return (
-        <RealmCard title={'Location'}>
-            <p className={styles.stepIntro}>Add a location for your nodes.</p>
+    const onContinue = () => {
+        setSubmitting(true);
 
+        continueSetupLocation()
+            .then((next) => {
+                updateStatus(next);
+                const nextStep = getNextStepId(next.steps, 'location') || next.currentStep;
+                history.push(getStepPath(nextStep));
+            })
+            .catch((error) => clearAndAddHttpError({ error }))
+            .finally(() => setSubmitting(false));
+    };
+
+    if (hasExistingLocation) {
+        return (
+            <SetupStepPanel
+                title={'Location'}
+                description={'A location is already configured on this panel. Continue to the next step.'}
+            >
+                <div className={styles.actions}>
+                    <Button type={'button'} onClick={onContinue} disabled={submitting}>
+                        {submitting ? 'Loading...' : 'Continue'}
+                    </Button>
+                </div>
+            </SetupStepPanel>
+        );
+    }
+
+    return (
+        <SetupStepPanel title={'Location'} description={'Add a geographic location for your nodes.'}>
             <form onSubmit={onSubmit}>
                 <SetupField id={'short'} label={'Short code'} help={'A short identifier, e.g. us-east'}>
                     <input
@@ -62,6 +89,6 @@ export default () => {
                     </Button>
                 </div>
             </form>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };

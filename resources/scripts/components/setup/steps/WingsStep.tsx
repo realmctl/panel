@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RealmCard from '@/components/elements/realm/RealmCard';
+import SetupStepPanel from '@/components/setup/SetupStepPanel';
 import Button from '@/components/elements/Button';
 import { getNodeConfiguration, verifySetupNode } from '@/api/setup/setup';
 import { useSetup } from '@/components/setup/SetupContext';
@@ -99,11 +99,14 @@ export default () => {
     };
 
     return (
-        <RealmCard title={'Wings'}>
-            <p className={styles.stepIntro}>
-                Copy this config to <code>/etc/pterodactyl/config.yml</code>, start Wings, then verify.
-            </p>
-
+        <SetupStepPanel
+            title={'Wings'}
+            description={
+                <>
+                    Copy this config to <code>/etc/pterodactyl/config.yml</code>, start Wings, then verify.
+                </>
+            }
+        >
             {loadingConfig ? (
                 <p className={styles.stepIntro}>Loading configuration...</p>
             ) : (
@@ -122,6 +125,6 @@ export default () => {
                     {verifying ? 'Verifying...' : 'Verify'}
                 </Button>
             </div>
-        </RealmCard>
+        </SetupStepPanel>
     );
 };
