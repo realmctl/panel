@@ -15,7 +15,7 @@ return [
             'label' => 'Minecraft',
             'description' => 'Java Edition Minecraft servers such as Paper, Vanilla, Forge, Fabric, and Sponge.',
             'icon' => 'ti-brand-minecraft',
-            'features' => ['players', 'plugins', 'versions'],
+            'features' => ['players', 'plugins', 'versions', 'configuration'],
         ],
     ],
 ];

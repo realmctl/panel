@@ -18,15 +18,30 @@ import classNames from 'classnames';
 import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
 
 import 'xterm/css/xterm.css';
+import { formatConsoleLine, formatDaemonErrorLine } from '@/components/server/console/consoleLogFormat';
 import styles from './style.module.css';
 
-const settings = {
-    prefix: '\x1B[33m\x1B[1m[Realm]:\x1B[39m ',
-    diskusagecheck: 'Checking server disk space usage, this could take a few seconds...',
-    processconfiguration: 'Updating process configuration files...',
-    permcheck: 'Ensuring file permissions are set correctly, this could take a few seconds...',
-    dockerpull: 'Pulling Docker container image, this could take a few minutes to complete...',
-    finishpull: 'Finished pulling Docker container image',
+/** Wings (node daemon) console prefix — shown in blue for system messages. */
+const AIRPLANE_PRELUDE = '\x1B[34m\x1B[1m[Airplane]:\x1B[39m ';
+
+/** Rewrite legacy Wings/Panel daemon output into Realm copy. Keys match wings/server/*.go strings. */
+const WINGS_MESSAGE_REWRITES: Record<string, string> = {
+    'Checking server disk space usage, this could take a few seconds...':
+        'Measuring available storage on this node…',
+    'Updating process configuration files...': 'Applying runtime configuration…',
+    'Ensuring file permissions are set correctly, this could take a few seconds...':
+        'Verifying file ownership and permissions…',
+    'Pulling Docker container image, this could take a few minutes to complete...':
+        'Downloading container image — this may take a few minutes…',
+    'Finished pulling Docker container image': 'Container image download complete.',
+    'Server is outputting console data too quickly -- throttling...':
+        'Console output rate limited — throttling stream…',
+    'Server is exceeding the assigned disk space limit, stopping process now.':
+        'Storage quota exceeded — stopping server process.',
+    '---------- Detected server process in a crashed state! ----------':
+        '---------- Server process crashed ----------',
+    'Aborting automatic restart, crash detection is disabled for this instance.':
+        'Automatic restart skipped — crash recovery is disabled for this instance.',
 };
 
 const powersettings = {
@@ -35,6 +50,10 @@ const powersettings = {
     offline: 'Server marked as offline',
 };
 
+const DAEMON_PREFIX_PATTERN = /\x1B\[33m\x1B\[1m\[[^\]]+ Daemon\]:\x1B\[39m ?/g;
+const LEGACY_SHELL_PROMPT_PATTERN = /\x1B\[1m\x1B\[33mcontainer@pterodactyl~ \x1B\[0m/g;
+const PLAIN_DAEMON_PREFIX_PATTERN = /\[[^\]]+ Daemon\]: ?/g;
+
 const customsettings: Record<string, string> = {
     // Add custom replacements here, e.g.:
     // 'Starting minecraft server version': 'Starting Realm server version',
@@ -42,24 +61,25 @@ const customsettings: Record<string, string> = {
 
 const theme = {
     background: '#192024',
+    foreground: '#cbd5e1',
     cursor: 'transparent',
     black: '#192024',
-    red: '#E54B4B',
-    green: '#9ECE58',
-    yellow: '#FAED70',
-    blue: '#396FE2',
-    magenta: '#BB80B3',
-    cyan: '#2DDAFD',
-    white: '#d0d0d0',
-    brightBlack: 'rgba(255, 255, 255, 0.2)',
-    brightRed: '#FF5370',
-    brightGreen: '#C3E88D',
-    brightYellow: '#FFCB6B',
-    brightBlue: '#82AAFF',
-    brightMagenta: '#C792EA',
-    brightCyan: '#89DDFF',
-    brightWhite: '#ffffff',
-    selection: '#FAF089',
+    red: '#f87171',
+    green: '#86efac',
+    yellow: '#fbbf24',
+    blue: '#60a5fa',
+    magenta: '#c084fc',
+    cyan: '#67e8f9',
+    white: '#cbd5e1',
+    brightBlack: '#64748b',
+    brightRed: '#fca5a5',
+    brightGreen: '#bbf7d0',
+    brightYellow: '#fcd34d',
+    brightBlue: '#93c5fd',
+    brightMagenta: '#d8b4fe',
+    brightCyan: '#a5f3fc',
+    brightWhite: '#f1f5f9',
+    selection: 'rgba(59, 130, 246, 0.35)',
 };
 
 const terminalProps: ITerminalOptions = {
@@ -73,7 +93,7 @@ const terminalProps: ITerminalOptions = {
 };
 
 export default () => {
-    const TERMINAL_PRELUDE = settings.prefix;
+    const TERMINAL_PRELUDE = AIRPLANE_PRELUDE;
     const ref = useRef<HTMLDivElement>(null);
     const terminal = useMemo(() => new Terminal({ ...terminalProps }), []);
     const fitAddon = new FitAddon();
@@ -94,38 +114,49 @@ export default () => {
         z-index: 10;
     }`;
 
-    const handleConsoleOutput = (line: string, prelude = false) => {
+    const normalizeConsoleLine = (line: string): string => {
+        let normalized = line;
+
         Object.keys(customsettings).forEach((element) => {
-            line = line.replace(element, customsettings[element]);
+            normalized = normalized.replace(element, customsettings[element]);
         });
-        terminal.writeln(
-            (prelude ? TERMINAL_PRELUDE : '') +
-                line
-                    .replace('\x1B[1m\x1B[33mcontainer@pterodactyl~ \x1B[0m', TERMINAL_PRELUDE)
-                    .replace('\x1B[33m\x1B[1m[Pterodactyl Daemon]:\x1B[39m', TERMINAL_PRELUDE)
-                    .replace('Checking server disk space usage, this could take a few seconds...', settings.diskusagecheck)
-                    .replace('Updating process configuration files...', settings.processconfiguration)
-                    .replace('Ensuring file permissions are set correctly, this could take a few seconds...', settings.permcheck)
-                    .replace('Pulling Docker container image, this could take a few minutes to complete...', settings.dockerpull)
-                    .replace('Finished pulling Docker container image', settings.finishpull)
-                    .replace(/(?:\r\n|\r|\n)$/im, '') +
-                '\u001b[0m'
-        );
+
+        Object.entries(WINGS_MESSAGE_REWRITES).forEach(([from, to]) => {
+            normalized = normalized.replace(from, to);
+        });
+
+        return normalized
+            .replace(LEGACY_SHELL_PROMPT_PATTERN, TERMINAL_PRELUDE)
+            .replace(DAEMON_PREFIX_PATTERN, TERMINAL_PRELUDE)
+            .replace(PLAIN_DAEMON_PREFIX_PATTERN, TERMINAL_PRELUDE);
+    };
+
+    const handleConsoleOutput = (line: string, prelude = false) => {
+        const formatted = formatConsoleLine(normalizeConsoleLine(line));
+
+        if (!formatted) {
+            return;
+        }
+
+        terminal.writeln((prelude ? TERMINAL_PRELUDE : '') + formatted);
     };
 
     const handleTransferStatus = (status: string) => {
         switch (status) {
             // Sent by either the source or target node if a failure occurs.
             case 'failure':
-                terminal.writeln(TERMINAL_PRELUDE + 'Transfer has failed.\u001b[0m');
+                terminal.writeln(TERMINAL_PRELUDE + formatConsoleLine('ERROR: Transfer has failed.'));
                 return;
         }
     };
 
-    const handleDaemonErrorOutput = (line: string) =>
-        terminal.writeln(
-            '\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
-        );
+    const handleDaemonErrorOutput = (line: string) => {
+        const formatted = formatDaemonErrorLine(line);
+
+        if (formatted) {
+            terminal.writeln(formatted);
+        }
+    };
 
     const handlePowerChangeEvent = (state: string) => {
         if (state === 'starting') {
