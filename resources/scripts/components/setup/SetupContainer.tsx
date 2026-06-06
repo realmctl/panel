@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import { useStoreState } from '@/state/hooks';
 import Spinner from '@/components/elements/Spinner';
@@ -27,7 +27,19 @@ const SetupRoutes = () => {
     const isAuthenticated = useStoreState((state) => !!state.user.data?.uuid);
     const panelName = useStoreState((state) => state.settings.data?.name || 'Realm');
 
-    if (loading || !status) {
+    // Once setup is complete, leave the wizard with a full page load so the
+    // dashboard/server views run in a freshly booted SPA instance instead of the
+    // one that handled setup (a soft redirect can carry over stale state, which is
+    // why a manual refresh "fixes" a broken server view).
+    const shouldExit = !!status?.complete && !location.pathname.endsWith('/finish');
+
+    useEffect(() => {
+        if (shouldExit) {
+            window.location.assign('/');
+        }
+    }, [shouldExit]);
+
+    if (loading || !status || shouldExit) {
         return (
             <div className={styles.page}>
                 <div className={styles.shell}>
@@ -35,10 +47,6 @@ const SetupRoutes = () => {
                 </div>
             </div>
         );
-    }
-
-    if (status.complete && !location.pathname.endsWith('/finish')) {
-        return <Redirect to={'/'} />;
     }
 
     const resolvedStepId = stepMatch?.params.step || status.currentStep;
