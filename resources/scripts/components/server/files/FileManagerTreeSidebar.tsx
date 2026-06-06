@@ -2,9 +2,17 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
-import { dirname, join } from 'pathe';
+import { dirname } from 'pathe';
 import loadDirectory, { FileObject } from '@/api/server/files/loadDirectory';
+import loadArchiveDirectory from '@/api/server/files/loadArchiveDirectory';
 import { cleanDirectoryPath } from '@/helpers';
+import {
+    getArchiveAncestorPaths,
+    getArchiveFetchTarget,
+    isBrowsableArchive,
+    joinTreePath,
+    parseArchiveTreePath,
+} from '@/components/server/files/archivePathUtils';
 import { ServerContext } from '@/state/server';
 import { usePermissions } from '@/plugins/usePermissions';
 import Spinner from '@/components/elements/Spinner';
@@ -23,6 +31,13 @@ const sortTreeEntries = (entries: FileObject[]) =>
         .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
 
 const getAncestorPaths = (path: string): string[] => {
+    const archiveAncestors = getArchiveAncestorPaths(path);
+    if (archiveAncestors.length > 0) {
+        const parsed = parseArchiveTreePath(path)!;
+        const fileAncestors = getAncestorPaths(dirname(parsed.archivePath));
+        return [...fileAncestors, ...archiveAncestors];
+    }
+
     const normalized = cleanDirectoryPath(path);
     if (normalized === '/') {
         return ['/'];
@@ -80,8 +95,9 @@ const TreeEntry = ({
         handleDrop,
     } = useExplorerDrag();
 
-    const fullPath = join(parentPath, file.name);
-    const isFolder = !file.isFile;
+    const fullPath = joinTreePath(parentPath, file.name);
+    const isBrowsableJar = isBrowsableArchive(file);
+    const isFolder = !file.isFile || isBrowsableJar;
     const isExpanded = isFolder && expandedPaths.has(fullPath);
     const isLoading = isFolder && loadingPaths.has(fullPath);
     const isSelected = !isFolder && activeFilePath === fullPath;
@@ -180,9 +196,9 @@ const TreeEntry = ({
                 )}
                 <FileTreeIcon
                     name={file.name}
-                    isFile={file.isFile}
+                    isFile={!isBrowsableJar && file.isFile}
                     isSymlink={file.isSymlink}
-                    isArchive={file.isArchiveType()}
+                    isArchive={file.isArchiveType() || isBrowsableJar}
                     expanded={isExpanded}
                 />
                 <span className={styles.tree_label}>{file.name}</span>
@@ -191,7 +207,7 @@ const TreeEntry = ({
                 <div>
                     {children.map((child) => (
                         <TreeEntry
-                            key={`${fullPath}/${child.name}`}
+                            key={`${fullPath}:${child.key}`}
                             file={child}
                             parentPath={fullPath}
                             depth={depth + 1}
@@ -283,7 +299,12 @@ export default ({
             setLoadingPaths((prev) => new Set(prev).add(normalized));
 
             try {
-                const data = sortTreeEntries(await loadDirectory(uuid, normalized));
+                const archiveTarget = getArchiveFetchTarget(normalized);
+                const data = sortTreeEntries(
+                    archiveTarget
+                        ? await loadArchiveDirectory(uuid, archiveTarget.archivePath, archiveTarget.internalPath)
+                        : await loadDirectory(uuid, normalized)
+                );
                 loadedPathsRef.current.add(normalized);
                 setTreeCache((prev) => ({ ...prev, [normalized]: data }));
             } catch (error) {

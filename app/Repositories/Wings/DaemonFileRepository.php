@@ -97,6 +97,32 @@ class DaemonFileRepository extends DaemonRepository
     }
 
     /**
+     * Return a directory listing for a path within an archive file.
+     *
+     * @throws DaemonConnectionException
+     */
+    public function getArchiveDirectory(string $file, string $directory = '/'): array
+    {
+        Assert::isInstanceOf($this->server, Server::class);
+
+        try {
+            $response = $this->getHttpClient()->get(
+                sprintf('/api/servers/%s/files/list-archive', $this->server->uuid),
+                [
+                    'query' => [
+                        'file' => $file,
+                        'directory' => $directory,
+                    ],
+                ]
+            );
+        } catch (TransferException $exception) {
+            throw new DaemonConnectionException($exception);
+        }
+
+        return json_decode($response->getBody(), true);
+    }
+
+    /**
      * Creates a new directory for the server in the given $path.
      *
      * @throws DaemonConnectionException

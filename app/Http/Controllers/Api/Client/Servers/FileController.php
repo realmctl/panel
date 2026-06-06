@@ -19,6 +19,7 @@ use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CopyFileRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\PullFileRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListArchiveDirectoryRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ChmodFilesRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DeleteFileRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\RenameFileRequest;
@@ -51,6 +52,25 @@ class FileController extends ClientApiController
         $contents = $this->fileRepository
             ->setServer($server)
             ->getDirectory($request->get('directory') ?? '/');
+
+        return $this->fractal->collection($contents)
+            ->transformWith($this->getTransformer(FileObjectTransformer::class))
+            ->toArray();
+    }
+
+    /**
+     * Returns a listing of files within an archive on the server.
+     *
+     * @throws DaemonConnectionException
+     */
+    public function archiveDirectory(ListArchiveDirectoryRequest $request, Server $server): array
+    {
+        $contents = $this->fileRepository
+            ->setServer($server)
+            ->getArchiveDirectory(
+                $request->get('file'),
+                $request->get('directory') ?? '/',
+            );
 
         return $this->fractal->collection($contents)
             ->transformWith($this->getTransformer(FileObjectTransformer::class))
