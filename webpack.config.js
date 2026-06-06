@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const webpack = require('webpack');
 const { WebpackAssetsManifest } = require('webpack-assets-manifest');
 const TerserPlugin = require('terser-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -25,8 +26,8 @@ module.exports = {
     devtool: process.env.DEVTOOL || (isProduction ? false : 'eval-source-map'),
     performance: {
         hints: isProduction ? 'warning' : false,
-        maxEntrypointSize: 512000,
-        maxAssetSize: 512000,
+        maxEntrypointSize: 1536000,
+        maxAssetSize: 1536000,
     },
     entry: ['react-hot-loader/patch', './resources/scripts/index.tsx'],
     output: {
@@ -130,6 +131,35 @@ module.exports = {
             publicPath: true,
             integrity: true,
             integrityHashes: ['sha384'],
+        }),
+        new MonacoWebpackPlugin({
+            languages: [
+                'plaintext',
+                'ini',
+                'json',
+                'yaml',
+                'shell',
+                'javascript',
+                'typescript',
+                'xml',
+                'html',
+                'markdown',
+                'sql',
+                'rust',
+                'go',
+                'python',
+                'php',
+                'css',
+                'scss',
+                'dockerfile',
+                'nginx',
+                'lua',
+                'c',
+                'cpp',
+                'csharp',
+                'ruby',
+            ],
+            filename: isProduction ? 'monaco.[name].[contenthash:8].worker.js' : 'monaco.[name].worker.js',
         }),
     ],
     optimization: {

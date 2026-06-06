@@ -9,6 +9,7 @@ import Spinner from '@/components/elements/Spinner';
 import { debounce } from 'debounce';
 import classNames from 'classnames';
 import RealmCard from '@/components/elements/realm/RealmCard';
+import RealmCardSourceHeader from '@/components/elements/realm/RealmCardSourceHeader';
 import { realmClasses } from '@/lib/realmTokens';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -111,26 +112,6 @@ const mapHangarVersions = (result: any[]): VersionOption[] =>
     });
 
 const hangarDownloadUrl = (directUrl: string | null) => directUrl ?? '';
-
-const SourceCardHeader = ({
-    source,
-    badge,
-}: {
-    source: (typeof SOURCES)[number];
-    badge?: string;
-}) => (
-    <div className={'flex items-center gap-3 flex-wrap'}>
-        <img src={source.icon} alt={source.label} className={'w-4 h-4 object-contain flex-shrink-0'} />
-        <span className={'text-xs uppercase tracking-wide text-neutral-400'}>{source.label}</span>
-        <span className={'text-neutral-600 text-xs'}>—</span>
-        <span className={'text-xs text-neutral-500'}>{source.description}</span>
-        {badge && (
-            <span className={classNames('ml-auto text-xs px-2 py-0.5 rounded-full font-mono', realmClasses.badge)}>
-                {badge}
-            </span>
-        )}
-    </div>
-);
 
 const PluginFallbackIcon = ({ large = false }: { large?: boolean }) => (
     <div
@@ -630,7 +611,14 @@ export default () => {
 
             <RealmCard
                 bodyClassName={'p-0'}
-                header={<SourceCardHeader source={activeSource} badge={listBadge} />}
+                header={
+                    <RealmCardSourceHeader
+                        label={activeSource.label}
+                        description={activeSource.description}
+                        icon={activeSource.icon}
+                        badge={listBadge}
+                    />
+                }
                 headerClassName={'px-5 py-3'}
             >
                 {selectedPlugin ? <div className={'p-5'}>{renderDetail()}</div> : renderList()}

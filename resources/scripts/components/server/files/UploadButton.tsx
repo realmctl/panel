@@ -14,6 +14,8 @@ import { WithClassname } from '@/components/types';
 import Portal from '@/components/elements/Portal';
 import { CloudUploadIcon, DocumentIcon, FolderIcon } from '@heroicons/react/outline';
 import { useSignal } from '@preact/signals-react';
+import styles from './style.module.css';
+import ExplorerIconTooltip from '@/components/server/files/ExplorerIconTooltip';
 
 interface FileWithPath {
     file: File;
@@ -65,7 +67,7 @@ async function getAllFilesFromEntry(entry: FileSystemEntry, path = ''): Promise<
     return [];
 }
 
-export default ({ className }: WithClassname) => {
+export default ({ className, iconOnly = false }: WithClassname & { iconOnly?: boolean }) => {
     const fileUploadInput = useRef<HTMLInputElement>(null);
     const folderUploadInput = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -252,13 +254,27 @@ export default ({ className }: WithClassname) => {
                 }}
             />
             <div ref={dropdownRef} className={'relative'}>
-                <Button className={className} onClick={() => (showDropdown.value = !showDropdown.value)}>
-                    Upload
-                </Button>
+                {iconOnly ? (
+                    <ExplorerIconTooltip label={'Upload'}>
+                        <button
+                            type={'button'}
+                            className={styles.explorer_icon_btn}
+                            onClick={() => (showDropdown.value = !showDropdown.value)}
+                        >
+                            <CloudUploadIcon className={'w-4 h-4'} />
+                        </button>
+                    </ExplorerIconTooltip>
+                ) : (
+                    <Button className={className} onClick={() => (showDropdown.value = !showDropdown.value)}>
+                        Upload
+                    </Button>
+                )}
                 {showDropdown.value && (
                     <div
                         className={
-                            'absolute right-0 top-full mt-1 bg-neutral-800 border border-neutral-700 rounded shadow-lg z-50 min-w-max overflow-hidden'
+                            iconOnly
+                                ? 'absolute left-full top-0 ml-1 bg-neutral-800 border border-neutral-700 rounded shadow-lg z-50 min-w-max overflow-hidden'
+                                : 'absolute right-0 top-full mt-1 bg-neutral-800 border border-neutral-700 rounded shadow-lg z-50 min-w-max overflow-hidden'
                         }
                     >
                         <button

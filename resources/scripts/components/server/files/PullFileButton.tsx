@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { ServerContext } from '@/state/server';
 import { Form, Formik, FormikHelpers } from 'formik';
 import Field from '@/components/elements/Field';
 import { join } from 'pathe';
 import { object, string } from 'yup';
-import createDirectory from '@/api/server/files/createDirectory';
+import pullFile from '@/api/server/files/pullFile';
 import tw from 'twin.macro';
 import { Button } from '@/components/elements/button/index';
-import { FileObject } from '@/api/server/files/loadDirectory';
 import { useFlashKey } from '@/plugins/useFlash';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { WithClassname } from '@/components/types';
@@ -15,43 +16,28 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
 import Code from '@/components/elements/Code';
 import asDialog from '@/hoc/asDialog';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolderPlus } from '@fortawesome/free-solid-svg-icons';
 import styles from './style.module.css';
 import ExplorerIconTooltip from '@/components/server/files/ExplorerIconTooltip';
 
 interface Values {
-    directoryName: string;
+    url: string;
+    filename: string;
 }
 
 const schema = object().shape({
-    directoryName: string().required('A valid directory name must be provided.'),
+    url: string().url('Enter a valid URL.').required('A URL is required.'),
+    filename: string(),
 });
 
-const generateDirectoryData = (name: string): FileObject => ({
-    key: `dir_${name.split('/', 1)[0] ?? name}`,
-    name: name.replace(/^(\/*)/, '').split('/', 1)[0] ?? name,
-    mode: 'drwxr-xr-x',
-    modeBits: '0755',
-    size: 0,
-    isFile: false,
-    isSymlink: false,
-    mimetype: '',
-    createdAt: new Date(),
-    modifiedAt: new Date(),
-    isArchiveType: () => false,
-    isEditable: () => false,
-});
-
-const NewDirectoryDialog = asDialog({
-    title: 'Create Directory',
-})(() => {
+const PullFileDialog = asDialog({
+    title: 'Import from URL',
+})(({ onImported }: { onImported?: () => void }) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
     const { mutate } = useFileManagerSwr();
     const { close } = useContext(DialogWrapperContext);
-    const { clearAndAddHttpError } = useFlashKey('files:directory-modal');
+    const { clearAndAddHttpError } = useFlashKey('files:pull-modal');
 
     useEffect(() => {
         return () => {
@@ -59,9 +45,10 @@ const NewDirectoryDialog = asDialog({
         };
     }, []);
 
-    const submit = ({ directoryName }: Values, { setSubmitting }: FormikHelpers<Values>) => {
-        createDirectory(uuid, directory, directoryName)
-            .then(() => mutate((data) => [...data, generateDirectoryData(directoryName)], false))
+    const submit = ({ url, filename }: Values, { setSubmitting }: FormikHelpers<Values>) => {
+        pullFile(uuid, url, directory, filename.trim() || undefined)
+            .then(() => mutate())
+            .then(() => onImported?.())
             .then(() => close())
             .catch((error) => {
                 setSubmitting(false);
@@ -70,18 +57,26 @@ const NewDirectoryDialog = asDialog({
     };
 
     return (
-        <Formik onSubmit={submit} validationSchema={schema} initialValues={{ directoryName: '' }}>
+        <Formik onSubmit={submit} validationSchema={schema} initialValues={{ url: '', filename: '' }}>
             {({ submitForm, values }) => (
                 <>
-                    <FlashMessageRender key={'files:directory-modal'} />
+                    <FlashMessageRender key={'files:pull-modal'} />
                     <Form css={tw`m-0`}>
-                        <Field autoFocus id={'directoryName'} name={'directoryName'} label={'Name'} />
+                        <Field autoFocus id={'url'} name={'url'} label={'File URL'} placeholder={'https://example.com/plugin.jar'} />
+                        <div css={tw`mt-4`}>
+                            <Field
+                                id={'filename'}
+                                name={'filename'}
+                                label={'Filename (optional)'}
+                                placeholder={'Leave blank to use the remote filename'}
+                            />
+                        </div>
                         <p css={tw`mt-2 text-sm md:text-base break-all`}>
-                            <span css={tw`text-neutral-200`}>This directory will be created as&nbsp;</span>
+                            <span css={tw`text-neutral-200`}>The file will be downloaded to&nbsp;</span>
                             <Code>
                                 /home/container/
                                 <span css={tw`text-cyan-200`}>
-                                    {join(directory, values.directoryName).replace(/^(\.\.\/|\/)+/, '')}
+                                    {join(directory, values.filename || '…').replace(/^(\.\.\/|\/)+/, '')}
                                 </span>
                             </Code>
                         </p>
@@ -91,7 +86,7 @@ const NewDirectoryDialog = asDialog({
                             Cancel
                         </Button.Text>
                         <Button className={'w-full sm:w-auto'} onClick={submitForm}>
-                            Create
+                            Import
                         </Button>
                     </Dialog.Footer>
                 </>
@@ -100,21 +95,25 @@ const NewDirectoryDialog = asDialog({
     );
 });
 
-export default ({ className, iconOnly = false }: WithClassname & { iconOnly?: boolean }) => {
+export default ({
+    className,
+    onImported,
+    iconOnly = false,
+}: WithClassname & { onImported?: () => void; iconOnly?: boolean }) => {
     const [open, setOpen] = useState(false);
 
     return (
         <>
-            <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} />
+            <PullFileDialog open={open} onClose={setOpen.bind(this, false)} onImported={onImported} />
             {iconOnly ? (
-                <ExplorerIconTooltip label={'Create directory'}>
+                <ExplorerIconTooltip label={'Import URL'}>
                     <button type={'button'} className={styles.explorer_icon_btn} onClick={() => setOpen(true)}>
-                        <FontAwesomeIcon icon={faFolderPlus} className={'text-sm'} />
+                        <FontAwesomeIcon icon={faLink} className={'text-sm'} />
                     </button>
                 </ExplorerIconTooltip>
             ) : (
                 <Button.Text onClick={setOpen.bind(this, true)} className={className}>
-                    Create Directory
+                    Import URL
                 </Button.Text>
             )}
         </>

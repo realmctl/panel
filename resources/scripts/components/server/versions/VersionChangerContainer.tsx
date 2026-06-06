@@ -17,11 +17,15 @@
 //    Affected lines: getVersions chain (~line 76) and installVersion chain (~line 96).
 
 import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { ServerContext } from '@/state/server';
 import getVersions from '@/api/server/versions/getVersions';
 import installVersion, { InstallResponse } from '@/api/server/versions/installVersion';
 import Spinner from '@/components/elements/Spinner';
+import RealmCard from '@/components/elements/realm/RealmCard';
+import RealmCardSourceHeader from '@/components/elements/realm/RealmCardSourceHeader';
+import { realmClasses } from '@/lib/realmTokens';
 
 const SERVER_TYPES = [
     { id: 'paper',    name: 'Paper',    description: 'High performance Minecraft server', icon: '/assets/icons/papermc.webp' },
@@ -49,7 +53,7 @@ const DownloadProgress = () => {
 
     return (
         <div className={'flex items-center gap-3 w-full'}>
-            <div className={'flex-1 h-1.5 rounded-full overflow-hidden'} style={{ backgroundColor: '#2d3338' }}>
+            <div className={'flex-1 h-1.5 rounded-full overflow-hidden bg-realm-surface'}>
                 <div
                     className={'h-full rounded-full transition-all duration-300 ease-out bg-blue-500'}
                     style={{ width: `${progress}%` }}
@@ -105,7 +109,6 @@ export default () => {
 
     return (
         <ServerContentBlock title={'Version Changer'}>
-            {/* Notices */}
             {result && (
                 <div className={'mb-4 p-4 rounded-lg text-sm'} style={{ backgroundColor: '#0d2f2a', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
                     Successfully installed <strong>{result.version}</strong>. Restart your server to apply changes.
@@ -117,23 +120,17 @@ export default () => {
                 </div>
             )}
 
-            {/* Server type tab bar */}
-            <div
-                className={'flex items-center gap-1 p-1 rounded-lg mb-6 flex-wrap'}
-                style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
-            >
+            <div className={classNames('flex items-center gap-1 p-1 rounded-lg mb-6 flex-wrap', realmClasses.tabBar)}>
                 {SERVER_TYPES.map((type) => {
                     const active = selectedType === type.id;
                     return (
                         <button
                             key={type.id}
                             onClick={() => setSelectedType(type.id)}
-                            className={'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150'}
-                            style={
-                                active
-                                    ? { backgroundColor: '#192024', color: '#e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }
-                                    : { color: '#64748b' }
-                            }
+                            className={classNames(
+                                'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150 border-0 cursor-pointer',
+                                active ? realmClasses.tabActive : realmClasses.tabInactive
+                            )}
                         >
                             <img src={type.icon} alt={type.name} className={'w-4 h-4 object-contain flex-shrink-0'} />
                             {type.name}
@@ -142,64 +139,56 @@ export default () => {
                 })}
             </div>
 
-            {/* Version list card */}
-            <div className={'rounded-lg overflow-hidden'} style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}>
-                {/* Card header */}
-                <div
-                    className={'flex items-center gap-3 px-5 py-3'}
-                    style={{ backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' }}
-                >
-                    <img src={activeType.icon} alt={activeType.name} className={'w-4 h-4 object-contain'} />
-                    <span className={'text-xs uppercase tracking-wide text-neutral-400'}>{activeType.name}</span>
-                    <span className={'text-neutral-600 text-xs'}>—</span>
-                    <span className={'text-xs text-neutral-500'}>{activeType.description}</span>
-                    {versions.length > 0 && !loading && (
-                        <span
-                            className={'ml-auto text-xs px-2 py-0.5 rounded-full font-mono'}
-                            style={{ backgroundColor: '#1e2d38', color: '#64748b' }}
-                        >
-                            {versions.length} versions
-                        </span>
-                    )}
-                </div>
-
-                {/* Content */}
-                <div className={'p-5'}>
-                    {loading ? (
-                        <div className={'py-12'}>
-                            <Spinner centered size={'large'} />
-                        </div>
-                    ) : versions.length === 0 ? (
-                        <p className={'text-sm text-neutral-500 text-center py-12'}>No versions available.</p>
-                    ) : (
-                        <div className={'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2'}>
-                            {versions.map((version) => (
-                                <div
-                                    key={version}
-                                    className={'flex items-center justify-between px-3 py-2.5 rounded-md transition-colors duration-100'}
-                                    style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
-                                >
-                                    {installing === version ? (
-                                        <DownloadProgress />
-                                    ) : (
-                                        <>
-                                            <span className={'text-sm text-neutral-300 font-mono'}>{version}</span>
-                                            <button
-                                                onClick={() => handleInstall(version)}
-                                                disabled={installing !== null}
-                                                className={'ml-3 flex-shrink-0 px-2.5 py-1 text-xs font-medium rounded transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'}
-                                                style={{ backgroundColor: '#1e3a5f', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}
-                                            >
-                                                Install
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
+            <RealmCard
+                bodyClassName={'p-5'}
+                headerClassName={'px-5 py-3'}
+                header={
+                    <RealmCardSourceHeader
+                        label={activeType.name}
+                        description={activeType.description}
+                        icon={activeType.icon}
+                        badge={versions.length > 0 && !loading ? `${versions.length} versions` : undefined}
+                    />
+                }
+            >
+                {loading ? (
+                    <div className={'py-12'}>
+                        <Spinner centered size={'large'} />
+                    </div>
+                ) : versions.length === 0 ? (
+                    <p className={'text-sm text-neutral-500 text-center py-12 m-0'}>No versions available.</p>
+                ) : (
+                    <div className={'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2'}>
+                        {versions.map((version) => (
+                            <div
+                                key={version}
+                                className={classNames(
+                                    'flex items-center justify-between px-3 py-2.5 rounded-md transition-colors duration-100',
+                                    realmClasses.row
+                                )}
+                            >
+                                {installing === version ? (
+                                    <DownloadProgress />
+                                ) : (
+                                    <>
+                                        <span className={'text-sm text-neutral-300 font-mono'}>{version}</span>
+                                        <button
+                                            onClick={() => handleInstall(version)}
+                                            disabled={installing !== null}
+                                            className={
+                                                'ml-3 flex-shrink-0 px-2.5 py-1 text-xs font-medium rounded transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed'
+                                            }
+                                            style={{ backgroundColor: '#1e3a5f', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}
+                                        >
+                                            Install
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </RealmCard>
         </ServerContentBlock>
     );
 };

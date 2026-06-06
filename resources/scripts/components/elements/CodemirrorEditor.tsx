@@ -82,7 +82,7 @@ require('codemirror/mode/yaml/yaml');
 const EditorContainer = styled.div`
     min-height: 16rem;
     height: calc(100vh - 20rem);
-    ${tw`relative`};
+    ${tw`relative flex-1`};
 
     > div {
         ${tw`rounded h-full`};
@@ -113,6 +113,7 @@ export interface Props {
     onModeChanged: (mode: string) => void;
     fetchContent: (callback: () => Promise<string>) => void;
     onContentSaved: () => void;
+    onContentChanged?: (content: string) => void;
 }
 
 const findModeByFilename = (filename: string) => {
@@ -143,7 +144,7 @@ const findModeByFilename = (filename: string) => {
     return undefined;
 };
 
-export default ({ style, initialContent, filename, mode, fetchContent, onContentSaved, onModeChanged }: Props) => {
+export default ({ style, initialContent, filename, mode, fetchContent, onContentSaved, onModeChanged, onContentChanged }: Props) => {
     const [editor, setEditor] = useState<CodeMirror.Editor>();
 
     const ref = useCallback((node) => {
@@ -191,12 +192,19 @@ export default ({ style, initialContent, filename, mode, fetchContent, onContent
     }, [editor, mode]);
 
     useEffect(() => {
-        if (editor) {
-            editor.setValue(initialContent || '');
-            // Reset the history so that "Ctrl+Z" doesn't delete the intial content
-            // we just set above.
-            editor.setHistory({ done: [], undone: [] });
+        if (!editor) {
+            return;
         }
+
+        const next = initialContent || '';
+        if (editor.getValue() === next) {
+            return;
+        }
+
+        editor.setValue(next);
+        // Reset the history so that "Ctrl+Z" doesn't delete the initial content
+        // we just set above.
+        editor.setHistory({ done: [], undone: [] });
     }, [editor, initialContent]);
 
     useEffect(() => {
@@ -211,7 +219,14 @@ export default ({ style, initialContent, filename, mode, fetchContent, onContent
         });
 
         fetchContent(() => Promise.resolve(editor.getValue()));
-    }, [editor, fetchContent, onContentSaved]);
+
+        const onChange = () => onContentChanged?.(editor.getValue());
+        editor.on('change', onChange);
+
+        return () => {
+            editor.off('change', onChange);
+        };
+    }, [editor, fetchContent, onContentChanged, onContentSaved]);
 
     return (
         <EditorContainer style={style}>
