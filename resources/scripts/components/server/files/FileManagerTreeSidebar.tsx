@@ -2,10 +2,9 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
-import { join } from 'pathe';
-import { useHistory } from 'react-router-dom';
+import { dirname, join } from 'pathe';
 import loadDirectory, { FileObject } from '@/api/server/files/loadDirectory';
-import { cleanDirectoryPath, encodePathSegments } from '@/helpers';
+import { cleanDirectoryPath } from '@/helpers';
 import { ServerContext } from '@/state/server';
 import { usePermissions } from '@/plugins/usePermissions';
 import Spinner from '@/components/elements/Spinner';
@@ -15,6 +14,7 @@ import { FileEditorPresence } from '@/api/server/files/fileEditingPresence';
 import { useExplorerDrag, writeInternalDragData } from '@/components/server/files/ExplorerDragContext';
 import { getDropFolderForPath } from '@/components/server/files/fileExplorerDrag';
 import { hasExternalFiles } from '@/components/server/files/fileUploadUtils';
+import FileTreeContextMenu, { TreeContextTarget } from '@/components/server/files/FileTreeContextMenu';
 import styles from './style.module.css';
 
 const sortTreeEntries = (entries: FileObject[]) =>
@@ -44,14 +44,13 @@ interface TreeEntryProps {
     file: FileObject;
     parentPath: string;
     depth: number;
-    directory: string;
     activeFilePath: string | null;
     expandedPaths: Set<string>;
     loadingPaths: Set<string>;
     treeCache: Record<string, FileObject[]>;
     onToggleFolder: (path: string) => void;
-    onNavigateDirectory: (path: string) => void;
     onOpenFile: (path: string, file: FileObject) => void;
+    onContextMenu: (event: React.MouseEvent, file: FileObject, parentPath: string) => void;
     activeEditors: FileEditorPresence[];
     currentUserUuid?: string;
 }
@@ -60,14 +59,13 @@ const TreeEntry = ({
     file,
     parentPath,
     depth,
-    directory,
     activeFilePath,
     expandedPaths,
     loadingPaths,
     treeCache,
     onToggleFolder,
-    onNavigateDirectory,
     onOpenFile,
+    onContextMenu,
     activeEditors,
     currentUserUuid,
 }: TreeEntryProps) => {
@@ -79,7 +77,6 @@ const TreeEntry = ({
         beginInternalDrag,
         endDrag,
         handleDragEnter,
-        handleDragLeave,
         handleDrop,
     } = useExplorerDrag();
 
@@ -87,7 +84,7 @@ const TreeEntry = ({
     const isFolder = !file.isFile;
     const isExpanded = isFolder && expandedPaths.has(fullPath);
     const isLoading = isFolder && loadingPaths.has(fullPath);
-    const isSelected = isFolder ? directory === fullPath : activeFilePath === fullPath;
+    const isSelected = !isFolder && activeFilePath === fullPath;
     const children = isFolder ? treeCache[fullPath] : undefined;
     const showPresence = !isFolder && activeFilePath === fullPath;
     const dropFolder = getDropFolderForPath(fullPath, isFolder);
@@ -98,10 +95,7 @@ const TreeEntry = ({
 
     const handleClick = () => {
         if (isFolder) {
-            onNavigateDirectory(fullPath);
-            if (!isExpanded) {
-                onToggleFolder(fullPath);
-            }
+            onToggleFolder(fullPath);
             return;
         }
 
@@ -121,6 +115,7 @@ const TreeEntry = ({
                 type={'button'}
                 draggable={canDrag}
                 onClick={handleClick}
+                onContextMenu={(event) => onContextMenu(event, file, parentPath)}
                 onDragStart={(event) => {
                     if (!canDrag) {
                         event.preventDefault();
@@ -150,10 +145,6 @@ const TreeEntry = ({
                     event.preventDefault();
                     event.stopPropagation();
                     handleDragEnter(fullPath, isFolder, event.dataTransfer);
-                }}
-                onDragLeave={(event) => {
-                    event.stopPropagation();
-                    handleDragLeave(fullPath);
                 }}
                 onDrop={(event) => {
                     if (!canAcceptDrop) {
@@ -204,14 +195,13 @@ const TreeEntry = ({
                             file={child}
                             parentPath={fullPath}
                             depth={depth + 1}
-                            directory={directory}
                             activeFilePath={activeFilePath}
                             expandedPaths={expandedPaths}
                             loadingPaths={loadingPaths}
                             treeCache={treeCache}
                             onToggleFolder={onToggleFolder}
-                            onNavigateDirectory={onNavigateDirectory}
                             onOpenFile={onOpenFile}
+                            onContextMenu={onContextMenu}
                             activeEditors={activeEditors}
                             currentUserUuid={currentUserUuid}
                         />
@@ -228,6 +218,11 @@ interface Props {
     activeEditors: FileEditorPresence[];
     currentUserUuid?: string;
     onOpenFile: (path: string, file: FileObject) => void;
+    onTreeChange?: () => void;
+    onNewFile?: () => void;
+    onNewFolder?: () => void;
+    onItemMoved?: (from: string, to: string) => void;
+    onItemDeleted?: (path: string) => void;
 }
 
 export default ({
@@ -236,11 +231,14 @@ export default ({
     activeEditors,
     currentUserUuid,
     onOpenFile,
+    onTreeChange,
+    onNewFile,
+    onNewFolder,
+    onItemMoved,
+    onItemDeleted,
 }: Props) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
-    const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
-    const history = useHistory();
     const [canRead] = usePermissions(['file.read']);
 
     const {
@@ -249,19 +247,30 @@ export default ({
         isExternalDrag,
         canUpdate,
         canCreate,
-        endDrag,
         handleDragEnter,
-        handleDragLeave,
+        clearHoverTarget,
         handleDrop,
         registerExpandHandler,
-        registerCollapseHandler,
     } = useExplorerDrag();
 
     const [treeCache, setTreeCache] = useState<Record<string, FileObject[]>>({});
     const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['/']));
     const [loadingPaths, setLoadingPaths] = useState<Set<string>>(new Set());
     const [rootLoading, setRootLoading] = useState(true);
+    const [contextMenu, setContextMenu] = useState<TreeContextTarget | null>(null);
     const loadedPathsRef = useRef(new Set<string>());
+
+    const openContextMenu = useCallback((event: React.MouseEvent, file: FileObject, parentPath: string) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setContextMenu({ file, parentPath: cleanDirectoryPath(parentPath), x: event.clientX, y: event.clientY });
+    }, []);
+
+    const openRootContextMenu = useCallback((event: React.MouseEvent, parentPath: string) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setContextMenu({ parentPath: cleanDirectoryPath(parentPath), x: event.clientX, y: event.clientY });
+    }, []);
 
     const fetchDirectory = useCallback(
         async (path: string, force = false) => {
@@ -305,20 +314,9 @@ export default ({
         [fetchDirectory]
     );
 
-    const collapseFolder = useCallback((path: string) => {
-        const normalized = cleanDirectoryPath(path);
-
-        setExpandedPaths((prev) => {
-            const next = new Set(prev);
-            next.delete(normalized);
-            return next;
-        });
-    }, []);
-
     useEffect(() => {
         registerExpandHandler(expandFolder);
-        registerCollapseHandler(collapseFolder);
-    }, [collapseFolder, expandFolder, registerCollapseHandler, registerExpandHandler]);
+    }, [expandFolder, registerExpandHandler]);
 
     useEffect(() => {
         setRootLoading(true);
@@ -331,19 +329,23 @@ export default ({
         }
 
         loadedPathsRef.current.clear();
-        const ancestors = getAncestorPaths(directory);
+        const ancestors = activeFilePath ? getAncestorPaths(dirname(activeFilePath)) : ['/'];
         ancestors.forEach((path) => {
             void fetchDirectory(path, true);
         });
-    }, [refreshToken, directory, fetchDirectory]);
+    }, [refreshToken, activeFilePath, fetchDirectory]);
 
     useEffect(() => {
-        const ancestors = getAncestorPaths(directory);
+        if (!activeFilePath) {
+            return;
+        }
+
+        const ancestors = getAncestorPaths(dirname(activeFilePath));
         setExpandedPaths((prev) => new Set([...prev, ...ancestors]));
         ancestors.forEach((path) => {
             void fetchDirectory(path);
         });
-    }, [directory, fetchDirectory]);
+    }, [activeFilePath, fetchDirectory]);
 
     const onToggleFolder = useCallback(
         (path: string) => {
@@ -366,36 +368,52 @@ export default ({
         [fetchDirectory]
     );
 
-    const onNavigateDirectory = useCallback(
-        (path: string) => {
-            history.push(`/server/${id}/files#${encodePathSegments(cleanDirectoryPath(path))}`);
-        },
-        [history, id]
-    );
-
     const rootEntries = treeCache['/'] ?? [];
     const canAcceptDrop = canUpdate || canCreate;
 
     return (
         <div className={styles.explorer_tree}>
             <div
-                className={classNames(styles.tree_body, isExternalDrag && styles.tree_body_external_drag)}
+                className={classNames(
+                    styles.tree_body,
+                    (isExternalDrag || dropTarget === cleanDirectoryPath(directory)) && styles.tree_body_external_drag
+                )}
                 onDragOver={(event) => {
-                    if (!canAcceptDrop || !hasExternalFiles(event.dataTransfer)) {
+                    if (!canAcceptDrop) {
                         return;
                     }
 
                     event.preventDefault();
-                    event.dataTransfer.dropEffect = 'copy';
+                    event.dataTransfer.dropEffect = hasExternalFiles(event.dataTransfer)
+                        ? 'copy'
+                        : event.dataTransfer.types.includes('application/x-realm-explorer-path')
+                          ? 'move'
+                          : 'copy';
+                }}
+                onDragLeave={(event) => {
+                    // Only clear the highlight when the cursor actually leaves the whole
+                    // tree, not when moving between rows inside it.
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        clearHoverTarget();
+                    }
                 }}
                 onDrop={(event) => {
-                    if (!canAcceptDrop || !hasExternalFiles(event.dataTransfer)) {
+                    if (!canAcceptDrop) {
                         return;
                     }
 
                     event.preventDefault();
                     void handleDrop(directory, true, event.dataTransfer);
                 }}
+                onDragEnter={(event) => {
+                    if (!canAcceptDrop) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    handleDragEnter(directory, true, event.dataTransfer);
+                }}
+                onContextMenu={(event) => openRootContextMenu(event, directory)}
             >
                 {rootLoading ? (
                     <div className={'py-6'}>
@@ -403,90 +421,38 @@ export default ({
                     </div>
                 ) : !canRead ? (
                     <p className={'text-xs text-neutral-500 px-3 py-2 m-0'}>No permission to browse files.</p>
+                ) : rootEntries.length === 0 ? (
+                    <p className={'text-xs text-neutral-500 px-3 py-2 m-0'}>This directory is empty.</p>
                 ) : (
-                    <>
-                        <button
-                            type={'button'}
-                            onClick={() => onNavigateDirectory('/')}
-                            onDragOver={(event) => {
-                                if (!canAcceptDrop) {
-                                    return;
-                                }
-
-                                event.preventDefault();
-                                event.stopPropagation();
-                                event.dataTransfer.dropEffect = event.dataTransfer.types.includes(
-                                    'application/x-realm-explorer-path'
-                                )
-                                    ? 'move'
-                                    : 'copy';
-                            }}
-                            onDragEnter={(event) => {
-                                if (!canAcceptDrop) {
-                                    return;
-                                }
-
-                                event.preventDefault();
-                                event.stopPropagation();
-                                handleDragEnter('/', true, event.dataTransfer);
-                            }}
-                            onDragLeave={(event) => {
-                                event.stopPropagation();
-                                handleDragLeave('/');
-                            }}
-                            onDrop={(event) => {
-                                if (!canAcceptDrop) {
-                                    return;
-                                }
-
-                                event.preventDefault();
-                                event.stopPropagation();
-                                void handleDrop('/', true, event.dataTransfer);
-                            }}
-                            className={classNames(
-                                styles.tree_row,
-                                directory === '/' && styles.tree_row_active,
-                                dropTarget === '/' && styles.tree_row_drop_target
-                            )}
-                            style={{ paddingLeft: '8px' }}
-                        >
-                            <span
-                                className={styles.tree_chevron}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    onToggleFolder('/');
-                                }}
-                            >
-                                <FontAwesomeIcon
-                                    icon={expandedPaths.has('/') ? faChevronDown : faChevronRight}
-                                    className={'text-[10px]'}
-                                />
-                            </span>
-                            <FileTreeIcon name={'container'} expanded={expandedPaths.has('/')} isRoot />
-                            <span className={styles.tree_label}>container</span>
-                        </button>
-                        {expandedPaths.has('/') &&
-                            rootEntries.map((file) => (
-                                <TreeEntry
-                                    key={file.key}
-                                    file={file}
-                                    parentPath={'/'}
-                                    depth={1}
-                                    directory={directory}
-                                    activeFilePath={activeFilePath}
-                                    expandedPaths={expandedPaths}
-                                    loadingPaths={loadingPaths}
-                                    treeCache={treeCache}
-                                    onToggleFolder={onToggleFolder}
-                                    onNavigateDirectory={onNavigateDirectory}
-                                    onOpenFile={onOpenFile}
-                                    activeEditors={activeEditors}
-                                    currentUserUuid={currentUserUuid}
-                                />
-                            ))}
-                    </>
+                    rootEntries.map((file) => (
+                        <TreeEntry
+                            key={file.key}
+                            file={file}
+                            parentPath={'/'}
+                            depth={0}
+                            activeFilePath={activeFilePath}
+                            expandedPaths={expandedPaths}
+                            loadingPaths={loadingPaths}
+                            treeCache={treeCache}
+                            onToggleFolder={onToggleFolder}
+                            onOpenFile={onOpenFile}
+                            onContextMenu={openContextMenu}
+                            activeEditors={activeEditors}
+                            currentUserUuid={currentUserUuid}
+                        />
+                    ))
                 )}
             </div>
+            <FileTreeContextMenu
+                target={contextMenu}
+                onClose={() => setContextMenu(null)}
+                onOpenFile={onOpenFile}
+                onNewFile={onNewFile}
+                onNewFolder={onNewFolder}
+                onTreeChange={onTreeChange}
+                onItemMoved={onItemMoved}
+                onItemDeleted={onItemDeleted}
+            />
             {(dragPath || isExternalDrag) && (
                 <div className={styles.tree_drop_hint}>
                     {isExternalDrag ? 'Drop to upload into folder' : 'Drop to move'}

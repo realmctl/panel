@@ -1,7 +1,8 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileCode, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import FileEditorEmptyState from '@/components/server/files/FileEditorEmptyState';
 import getFileContents from '@/api/server/files/getFileContents';
 import saveFileContents from '@/api/server/files/saveFileContents';
 import { httpErrorToHuman } from '@/api/http';
@@ -18,6 +19,7 @@ import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 import { detectModeFromFilename, getFileName, isTabDirty, OpenFileTab } from '@/components/server/files/fileEditorUtils';
 import FileEditorPresenceAvatars from '@/components/server/files/FileEditorPresenceAvatars';
+import FileMediaViewer from '@/components/server/files/FileMediaViewer';
 import { FileEditorPresence } from '@/api/server/files/fileEditingPresence';
 import styles from './style.module.css';
 import tw from 'twin.macro';
@@ -33,41 +35,6 @@ interface Props {
     onCursorLineChange: (line: number) => void;
 }
 
-const EMPTY_PREVIEW_LINES = 8;
-
-const EditorEmptyState = () => (
-    <div className={styles.editor_empty}>
-        <div className={styles.editor_empty_preview} aria-hidden>
-            <div className={styles.editor_empty_gutter}>
-                {Array.from({ length: EMPTY_PREVIEW_LINES }).map((_, index) => (
-                    <span key={index}>{index + 1}</span>
-                ))}
-            </div>
-            <div className={styles.editor_empty_lines}>
-                {Array.from({ length: EMPTY_PREVIEW_LINES }).map((_, index) => (
-                    <span
-                        key={index}
-                        className={
-                            index % 3 === 1
-                                ? styles.editor_empty_short
-                                : index % 4 === 2
-                                  ? styles.editor_empty_medium
-                                  : undefined
-                        }
-                    />
-                ))}
-            </div>
-        </div>
-        <div className={styles.editor_empty_message}>
-            <div className={styles.editor_empty_message_card}>
-                <FontAwesomeIcon icon={faFileCode} className={'text-3xl text-neutral-400 mb-3'} />
-                <p className={'text-sm font-medium text-neutral-100 m-0 mb-1'}>Open a file to start editing</p>
-                <p className={'text-xs text-neutral-400 m-0'}>Select a file from the tree on the left</p>
-            </div>
-        </div>
-    </div>
-);
-
 export default ({
     tabs,
     activePath,
@@ -82,6 +49,7 @@ export default ({
     const { addError, clearFlashes } = useFlash();
     const [saving, setSaving] = useState(false);
     const [showRevisions, setShowRevisions] = useState(false);
+    const [mediaRefreshToken, setMediaRefreshToken] = useState(0);
     const fetchContentRef = useRef<(() => Promise<string>) | null>(null);
 
     const activeTab = tabs.find((tab) => tab.path === activePath) ?? null;
@@ -135,6 +103,11 @@ export default ({
 
     const reloadActive = useCallback(async () => {
         if (!activeTab) {
+            return;
+        }
+
+        if (activeTab.mediaKind) {
+            setMediaRefreshToken((value) => value + 1);
             return;
         }
 
@@ -196,7 +169,7 @@ export default ({
 
             {!activeTab ? (
                 <div className={styles.editor_surface_empty}>
-                    <EditorEmptyState />
+                    <FileEditorEmptyState />
                 </div>
             ) : (
                 <div className={styles.editor_panel}>
@@ -223,6 +196,13 @@ export default ({
                                     Retry
                                 </Button>
                             </div>
+                        ) : activeTab.mediaKind ? (
+                            <FileMediaViewer
+                                key={`${activeTab.path}:${mediaRefreshToken}`}
+                                uuid={uuid}
+                                path={activeTab.path}
+                                mediaKind={activeTab.mediaKind}
+                            />
                         ) : (
                             <div className={styles.editor_surface}>
                                 <SpinnerOverlay visible={saving} />
@@ -252,45 +232,47 @@ export default ({
                         )}
                     </div>
 
-                    <div className={styles.editor_footer}>
-                        <div className={styles.editor_footer_left}>
-                            {activeEditors.length > 0 && (
-                                <FileEditorPresenceAvatars
-                                    editors={activeEditors}
-                                    currentUserUuid={currentUserUuid}
-                                    className={styles.tab_presence}
-                                />
-                            )}
-                            <Select
-                                value={activeTab.mode}
-                                onChange={(event) => updateTab(activeTab.path, { mode: event.currentTarget.value })}
-                            >
-                                {modes.map((mode) => (
-                                    <option key={`${mode.name}_${mode.mime}`} value={mode.mime}>
-                                        {mode.name}
-                                    </option>
-                                ))}
-                            </Select>
-                        </div>
-                        <div className={styles.editor_footer_right}>
-                            {!activeTab.isNew && (
-                                <Can action={'file.revision-read'}>
-                                    <Button isSecondary onClick={() => setShowRevisions(true)}>
-                                        History
+                    {!activeTab.mediaKind && (
+                        <div className={styles.editor_footer}>
+                            <div className={styles.editor_footer_left}>
+                                {activeEditors.length > 0 && (
+                                    <FileEditorPresenceAvatars
+                                        editors={activeEditors}
+                                        currentUserUuid={currentUserUuid}
+                                        className={styles.tab_presence}
+                                    />
+                                )}
+                                <Select
+                                    value={activeTab.mode}
+                                    onChange={(event) => updateTab(activeTab.path, { mode: event.currentTarget.value })}
+                                >
+                                    {modes.map((mode) => (
+                                        <option key={`${mode.name}_${mode.mime}`} value={mode.mime}>
+                                            {mode.name}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
+                            <div className={styles.editor_footer_right}>
+                                {!activeTab.isNew && (
+                                    <Can action={'file.revision-read'}>
+                                        <Button isSecondary onClick={() => setShowRevisions(true)}>
+                                            History
+                                        </Button>
+                                    </Can>
+                                )}
+                                <Can action={activeTab.isNew ? 'file.create' : 'file.update'}>
+                                    <Button onClick={() => void saveActive()} disabled={saving || activeTab.loading}>
+                                        {activeTab.isNew ? 'Create File' : 'Save'}
                                     </Button>
                                 </Can>
-                            )}
-                            <Can action={activeTab.isNew ? 'file.create' : 'file.update'}>
-                                <Button onClick={() => void saveActive()} disabled={saving || activeTab.loading}>
-                                    {activeTab.isNew ? 'Create File' : 'Save'}
-                                </Button>
-                            </Can>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             )}
 
-            {activeTab && !activeTab.isNew && (
+            {activeTab && !activeTab.isNew && !activeTab.mediaKind && (
                 <FileRevisionModal
                     visible={showRevisions}
                     filePath={activeTab.path}

@@ -41,6 +41,7 @@ export interface OpenFileTab {
     loading: boolean;
     error: string | null;
     isNew?: boolean;
+    mediaKind?: 'audio' | 'video' | null;
 }
 
 export const isTabDirty = (tab: OpenFileTab) => tab.content !== tab.savedContent;

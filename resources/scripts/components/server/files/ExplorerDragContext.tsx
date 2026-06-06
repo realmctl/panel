@@ -25,10 +25,6 @@ interface ExpandFolderHandler {
     (path: string): void;
 }
 
-interface CollapseFolderHandler {
-    (path: string): void;
-}
-
 interface ContextValue {
     dragPath: string | null;
     dropTarget: string | null;
@@ -38,10 +34,9 @@ interface ContextValue {
     beginInternalDrag: (payload: ExplorerDragPayload) => void;
     endDrag: () => void;
     handleDragEnter: (path: string, isFolder: boolean, dataTransfer?: DataTransfer) => void;
-    handleDragLeave: (path: string) => void;
+    clearHoverTarget: () => void;
     handleDrop: (path: string, isFolder: boolean, dataTransfer: DataTransfer) => Promise<void>;
     registerExpandHandler: (handler: ExpandFolderHandler) => void;
-    registerCollapseHandler: (handler: CollapseFolderHandler) => void;
 }
 
 const ExplorerDragContext = createContext<ContextValue | null>(null);
@@ -76,49 +71,37 @@ export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onIte
     const [isExternalDrag, setIsExternalDrag] = useState(false);
 
     const expandHandlerRef = useRef<ExpandFolderHandler | null>(null);
-    const collapseHandlerRef = useRef<CollapseFolderHandler | null>(null);
-    const autoExpandedRef = useRef(new Set<string>());
-    const expandTimersRef = useRef<Record<string, number>>({});
-    const clearExpandTimers = useCallback(() => {
-        Object.values(expandTimersRef.current).forEach((timer) => window.clearTimeout(timer));
-        expandTimersRef.current = {};
-    }, []);
+    // The folder the cursor is currently hovering over. Tracking a single folder keeps
+    // the spring-open timer stable: moving between elements inside the same row no longer
+    // resets it, and only a real change in target restarts the countdown.
+    const hoverFolderRef = useRef<string | null>(null);
+    const expandTimerRef = useRef<number | null>(null);
 
-    const collapseAutoExpanded = useCallback(() => {
-        if (!collapseHandlerRef.current) {
-            autoExpandedRef.current.clear();
-            return;
+    const clearExpandTimer = useCallback(() => {
+        if (expandTimerRef.current !== null) {
+            window.clearTimeout(expandTimerRef.current);
+            expandTimerRef.current = null;
         }
-
-        autoExpandedRef.current.forEach((path) => collapseHandlerRef.current?.(path));
-        autoExpandedRef.current.clear();
     }, []);
 
     const endDrag = useCallback(() => {
+        clearExpandTimer();
+        hoverFolderRef.current = null;
         setDragPath(null);
         setDropTarget(null);
         setIsExternalDrag(false);
-        clearExpandTimers();
-        collapseAutoExpanded();
-    }, [clearExpandTimers, collapseAutoExpanded]);
+    }, [clearExpandTimer]);
+
+    const clearHoverTarget = useCallback(() => {
+        clearExpandTimer();
+        hoverFolderRef.current = null;
+        setDropTarget(null);
+        setIsExternalDrag(false);
+    }, [clearExpandTimer]);
 
     const beginInternalDrag = useCallback((payload: ExplorerDragPayload) => {
         setDragPath(cleanDirectoryPath(payload.path));
         setIsExternalDrag(false);
-    }, []);
-
-    const scheduleExpand = useCallback((folderPath: string) => {
-        const normalized = cleanDirectoryPath(folderPath);
-
-        if (expandTimersRef.current[normalized]) {
-            return;
-        }
-
-        expandTimersRef.current[normalized] = window.setTimeout(() => {
-            delete expandTimersRef.current[normalized];
-            expandHandlerRef.current?.(normalized);
-            autoExpandedRef.current.add(normalized);
-        }, EXPLORER_DRAG_EXPAND_MS);
     }, []);
 
     const handleDragEnter = useCallback(
@@ -128,19 +111,25 @@ export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onIte
             }
 
             const folder = getDropFolderForPath(path, isFolder);
-            setDropTarget(folder);
-            scheduleExpand(folder);
-        },
-        [scheduleExpand]
-    );
 
-    const handleDragLeave = useCallback((path: string) => {
-        const folder = cleanDirectoryPath(path);
-        if (expandTimersRef.current[folder]) {
-            window.clearTimeout(expandTimersRef.current[folder]);
-            delete expandTimersRef.current[folder];
-        }
-    }, []);
+            // Already hovering this folder – do nothing so the spring-open timer keeps running.
+            if (hoverFolderRef.current === folder) {
+                return;
+            }
+
+            hoverFolderRef.current = folder;
+            setDropTarget(folder);
+
+            clearExpandTimer();
+            expandTimerRef.current = window.setTimeout(() => {
+                expandTimerRef.current = null;
+                // Spring-open the folder and leave it open – folders never auto-collapse,
+                // which avoids the tree jumping around mid-drag.
+                expandHandlerRef.current?.(folder);
+            }, EXPLORER_DRAG_EXPAND_MS);
+        },
+        [clearExpandTimer]
+    );
 
     const moveItem = useCallback(
         async (sourcePath: string, targetFolder: string) => {
@@ -197,7 +186,7 @@ export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onIte
                     return;
                 }
 
-                if (dataTransfer.files.length > 0) {
+                if (dataTransfer.files.length > 0 || hasExternalFiles(dataTransfer)) {
                     await uploadToFolder(targetFolder, dataTransfer);
                 }
             } catch (error) {
@@ -213,8 +202,12 @@ export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onIte
     useEffect(() => {
         const onDragEnd = () => endDrag();
         window.addEventListener('dragend', onDragEnd);
+        window.addEventListener('drop', onDragEnd);
 
-        return () => window.removeEventListener('dragend', onDragEnd);
+        return () => {
+            window.removeEventListener('dragend', onDragEnd);
+            window.removeEventListener('drop', onDragEnd);
+        };
     }, [endDrag]);
 
     const value = useMemo(
@@ -227,24 +220,21 @@ export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onIte
             beginInternalDrag,
             endDrag,
             handleDragEnter,
-            handleDragLeave,
+            clearHoverTarget,
             handleDrop,
             registerExpandHandler: (handler: ExpandFolderHandler) => {
                 expandHandlerRef.current = handler;
-            },
-            registerCollapseHandler: (handler: CollapseFolderHandler) => {
-                collapseHandlerRef.current = handler;
             },
         }),
         [
             beginInternalDrag,
             canCreate,
             canUpdate,
+            clearHoverTarget,
             dragPath,
             dropTarget,
             endDrag,
             handleDragEnter,
-            handleDragLeave,
             handleDrop,
             isExternalDrag,
         ]

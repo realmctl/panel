@@ -76,19 +76,18 @@ const ServerConsoleContainer = () => {
             <div className={'grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4'}>
                 {/* Left: Server info + Runtime cards */}
                 <div className={'lg:col-span-1 flex flex-col gap-4'}>
-                    <RealmCard title={'Server'} rounded={'md'} border={'soft'} bodyClassName={'space-y-0'}>
-                        <div className={'space-y-4'}>
-                            <div className={'flex items-center'}>
-                                <span className={'text-sm text-neutral-400 w-20'}>Status</span>
-                                <StatusIndicator status={status} />
-                            </div>
-                            <div className={'flex items-center'}>
-                                <span className={'text-sm text-neutral-400 w-20'}>IP</span>
-                                <span className={'text-sm text-neutral-200 font-mono'}>{allocation}</span>
-                            </div>
+                    <RealmCard title={'Server'} rounded={'md'} border={'soft'} bodyClassName={'space-y-3'}>
+                        <div className={'flex items-center justify-between'}>
+                            <span className={'text-sm text-neutral-400'}>Status</span>
+                            <StatusIndicator status={status} />
                         </div>
-
-                        <ServerPowerControls variant={'card'} />
+                        <div className={'flex items-center justify-between'}>
+                            <span className={'text-sm text-neutral-400'}>IP</span>
+                            <span className={'text-sm text-neutral-200 font-mono'}>{allocation}</span>
+                        </div>
+                        <div className={'pt-4 border-t border-realm-border/50'}>
+                            <ServerPowerControls variant={'card'} />
+                        </div>
                     </RealmCard>
 
                     <RealmCard title={'Runtime'} rounded={'md'} border={'soft'} bodyClassName={'space-y-3'}>

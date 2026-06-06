@@ -57,7 +57,7 @@ export default ({ variant }: ServerPowerControlsProps) => {
     const showKill = status === 'running' || status === 'starting' || status === 'stopping';
     const canRestart = status === 'running';
 
-    const containerClass = variant === 'card' ? 'mt-6 flex gap-2' : 'flex items-center gap-2';
+    const containerClass = variant === 'card' ? 'flex gap-2' : 'flex items-center gap-2';
 
     return (
         <div className={containerClass}>

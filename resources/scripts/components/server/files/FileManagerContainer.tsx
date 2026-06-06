@@ -16,6 +16,7 @@ import { dirname, join } from 'pathe';
 import { ServerContext } from '@/state/server';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { detectModeFromFilename, getFileName, OpenFileTab } from '@/components/server/files/fileEditorUtils';
+import { canOpenInEditor, getMediaKindFromPath } from '@/components/server/files/fileMediaUtils';
 import useFileEditingPresence from '@/plugins/useFileEditingPresence';
 import { usePermissions } from '@/plugins/usePermissions';
 import { ExplorerDragProvider } from '@/components/server/files/ExplorerDragContext';
@@ -36,6 +37,7 @@ export default () => {
     const [activePath, setActivePath] = useState<string | null>(null);
     const [cursorLine, setCursorLine] = useState(1);
     const [newFileModalVisible, setNewFileModalVisible] = useState(false);
+    const [newFolderModalVisible, setNewFolderModalVisible] = useState(false);
     const [treeRefreshToken, setTreeRefreshToken] = useState(0);
     const { activeEditors, currentUserUuid } = useFileEditingPresence(uuid, activePath, cursorLine);
     const [canUpdate] = usePermissions(['file.update']);
@@ -61,6 +63,7 @@ export default () => {
     const openFile = useCallback(
         async (path: string) => {
             const normalized = cleanDirectoryPath(path);
+            const mediaKind = getMediaKindFromPath(normalized);
             let shouldFetch = false;
 
             setTabs((current) => {
@@ -76,8 +79,9 @@ export default () => {
                         content: '',
                         savedContent: '',
                         mode: detectModeFromFilename(getFileName(normalized)),
-                        loading: true,
+                        loading: !mediaKind,
                         error: null,
+                        mediaKind,
                     },
                 ];
             });
@@ -86,6 +90,10 @@ export default () => {
             syncEditorUrl(normalized);
 
             if (!shouldFetch) {
+                return;
+            }
+
+            if (mediaKind) {
                 return;
             }
 
@@ -141,10 +149,7 @@ export default () => {
 
         if (path !== '/' && getFileName(path).includes('.')) {
             void openFile(path);
-            return;
         }
-
-        setDirectory(path);
     }, [hash, openFile]);
 
     const openNewFileTab = useCallback((fullPath: string) => {
@@ -175,7 +180,7 @@ export default () => {
 
     const handleOpenFileFromTree = useCallback(
         (path: string, file: FileObject) => {
-            if (!file.isEditable()) {
+            if (!canOpenInEditor(file)) {
                 return;
             }
 
@@ -216,9 +221,10 @@ export default () => {
                 return;
             }
 
-            syncEditorUrl(directory);
+            setDirectory('/');
+            history.replace(`/server/${id}/files`);
         },
-        [directory, syncEditorUrl]
+        [history, id, syncEditorUrl]
     );
 
     const handleFileSaved = useCallback(
@@ -251,6 +257,23 @@ export default () => {
         [activePath, syncEditorUrl]
     );
 
+    const handleItemDeleted = useCallback(
+        (path: string) => {
+            const normalized = cleanDirectoryPath(path);
+
+            setTabs((current) =>
+                current.filter((tab) => tab.path !== normalized && !tab.path.startsWith(`${normalized}/`))
+            );
+
+            if (activePath === normalized || activePath?.startsWith(`${normalized}/`)) {
+                setActivePath(null);
+                setDirectory('/');
+                history.replace(`/server/${id}/files`);
+            }
+        },
+        [activePath, history, id]
+    );
+
     return (
         <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
             <div className={style.ide_layout}>
@@ -265,6 +288,8 @@ export default () => {
                             <FileManagerExplorerToolbar
                                 onNewFile={() => setNewFileModalVisible(true)}
                                 onTreeChange={bumpTree}
+                                newFolderOpen={newFolderModalVisible}
+                                onNewFolderOpenChange={setNewFolderModalVisible}
                             />
                             <ErrorBoundary>
                                 <FileManagerTreeSidebar
@@ -273,6 +298,11 @@ export default () => {
                                     activeEditors={activeEditors}
                                     currentUserUuid={currentUserUuid}
                                     onOpenFile={handleOpenFileFromTree}
+                                    onTreeChange={bumpTree}
+                                    onNewFile={() => setNewFileModalVisible(true)}
+                                    onNewFolder={() => setNewFolderModalVisible(true)}
+                                    onItemMoved={handleItemMoved}
+                                    onItemDeleted={handleItemDeleted}
                                 />
                             </ErrorBoundary>
                         </div>

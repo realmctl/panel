@@ -101,15 +101,28 @@ const NewDirectoryDialog = asDialog({
     );
 });
 
-export default ({ className, iconOnly = false, onCreated }: WithClassname & { iconOnly?: boolean; onCreated?: () => void }) => {
-    const [open, setOpen] = useState(false);
+export default ({
+    className,
+    iconOnly = false,
+    onCreated,
+    open: controlledOpen,
+    onOpenChange,
+}: WithClassname & {
+    iconOnly?: boolean;
+    onCreated?: () => void;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}) => {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const open = controlledOpen ?? internalOpen;
+    const setOpen = onOpenChange ?? setInternalOpen;
 
     return (
         <>
-            <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} onCreated={onCreated} />
+            <NewDirectoryDialog open={open} onClose={() => setOpen(false)} onCreated={onCreated} />
             {iconOnly ? (
                 <ExplorerIconTooltip label={'Create directory'}>
-                    <button type={'button'} className={styles.explorer_icon_btn} onClick={() => setOpen(true)}>
+                    <button type={'button'} className={styles.explorer_icon_btn} onClick={() => setOpen(true)} id={'file-explorer-new-folder-trigger'}>
                         <FontAwesomeIcon icon={faFolderPlus} className={'text-sm'} />
                     </button>
                 </ExplorerIconTooltip>
