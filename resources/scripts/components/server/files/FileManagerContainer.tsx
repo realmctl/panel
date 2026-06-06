@@ -16,6 +16,7 @@ import { dirname, join } from 'pathe';
 import { ServerContext } from '@/state/server';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { detectModeFromFilename, getFileName, OpenFileTab } from '@/components/server/files/fileEditorUtils';
+import useFileEditingPresence from '@/plugins/useFileEditingPresence';
 import style from './style.module.css';
 
 export default () => {
@@ -31,8 +32,10 @@ export default () => {
 
     const [tabs, setTabs] = useState<OpenFileTab[]>([]);
     const [activePath, setActivePath] = useState<string | null>(null);
+    const [cursorLine, setCursorLine] = useState(1);
     const [newFileModalVisible, setNewFileModalVisible] = useState(false);
     const [treeRefreshToken, setTreeRefreshToken] = useState(0);
+    const { activeEditors, currentUserUuid } = useFileEditingPresence(uuid, activePath, cursorLine);
     const skipHashSync = useRef(false);
     const tabsRef = useRef(tabs);
 
@@ -201,6 +204,7 @@ export default () => {
     const handleActivePathChange = useCallback(
         (path: string | null) => {
             setActivePath(path);
+            setCursorLine(1);
 
             if (path) {
                 setDirectory(dirname(path));
@@ -234,6 +238,8 @@ export default () => {
                             <FileManagerTreeSidebar
                                 refreshToken={treeRefreshToken || files}
                                 activeFilePath={activePath}
+                                activeEditors={activeEditors}
+                                currentUserUuid={currentUserUuid}
                                 onOpenFile={handleOpenFileFromTree}
                             />
                         </ErrorBoundary>
@@ -246,6 +252,9 @@ export default () => {
                     onTabsChange={setTabs}
                     onActivePathChange={handleActivePathChange}
                     onFileSaved={handleFileSaved}
+                    activeEditors={activeEditors}
+                    currentUserUuid={currentUserUuid}
+                    onCursorLineChange={setCursorLine}
                 />
             </div>
 

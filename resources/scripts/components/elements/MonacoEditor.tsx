@@ -26,6 +26,7 @@ export interface Props {
     fetchContent: (callback: () => Promise<string>) => void;
     onContentSaved: () => void;
     onContentChanged?: (content: string) => void;
+    onCursorLineChange?: (line: number) => void;
 }
 
 let themeDefined = false;
@@ -64,18 +65,21 @@ export default ({
     onContentSaved,
     onModeChanged,
     onContentChanged,
+    onCursorLineChange,
 }: Props) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
     const onModeChangedRef = useRef(onModeChanged);
     const onContentSavedRef = useRef(onContentSaved);
     const onContentChangedRef = useRef(onContentChanged);
+    const onCursorLineChangeRef = useRef(onCursorLineChange);
     const fetchContentRef = useRef(fetchContent);
     const modeRef = useRef(mode);
 
     onModeChangedRef.current = onModeChanged;
     onContentSavedRef.current = onContentSaved;
     onContentChangedRef.current = onContentChanged;
+    onCursorLineChangeRef.current = onCursorLineChange;
     fetchContentRef.current = fetchContent;
     modeRef.current = mode;
 
@@ -112,12 +116,19 @@ export default ({
 
         fetchContentRef.current(() => Promise.resolve(editor.getValue()));
 
-        const subscription = editor.onDidChangeModelContent(() => {
+        const contentSubscription = editor.onDidChangeModelContent(() => {
             onContentChangedRef.current?.(editor.getValue());
         });
 
+        const cursorSubscription = editor.onDidChangeCursorPosition((event) => {
+            onCursorLineChangeRef.current?.(event.position.lineNumber);
+        });
+
+        onCursorLineChangeRef.current?.(editor.getPosition()?.lineNumber ?? 1);
+
         return () => {
-            subscription.dispose();
+            contentSubscription.dispose();
+            cursorSubscription.dispose();
             editor.dispose();
             editorRef.current = null;
         };

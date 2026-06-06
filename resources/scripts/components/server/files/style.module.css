@@ -79,6 +79,38 @@
     @apply truncate flex-1 min-w-0;
 }
 
+.tree_file_icon {
+    @apply flex-shrink-0 object-contain;
+    width: 16px;
+    height: 16px;
+}
+
+.presence_stack {
+    @apply inline-flex items-center flex-shrink-0;
+}
+
+.presence_avatar {
+    @apply inline-flex items-center justify-center rounded-full overflow-hidden border border-realm-card flex-shrink-0;
+    margin-left: -6px;
+}
+
+.presence_avatar:first-child {
+    margin-left: 0;
+}
+
+.presence_avatar_self {
+    @apply border-blue-400/80;
+}
+
+.presence_overflow {
+    @apply inline-flex items-center justify-center rounded-full border border-realm-card bg-neutral-800 text-[10px] font-medium text-neutral-300 flex-shrink-0;
+    margin-left: -6px;
+}
+
+.tab_presence {
+    @apply flex-shrink-0;
+}
+
 .editor_workspace {
     @apply flex-1 min-w-0 min-h-0 h-full flex flex-col bg-realm-page border border-realm-border rounded-lg overflow-hidden;
 }
@@ -129,7 +161,7 @@
 }
 
 .editor_footer_left {
-    @apply flex-1 min-w-0 max-w-xs;
+    @apply flex flex-1 min-w-0 max-w-xs items-center gap-2;
 }
 
 .editor_footer_right {

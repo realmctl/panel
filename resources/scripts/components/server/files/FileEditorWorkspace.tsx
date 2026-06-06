@@ -17,6 +17,8 @@ import modes from '@/modes';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 import { detectModeFromFilename, getFileName, isTabDirty, OpenFileTab } from '@/components/server/files/fileEditorUtils';
+import FileEditorPresenceAvatars from '@/components/server/files/FileEditorPresenceAvatars';
+import { FileEditorPresence } from '@/api/server/files/fileEditingPresence';
 import styles from './style.module.css';
 import tw from 'twin.macro';
 
@@ -26,6 +28,9 @@ interface Props {
     onTabsChange: (tabs: OpenFileTab[]) => void;
     onActivePathChange: (path: string | null) => void;
     onFileSaved?: (path: string) => void;
+    activeEditors: FileEditorPresence[];
+    currentUserUuid?: string;
+    onCursorLineChange: (line: number) => void;
 }
 
 const EMPTY_PREVIEW_LINES = 8;
@@ -63,7 +68,16 @@ const EditorEmptyState = () => (
     </div>
 );
 
-export default ({ tabs, activePath, onTabsChange, onActivePathChange, onFileSaved }: Props) => {
+export default ({
+    tabs,
+    activePath,
+    onTabsChange,
+    onActivePathChange,
+    onFileSaved,
+    activeEditors,
+    currentUserUuid,
+    onCursorLineChange,
+}: Props) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { addError, clearFlashes } = useFlash();
     const [saving, setSaving] = useState(false);
@@ -231,6 +245,7 @@ export default ({ tabs, activePath, onTabsChange, onActivePathChange, onFileSave
                                         }}
                                         onContentChanged={(content) => updateTab(activeTab.path, { content })}
                                         onContentSaved={() => void saveActive()}
+                                        onCursorLineChange={onCursorLineChange}
                                     />
                                 </Suspense>
                             </div>
@@ -239,6 +254,13 @@ export default ({ tabs, activePath, onTabsChange, onActivePathChange, onFileSave
 
                     <div className={styles.editor_footer}>
                         <div className={styles.editor_footer_left}>
+                            {activeEditors.length > 0 && (
+                                <FileEditorPresenceAvatars
+                                    editors={activeEditors}
+                                    currentUserUuid={currentUserUuid}
+                                    className={styles.tab_presence}
+                                />
+                            )}
                             <Select
                                 value={activeTab.mode}
                                 onChange={(event) => updateTab(activeTab.path, { mode: event.currentTarget.value })}

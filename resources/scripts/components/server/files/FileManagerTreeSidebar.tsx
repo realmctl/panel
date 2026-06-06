@@ -9,7 +9,9 @@ import { cleanDirectoryPath, encodePathSegments } from '@/helpers';
 import { ServerContext } from '@/state/server';
 import { usePermissions } from '@/plugins/usePermissions';
 import Spinner from '@/components/elements/Spinner';
-import { getTreeFileIcon, getTreeFileIconColor, getTreeFolderIcon } from '@/components/server/files/fileTreeIcons';
+import FileEditorPresenceAvatars from '@/components/server/files/FileEditorPresenceAvatars';
+import FileTreeIcon from '@/components/server/files/FileTreeIcon';
+import { FileEditorPresence } from '@/api/server/files/fileEditingPresence';
 import styles from './style.module.css';
 
 const sortTreeEntries = (entries: FileObject[]) =>
@@ -47,6 +49,8 @@ interface TreeEntryProps {
     onToggleFolder: (path: string) => void;
     onNavigateDirectory: (path: string) => void;
     onOpenFile: (path: string, file: FileObject) => void;
+    activeEditors: FileEditorPresence[];
+    currentUserUuid?: string;
 }
 
 const TreeEntry = ({
@@ -61,6 +65,8 @@ const TreeEntry = ({
     onToggleFolder,
     onNavigateDirectory,
     onOpenFile,
+    activeEditors,
+    currentUserUuid,
 }: TreeEntryProps) => {
     const fullPath = join(parentPath, file.name);
     const isFolder = !file.isFile;
@@ -68,8 +74,7 @@ const TreeEntry = ({
     const isLoading = isFolder && loadingPaths.has(fullPath);
     const isSelected = isFolder ? directory === fullPath : activeFilePath === fullPath;
     const children = isFolder ? treeCache[fullPath] : undefined;
-    const icon = isFolder ? getTreeFolderIcon(isExpanded) : getTreeFileIcon(file);
-    const iconColor = isFolder ? 'text-amber-400/90' : getTreeFileIconColor(file);
+    const showPresence = !isFolder && activeFilePath === fullPath;
 
     const handleClick = () => {
         if (isFolder) {
@@ -110,7 +115,16 @@ const TreeEntry = ({
                         <span className={'inline-block w-2.5'} />
                     )}
                 </span>
-                <FontAwesomeIcon icon={icon} className={classNames('text-xs flex-shrink-0', iconColor)} />
+                {showPresence && (
+                    <FileEditorPresenceAvatars editors={activeEditors} currentUserUuid={currentUserUuid} />
+                )}
+                <FileTreeIcon
+                    name={file.name}
+                    isFile={file.isFile}
+                    isSymlink={file.isSymlink}
+                    isArchive={file.isArchiveType()}
+                    expanded={isExpanded}
+                />
                 <span className={styles.tree_label}>{file.name}</span>
             </button>
             {isFolder && isExpanded && children && children.length > 0 && (
@@ -129,6 +143,8 @@ const TreeEntry = ({
                             onToggleFolder={onToggleFolder}
                             onNavigateDirectory={onNavigateDirectory}
                             onOpenFile={onOpenFile}
+                            activeEditors={activeEditors}
+                            currentUserUuid={currentUserUuid}
                         />
                     ))}
                 </div>
@@ -140,10 +156,18 @@ const TreeEntry = ({
 interface Props {
     refreshToken?: unknown;
     activeFilePath?: string | null;
+    activeEditors: FileEditorPresence[];
+    currentUserUuid?: string;
     onOpenFile: (path: string, file: FileObject) => void;
 }
 
-export default ({ refreshToken, activeFilePath = null, onOpenFile }: Props) => {
+export default ({
+    refreshToken,
+    activeFilePath = null,
+    activeEditors,
+    currentUserUuid,
+    onOpenFile,
+}: Props) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
@@ -267,7 +291,7 @@ export default ({ refreshToken, activeFilePath = null, onOpenFile }: Props) => {
                                     className={'text-[10px]'}
                                 />
                             </span>
-                            <FontAwesomeIcon icon={getTreeFolderIcon(expandedPaths.has('/'))} className={'text-xs text-amber-400/90'} />
+                            <FileTreeIcon name={'container'} expanded={expandedPaths.has('/')} isRoot />
                             <span className={styles.tree_label}>container</span>
                         </button>
                         {expandedPaths.has('/') &&
@@ -285,6 +309,8 @@ export default ({ refreshToken, activeFilePath = null, onOpenFile }: Props) => {
                                     onToggleFolder={onToggleFolder}
                                     onNavigateDirectory={onNavigateDirectory}
                                     onOpenFile={onOpenFile}
+                                    activeEditors={activeEditors}
+                                    currentUserUuid={currentUserUuid}
                                 />
                             ))}
                     </>

@@ -104,6 +104,10 @@ Route::group([
             ->post('/pull', [Client\Servers\FileController::class, 'pull']);
         Route::get('/upload', Client\Servers\FileUploadController::class);
 
+        Route::get('/presence', [Client\Servers\FileEditingPresenceController::class, 'index']);
+        Route::post('/presence', [Client\Servers\FileEditingPresenceController::class, 'update']);
+        Route::delete('/presence', [Client\Servers\FileEditingPresenceController::class, 'destroy']);
+
         Route::group(['prefix' => '/revisions'], function () {
             Route::get('/', [Client\Servers\FileRevisionController::class, 'index']);
             Route::get('/{revision}', [Client\Servers\FileRevisionController::class, 'view']);
