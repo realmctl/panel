@@ -24,6 +24,11 @@ const shouldTrackProgress = (url?: string, method?: string) => {
         return false;
     }
 
+    // Setup wizard polling and navigation should not animate the global progress bar.
+    if (url.startsWith('/setup')) {
+        return false;
+    }
+
     // Background server-list fetches should not animate the global progress bar.
     if (method?.toLowerCase() === 'get' && (url === '/api/client' || url.startsWith('/api/client?'))) {
         return false;

@@ -1,0 +1,159 @@
+.page {
+    @apply min-h-screen px-4 py-6 sm:px-6;
+    background-color: #0b0f10;
+}
+
+.shell {
+    @apply mx-auto w-full max-w-5xl;
+}
+
+.header {
+    @apply mb-6 flex items-center gap-3;
+}
+
+.logo {
+    @apply h-7;
+    filter: brightness(0) invert(1);
+}
+
+.headerTitle {
+    @apply m-0 text-base font-medium text-neutral-200;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sidebar {
+    @apply flex flex-col gap-3;
+}
+
+.progressLine {
+    @apply m-0 text-xs text-neutral-500;
+}
+
+.progressBar {
+    @apply mt-2 h-1 w-full overflow-hidden rounded-full bg-neutral-800;
+}
+
+.progressFill {
+    @apply h-full rounded-full bg-primary-500 transition-all duration-300;
+}
+
+.stepList {
+    @apply flex flex-col gap-0.5;
+}
+
+.stepButton {
+    @apply flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left text-sm transition-colors duration-150;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    border: none;
+}
+
+.stepButton:hover:not(:disabled) {
+    @apply text-neutral-300;
+}
+
+.stepButton:disabled {
+    @apply cursor-default opacity-40;
+}
+
+.stepButtonActive {
+    @apply text-neutral-100;
+}
+
+.stepButtonComplete {
+    @apply text-neutral-400;
+}
+
+.stepIndex {
+    @apply flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-semibold;
+    background: #1a2228;
+    color: #64748b;
+}
+
+.stepButtonActive .stepIndex {
+    @apply bg-primary-500 text-white;
+}
+
+.stepButtonComplete .stepIndex {
+    @apply bg-neutral-800 text-neutral-400;
+}
+
+.stepLabel {
+    @apply truncate font-medium;
+}
+
+.content {
+    @apply min-w-0;
+}
+
+.stepIntro {
+    @apply m-0 mb-5 text-sm leading-relaxed text-neutral-400;
+}
+
+.field {
+    @apply mb-3.5;
+}
+
+.fieldLabel {
+    @apply mb-1 block text-xs font-medium text-neutral-400;
+}
+
+.fieldInput,
+.fieldSelect,
+.fieldTextarea {
+    @apply w-full rounded-md border border-neutral-800 bg-neutral-900/80 px-3 text-sm text-neutral-100 placeholder-neutral-600 focus:border-neutral-600 focus:outline-none focus:ring-1 focus:ring-neutral-600 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.fieldInput,
+.fieldSelect {
+    @apply h-9;
+}
+
+.fieldTextarea {
+    @apply min-h-[140px] py-2 font-mono text-xs;
+}
+
+.fieldError {
+    @apply mt-1 text-xs text-red-400;
+}
+
+.fieldHelp {
+    @apply mt-1 text-xs text-neutral-600;
+}
+
+.actions {
+    @apply mt-5 flex flex-wrap items-center gap-2;
+}
+
+.codeBlock {
+    @apply overflow-x-auto rounded-md border border-neutral-800 bg-neutral-950/80 p-3;
+}
+
+.codeBlock pre {
+    @apply m-0 whitespace-pre-wrap break-all font-mono text-[11px] leading-relaxed text-neutral-400;
+}
+
+.inlineMessage {
+    @apply mt-3 text-xs;
+}
+
+.inlineMessageSuccess {
+    @apply text-green-400;
+}
+
+.inlineMessageError {
+    @apply text-red-400;
+}

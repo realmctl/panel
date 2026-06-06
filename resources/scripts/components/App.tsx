@@ -15,10 +15,12 @@ import { ServerContext } from '@/state/server';
 import '@/assets/tailwind.css';
 import Spinner from '@/components/elements/Spinner';
 import FlashToast from '@/components/FlashToast';
+import SetupRedirect from '@/components/setup/SetupRedirect';
 
 const DashboardRouter = lazy(() => import(/* webpackChunkName: "dashboard" */ '@/routers/DashboardRouter'));
 const ServerRouter = lazy(() => import(/* webpackChunkName: "server" */ '@/routers/ServerRouter'));
 const AuthenticationRouter = lazy(() => import(/* webpackChunkName: "auth" */ '@/routers/AuthenticationRouter'));
+const SetupRouter = lazy(() => import(/* webpackChunkName: "setup" */ '@/routers/SetupRouter'));
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
@@ -56,7 +58,16 @@ const App = () => {
     }
 
     if (!store.getState().settings.data) {
-        store.getActions().settings.setSettings(SiteConfiguration!);
+        store.getActions().settings.setSettings({
+            ...SiteConfiguration!,
+            setup: SiteConfiguration?.setup ?? {
+                required: false,
+                complete: true,
+                currentStep: 'finish',
+                steps: [],
+                progress: { completed: 0, total: 0, percent: 100 },
+            },
+        });
     }
 
     return (
@@ -67,28 +78,35 @@ const App = () => {
                 <FlashToast />
                 <div css={tw`mx-auto w-auto`}>
                     <Router history={history}>
-                        <Switch>
-                            <Route path={'/auth'}>
-                                <Spinner.Suspense>
-                                    <AuthenticationRouter />
-                                </Spinner.Suspense>
-                            </Route>
-                            <AuthenticatedRoute path={'/server/:id'}>
-                                <Spinner.Suspense>
-                                    <ServerContext.Provider>
-                                        <ServerRouter />
-                                    </ServerContext.Provider>
-                                </Spinner.Suspense>
-                            </AuthenticatedRoute>
-                            <AuthenticatedRoute path={'/'}>
-                                <Spinner.Suspense>
-                                    <DashboardRouter />
-                                </Spinner.Suspense>
-                            </AuthenticatedRoute>
-                            <Route path={'*'}>
-                                <NotFound />
-                            </Route>
-                        </Switch>
+                        <SetupRedirect>
+                            <Switch>
+                                <Route path={'/setup'}>
+                                    <Spinner.Suspense>
+                                        <SetupRouter />
+                                    </Spinner.Suspense>
+                                </Route>
+                                <Route path={'/auth'}>
+                                    <Spinner.Suspense>
+                                        <AuthenticationRouter />
+                                    </Spinner.Suspense>
+                                </Route>
+                                <AuthenticatedRoute path={'/server/:id'}>
+                                    <Spinner.Suspense>
+                                        <ServerContext.Provider>
+                                            <ServerRouter />
+                                        </ServerContext.Provider>
+                                    </Spinner.Suspense>
+                                </AuthenticatedRoute>
+                                <AuthenticatedRoute path={'/'}>
+                                    <Spinner.Suspense>
+                                        <DashboardRouter />
+                                    </Spinner.Suspense>
+                                </AuthenticatedRoute>
+                                <Route path={'*'}>
+                                    <NotFound />
+                                </Route>
+                            </Switch>
+                        </SetupRedirect>
                     </Router>
                 </div>
             </StoreProvider>

@@ -45,6 +45,8 @@ class RouteServiceProvider extends ServiceProvider
                     ->group(base_path('routes/admin.php'));
 
                 Route::middleware('guest')->prefix('/auth')->group(base_path('routes/auth.php'));
+
+                Route::middleware('web')->prefix('/setup')->group(base_path('routes/setup.php'));
             });
 
             Route::middleware(['api', RequireTwoFactorAuthentication::class])->group(function () {

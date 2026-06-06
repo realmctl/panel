@@ -4,14 +4,17 @@ namespace Pterodactyl\Http\ViewComposers;
 
 use Illuminate\View\View;
 use Pterodactyl\Services\Helpers\AssetHashService;
+use Pterodactyl\Services\Setup\PanelSetupService;
 
 class AssetComposer
 {
     /**
      * AssetComposer constructor.
      */
-    public function __construct(private AssetHashService $assetHashService)
-    {
+    public function __construct(
+        private AssetHashService $assetHashService,
+        private PanelSetupService $setupService,
+    ) {
     }
 
     /**
@@ -43,6 +46,7 @@ class AssetComposer
                 'github' => (bool) config('oauth.github.enabled', false),
             ],
             'registration' => (bool) config('pterodactyl.auth.registration_enabled', false),
+            'setup' => $this->setupService->toSiteConfiguration(),
         ]);
     }
 }

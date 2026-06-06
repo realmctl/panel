@@ -5,6 +5,26 @@ export interface CaptchaSettings {
     siteKey: string;
 }
 
+export interface SetupStep {
+    id: string;
+    label: string;
+    description: string;
+    complete: boolean;
+    skipped?: boolean;
+}
+
+export interface SetupConfiguration {
+    required: boolean;
+    complete: boolean;
+    currentStep: string;
+    steps: SetupStep[];
+    progress: {
+        completed: number;
+        total: number;
+        percent: number;
+    };
+}
+
 export interface SiteSettings {
     name: string;
     locale: string;
@@ -19,6 +39,7 @@ export interface SiteSettings {
         github: boolean;
     };
     registration: boolean;
+    setup: SetupConfiguration;
 }
 
 export interface SettingsStore {
