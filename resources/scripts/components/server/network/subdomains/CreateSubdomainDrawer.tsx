@@ -34,8 +34,8 @@ const CreateSubdomainDrawer = ({ visible, templates, onDismissed }: Props) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('server:network');
     const { mutate } = getSubdomains();
-    const [domain, setDomain] = useState('');
-    const [template, setTemplate] = useState<SubdomainTemplate | null>(null);
+    const [domain, setDomain] = useState(() => templates[0]?.domain ?? '');
+    const [template, setTemplate] = useState<SubdomainTemplate | null>(() => templates[0] ?? null);
 
     useEffect(() => {
         if (!visible || templates.length === 0) {
@@ -77,10 +77,6 @@ const CreateSubdomainDrawer = ({ visible, templates, onDismissed }: Props) => {
             .then(() => setSubmitting(false));
     };
 
-    if (!template || templates.length === 0) {
-        return null;
-    }
-
     return (
         <Formik onSubmit={submit} initialValues={{ name: '' }} validationSchema={schema} enableReinitialize>
             {({ isSubmitting, resetForm, values }) => (
@@ -91,62 +87,67 @@ const CreateSubdomainDrawer = ({ visible, templates, onDismissed }: Props) => {
                         handleDismiss();
                     }}
                     title={'New Subdomain'}
-                    subtitle={values.name ? `${values.name}.${domain}` : domain}
+                    subtitle={values.name && domain ? `${values.name}.${domain}` : domain || undefined}
                     width={'28rem'}
                     dismissable={!isSubmitting}
                     closeOnBackground={!isSubmitting}
                     closeOnEscape={!isSubmitting}
                 >
                     <Form css={tw`space-y-4 flex-1 m-0`}>
-                            <Field type={'string'} id={'name'} name={'name'} label={'Subdomain name'} />
+                        <Field type={'string'} id={'name'} name={'name'} label={'Subdomain name'} />
 
-                            <div>
-                                <Label>Domain</Label>
-                                <Select
-                                    onChange={(e) => setDomain(e.target.value)}
-                                    value={domain}
-                                    className={'h-12'}
-                                >
-                                    {[...new Set(templates.map((item) => item.domain))].map((item) => (
-                                        <option key={item} value={item}>
-                                            {item}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </div>
+                        <div>
+                            <Label>Domain</Label>
+                            <Select
+                                onChange={(e) => setDomain(e.target.value)}
+                                value={domain}
+                                disabled={templates.length === 0}
+                                className={'h-12'}
+                            >
+                                {[...new Set(templates.map((item) => item.domain))].map((item) => (
+                                    <option key={item} value={item}>
+                                        {item}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
 
-                            <div>
-                                <Label>Record template</Label>
-                                <Select
-                                    onChange={(e) => {
-                                        const selected = domainTemplates.find((item) => item.id === Number(e.target.value));
-                                        if (selected) setTemplate(selected);
-                                    }}
-                                    value={template.id}
-                                    disabled={domainTemplates.length === 0}
-                                    className={'h-12'}
-                                >
-                                    {domainTemplates.map((item) => (
-                                        <option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </div>
+                        <div>
+                            <Label>Record template</Label>
+                            <Select
+                                onChange={(e) => {
+                                    const selected = domainTemplates.find((item) => item.id === Number(e.target.value));
+                                    if (selected) setTemplate(selected);
+                                }}
+                                value={template?.id ?? ''}
+                                disabled={domainTemplates.length === 0}
+                                className={'h-12'}
+                            >
+                                {domainTemplates.map((item) => (
+                                    <option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
 
-                            <div css={tw`mt-6 pt-4 border-t border-realm-border flex justify-end gap-3`}>
-                                <Button.Text
-                                    size={Button.Sizes.Small}
-                                    type={'button'}
-                                    onClick={handleDismiss}
-                                    disabled={isSubmitting}
-                                >
-                                    Cancel
-                                </Button.Text>
-                                <Button size={Button.Sizes.Small} type={'submit'} disabled={isSubmitting}>
-                                    {isSubmitting ? 'Creating…' : 'Create subdomain'}
-                                </Button>
-                            </div>
+                        <div css={tw`mt-6 pt-4 border-t border-realm-border flex justify-end gap-3`}>
+                            <Button.Text
+                                size={Button.Sizes.Small}
+                                type={'button'}
+                                onClick={handleDismiss}
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </Button.Text>
+                            <Button
+                                size={Button.Sizes.Small}
+                                type={'submit'}
+                                disabled={isSubmitting || !template}
+                            >
+                                {isSubmitting ? 'Creating…' : 'Create subdomain'}
+                            </Button>
+                        </div>
                     </Form>
                 </Drawer>
             )}
