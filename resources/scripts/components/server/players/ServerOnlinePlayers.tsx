@@ -9,10 +9,6 @@ import { ServerContext } from '@/state/server';
 import { usePermissions } from '@/plugins/usePermissions';
 import { serverSupportsPlayers } from '@/lib/minecraftEgg';
 import {
-    MOCK_SERVER_STATUS,
-    USE_MOCK_PLAYER_DATA,
-} from '@/components/server/players/mockPlayerData';
-import {
     formatMinecraftVersion,
     getServerConnectionAddress,
     resolveServerDisplayStatus,
@@ -43,12 +39,6 @@ export default () => {
 
     const fetchPlayers = useCallback(() => {
         if (!showPlayers) {
-            setLoading(false);
-            return;
-        }
-
-        if (USE_MOCK_PLAYER_DATA) {
-            setLiveStatus(MOCK_SERVER_STATUS);
             setLoading(false);
             return;
         }
