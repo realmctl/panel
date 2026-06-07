@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import AdminPreviewContent from '@/components/admin-preview/AdminPreviewContent';
 import GeneralSettingsPanel from '@/components/admin-preview/settings/GeneralSettingsPanel';
 import MailSettingsPanel from '@/components/admin-preview/settings/MailSettingsPanel';
@@ -9,7 +9,7 @@ import MappingsSettingsPanel from '@/components/admin-preview/settings/MappingsS
 import AdvancedSettingsPanel from '@/components/admin-preview/settings/AdvancedSettingsPanel';
 import { settingsTabs } from '@/components/admin-preview/settings/settingsTabs';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
-import { cn } from '@/lib/utils';
+import TabNav, { TabItem } from '@/components/admin-preview/TabNav';
 import FlashMessageRender from '@/components/FlashMessageRender';
 
 const panelByTabId: Record<string, React.ComponentType> = {
@@ -24,30 +24,18 @@ const panelByTabId: Record<string, React.ComponentType> = {
 export default () => {
     const match = useRouteMatch();
 
+    const tabItems: TabItem[] = settingsTabs.map((tab) => ({
+        id: tab.id,
+        label: tab.label,
+        to: `${adminPreviewBasePath}/settings${tab.path}`.replace('//', '/'),
+        exact: tab.path === '',
+    }));
+
     return (
         <AdminPreviewContent title={'Settings'} description={'Configure how your panel behaves.'}>
             <FlashMessageRender byKey={'admin-settings'} className={'mb-4'} />
 
-            <div className="mb-6 flex flex-wrap gap-1 border-b border-border pb-1">
-                {settingsTabs.map((tab) => {
-                    const to = `${adminPreviewBasePath}/settings${tab.path}`.replace('//', '/');
-
-                    return (
-                        <NavLink
-                            key={tab.id}
-                            to={to}
-                            exact={tab.path === ''}
-                            className={cn(
-                                'rounded-md px-3 py-2 text-sm no-underline transition-colors',
-                                'text-muted-foreground hover:bg-muted hover:text-foreground'
-                            )}
-                            activeClassName="bg-muted text-primary"
-                        >
-                            {tab.label}
-                        </NavLink>
-                    );
-                })}
-            </div>
+            <TabNav items={tabItems} />
 
             <Switch>
                 {settingsTabs.map((tab) => {
