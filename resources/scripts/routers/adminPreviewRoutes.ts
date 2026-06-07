@@ -22,6 +22,9 @@ const AdminPreviewOverviewContainer = lazy(
 const AdminPreviewPlaceholderContainer = lazy(
     () => import('@/components/admin-preview/AdminPreviewPlaceholderContainer')
 );
+const AdminPreviewSettingsContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewSettingsContainer')
+);
 
 export interface AdminPreviewRouteDefinition {
     path: string;
@@ -51,7 +54,7 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
     {
         path: '/settings',
         name: 'Settings',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewSettingsContainer,
         icon: faCogs,
         legacyPath: '/admin/settings',
     },
@@ -147,6 +150,10 @@ export const getAdminPreviewRoute = (pathname: string): AdminPreviewRouteDefinit
             route.path === '/'
                 ? adminPreviewBasePath
                 : `${adminPreviewBasePath}${route.path}`.replace('//', '/');
+
+        if (route.path === '/settings') {
+            return normalized === fullPath || normalized.startsWith(`${fullPath}/`);
+        }
 
         return route.exact ? normalized === fullPath : normalized.startsWith(fullPath);
     });

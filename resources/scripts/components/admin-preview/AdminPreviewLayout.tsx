@@ -10,11 +10,10 @@ export default () => {
     const location = useLocation();
 
     return (
-        <div className="dark flex h-screen w-screen flex-row bg-background text-foreground">
+        <div className="dark min-h-screen bg-background text-foreground">
             <AdminPreviewSidebar />
-            <main className="flex h-screen grow flex-col overflow-auto pl-[3.05rem]">
-                <div className="flex w-full flex-1 justify-center px-6 py-8 lg:px-10 lg:py-10">
-                    <div className="w-full max-w-4xl">
+            <main className="min-h-screen pl-[3.05rem] md:pl-60">
+                <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
                     <React.Suspense fallback={<Spinner centered />}>
                         <Switch location={location}>
                             {adminPreviewRoutes.map(({ path, component: Component, exact }) => (
@@ -35,7 +34,6 @@ export default () => {
                             </Route>
                         </Switch>
                     </React.Suspense>
-                    </div>
                 </div>
             </main>
         </div>
