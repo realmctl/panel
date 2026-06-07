@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Heart, HeartCrack, Lock, LockOpen, Network, Plus, Search, Wrench } from 'lucide-react';
+import { Eye, EyeOff, Lock, LockOpen, Network, Plus, Search, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { getNodeHealth, getNodes } from '@/api/admin/nodes';
@@ -20,28 +21,43 @@ import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
 
 type HealthState = 'loading' | 'online' | 'offline';
 
+const HEALTH_LABEL: Record<HealthState, string> = {
+    loading: 'Checking node…',
+    online: 'Online',
+    offline: 'Offline',
+};
+
+const HEALTH_DOT: Record<HealthState, string> = {
+    loading: 'bg-muted-foreground/40',
+    online: 'bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.18)]',
+    offline: 'bg-red-500 shadow-[0_0_0_4px_rgba(239,68,68,0.18)]',
+};
+
 const NodeHealthIcon = ({ nodeId }: { nodeId: number }) => {
     const [state, setState] = useState<HealthState>('loading');
-    const [title, setTitle] = useState('Checking...');
+    const [detail, setDetail] = useState<string | null>(null);
+    const [version, setVersion] = useState<string | null>(null);
 
     useEffect(() => {
         let cancelled = false;
 
         const check = () => {
-            setState('loading');
-
             getNodeHealth(nodeId)
                 .then((data) => {
                     if (cancelled) return;
                     setState('online');
-                    setTitle(data.version ? `Online · v${data.version}` : 'Online');
+                    setVersion(data.version ?? null);
+                    setDetail(null);
                 })
                 .catch((error) => {
                     if (cancelled) return;
                     setState('offline');
-                    const message =
-                        error?.response?.data?.error ?? error?.response?.data?.message ?? 'Offline — could not connect';
-                    setTitle(message);
+                    setVersion(null);
+                    setDetail(
+                        error?.response?.data?.error ??
+                            error?.response?.data?.message ??
+                            'Could not reach Wings daemon.'
+                    );
                 });
         };
 
@@ -54,19 +70,29 @@ const NodeHealthIcon = ({ nodeId }: { nodeId: number }) => {
         };
     }, [nodeId]);
 
-    const Icon = state === 'offline' ? HeartCrack : Heart;
-
     return (
-        <span title={title} className="inline-flex justify-center">
-            <Icon
-                className={cn(
-                    'h-4 w-4',
-                    state === 'online' && 'animate-pulse text-green-500',
-                    state === 'offline' && 'text-red-500',
-                    state === 'loading' && 'animate-pulse text-muted-foreground'
-                )}
-            />
-        </span>
+        <Tooltip delayDuration={120}>
+            <TooltipTrigger asChild>
+                <button
+                    type="button"
+                    aria-label={HEALTH_LABEL[state]}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                    <span
+                        className={cn(
+                            'block h-2.5 w-2.5 rounded-full transition-all',
+                            HEALTH_DOT[state],
+                            state === 'loading' && 'animate-pulse'
+                        )}
+                    />
+                </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="max-w-[220px]">
+                <p className="font-medium text-foreground">{HEALTH_LABEL[state]}</p>
+                {version && <p className="text-muted-foreground">Wings v{version}</p>}
+                {detail && <p className="text-muted-foreground">{detail}</p>}
+            </TooltipContent>
+        </Tooltip>
     );
 };
 
@@ -102,6 +128,7 @@ export default () => {
     const pagination = data?.pagination;
 
     return (
+        <TooltipProvider delayDuration={120}>
         <div className="rounded-lg border border-border bg-card">
             <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -150,7 +177,7 @@ export default () => {
                     <table className={tableClass}>
                         <thead>
                             <tr className={tableHeadRowClass}>
-                                <th className={cn(tableHeadCellClass, 'w-10 text-center')} />
+                                <th className={cn(tableHeadCellClass, 'w-14 text-center')} />
                                 <th className={tableHeadCellClass}>Name</th>
                                 <th className={tableHeadCellClass}>Location</th>
                                 <th className={tableHeadCellClass}>Memory</th>
@@ -244,5 +271,6 @@ export default () => {
                 </div>
             )}
         </div>
+        </TooltipProvider>
     );
 };
