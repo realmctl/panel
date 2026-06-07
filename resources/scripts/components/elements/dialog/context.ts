@@ -5,6 +5,7 @@ export const DialogContext = React.createContext<DialogContextType>({
     setIcon: () => null,
     setFooter: () => null,
     setIconPosition: () => null,
+    appearance: 'default',
 });
 
 export const DialogWrapperContext = React.createContext<DialogWrapperContextType>({

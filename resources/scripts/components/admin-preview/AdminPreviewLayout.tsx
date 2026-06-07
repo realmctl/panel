@@ -13,7 +13,7 @@ export default () => {
         <div className="dark min-h-screen bg-background text-foreground">
             <AdminPreviewSidebar />
             <main className="min-h-screen pl-[3.05rem] md:pl-60">
-                <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+                <div className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-6 lg:px-8 lg:py-10 2xl:max-w-[90rem]">
                     <React.Suspense fallback={<Spinner centered />}>
                         <Switch location={location}>
                             {adminPreviewRoutes.map(({ path, component: Component, exact }) => (

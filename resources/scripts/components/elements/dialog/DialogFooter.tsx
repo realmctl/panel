@@ -3,13 +3,19 @@ import { DialogContext } from './';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 
 export default ({ children }: { children: React.ReactNode }) => {
-    const { setFooter } = useContext(DialogContext);
+    const { setFooter, appearance } = useContext(DialogContext);
 
     useDeepCompareEffect(() => {
         setFooter(
-            <div className={'px-6 py-3 bg-gray-700 flex items-center justify-end space-x-3 rounded-b'}>{children}</div>
+            appearance === 'admin' ? (
+                <div className={'dark flex items-center justify-end gap-2 rounded-b-lg border-t border-border bg-card px-5 py-4'}>
+                    {children}
+                </div>
+            ) : (
+                <div className={'flex items-center justify-end space-x-3 rounded-b bg-gray-700 px-6 py-3'}>{children}</div>
+            )
         );
-    }, [children]);
+    }, [children, appearance]);
 
     return null;
 };

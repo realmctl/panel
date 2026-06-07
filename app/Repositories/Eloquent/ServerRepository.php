@@ -172,7 +172,7 @@ class ServerRepository extends EloquentRepository implements ServerRepositoryInt
     public function loadAllServersForNode(int $node, int $limit): LengthAwarePaginator
     {
         return $this->getBuilder()
-            ->with(['user', 'nest', 'egg'])
+            ->with(['user', 'nest', 'egg', 'allocation'])
             ->where('node_id', '=', $node)
             ->paginate($limit);
     }

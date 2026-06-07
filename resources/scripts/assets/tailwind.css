@@ -34,7 +34,7 @@
     --popover: 200 14% 14%;
     --popover-foreground: 210 20% 92%;
     --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
     --secondary: 200 12% 16%;
     --secondary-foreground: 210 20% 92%;
     --muted: 200 12% 16%;
@@ -47,5 +47,49 @@
     --input: 200 10% 20%;
     --ring: 224.3 76.3% 48%;
     --radius: 0.5rem;
+  }
+
+  body {
+    font-family: theme('fontFamily.sans');
+  }
+}
+
+@layer components {
+  .admin-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239da3ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 16px;
+  }
+
+  .admin-code-block .CodeMirror {
+    height: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    background: #0f1419 !important;
+  }
+
+  .admin-code-block .CodeMirror-scroll {
+    overflow: auto !important;
+  }
+
+  .admin-code-block .CodeMirror-gutters {
+    background: #0f1419 !important;
+    border-right: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .admin-code-block .CodeMirror-linenumber {
+    color: hsl(var(--muted-foreground));
+    padding: 0 8px 0 4px;
+    min-width: 2rem;
+  }
+
+  .admin-code-block--embedded .CodeMirror {
+    border-radius: 0;
+  }
+
+  .admin-code-block--embedded .CodeMirror-gutters {
+    border-right-color: hsl(var(--border) / 0.35);
   }
 }

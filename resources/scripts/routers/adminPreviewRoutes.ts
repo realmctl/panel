@@ -22,8 +22,35 @@ const AdminPreviewOverviewContainer = lazy(
 const AdminPreviewPlaceholderContainer = lazy(
     () => import('@/components/admin-preview/AdminPreviewPlaceholderContainer')
 );
+const AdminPreviewApiContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewApiContainer')
+);
 const AdminPreviewSettingsContainer = lazy(
     () => import('@/components/admin-preview/AdminPreviewSettingsContainer')
+);
+const AdminPreviewDatabasesContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewDatabasesContainer')
+);
+const AdminPreviewLocationsContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewLocationsContainer')
+);
+const AdminPreviewNodesContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewNodesContainer')
+);
+const AdminPreviewServersContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewServersContainer')
+);
+const AdminPreviewSubdomainsContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewSubdomainsContainer')
+);
+const AdminPreviewUsersContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewUsersContainer')
+);
+const AdminPreviewMountsContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewMountsContainer')
+);
+const AdminPreviewNestsContainer = lazy(
+    () => import('@/components/admin-preview/AdminPreviewNestsContainer')
 );
 
 export interface AdminPreviewRouteDefinition {
@@ -61,63 +88,63 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
     {
         path: '/api',
         name: 'API',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewApiContainer,
         icon: faPlug,
         legacyPath: '/admin/api',
     },
     {
         path: '/databases',
         name: 'Databases',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewDatabasesContainer,
         icon: faDatabase,
         legacyPath: '/admin/databases',
     },
     {
         path: '/locations',
         name: 'Locations',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewLocationsContainer,
         icon: faGlobe,
         legacyPath: '/admin/locations',
     },
     {
         path: '/nodes',
         name: 'Nodes',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewNodesContainer,
         icon: faNetworkWired,
         legacyPath: '/admin/nodes',
     },
     {
         path: '/servers',
         name: 'Servers',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewServersContainer,
         icon: faServer,
         legacyPath: '/admin/servers',
     },
     {
         path: '/subdomains',
         name: 'Subdomains',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewSubdomainsContainer,
         icon: faGlobeAmericas,
         legacyPath: '/admin/subdomains',
     },
     {
         path: '/users',
         name: 'Users',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewUsersContainer,
         icon: faUsers,
         legacyPath: '/admin/users',
     },
     {
         path: '/mounts',
         name: 'Mounts',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewMountsContainer,
         icon: faFolder,
         legacyPath: '/admin/mounts',
     },
     {
         path: '/nests',
         name: 'Nests',
-        component: AdminPreviewPlaceholderContainer,
+        component: AdminPreviewNestsContainer,
         icon: faEgg,
         legacyPath: '/admin/nests',
     },
@@ -151,7 +178,7 @@ export const getAdminPreviewRoute = (pathname: string): AdminPreviewRouteDefinit
                 ? adminPreviewBasePath
                 : `${adminPreviewBasePath}${route.path}`.replace('//', '/');
 
-        if (route.path === '/settings') {
+        if (['/settings', '/api', '/databases', '/locations', '/nodes', '/servers', '/subdomains', '/users', '/mounts', '/nests'].includes(route.path)) {
             return normalized === fullPath || normalized.startsWith(`${fullPath}/`);
         }
 

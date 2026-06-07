@@ -22,6 +22,8 @@ export interface RenderDialogProps extends DialogProps {
     title?: string;
     description?: string | undefined;
     children?: React.ReactNode;
+    appearance?: 'default' | 'admin';
+    panelClassName?: string;
 }
 
 export type WrapperProps = Omit<RenderDialogProps, 'children' | 'open' | 'onClose'>;
@@ -35,4 +37,5 @@ export interface DialogContextType {
     setIcon: Callback<React.ReactNode>;
     setFooter: Callback<React.ReactNode>;
     setIconPosition: Callback<IconPosition>;
+    appearance: 'default' | 'admin';
 }

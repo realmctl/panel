@@ -5,6 +5,7 @@
     },
     "dependencies": {
         "@floating-ui/react-dom-interactions": "^0.6.6",
+        "@fontsource-variable/inter": "^5.2.8",
         "@fortawesome/fontawesome-svg-core": "^1.2.32",
         "@fortawesome/free-solid-svg-icons": "^5.15.1",
         "@fortawesome/react-fontawesome": "^0.1.11",
@@ -81,7 +82,6 @@
         "@babel/preset-react": "^7.12.1",
         "@babel/preset-typescript": "^7.12.1",
         "@babel/runtime": "^7.12.1",
-        "@fontsource-variable/ibm-plex-sans": "^5.2.8",
         "@melloware/coloris": "^0.25.0",
         "@popperjs/core": "^2.11.8",
         "@tabler/core": "1.4.0",

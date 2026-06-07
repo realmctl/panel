@@ -6,10 +6,7 @@ import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { getAdminSettings, GeneralSettings, updateGeneralSettings } from '@/api/admin/settings';
-import { cn } from '@/lib/utils';
-
-const fieldClass =
-    'flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
+import { fieldClass, selectClass } from '@/components/admin-preview/settings/fieldClass';
 
 export default () => {
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
@@ -95,7 +92,7 @@ export default () => {
                         <Label htmlFor="default-language">Default language</Label>
                         <select
                             id="default-language"
-                            className={cn(fieldClass, 'cursor-pointer')}
+                            className={selectClass}
                             value={form['app:locale']}
                             onChange={(e) => updateField('app:locale', e.target.value)}
                         >
@@ -112,7 +109,7 @@ export default () => {
                         <Label htmlFor="two-factor">Require 2-factor authentication</Label>
                         <select
                             id="two-factor"
-                            className={cn(fieldClass, 'cursor-pointer')}
+                            className={selectClass}
                             value={String(form['pterodactyl:auth:2fa_required'])}
                             onChange={(e) =>
                                 updateField('pterodactyl:auth:2fa_required', Number(e.target.value))
@@ -131,7 +128,7 @@ export default () => {
                         <Label htmlFor="registration">User registration</Label>
                         <select
                             id="registration"
-                            className={cn(fieldClass, 'cursor-pointer')}
+                            className={selectClass}
                             value={form['pterodactyl:auth:registration_enabled']}
                             onChange={(e) =>
                                 updateField(

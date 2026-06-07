@@ -4,6 +4,7 @@ import { Button } from '@/components/elements/button/index';
 import { XIcon } from '@heroicons/react/solid';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DialogContext, IconPosition, RenderDialogProps, styles } from './';
+import { cn } from '@/lib/utils';
 
 const variants = {
     open: {
@@ -38,6 +39,8 @@ export default ({
     onClose,
     hideCloseIcon,
     preventExternalClose,
+    appearance = 'default',
+    panelClassName,
     children,
 }: RenderDialogProps) => {
     const container = useRef<HTMLDivElement>(null);
@@ -61,7 +64,7 @@ export default ({
     return (
         <AnimatePresence>
             {open && (
-                <DialogContext.Provider value={{ setIcon, setFooter, setIconPosition }}>
+                <DialogContext.Provider value={{ setIcon, setFooter, setIconPosition, appearance }}>
                     <HDialog
                         static
                         as={motion.div}
@@ -72,7 +75,13 @@ export default ({
                         open={open}
                         onClose={onDialogClose}
                     >
-                        <div className={'fixed inset-0 bg-gray-900/50 z-40'} />
+                        <div
+                            className={
+                                appearance === 'admin'
+                                    ? 'fixed inset-0 z-40 bg-black/60'
+                                    : 'fixed inset-0 z-40 bg-gray-900/50'
+                            }
+                        />
                         <div className={'fixed inset-0 overflow-y-auto z-50'}>
                             <div
                                 ref={container}
@@ -86,23 +95,40 @@ export default ({
                                     animate={down ? 'bounce' : 'open'}
                                     exit={'closed'}
                                     variants={variants}
-                                    className={styles.panel}
+                                    className={cn(
+                                        appearance === 'admin' ? styles.adminPanel : styles.panel,
+                                        panelClassName
+                                    )}
                                 >
-                                    <div className={'flex p-6 pb-0 overflow-y-auto'}>
+                                    <div className={'flex overflow-y-auto p-6 pb-0'}>
                                         {iconPosition === 'container' && icon}
-                                        <div className={'flex-1 max-h-[70vh] min-w-0'}>
+                                        <div className={'min-w-0 max-h-[70vh] flex-1'}>
                                             <div className={'flex items-center'}>
                                                 {iconPosition !== 'container' && icon}
                                                 <div>
                                                     {title && (
-                                                        <HDialog.Title className={styles.title}>{title}</HDialog.Title>
+                                                        <HDialog.Title
+                                                            className={
+                                                                appearance === 'admin' ? styles.adminTitle : styles.title
+                                                            }
+                                                        >
+                                                            {title}
+                                                        </HDialog.Title>
                                                     )}
                                                     {description && (
-                                                        <HDialog.Description>{description}</HDialog.Description>
+                                                        <HDialog.Description
+                                                            className={
+                                                                appearance === 'admin' ? styles.adminDescription : undefined
+                                                            }
+                                                        >
+                                                            {description}
+                                                        </HDialog.Description>
                                                     )}
                                                 </div>
                                             </div>
-                                            {children}
+                                            <div className={appearance === 'admin' ? 'text-sm text-foreground' : undefined}>
+                                                {children}
+                                            </div>
                                             <div className={'invisible h-6'} />
                                         </div>
                                     </div>
@@ -114,9 +140,15 @@ export default ({
                                                 size={Button.Sizes.Small}
                                                 shape={Button.Shapes.IconSquare}
                                                 onClick={onClose}
-                                                className={'group'}
+                                                className={appearance === 'admin' ? 'group text-muted-foreground hover:text-foreground' : 'group'}
                                             >
-                                                <XIcon className={styles.close_icon} />
+                                                <XIcon
+                                                    className={
+                                                        appearance === 'admin'
+                                                            ? 'h-5 w-5 text-muted-foreground transition-transform group-hover:rotate-90 group-hover:text-foreground'
+                                                            : styles.close_icon
+                                                    }
+                                                />
                                             </Button.Text>
                                         </div>
                                     )}

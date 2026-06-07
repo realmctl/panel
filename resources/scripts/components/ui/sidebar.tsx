@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import {
     Blocks,
-    ChevronsUpDown,
+    ChevronDown,
     Database,
     Egg,
     ExternalLink,
@@ -212,7 +212,7 @@ export function AdminPreviewSidebar() {
                                             />
                                             <span className="hidden w-fit items-center gap-2 md:flex">
                                                 <span className="text-sm font-medium text-foreground">{panelName}</span>
-                                                <ChevronsUpDown className="h-4 w-4 text-muted-foreground/50" />
+                                                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
                                             </span>
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -273,7 +273,7 @@ export function AdminPreviewSidebar() {
                                     </Avatar>
                                     <span className="hidden w-full items-center gap-2 md:flex">
                                         <span className="text-sm font-medium">{username}</span>
-                                        <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground/50" />
+                                        <ChevronDown className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
                                     </span>
                                 </div>
                             </DropdownMenuTrigger>
