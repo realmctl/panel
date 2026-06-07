@@ -4,7 +4,7 @@ import { useLocation } from 'react-router';
 import Spinner from '@/components/elements/Spinner';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import { AdminPreviewSidebar } from '@/components/ui/sidebar';
-import { adminPreviewBasePath, adminPreviewRoutes } from '@/routers/adminPreviewRoutes';
+import { adminPreviewBasePath, adminPreviewRoutes, fullPathFor } from '@/routers/adminPreviewRoutes';
 
 export default () => {
     const location = useLocation();
@@ -16,17 +16,13 @@ export default () => {
                 <div className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-6 lg:px-8 lg:py-10 2xl:max-w-[90rem]">
                     <React.Suspense fallback={<Spinner centered />}>
                         <Switch location={location}>
-                            {adminPreviewRoutes.map(({ path, component: Component, exact }) => (
+                            {adminPreviewRoutes.map((route) => (
                                 <Route
-                                    key={path}
-                                    path={
-                                        path === '/'
-                                            ? adminPreviewBasePath
-                                            : `${adminPreviewBasePath}${path}`.replace('//', '/')
-                                    }
-                                    exact={exact}
+                                    key={route.path}
+                                    path={fullPathFor(route)}
+                                    exact={route.exact}
                                 >
-                                    <Component />
+                                    <route.component />
                                 </Route>
                             ))}
                             <Route path={`${adminPreviewBasePath}/*`}>

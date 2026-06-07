@@ -1,19 +1,10 @@
 import React, { useMemo } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import {
-    Blocks,
     ChevronDown,
-    Database,
-    Egg,
     ExternalLink,
-    Folder,
-    Globe,
-    Globe2,
     LayoutDashboard,
     LogOut,
-    Network,
-    Server,
-    Settings,
     Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,69 +23,16 @@ import { Separator } from '@/components/ui/separator';
 import { useStoreState } from '@/state/hooks';
 import http from '@/api/http';
 import { REALM_FAVICON } from '@/lib/branding';
-import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
+import {
+    AdminPreviewRouteDefinition,
+    adminPreviewRoutesBySection,
+    fullPathFor,
+} from '@/routers/adminPreviewRoutes';
 
-interface NavItem {
-    label: string;
-    to: string;
-    icon: React.ComponentType<{ className?: string }>;
-    match?: (pathname: string) => boolean;
-    badge?: string;
-}
-
-const managementItems: NavItem[] = [
-    {
-        label: 'Databases',
-        to: `${adminPreviewBasePath}/databases`,
-        icon: Database,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/databases`),
-    },
-    {
-        label: 'Locations',
-        to: `${adminPreviewBasePath}/locations`,
-        icon: Globe,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/locations`),
-    },
-    {
-        label: 'Nodes',
-        to: `${adminPreviewBasePath}/nodes`,
-        icon: Network,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/nodes`),
-    },
-    {
-        label: 'Servers',
-        to: `${adminPreviewBasePath}/servers`,
-        icon: Server,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/servers`),
-    },
-    {
-        label: 'Subdomains',
-        to: `${adminPreviewBasePath}/subdomains`,
-        icon: Globe2,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/subdomains`),
-    },
-    {
-        label: 'Users',
-        to: `${adminPreviewBasePath}/users`,
-        icon: Users,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/users`),
-    },
-];
-
-const serviceItems: NavItem[] = [
-    {
-        label: 'Mounts',
-        to: `${adminPreviewBasePath}/mounts`,
-        icon: Folder,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/mounts`),
-    },
-    {
-        label: 'Nests',
-        to: `${adminPreviewBasePath}/nests`,
-        icon: Egg,
-        match: (pathname) => pathname.startsWith(`${adminPreviewBasePath}/nests`),
-    },
-];
+const isRouteActive = (route: AdminPreviewRouteDefinition, pathname: string): boolean => {
+    const full = fullPathFor(route);
+    return route.exact ? pathname === full : pathname === full || pathname.startsWith(`${full}/`);
+};
 
 const NavCategory = ({
     label,
@@ -102,10 +40,10 @@ const NavCategory = ({
     pathname,
 }: {
     label: string;
-    items: NavItem[];
+    items: AdminPreviewRouteDefinition[];
     pathname: string;
 }) => {
-    const hasActive = items.some((item) => (item.match ? item.match(pathname) : pathname === item.to));
+    const hasActive = items.some((item) => isRouteActive(item, pathname));
 
     return (
         <div className="pt-2">
@@ -119,7 +57,7 @@ const NavCategory = ({
             </div>
             <div className="space-y-1 md:mt-1">
                 {items.map((item) => (
-                    <NavLinkItem key={item.to} item={item} pathname={pathname} />
+                    <NavLinkItem key={item.path} item={item} pathname={pathname} />
                 ))}
             </div>
         </div>
@@ -130,24 +68,25 @@ const NavLinkItem = ({
     item,
     pathname,
 }: {
-    item: NavItem;
+    item: AdminPreviewRouteDefinition;
     pathname: string;
 }) => {
     const Icon = item.icon;
-    const active = item.match ? item.match(pathname) : pathname === item.to;
+    const to = fullPathFor(item);
+    const active = isRouteActive(item, pathname);
 
     return (
         <Link
-            to={item.to}
+            to={to}
             className={cn(
                 'flex h-9 w-full flex-row items-center rounded-md px-2 py-1.5 text-muted-foreground transition hover:bg-muted hover:text-primary',
                 active && 'bg-muted text-blue-500'
             )}
-            title={item.label}
+            title={item.name}
         >
             <Icon className="h-4 w-4 shrink-0" />
             <span className="ml-2 hidden min-w-0 items-center gap-2 truncate text-sm font-medium md:flex">
-                {item.label}
+                {item.name}
                 {item.badge && (
                     <Badge
                         className="flex h-fit w-fit items-center gap-1.5 rounded border-none bg-blue-500/10 px-1.5 text-blue-400"
@@ -169,27 +108,9 @@ export function AdminPreviewSidebar() {
     const email = useStoreState((state) => state.user.data?.email || '');
     const initials = useMemo(() => username.slice(0, 2).toUpperCase(), [username]);
 
-    const topLevelItems: NavItem[] = [
-        {
-            label: 'Overview',
-            to: adminPreviewBasePath,
-            icon: LayoutDashboard,
-            match: (path) => path === adminPreviewBasePath,
-            badge: 'Preview',
-        },
-        {
-            label: 'Settings',
-            to: `${adminPreviewBasePath}/settings`,
-            icon: Settings,
-            match: (path) => path.startsWith(`${adminPreviewBasePath}/settings`),
-        },
-        {
-            label: 'API',
-            to: `${adminPreviewBasePath}/api`,
-            icon: Blocks,
-            match: (path) => path.startsWith(`${adminPreviewBasePath}/api`),
-        },
-    ];
+    const topLevelItems = adminPreviewRoutesBySection('top');
+    const managementItems = adminPreviewRoutesBySection('management');
+    const serviceItems = adminPreviewRoutesBySection('services');
 
     const onLogout = () => {
         http.post('/auth/logout').finally(() => {
@@ -242,7 +163,7 @@ export function AdminPreviewSidebar() {
                     <ScrollArea className="min-h-0 flex-1 p-2">
                         <div className="flex w-full flex-col gap-1">
                             {topLevelItems.map((item) => (
-                                <NavLinkItem key={item.to} item={item} pathname={pathname} />
+                                <NavLinkItem key={item.path} item={item} pathname={pathname} />
                             ))}
 
                             <Separator className="w-full" />

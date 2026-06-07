@@ -1,26 +1,21 @@
 import React, { lazy } from 'react';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
-    faCogs,
-    faDatabase,
-    faEgg,
-    faFolder,
-    faGlobe,
-    faHome,
-    faNetworkWired,
-    faPlug,
-    faPuzzlePiece,
-    faServer,
-    faThLarge,
-    faUsers,
-    faGlobeAmericas,
-} from '@fortawesome/free-solid-svg-icons';
+    Blocks,
+    Database,
+    Egg,
+    Folder,
+    Globe,
+    Globe2,
+    LayoutDashboard,
+    LucideIcon,
+    Network,
+    Server,
+    Settings,
+    Users,
+} from 'lucide-react';
 
 const AdminPreviewOverviewContainer = lazy(
     () => import('@/components/admin-preview/AdminPreviewOverviewContainer')
-);
-const AdminPreviewPlaceholderContainer = lazy(
-    () => import('@/components/admin-preview/AdminPreviewPlaceholderContainer')
 );
 const AdminPreviewApiContainer = lazy(
     () => import('@/components/admin-preview/AdminPreviewApiContainer')
@@ -53,19 +48,17 @@ const AdminPreviewNestsContainer = lazy(
     () => import('@/components/admin-preview/AdminPreviewNestsContainer')
 );
 
+export type AdminPreviewSection = 'top' | 'management' | 'services';
+
 export interface AdminPreviewRouteDefinition {
     path: string;
     name: string;
     component: React.ComponentType;
+    icon: LucideIcon;
+    section: AdminPreviewSection;
     exact?: boolean;
-    icon?: IconDefinition;
     legacyPath?: string;
-}
-
-export interface AdminPreviewNavGroup {
-    name: string;
-    icon: IconDefinition;
-    items: AdminPreviewRouteDefinition[];
+    badge?: string;
 }
 
 export const adminPreviewBasePath = '/admin-preview';
@@ -76,112 +69,94 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         name: 'Overview',
         component: AdminPreviewOverviewContainer,
         exact: true,
-        icon: faHome,
+        icon: LayoutDashboard,
+        section: 'top',
+        badge: 'Preview',
     },
     {
         path: '/settings',
         name: 'Settings',
         component: AdminPreviewSettingsContainer,
-        icon: faCogs,
+        icon: Settings,
+        section: 'top',
         legacyPath: '/admin/settings',
     },
     {
         path: '/api',
         name: 'API',
         component: AdminPreviewApiContainer,
-        icon: faPlug,
+        icon: Blocks,
+        section: 'top',
         legacyPath: '/admin/api',
     },
     {
         path: '/databases',
         name: 'Databases',
         component: AdminPreviewDatabasesContainer,
-        icon: faDatabase,
+        icon: Database,
+        section: 'management',
         legacyPath: '/admin/databases',
     },
     {
         path: '/locations',
         name: 'Locations',
         component: AdminPreviewLocationsContainer,
-        icon: faGlobe,
+        icon: Globe,
+        section: 'management',
         legacyPath: '/admin/locations',
     },
     {
         path: '/nodes',
         name: 'Nodes',
         component: AdminPreviewNodesContainer,
-        icon: faNetworkWired,
+        icon: Network,
+        section: 'management',
         legacyPath: '/admin/nodes',
     },
     {
         path: '/servers',
         name: 'Servers',
         component: AdminPreviewServersContainer,
-        icon: faServer,
+        icon: Server,
+        section: 'management',
         legacyPath: '/admin/servers',
     },
     {
         path: '/subdomains',
         name: 'Subdomains',
         component: AdminPreviewSubdomainsContainer,
-        icon: faGlobeAmericas,
+        icon: Globe2,
+        section: 'management',
         legacyPath: '/admin/subdomains',
     },
     {
         path: '/users',
         name: 'Users',
         component: AdminPreviewUsersContainer,
-        icon: faUsers,
+        icon: Users,
+        section: 'management',
         legacyPath: '/admin/users',
     },
     {
         path: '/mounts',
         name: 'Mounts',
         component: AdminPreviewMountsContainer,
-        icon: faFolder,
+        icon: Folder,
+        section: 'services',
         legacyPath: '/admin/mounts',
     },
     {
         path: '/nests',
         name: 'Nests',
         component: AdminPreviewNestsContainer,
-        icon: faEgg,
+        icon: Egg,
+        section: 'services',
         legacyPath: '/admin/nests',
     },
 ];
 
-export const adminPreviewNavGroups: AdminPreviewNavGroup[] = [
-    {
-        name: 'Management',
-        icon: faThLarge,
-        items: adminPreviewRoutes.filter((route) =>
-            ['/databases', '/locations', '/nodes', '/servers', '/subdomains', '/users'].includes(route.path)
-        ),
-    },
-    {
-        name: 'Services',
-        icon: faPuzzlePiece,
-        items: adminPreviewRoutes.filter((route) => ['/mounts', '/nests'].includes(route.path)),
-    },
-];
+export const fullPathFor = (route: AdminPreviewRouteDefinition): string =>
+    route.path === '/' ? adminPreviewBasePath : `${adminPreviewBasePath}${route.path}`.replace('//', '/');
 
-export const adminPreviewTopLevelRoutes = adminPreviewRoutes.filter(
-    (route) => route.path === '/' || route.path === '/settings' || route.path === '/api'
-);
-
-export const getAdminPreviewRoute = (pathname: string): AdminPreviewRouteDefinition | undefined => {
-    const normalized = pathname.replace(/\/$/, '') || adminPreviewBasePath;
-
-    return adminPreviewRoutes.find((route) => {
-        const fullPath =
-            route.path === '/'
-                ? adminPreviewBasePath
-                : `${adminPreviewBasePath}${route.path}`.replace('//', '/');
-
-        if (['/settings', '/api', '/databases', '/locations', '/nodes', '/servers', '/subdomains', '/users', '/mounts', '/nests'].includes(route.path)) {
-            return normalized === fullPath || normalized.startsWith(`${fullPath}/`);
-        }
-
-        return route.exact ? normalized === fullPath : normalized.startsWith(fullPath);
-    });
-};
+export const adminPreviewRoutesBySection = (section: AdminPreviewSection): AdminPreviewRouteDefinition[] =>
+    adminPreviewRoutes.filter((route) => route.section === section);
