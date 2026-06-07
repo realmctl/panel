@@ -5,6 +5,7 @@ export interface ServerDatabaseStore {
     data: ServerDatabase[];
     setDatabases: Action<ServerDatabaseStore, ServerDatabase[]>;
     appendDatabase: Action<ServerDatabaseStore, ServerDatabase>;
+    updateDatabase: Action<ServerDatabaseStore, ServerDatabase>;
     removeDatabase: Action<ServerDatabaseStore, string>;
 }
 
@@ -21,6 +22,17 @@ const databases: ServerDatabaseStore = {
         } else {
             state.data = [...state.data, payload];
         }
+    }),
+
+    updateDatabase: action((state, payload) => {
+        state.data = state.data.map((database) =>
+            database.id === payload.id
+                ? {
+                      ...database,
+                      ...payload,
+                  }
+                : database
+        );
     }),
 
     removeDatabase: action((state, payload) => {

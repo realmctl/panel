@@ -5,6 +5,8 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 
 ## v1.12.3
 ### Fixed
+* Fixes database password rotation acquiring a proper row lock so concurrent rotations no longer corrupt other database entries in the panel UI ([#5638](https://github.com/pterodactyl/panel/pull/5638)).
+* [GHSA-8r6w-3qq5-4p4r](https://github.com/pterodactyl/panel/security/advisories/GHSA-8r6w-3qq5-4p4r): Improper JWT scoping allowed subusers to reuse websocket or download tokens for file uploads without `file.create` permission.
 * Adds a rate limit when changing email addresses on an account to prevent account enumeration.
 * Fixes backups, databases, and allocation creation to properly acquire a lock before checking if users can create more resources on a server.
 

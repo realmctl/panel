@@ -31,7 +31,7 @@ export default ({ database, className }: Props) => {
     const [visible, setVisible] = useState(false);
     const [connectionVisible, setConnectionVisible] = useState(false);
 
-    const appendDatabase = ServerContext.useStoreActions((actions) => actions.databases.appendDatabase);
+    const updateDatabase = ServerContext.useStoreActions((actions) => actions.databases.updateDatabase);
     const removeDatabase = ServerContext.useStoreActions((actions) => actions.databases.removeDatabase);
 
     const jdbcConnectionString = `jdbc:mysql://${database.username}${
@@ -132,7 +132,7 @@ export default ({ database, className }: Props) => {
                 </div>
                 <div css={tw`mt-6 text-right`}>
                     <Can action={'database.update'}>
-                        <RotatePasswordButton databaseId={database.id} onUpdate={appendDatabase} />
+                        <RotatePasswordButton databaseId={database.id} onUpdate={updateDatabase} />
                     </Can>
                     <Button isSecondary onClick={() => setConnectionVisible(false)}>
                         Close

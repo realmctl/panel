@@ -105,8 +105,21 @@ class NodeJWTService
             $builder = $builder->withClaim('user_uuid', $this->user->uuid);
         }
 
-        return $builder
+        $token = $builder
             ->withClaim('unique_id', Str::random())
             ->getToken($config->signer(), $config->signingKey());
+
+        $this->reset();
+
+        return $token;
+    }
+
+    private function reset(): void
+    {
+        $this->claims = [];
+        $this->scopes = [];
+        $this->user = null;
+        unset($this->expiresAt);
+        $this->subject = null;
     }
 }
