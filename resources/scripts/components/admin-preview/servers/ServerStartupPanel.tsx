@@ -1,18 +1,28 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
-import { getServerStartup, StartupEgg, updateServerStartup } from '@/api/admin/servers';
+import { getServer, getServerStartup, StartupEgg, updateServerStartup } from '@/api/admin/servers';
 import { fieldClass, selectClass } from '@/components/admin-preview/settings/fieldClass';
+import {
+    SegmentedControl,
+    SettingRow,
+    SettingsFooter,
+    SettingsSection,
+} from '@/components/admin-preview/settings/settingsLayout';
+import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 
 export default () => {
     const { id } = useParams<{ id: string }>();
     const serverId = Number(id);
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
+    const { data: serverData } = useSWR(
+        Number.isFinite(serverId) ? `admin-server-${serverId}` : null,
+        () => getServer(serverId)
+    );
     const { data, error, isValidating, mutate } = useSWR(
         Number.isFinite(serverId) ? `admin-server-startup-${serverId}` : null,
         () => getServerStartup(serverId)
@@ -135,180 +145,167 @@ export default () => {
         return <p className="text-sm text-muted-foreground">Unable to load startup configuration.</p>;
     }
 
+    const serverName = serverData?.server.name ?? 'Server';
+
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
-            <div className="rounded-lg border border-border bg-card">
-                <div className="border-b border-border px-5 py-4">
-                    <h2 className="text-base font-semibold text-foreground">Startup command</h2>
-                </div>
-                <div className="space-y-4 p-5">
-                    <div className="space-y-2">
-                        <Label htmlFor="startup">Startup command</Label>
-                        <input
-                            id="startup"
-                            className={fieldClass}
-                            value={form.startup}
-                            onChange={(event) => {
-                                const value = event.target.value;
-                                setForm((current) => ({ ...current, startup: value }));
-                            }}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="default-startup">Default service start command</Label>
-                        <input id="default-startup" className={fieldClass} value={defaultStartup} readOnly />
-                    </div>
-                </div>
+        <form onSubmit={onSubmit} className="space-y-4">
+            <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
+                <h2 className="text-base font-semibold text-foreground">{serverName}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Startup configuration</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Service configuration</h2>
-                    </div>
-                    <div className="space-y-4 p-5">
-                        <div className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-muted-foreground">
-                            Changing nest, egg, or docker image may trigger a reinstall.
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="nest-id">Nest</Label>
-                            <select
-                                id="nest-id"
-                                className={selectClass}
-                                value={form.nest_id}
-                                onChange={(event) => onNestChange(Number(event.target.value))}
-                            >
-                                {data.nests.map((nest) => (
-                                    <option key={nest.id} value={nest.id}>
-                                        {nest.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="egg-id">Egg</Label>
-                            <select
-                                id="egg-id"
-                                className={selectClass}
-                                value={form.egg_id}
-                                onChange={(event) => onEggChange(Number(event.target.value))}
-                            >
-                                {selectedNest?.eggs.map((egg) => (
-                                    <option key={egg.id} value={egg.id}>
-                                        {egg.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <label className="flex items-center gap-2 text-sm">
-                            <input
-                                type="checkbox"
-                                checked={form.skip_scripts}
-                                onChange={(event) => {
-                                    const checked = event.target.checked;
-                                    setForm((current) => ({ ...current, skip_scripts: checked }));
-                                }}
-                            />
-                            Skip egg install script
-                        </label>
-                    </div>
-                </div>
+            <p className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-muted-foreground">
+                Changing nest, egg, or docker image may trigger a reinstall.
+            </p>
 
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Docker image</h2>
-                    </div>
-                    <div className="space-y-4 p-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="docker-image">Image</Label>
-                            <select
-                                id="docker-image"
-                                className={selectClass}
-                                value={form.docker_image}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    setForm((current) => ({
-                                        ...current,
-                                        docker_image: value,
-                                        custom_docker_image: value ? '' : current.custom_docker_image,
-                                    }));
-                                }}
-                            >
-                                <option value="">Select image...</option>
-                                {dockerOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label} ({option.value})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="custom-docker-image">Custom image</Label>
-                            <input
-                                id="custom-docker-image"
-                                className={fieldClass}
-                                value={form.custom_docker_image}
-                                placeholder="Or enter a custom image..."
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    setForm((current) => ({
-                                        ...current,
-                                        custom_docker_image: value,
-                                        docker_image: value ? '' : current.docker_image,
-                                    }));
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <SettingsSection title="Startup command" description="Command run when the server starts.">
+                <SettingRow label="Command" htmlFor="startup" description="Override the egg default startup command." wide>
+                    <input
+                        id="startup"
+                        className={fieldClass}
+                        value={form.startup}
+                        onChange={(e) => setForm((current) => ({ ...current, startup: e.target.value }))}
+                    />
+                </SettingRow>
+                <SettingRow label="Egg default" description="Default command from the selected egg.">
+                    <code className="block break-all rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-foreground">
+                        {defaultStartup}
+                    </code>
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsSection title="Service" description="Nest, egg, and install script behavior.">
+                <SettingRow label="Nest" htmlFor="nest-id" description="Service category for this server.">
+                    <select
+                        id="nest-id"
+                        className={selectClass}
+                        value={form.nest_id}
+                        onChange={(e) => onNestChange(Number(e.target.value))}
+                    >
+                        {data.nests.map((nest) => (
+                            <option key={nest.id} value={nest.id}>
+                                {nest.name}
+                            </option>
+                        ))}
+                    </select>
+                </SettingRow>
+                <SettingRow label="Egg" htmlFor="egg-id" description="Server template and default configuration.">
+                    <select
+                        id="egg-id"
+                        className={selectClass}
+                        value={form.egg_id}
+                        onChange={(e) => onEggChange(Number(e.target.value))}
+                    >
+                        {selectedNest?.eggs.map((egg) => (
+                            <option key={egg.id} value={egg.id}>
+                                {egg.name}
+                            </option>
+                        ))}
+                    </select>
+                </SettingRow>
+                <SettingRow label="Install script" description="Run the egg install script on reinstall.">
+                    <SegmentedControl
+                        value={form.skip_scripts}
+                        options={[
+                            { value: false, label: 'Run' },
+                            { value: true, label: 'Skip' },
+                        ]}
+                        onChange={(value) => setForm((current) => ({ ...current, skip_scripts: value }))}
+                    />
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsSection title="Docker image" description="Container image used to run this server.">
+                <SettingRow label="Image" htmlFor="docker-image" description="Select from egg-defined images.">
+                    <select
+                        id="docker-image"
+                        className={selectClass}
+                        value={form.docker_image}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setForm((current) => ({
+                                ...current,
+                                docker_image: value,
+                                custom_docker_image: value ? '' : current.custom_docker_image,
+                            }));
+                        }}
+                    >
+                        <option value="">Select image...</option>
+                        {dockerOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label} ({option.value})
+                            </option>
+                        ))}
+                    </select>
+                </SettingRow>
+                <SettingRow
+                    label="Custom image"
+                    htmlFor="custom-docker-image"
+                    description="Use a custom image instead of the egg default."
+                >
+                    <input
+                        id="custom-docker-image"
+                        className={fieldClass}
+                        value={form.custom_docker_image}
+                        placeholder="e.g. ghcr.io/org/image:tag"
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setForm((current) => ({
+                                ...current,
+                                custom_docker_image: value,
+                                docker_image: value ? '' : current.docker_image,
+                            }));
+                        }}
+                    />
+                </SettingRow>
+            </SettingsSection>
 
             {selectedEgg && selectedEgg.variables.length > 0 && (
-                <div className="space-y-4">
+                <SettingsSection
+                    title="Environment variables"
+                    description="Values injected into the container at runtime."
+                >
                     {selectedEgg.variables.map((variable) => (
-                        <div key={variable.env_variable} className="rounded-lg border border-border bg-card">
-                            <div className="border-b border-border px-5 py-4">
-                                <h3 className="text-sm font-semibold text-foreground">
-                                    {variable.required && (
-                                        <span className="mr-2 rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive">
-                                            Required
-                                        </span>
-                                    )}
-                                    {variable.name}
-                                </h3>
-                            </div>
-                            <div className="space-y-2 p-5">
-                                <input
-                                    className={fieldClass}
-                                    value={form.environment[variable.env_variable] ?? variable.default_value ?? ''}
-                                    onChange={(event) => {
-                                        const value = event.target.value;
-                                        setForm((current) => ({
-                                            ...current,
-                                            environment: {
-                                                ...current.environment,
-                                                [variable.env_variable]: value,
-                                            },
-                                        }));
-                                    }}
-                                />
-                                <p className="text-xs text-muted-foreground">{variable.description}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    Variable: <code>{variable.env_variable}</code> · Rules:{' '}
-                                    <code>{variable.rules}</code>
-                                </p>
-                            </div>
-                        </div>
+                        <SettingRow
+                            key={variable.env_variable}
+                            label={variable.name}
+                            htmlFor={`env-${variable.env_variable}`}
+                            description={`${variable.description} · ${variable.env_variable} · ${variable.rules}${
+                                variable.required ? ' · Required' : ''
+                            }`}
+                            wide
+                        >
+                            <input
+                                id={`env-${variable.env_variable}`}
+                                className={fieldClass}
+                                value={form.environment[variable.env_variable] ?? variable.default_value ?? ''}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setForm((current) => ({
+                                        ...current,
+                                        environment: {
+                                            ...current.environment,
+                                            [variable.env_variable]: value,
+                                        },
+                                    }));
+                                }}
+                            />
+                        </SettingRow>
                     ))}
-                </div>
+                </SettingsSection>
             )}
 
-            <div className="flex justify-end">
+            <SettingsFooter>
+                <Link to={`${adminPreviewBasePath}/servers/${serverId}`} className="no-underline">
+                    <Button type="button" variant="outline" disabled={saving}>
+                        Cancel
+                    </Button>
+                </Link>
                 <Button type="submit" disabled={saving}>
                     <Save className="mr-2 h-4 w-4" />
-                    {saving ? 'Saving...' : 'Save startup'}
+                    {saving ? 'Saving...' : 'Save changes'}
                 </Button>
-            </div>
+            </SettingsFooter>
         </form>
     );
 };

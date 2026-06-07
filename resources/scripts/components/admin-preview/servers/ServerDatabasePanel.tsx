@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
-import { RefreshCw, Save, Trash2 } from 'lucide-react';
+import { Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
@@ -14,22 +13,21 @@ import {
     getServerDatabases,
     resetServerDatabasePassword,
 } from '@/api/admin/servers';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
 import { fieldClass, selectClass } from '@/components/admin-preview/settings/fieldClass';
+import {
+    SettingRow,
+    SettingsFooter,
+    SettingsSection,
+} from '@/components/admin-preview/settings/settingsLayout';
+import { cn } from '@/lib/utils';
 
 export default () => {
     const { id } = useParams<{ id: string }>();
     const serverId = Number(id);
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
-    const { data: serverData } = useSWR(Number.isFinite(serverId) ? `admin-server-${serverId}` : null, () =>
-        getServer(serverId)
+    const { data: serverData } = useSWR(
+        Number.isFinite(serverId) ? `admin-server-${serverId}` : null,
+        () => getServer(serverId)
     );
     const { data, error, isValidating, mutate } = useSWR(
         Number.isFinite(serverId) ? `admin-server-databases-${serverId}` : null,
@@ -139,6 +137,7 @@ export default () => {
     }
 
     const databases = data.databases ?? [];
+    const serverName = serverData?.server.name ?? `Server #${serverId}`;
 
     return (
         <>
@@ -153,169 +152,177 @@ export default () => {
                 Are you sure you want to delete this database?
             </Dialog.Confirm>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2 space-y-4">
-                    <div className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-muted-foreground">
-                        Database passwords can be viewed on the client panel at{' '}
-                        <a
-                            href={`/server/${serverData?.server.uuid_short}/databases`}
-                            className="text-primary no-underline hover:underline"
-                        >
-                            /server/{serverData?.server.uuid_short}/databases
-                        </a>
-                        .
-                    </div>
+            <div className="space-y-4">
+                <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
+                    <h2 className="text-base font-semibold text-foreground">{serverName}</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Database management</p>
+                </div>
 
-                    <div className="rounded-lg border border-border bg-card">
+                <p className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-muted-foreground">
+                    Database passwords can be viewed on the client panel at{' '}
+                    <a
+                        href={`/server/${serverData?.server.uuid_short}/databases`}
+                        className="text-blue-400 no-underline hover:text-blue-300"
+                    >
+                        /server/{serverData?.server.uuid_short}/databases
+                    </a>
+                    .
+                </p>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
+                    <div className="overflow-hidden rounded-md border border-border bg-card lg:col-span-2">
                         <div className="border-b border-border px-5 py-4">
                             <h2 className="text-base font-semibold text-foreground">Active databases</h2>
+                            <p className="mt-0.5 text-sm text-muted-foreground">
+                                Databases assigned to this server.
+                            </p>
                         </div>
+
                         {databases.length === 0 ? (
-                            <div className="px-5 py-12 text-center text-sm text-muted-foreground">
+                            <p className="px-5 py-8 text-sm text-muted-foreground">
                                 No databases assigned to this server.
-                            </div>
+                            </p>
                         ) : (
-                            <div className={tableWrapClass}>
-                                <table className={tableClass}>
-                                    <thead>
-                                        <tr className={tableHeadRowClass}>
-                                            <th className={tableHeadCellClass}>Database</th>
-                                            <th className={tableHeadCellClass}>Username</th>
-                                            <th className={tableHeadCellClass}>Connections from</th>
-                                            <th className={tableHeadCellClass}>Host</th>
-                                            <th className={tableHeadCellClass}>Max connections</th>
-                                            <th className={tableHeadCellClass} />
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {databases.map((database) => (
-                                            <tr key={database.id} className={tableBodyRowClass}>
-                                                <td className={tableBodyCellClass}>
-                                                    <code className="text-xs">{database.database}</code>
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <code className="text-xs">{database.username}</code>
-                                                </td>
-                                                <td className={tableBodyCellClass}>{database.remote}</td>
-                                                <td className={tableBodyCellClass}>
-                                                    {database.host ? (
-                                                        <code className="text-xs">
+                            <div className="divide-y divide-border">
+                                {databases.map((database) => (
+                                    <div
+                                        key={database.id}
+                                        className="flex items-start justify-between gap-4 px-5 py-4"
+                                    >
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-sm font-medium text-foreground">
+                                                <code className="text-xs">{database.database}</code>
+                                            </p>
+                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                <code>{database.username}</code>
+                                                {' · '}
+                                                {database.remote}
+                                                {database.host ? (
+                                                    <>
+                                                        {' · '}
+                                                        <code>
                                                             {database.host.host}:{database.host.port}
                                                         </code>
-                                                    ) : (
-                                                        '—'
-                                                    )}
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    {database.max_connections ?? 'Unlimited'}
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-8 w-8"
-                                                            disabled={working}
-                                                            onClick={() => onResetPassword(database.id)}
-                                                        >
-                                                            <RefreshCw className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                            disabled={working}
-                                                            onClick={() => setConfirmDelete(database.id)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                    </>
+                                                ) : null}
+                                                {' · '}
+                                                {database.max_connections ?? 'Unlimited'} max connections
+                                            </p>
+                                        </div>
+                                        <div className="flex shrink-0 gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                                disabled={working}
+                                                title="Reset password"
+                                                onClick={() => onResetPassword(database.id)}
+                                            >
+                                                <RefreshCw className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                                disabled={working}
+                                                title="Delete database"
+                                                onClick={() => setConfirmDelete(database.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
-                </div>
 
-                <form onSubmit={onCreate} className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Create new database</h2>
-                    </div>
-                    <div className="space-y-4 p-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="database-host">Database host</Label>
-                            <select
-                                id="database-host"
-                                className={selectClass}
-                                value={form.database_host_id}
-                                onChange={(event) => {
-                                    const value = Number(event.target.value);
-                                    setForm((current) => ({ ...current, database_host_id: value }));
-                                }}
+                    <form onSubmit={onCreate} className="space-y-4">
+                        <SettingsSection
+                            title="Create database"
+                            description="Provision a new database on a host."
+                        >
+                            <SettingRow label="Database host" htmlFor="database-host" description="Host cluster to create on.">
+                                <select
+                                    id="database-host"
+                                    className={selectClass}
+                                    value={form.database_host_id}
+                                    onChange={(event) => {
+                                        const value = Number(event.target.value);
+                                        setForm((current) => ({ ...current, database_host_id: value }));
+                                    }}
+                                >
+                                    {data.hosts.map((host) => (
+                                        <option key={host.id} value={host.id}>
+                                            {host.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </SettingRow>
+                            <SettingRow
+                                label="Database name"
+                                htmlFor="database-name"
+                                description="Appended to the server prefix automatically."
                             >
-                                {data.hosts.map((host) => (
-                                    <option key={host.id} value={host.id}>
-                                        {host.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="database-name">Database</Label>
-                            <div className="flex">
-                                <span className="inline-flex items-center rounded-l-md border border-r-0 border-border bg-muted px-3 text-sm text-muted-foreground">
-                                    s{serverId}_
-                                </span>
+                                <div className="flex min-w-0">
+                                    <span className="inline-flex shrink-0 items-center rounded-l-md border border-r-0 border-border bg-muted px-3 text-sm text-muted-foreground">
+                                        s{serverId}_
+                                    </span>
+                                    <input
+                                        id="database-name"
+                                        className={cn(fieldClass, 'min-w-0 rounded-l-none')}
+                                        value={form.database}
+                                        onChange={(event) => {
+                                            const value = event.target.value;
+                                            setForm((current) => ({ ...current, database: value }));
+                                        }}
+                                        required
+                                    />
+                                </div>
+                            </SettingRow>
+                            <SettingRow
+                                label="Connections from"
+                                htmlFor="remote"
+                                description="Remote host pattern, e.g. % for any host."
+                            >
                                 <input
-                                    id="database-name"
-                                    className={`${fieldClass} rounded-l-none`}
-                                    value={form.database}
+                                    id="remote"
+                                    className={fieldClass}
+                                    value={form.remote}
                                     onChange={(event) => {
                                         const value = event.target.value;
-                                        setForm((current) => ({ ...current, database: value }));
+                                        setForm((current) => ({ ...current, remote: value }));
                                     }}
                                     required
                                 />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="remote">Connections</Label>
-                            <input
-                                id="remote"
-                                className={fieldClass}
-                                value={form.remote}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    setForm((current) => ({ ...current, remote: value }));
-                                }}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="max-connections">Concurrent connections</Label>
-                            <input
-                                id="max-connections"
-                                className={fieldClass}
-                                value={form.max_connections}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    setForm((current) => ({ ...current, max_connections: value }));
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className="flex justify-end border-t border-border px-5 py-4">
-                        <Button type="submit" disabled={creating}>
-                            <Save className="mr-2 h-4 w-4" />
-                            {creating ? 'Creating...' : 'Create database'}
-                        </Button>
-                    </div>
-                </form>
+                            </SettingRow>
+                            <SettingRow
+                                label="Max connections"
+                                htmlFor="max-connections"
+                                description="Leave empty for unlimited."
+                            >
+                                <input
+                                    id="max-connections"
+                                    className={fieldClass}
+                                    value={form.max_connections}
+                                    onChange={(event) => {
+                                        const value = event.target.value;
+                                        setForm((current) => ({ ...current, max_connections: value }));
+                                    }}
+                                />
+                            </SettingRow>
+                        </SettingsSection>
+
+                        <SettingsFooter>
+                            <Button type="submit" disabled={creating}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                {creating ? 'Creating...' : 'Create database'}
+                            </Button>
+                        </SettingsFooter>
+                    </form>
+                </div>
             </div>
         </>
     );

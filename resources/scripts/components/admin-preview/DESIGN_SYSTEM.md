@@ -489,6 +489,6 @@ Register route in `adminPreviewRoutes.ts` and add to overview `managementSection
 
 ## Migration note
 
-Some server sub-panels (`ServerDatabasePanel`, `ServerMountsPanel`) still use `adminTable`. When touching those files, migrate to this design system.
+All admin-preview panels follow this design system. Multi-step wizards (e.g. `NodeCreatePanel`, `ServerCreatePanel`) reuse the same sidebar + `SettingsSection` pattern.
 
 Legacy admin Blade pages under `/admin` are unrelated—only `/admin-preview` follows this document.

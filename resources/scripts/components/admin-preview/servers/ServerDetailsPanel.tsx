@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { getServerDetails, searchUsers, updateServerDetails } from '@/api/admin/servers';
 import { fieldClass, textareaClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow, SettingsFooter, SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
+import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 
 export default () => {
     const { id } = useParams<{ id: string }>();
@@ -86,6 +87,8 @@ export default () => {
                     message: response.message,
                 });
                 mutate();
+                setOwnerQuery('');
+                setOwnerResults([]);
             })
             .catch((submitError) => {
                 clearAndAddHttpError({ key: 'admin-servers', error: submitError });
@@ -101,96 +104,129 @@ export default () => {
         return <p className="text-sm text-muted-foreground">Unable to load server details.</p>;
     }
 
+    const ownerLink = data.server.owner ? (
+        <Link
+            to={`${adminPreviewBasePath}/users/${data.server.owner.id}`}
+            className="text-blue-400 no-underline hover:text-blue-300"
+        >
+            {data.server.owner.username}
+        </Link>
+    ) : null;
+
     return (
-        <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card">
-            <div className="border-b border-border px-5 py-4">
-                <h2 className="text-base font-semibold text-foreground">Base information</h2>
+        <form onSubmit={onSubmit} className="space-y-4">
+            <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
+                <h2 className="text-base font-semibold text-foreground">{form.name || data.server.name}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    <code>#{data.server.id}</code>
+                    {ownerLink ? (
+                        <>
+                            {' · Owner '}
+                            {ownerLink}
+                        </>
+                    ) : null}
+                </p>
             </div>
-            <div className="space-y-5 p-5">
-                <div className="space-y-2">
-                    <Label htmlFor="server-name">Server name</Label>
+
+            <SettingsSection title="Details" description="Name, owner, and metadata for this server.">
+                <SettingRow label="Server name" htmlFor="server-name" description="Display name shown across the panel.">
                     <input
                         id="server-name"
                         className={fieldClass}
                         value={form.name}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setForm((current) => ({ ...current, name: value }));
-                        }}
+                        onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
                         required
                     />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="external-id">External identifier</Label>
+                </SettingRow>
+                <SettingRow
+                    label="External ID"
+                    htmlFor="external-id"
+                    description="Optional identifier from an external billing or provisioning system."
+                >
                     <input
                         id="external-id"
                         className={fieldClass}
                         value={form.external_id}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setForm((current) => ({ ...current, external_id: value }));
-                        }}
+                        onChange={(event) =>
+                            setForm((current) => ({ ...current, external_id: event.target.value }))
+                        }
                     />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="owner-search">Server owner</Label>
-                    <input
-                        id="owner-search"
-                        className={fieldClass}
-                        value={ownerQuery || form.owner_label}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setOwnerQuery(value);
-                            setForm((current) => ({ ...current, owner_label: value }));
-                        }}
-                        placeholder="Search by email..."
-                    />
-                    {ownerResults.length > 0 && (
-                        <div className="overflow-hidden rounded-md border border-border bg-background">
-                            {ownerResults.map((user) => (
-                                <button
-                                    key={user.id}
-                                    type="button"
-                                    className="block w-full border-b border-border px-3 py-2 text-left text-sm last:border-b-0 hover:bg-muted"
-                                    onClick={() => {
-                                        setForm((current) => ({
-                                            ...current,
-                                            owner_id: user.id,
-                                            owner_label: `${user.email} (${user.username})`,
-                                        }));
-                                        setOwnerQuery('');
-                                        setOwnerResults([]);
-                                    }}
-                                >
-                                    <span className="font-medium text-foreground">
-                                        {user.name_first} {user.name_last}
-                                    </span>
-                                    <span className="ml-2 text-muted-foreground">{user.email}</span>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="description">Server description</Label>
+                </SettingRow>
+                <SettingRow
+                    label="Owner"
+                    htmlFor="owner-search"
+                    description="Search by email to transfer ownership to another user."
+                >
+                    <div className="space-y-2">
+                        <input
+                            id="owner-search"
+                            className={fieldClass}
+                            value={ownerQuery || form.owner_label}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                setOwnerQuery(value);
+                                setForm((current) => ({ ...current, owner_label: value }));
+                            }}
+                            placeholder="Search by email..."
+                        />
+                        {ownerResults.length > 0 && (
+                            <div className="overflow-hidden rounded-md border border-border bg-background">
+                                <div className="divide-y divide-border">
+                                    {ownerResults.map((user) => (
+                                        <button
+                                            key={user.id}
+                                            type="button"
+                                            className="block w-full px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted/50"
+                                            onClick={() => {
+                                                setForm((current) => ({
+                                                    ...current,
+                                                    owner_id: user.id,
+                                                    owner_label: `${user.email} (${user.username})`,
+                                                }));
+                                                setOwnerQuery('');
+                                                setOwnerResults([]);
+                                            }}
+                                        >
+                                            <span className="font-medium text-foreground">
+                                                {user.name_first} {user.name_last}
+                                            </span>
+                                            <span className="ml-2 text-muted-foreground">{user.email}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </SettingRow>
+                <SettingRow
+                    label="Description"
+                    htmlFor="description"
+                    description="Optional notes visible to administrators."
+                    wide
+                >
                     <textarea
                         id="description"
                         className={textareaClass}
                         rows={3}
                         value={form.description}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setForm((current) => ({ ...current, description: value }));
-                        }}
+                        onChange={(event) =>
+                            setForm((current) => ({ ...current, description: event.target.value }))
+                        }
                     />
-                </div>
-            </div>
-            <div className="flex justify-end border-t border-border px-5 py-4">
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsFooter>
+                <Link to={`${adminPreviewBasePath}/servers/${serverId}`} className="no-underline">
+                    <Button type="button" variant="outline" disabled={saving}>
+                        Cancel
+                    </Button>
+                </Link>
                 <Button type="submit" disabled={saving}>
                     <Save className="mr-2 h-4 w-4" />
-                    {saving ? 'Saving...' : 'Update details'}
+                    {saving ? 'Saving...' : 'Save changes'}
                 </Button>
-            </div>
+            </SettingsFooter>
         </form>
     );
 };

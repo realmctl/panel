@@ -74,143 +74,170 @@ export default () => {
     const { server } = data;
 
     return (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
-            <div className="space-y-4 lg:col-span-2">
-                <SettingsSection title="General" description="Identifiers and egg configuration.">
-                    <InfoRow label="Name">{server.name}</InfoRow>
-                    <InfoRow label="Internal ID">
-                        <code>#{server.id}</code>
-                    </InfoRow>
-                    <InfoRow label="UUID">
-                        <code className="break-all">{server.uuid}</code>
-                    </InfoRow>
-                    <InfoRow label="External ID">
-                        {server.external_id ? <code>{server.external_id}</code> : 'Not set'}
-                    </InfoRow>
-                    <InfoRow label="Egg">
-                        {server.nest && server.egg ? (
-                            <>
-                                <Link
-                                    to={`${adminPreviewBasePath}/nests/${server.nest.id}`}
-                                    className="text-blue-400 no-underline hover:text-blue-300"
-                                >
-                                    {server.nest.name}
-                                </Link>
-                                {' · '}
-                                <Link
-                                    to={`${adminPreviewBasePath}/nests/eggs/${server.egg.id}`}
-                                    className="text-blue-400 no-underline hover:text-blue-300"
-                                >
-                                    {server.egg.name}
-                                </Link>
-                            </>
-                        ) : (
-                            '—'
-                        )}
-                    </InfoRow>
-                </SettingsSection>
-
-                <SettingsSection title="Resources" description="CPU, memory, and disk limits.">
-                    <InfoRow label="CPU">
-                        <code>{formatCpu(server.cpu)}</code>
-                    </InfoRow>
-                    <InfoRow label="CPU pinning">
-                        {server.threads ? <code>{server.threads}</code> : 'Not set'}
-                    </InfoRow>
-                    <InfoRow label="Memory">
-                        <code>
-                            {formatMemory(server.memory)} / {formatSwap(server.swap)} swap
-                        </code>
-                    </InfoRow>
-                    <InfoRow label="Disk">
-                        <code>{formatDisk(server.disk)}</code>
-                    </InfoRow>
-                    <InfoRow label="Block IO">
-                        <code>{server.io}</code>
-                    </InfoRow>
-                </SettingsSection>
-
-                <SettingsSection title="Network" description="Default connection details.">
-                    <InfoRow label="Connection">
-                        {server.allocation ? (
-                            <code>
-                                {server.allocation.ip}:{server.allocation.port}
-                            </code>
-                        ) : (
-                            '—'
-                        )}
-                    </InfoRow>
-                    <InfoRow label="Alias">
-                        {server.allocation?.has_alias ? (
-                            <code>
-                                {server.allocation.alias}:{server.allocation.port}
-                            </code>
-                        ) : (
-                            'No alias assigned'
-                        )}
-                    </InfoRow>
-                </SettingsSection>
+        <div className="space-y-4">
+            <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
+                <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-base font-semibold text-foreground">{server.name}</h2>
+                    {server.is_suspended && (
+                        <span className="rounded bg-yellow-500/15 px-1.5 py-0.5 text-xs font-medium text-yellow-600 dark:text-yellow-500">
+                            Suspended
+                        </span>
+                    )}
+                    {!server.is_installed && (
+                        <span className="rounded bg-blue-500/15 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+                            Installing
+                        </span>
+                    )}
+                    {server.is_installed && !server.is_suspended && (
+                        <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                            Active
+                        </span>
+                    )}
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    <code>#{server.id}</code>
+                    {server.owner && (
+                        <>
+                            {' · '}
+                            <Link
+                                to={`${adminPreviewBasePath}/users/${server.owner.id}`}
+                                className="text-blue-400 no-underline hover:text-blue-300"
+                            >
+                                {server.owner.username}
+                            </Link>
+                        </>
+                    )}
+                    {server.node && (
+                        <>
+                            {' · '}
+                            <Link
+                                to={`${adminPreviewBasePath}/nodes/${server.node.id}`}
+                                className="text-blue-400 no-underline hover:text-blue-300"
+                            >
+                                {server.node.name}
+                            </Link>
+                        </>
+                    )}
+                </p>
             </div>
 
-            <div className="space-y-4">
-                <div className="overflow-hidden rounded-md border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Status</h2>
-                    </div>
-                    <div className="divide-y divide-border px-5 py-4 text-sm">
-                        {server.is_suspended && (
-                            <p className="pb-3 text-yellow-700 dark:text-yellow-200">This server is suspended.</p>
-                        )}
-                        {!server.is_installed && (
-                            <p className="pb-3 text-blue-600 dark:text-blue-400">This server is still installing.</p>
-                        )}
-                        {server.is_installed && !server.is_suspended && (
-                            <p className="text-emerald-600 dark:text-emerald-500">Active and installed.</p>
-                        )}
-                    </div>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
+                <div className="space-y-4 lg:col-span-2">
+                    <SettingsSection title="General" description="Identifiers and egg configuration.">
+                        <InfoRow label="Name">{server.name}</InfoRow>
+                        <InfoRow label="Internal ID">
+                            <code>#{server.id}</code>
+                        </InfoRow>
+                        <InfoRow label="UUID">
+                            <code className="break-all">{server.uuid}</code>
+                        </InfoRow>
+                        <InfoRow label="External ID">
+                            {server.external_id ? <code>{server.external_id}</code> : 'Not set'}
+                        </InfoRow>
+                        <InfoRow label="Egg">
+                            {server.nest && server.egg ? (
+                                <>
+                                    <Link
+                                        to={`${adminPreviewBasePath}/nests/${server.nest.id}`}
+                                        className="text-blue-400 no-underline hover:text-blue-300"
+                                    >
+                                        {server.nest.name}
+                                    </Link>
+                                    {' · '}
+                                    <Link
+                                        to={`${adminPreviewBasePath}/nests/eggs/${server.egg.id}`}
+                                        className="text-blue-400 no-underline hover:text-blue-300"
+                                    >
+                                        {server.egg.name}
+                                    </Link>
+                                </>
+                            ) : (
+                                '—'
+                            )}
+                        </InfoRow>
+                    </SettingsSection>
+
+                    <SettingsSection title="Resources" description="CPU, memory, and disk limits.">
+                        <InfoRow label="CPU">
+                            <code>{formatCpu(server.cpu)}</code>
+                        </InfoRow>
+                        <InfoRow label="CPU pinning">
+                            {server.threads ? <code>{server.threads}</code> : 'Not set'}
+                        </InfoRow>
+                        <InfoRow label="Memory">
+                            <code>
+                                {formatMemory(server.memory)} / {formatSwap(server.swap)} swap
+                            </code>
+                        </InfoRow>
+                        <InfoRow label="Disk">
+                            <code>{formatDisk(server.disk)}</code>
+                        </InfoRow>
+                        <InfoRow label="Block IO">
+                            <code>{server.io}</code>
+                        </InfoRow>
+                    </SettingsSection>
+
+                    <SettingsSection title="Network" description="Default connection details.">
+                        <InfoRow label="Connection">
+                            {server.allocation ? (
+                                <code>
+                                    {server.allocation.ip}:{server.allocation.port}
+                                </code>
+                            ) : (
+                                '—'
+                            )}
+                        </InfoRow>
+                        <InfoRow label="Alias">
+                            {server.allocation?.has_alias ? (
+                                <code>
+                                    {server.allocation.alias}:{server.allocation.port}
+                                </code>
+                            ) : (
+                                'No alias assigned'
+                            )}
+                        </InfoRow>
+                    </SettingsSection>
                 </div>
 
-                {(server.owner || server.node) && (
-                    <div className="overflow-hidden rounded-md border border-border bg-card">
-                        <div className="border-b border-border px-5 py-4">
-                            <h2 className="text-base font-semibold text-foreground">Related</h2>
-                        </div>
-                        <div className="divide-y divide-border">
-                            {server.owner && (
-                                <Link
-                                    to={`${adminPreviewBasePath}/users/${server.owner.id}`}
-                                    className="block px-5 py-4 no-underline transition-colors hover:bg-muted/50"
-                                >
-                                    <p className="text-sm font-medium text-foreground">{server.owner.username}</p>
-                                    <p className="mt-0.5 text-xs text-muted-foreground">Owner</p>
-                                </Link>
-                            )}
-                            {server.node && (
-                                <Link
-                                    to={`${adminPreviewBasePath}/nodes/${server.node.id}`}
-                                    className="block px-5 py-4 no-underline transition-colors hover:bg-muted/50"
-                                >
-                                    <p className="text-sm font-medium text-foreground">{server.node.name}</p>
-                                    <p className="mt-0.5 text-xs text-muted-foreground">Node</p>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                )}
+                <div className="space-y-4">
+                    <SettingsSection title="Quick links" description="Edit server configuration.">
+                        <Link
+                            to={`${adminPreviewBasePath}/servers/${serverId}/details`}
+                            className="block px-5 py-4 no-underline transition-colors hover:bg-muted/50"
+                        >
+                            <p className="text-sm font-medium text-foreground">Details</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">Name, owner, description</p>
+                        </Link>
+                        <Link
+                            to={`${adminPreviewBasePath}/servers/${serverId}/build`}
+                            className="block px-5 py-4 no-underline transition-colors hover:bg-muted/50"
+                        >
+                            <p className="text-sm font-medium text-foreground">Build</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">Resources and allocations</p>
+                        </Link>
+                        <Link
+                            to={`${adminPreviewBasePath}/servers/${serverId}/startup`}
+                            className="block px-5 py-4 no-underline transition-colors hover:bg-muted/50"
+                        >
+                            <p className="text-sm font-medium text-foreground">Startup</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">Egg, image, and variables</p>
+                        </Link>
+                    </SettingsSection>
 
-                <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
-                    <p className="text-sm text-muted-foreground">
-                        Create a copy of this server with the same configuration.
-                    </p>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="mt-3 w-full"
-                        disabled={duplicating}
-                        onClick={onDuplicate}
-                    >
-                        {duplicating ? 'Duplicating...' : 'Duplicate server'}
-                    </Button>
+                    <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
+                        <p className="text-sm text-muted-foreground">
+                            Create a copy of this server with the same configuration.
+                        </p>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="mt-3 w-full"
+                            disabled={duplicating}
+                            onClick={onDuplicate}
+                        >
+                            {duplicating ? 'Duplicating...' : 'Duplicate server'}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

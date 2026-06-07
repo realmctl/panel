@@ -1,24 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
-import {
-    AlertTriangle,
-    Ban,
-    CheckCircle2,
-    Loader2,
-    Pause,
-    Play,
-    RefreshCw,
-    ToggleLeft,
-    Truck,
-} from 'lucide-react';
+import { Ban, Play, RefreshCw, ToggleLeft, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
 import {
+    getServer,
     getServerManage,
     reinstallServer,
     suspendServer,
@@ -26,66 +15,18 @@ import {
     transferServer,
 } from '@/api/admin/servers';
 import { selectClass } from '@/components/admin-preview/settings/fieldClass';
-import { cn } from '@/lib/utils';
+import { SettingRow, SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
 
 type ConfirmAction = 'reinstall' | 'toggle-install' | 'suspend' | null;
-
-interface StatusBadgeProps {
-    label: string;
-    tone: 'success' | 'warning' | 'danger' | 'info' | 'muted';
-    icon: React.ReactNode;
-}
-
-const toneClass: Record<StatusBadgeProps['tone'], string> = {
-    success: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
-    warning: 'border-amber-500/30 bg-amber-500/10 text-amber-200',
-    danger: 'border-red-500/30 bg-red-500/10 text-red-300',
-    info: 'border-blue-500/30 bg-blue-500/10 text-blue-300',
-    muted: 'border-border bg-muted/40 text-muted-foreground',
-};
-
-const StatusBadge = ({ label, tone, icon }: StatusBadgeProps) => (
-    <span
-        className={cn(
-            'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
-            toneClass[tone]
-        )}
-    >
-        {icon}
-        {label}
-    </span>
-);
-
-interface ActionCardProps {
-    title: string;
-    description: string;
-    destructive?: boolean;
-    accent?: 'destructive' | 'warning' | 'info' | 'success';
-    children: React.ReactNode;
-}
-
-const accentBar: Record<NonNullable<ActionCardProps['accent']>, string> = {
-    destructive: 'bg-red-500',
-    warning: 'bg-amber-500',
-    info: 'bg-blue-500',
-    success: 'bg-emerald-500',
-};
-
-const ActionCard = ({ title, description, accent, children }: ActionCardProps) => (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card">
-        {accent && <span className={cn('absolute inset-y-0 left-0 w-1', accentBar[accent])} />}
-        <div className="border-b border-border px-5 py-4 pl-6">
-            <h2 className="text-base font-semibold text-foreground">{title}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-        </div>
-        <div className="mt-auto p-5 pl-6">{children}</div>
-    </div>
-);
 
 export default () => {
     const { id } = useParams<{ id: string }>();
     const serverId = Number(id);
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
+    const { data: serverData } = useSWR(
+        Number.isFinite(serverId) ? `admin-server-${serverId}` : null,
+        () => getServer(serverId)
+    );
     const { data, error, isValidating, mutate } = useSWR(
         Number.isFinite(serverId) ? `admin-server-manage-${serverId}` : null,
         () => getServerManage(serverId)
@@ -108,24 +49,29 @@ export default () => {
     }, [error, clearAndAddHttpError, clearFlashes]);
 
     useEffect(() => {
-        if (!data?.node_options.length) return;
+        const nodeOptions = data?.node_options;
+        if (!nodeOptions?.length) return;
 
-        const firstNode = data.node_options[0];
+        const firstNode = nodeOptions[0];
         setTransferForm({
             node_id: firstNode.id,
-            allocation_id: firstNode.allocations[0]?.id ?? 0,
+            allocation_id: firstNode.allocations?.[0]?.id ?? 0,
             allocation_additional: [],
         });
     }, [data]);
 
+    const nodeOptionsFromData = data?.node_options ?? [];
+
     const selectedNode = useMemo(
-        () => data?.node_options.find((node) => node.id === transferForm.node_id) ?? null,
-        [data, transferForm.node_id]
+        () => nodeOptionsFromData.find((node) => node.id === transferForm.node_id) ?? null,
+        [nodeOptionsFromData, transferForm.node_id]
     );
 
     const additionalOptions = useMemo(
         () =>
-            selectedNode?.allocations.filter((allocation) => allocation.id !== transferForm.allocation_id) ?? [],
+            (selectedNode?.allocations ?? []).filter(
+                (allocation) => allocation.id !== transferForm.allocation_id
+            ),
         [selectedNode, transferForm.allocation_id]
     );
 
@@ -187,6 +133,7 @@ export default () => {
 
     const { server } = data;
     const transferInProgress = Boolean(server.transfer);
+    const serverName = serverData?.server.name ?? `Server #${server.id}`;
 
     return (
         <>
@@ -243,32 +190,35 @@ export default () => {
                     Move this server's files and configuration to another node. The server is stopped during transfer
                     and started again on the target node when the copy completes.
                 </p>
-                <div className="mt-4 space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="transfer-node">Target node</Label>
+                {transferOpen && (
+                <div className="mt-4 divide-y divide-border overflow-hidden rounded-md border border-border">
+                    <SettingRow label="Target node" htmlFor="transfer-node" description="Wings node to move the server to.">
                         <select
                             id="transfer-node"
                             className={selectClass}
                             value={transferForm.node_id}
                             onChange={(event) => {
                                 const nodeId = Number(event.target.value);
-                                const node = data.node_options.find((item) => item.id === nodeId);
+                                const node = nodeOptionsFromData.find((item) => item.id === nodeId);
                                 setTransferForm({
                                     node_id: nodeId,
-                                    allocation_id: node?.allocations[0]?.id ?? 0,
+                                    allocation_id: node?.allocations?.[0]?.id ?? 0,
                                     allocation_additional: [],
                                 });
                             }}
                         >
-                            {data.node_options.map((node) => (
+                            {nodeOptionsFromData.map((node) => (
                                 <option key={node.id} value={node.id}>
                                     {node.text}
                                 </option>
                             ))}
                         </select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="transfer-allocation">Default allocation</Label>
+                    </SettingRow>
+                    <SettingRow
+                        label="Default allocation"
+                        htmlFor="transfer-allocation"
+                        description="Primary game port on the target node."
+                    >
                         <select
                             id="transfer-allocation"
                             className={selectClass}
@@ -279,20 +229,24 @@ export default () => {
                                     ...current,
                                     allocation_id: allocationId,
                                     allocation_additional: current.allocation_additional.filter(
-                                        (id) => id !== allocationId
+                                        (item) => item !== allocationId
                                     ),
                                 }));
                             }}
                         >
-                            {selectedNode?.allocations.map((allocation) => (
+                            {(selectedNode?.allocations ?? []).map((allocation) => (
                                 <option key={allocation.id} value={allocation.id}>
                                     {allocation.text}
                                 </option>
                             ))}
                         </select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="transfer-additional">Additional allocations</Label>
+                    </SettingRow>
+                    <SettingRow
+                        label="Additional allocations"
+                        htmlFor="transfer-additional"
+                        description="Hold Cmd/Ctrl to select multiple ports on the new node."
+                        wide
+                    >
                         <select
                             id="transfer-additional"
                             className={selectClass}
@@ -312,12 +266,9 @@ export default () => {
                                 </option>
                             ))}
                         </select>
-                        <p className="text-xs text-muted-foreground">
-                            Hold ⌘ / Ctrl to pick multiple. These are assigned alongside the default allocation on
-                            the new node.
-                        </p>
-                    </div>
+                    </SettingRow>
                 </div>
+                )}
                 <Dialog.Footer>
                     <Button type="button" variant="outline" onClick={() => setTransferOpen(false)}>
                         Cancel
@@ -328,115 +279,91 @@ export default () => {
                 </Dialog.Footer>
             </Dialog>
 
-            <div className="space-y-6">
-                <div className="rounded-lg border border-border bg-card px-5 py-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <h2 className="text-base font-semibold text-foreground">Server status</h2>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                Snapshot of the server's lifecycle, access, and any pending operations.
-                            </p>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2">
-                            {server.is_installed ? (
-                                <StatusBadge
-                                    label="Installed"
-                                    tone="success"
-                                    icon={<CheckCircle2 className="h-3.5 w-3.5" />}
-                                />
-                            ) : (
-                                <StatusBadge
-                                    label="Installing"
-                                    tone="info"
-                                    icon={<Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                                />
-                            )}
-                            {server.is_suspended ? (
-                                <StatusBadge
-                                    label="Suspended"
-                                    tone="danger"
-                                    icon={<Pause className="h-3.5 w-3.5" />}
-                                />
-                            ) : (
-                                <StatusBadge
-                                    label="Active"
-                                    tone="success"
-                                    icon={<Play className="h-3.5 w-3.5" />}
-                                />
-                            )}
-                            {transferInProgress && (
-                                <StatusBadge
-                                    label="Transferring"
-                                    tone="warning"
-                                    icon={<Truck className="h-3.5 w-3.5" />}
-                                />
-                            )}
-                        </div>
-                    </div>
-                    {transferInProgress && (
-                        <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-200">
-                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                            <span>
-                                Transfer initiated at <strong>{server.transfer?.created_at}</strong>. Lifecycle actions
-                                are disabled until the transfer finishes.
+            <div className="space-y-4">
+                <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-base font-semibold text-foreground">{serverName}</h2>
+                        {server.is_installed ? (
+                            <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                                Installed
                             </span>
-                        </div>
+                        ) : (
+                            <span className="rounded bg-blue-500/15 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+                                Installing
+                            </span>
+                        )}
+                        {server.is_suspended ? (
+                            <span className="rounded bg-yellow-500/15 px-1.5 py-0.5 text-xs font-medium text-yellow-600 dark:text-yellow-500">
+                                Suspended
+                            </span>
+                        ) : (
+                            <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                                Active
+                            </span>
+                        )}
+                        {transferInProgress && (
+                            <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                                Transferring
+                            </span>
+                        )}
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        Lifecycle and transfer actions for this server.
+                    </p>
+                    {transferInProgress && (
+                        <p className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-muted-foreground">
+                            Transfer initiated at <strong>{server.transfer?.created_at}</strong>. Lifecycle actions are
+                            disabled until the transfer finishes.
+                        </p>
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <ActionCard
-                        title="Reinstall"
-                        description="Re-run the egg install script on Wings. Any files the script writes will be overwritten."
-                        accent="destructive"
+                <SettingsSection
+                    title="Lifecycle"
+                    description="Reinstall, install status, and access control."
+                >
+                    <SettingRow
+                        label="Reinstall"
+                        description="Re-run the egg install script. Files written by the script will be overwritten."
                     >
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-200"
+                            className="w-full border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive sm:w-auto"
                             disabled={!server.is_installed || working || transferInProgress}
                             onClick={() => setConfirm('reinstall')}
                         >
                             <RefreshCw className="mr-2 h-4 w-4" />
                             Reinstall server
                         </Button>
-                    </ActionCard>
-
-                    <ActionCard
-                        title="Install status"
-                        description="Flip the install flag between installed and installing. Use this to unblock a stuck install."
-                        accent="info"
+                    </SettingRow>
+                    <SettingRow
+                        label="Install status"
+                        description="Flip between installed and installing to unblock a stuck install."
                     >
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full"
+                            className="w-full sm:w-auto"
                             disabled={working || transferInProgress}
                             onClick={() => setConfirm('toggle-install')}
                         >
                             <ToggleLeft className="mr-2 h-4 w-4" />
                             {server.is_installed ? 'Mark as installing' : 'Mark as installed'}
                         </Button>
-                    </ActionCard>
-
-                    <ActionCard
-                        title={server.is_suspended ? 'Unsuspend access' : 'Suspend access'}
+                    </SettingRow>
+                    <SettingRow
+                        label={server.is_suspended ? 'Unsuspend' : 'Suspend'}
                         description={
                             server.is_suspended
                                 ? 'Restore user access and let the daemon start the server again.'
                                 : 'Stop processes and revoke all user access to this server.'
                         }
-                        accent={server.is_suspended ? 'success' : 'warning'}
                     >
                         <Button
                             type="button"
                             variant="outline"
-                            className={cn(
-                                'w-full',
-                                server.is_suspended
-                                    ? 'border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10 hover:text-emerald-200'
-                                    : 'border-amber-500/40 text-amber-300 hover:bg-amber-500/10 hover:text-amber-200'
-                            )}
+                            className="w-full sm:w-auto"
                             disabled={working || (!server.is_suspended && transferInProgress)}
                             onClick={() => setConfirm('suspend')}
                         >
@@ -452,31 +379,35 @@ export default () => {
                                 </>
                             )}
                         </Button>
-                    </ActionCard>
+                    </SettingRow>
+                </SettingsSection>
 
-                    <ActionCard
-                        title="Transfer to another node"
+                <SettingsSection
+                    title="Transfer"
+                    description="Move this server to a different Wings node."
+                >
+                    <SettingRow
+                        label="Transfer to another node"
                         description={
                             transferInProgress
                                 ? `In progress since ${server.transfer?.created_at}.`
                                 : !data.can_transfer
                                   ? 'No other nodes are available to transfer this server to.'
-                                  : 'Move this server to a different Wings node. The server is stopped during the transfer.'
+                                  : 'The server is stopped during the transfer and started on the target node when complete.'
                         }
-                        accent="info"
                     >
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full border-blue-500/40 text-blue-300 hover:bg-blue-500/10 hover:text-blue-200"
+                            className="w-full sm:w-auto"
                             disabled={!data.can_transfer || transferInProgress || working}
                             onClick={() => setTransferOpen(true)}
                         >
                             <Truck className="mr-2 h-4 w-4" />
                             {transferInProgress ? 'Transfer in progress' : 'Transfer server'}
                         </Button>
-                    </ActionCard>
-                </div>
+                    </SettingRow>
+                </SettingsSection>
             </div>
         </>
     );

@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
-import { addServerMount, getServerMounts, removeServerMount } from '@/api/admin/servers';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
+import { addServerMount, getServer, getServerMounts, removeServerMount } from '@/api/admin/servers';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 
 export default () => {
     const { id } = useParams<{ id: string }>();
     const serverId = Number(id);
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
+    const { data: serverData } = useSWR(
+        Number.isFinite(serverId) ? `admin-server-${serverId}` : null,
+        () => getServer(serverId)
+    );
     const { data, error, isValidating, mutate } = useSWR(
         Number.isFinite(serverId) ? `admin-server-mounts-${serverId}` : null,
         () => getServerMounts(serverId)
@@ -65,82 +61,92 @@ export default () => {
     }
 
     const mounts = data.mounts ?? [];
+    const serverName = serverData?.server.name ?? `Server #${serverId}`;
 
     return (
-        <div className="rounded-lg border border-border bg-card">
-            <div className="border-b border-border px-5 py-4">
-                <h2 className="text-base font-semibold text-foreground">Available mounts</h2>
+        <div className="space-y-4">
+            <div className="overflow-hidden rounded-md border border-border bg-card px-5 py-4">
+                <h2 className="text-base font-semibold text-foreground">{serverName}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Mount assignments</p>
             </div>
-            {mounts.length === 0 ? (
-                <div className="px-5 py-12 text-center text-sm text-muted-foreground">
-                    No compatible mounts available for this server.
+
+            <div className="overflow-hidden rounded-md border border-border bg-card">
+                <div className="border-b border-border px-5 py-4">
+                    <h2 className="text-base font-semibold text-foreground">Available mounts</h2>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                        Compatible mounts for this server's egg and node.
+                    </p>
                 </div>
-            ) : (
-                <div className={tableWrapClass}>
-                    <table className={tableClass}>
-                        <thead>
-                            <tr className={tableHeadRowClass}>
-                                <th className={tableHeadCellClass}>ID</th>
-                                <th className={tableHeadCellClass}>Name</th>
-                                <th className={tableHeadCellClass}>Source</th>
-                                <th className={tableHeadCellClass}>Target</th>
-                                <th className={tableHeadCellClass}>Status</th>
-                                <th className={tableHeadCellClass} />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {mounts.map((mount) => (
-                                <tr key={mount.id} className={tableBodyRowClass}>
-                                    <td className={tableBodyCellClass}>
-                                        <code className="text-xs">{mount.id}</code>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
+
+                {mounts.length === 0 ? (
+                    <p className="px-5 py-8 text-sm text-muted-foreground">
+                        No compatible mounts available.{' '}
+                        <Link
+                            to={`${adminPreviewBasePath}/mounts`}
+                            className="text-blue-400 no-underline hover:text-blue-300"
+                        >
+                            Manage mounts
+                        </Link>
+                        .
+                    </p>
+                ) : (
+                    <div className="divide-y divide-border">
+                        {mounts.map((mount) => (
+                            <div key={mount.id} className="flex items-start justify-between gap-4 px-5 py-4">
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-center gap-2">
                                         <Link
                                             to={`${adminPreviewBasePath}/mounts/${mount.id}`}
-                                            className="text-primary no-underline hover:underline"
+                                            className="text-sm font-medium text-blue-400 no-underline hover:text-blue-300"
                                         >
                                             {mount.name}
                                         </Link>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        <code className="text-xs">{mount.source}</code>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        <code className="text-xs">{mount.target}</code>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
+                                        <code className="text-xs text-muted-foreground">#{mount.id}</code>
                                         <span
                                             className={
                                                 mount.mounted
-                                                    ? 'rounded-full bg-green-500/15 px-2 py-0.5 text-xs font-medium text-green-500'
-                                                    : 'rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary'
+                                                    ? 'rounded bg-emerald-500/15 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400'
+                                                    : 'rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground'
                                             }
                                         >
                                             {mount.mounted ? 'Mounted' : 'Unmounted'}
                                         </span>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        <Button
-                                            type="button"
-                                            variant={mount.mounted ? 'destructive' : 'default'}
-                                            size="icon"
-                                            className="h-8 w-8"
-                                            disabled={workingId === mount.id}
-                                            onClick={() => onToggle(mount.id, mount.mounted)}
-                                        >
-                                            {mount.mounted ? (
-                                                <Minus className="h-4 w-4" />
-                                            ) : (
-                                                <Plus className="h-4 w-4" />
-                                            )}
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                                    </div>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        <code>{mount.source}</code>
+                                        {' → '}
+                                        <code>{mount.target}</code>
+                                    </p>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant={mount.mounted ? 'outline' : 'default'}
+                                    size="sm"
+                                    className={
+                                        mount.mounted
+                                            ? 'shrink-0 border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive'
+                                            : 'shrink-0'
+                                    }
+                                    disabled={workingId === mount.id}
+                                    onClick={() => onToggle(mount.id, mount.mounted)}
+                                >
+                                    {mount.mounted ? (
+                                        <>
+                                            <Minus className="mr-1.5 h-4 w-4" />
+                                            Unmount
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Plus className="mr-1.5 h-4 w-4" />
+                                            Mount
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
