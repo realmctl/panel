@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Client;
+namespace Realm\Transformers\Api\Client;
 
-use Pterodactyl\Models\ServerGroup;
+use Realm\Models\ServerGroup;
 
 class ServerGroupTransformer extends BaseClientTransformer
 {

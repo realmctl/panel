@@ -1,21 +1,21 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use PDOException;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\LocationFormRequest;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Services\Locations\LocationCreationService;
-use Pterodactyl\Services\Locations\LocationDeletionService;
-use Pterodactyl\Services\Locations\LocationUpdateService;
-use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\LocationFormRequest;
+use Realm\Models\Location;
+use Realm\Services\Locations\LocationCreationService;
+use Realm\Services\Locations\LocationDeletionService;
+use Realm\Services\Locations\LocationUpdateService;
+use Realm\Contracts\Repository\LocationRepositoryInterface;
 use Throwable;
 
 class LocationController extends Controller

@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware\Api\Client\Server;
+namespace Realm\Http\Middleware\Api\Client\Server;
 
 use Closure;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
+use Realm\Exceptions\Http\Server\ServerStateConflictException;
 
 class AuthenticateServerAccess
 {

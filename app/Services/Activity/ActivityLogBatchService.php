@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Services\Activity;
+namespace Realm\Services\Activity;
 
 use Closure;
 use Ramsey\Uuid\Uuid;

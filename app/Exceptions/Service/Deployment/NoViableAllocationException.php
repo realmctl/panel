@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Service\Deployment;
+namespace Realm\Exceptions\Service\Deployment;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 
 class NoViableAllocationException extends DisplayException
 {

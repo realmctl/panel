@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Locations;
+namespace Realm\Services\Locations;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Location;
+use Realm\Contracts\Repository\LocationRepositoryInterface;
 
 class LocationUpdateService
 {

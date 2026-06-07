@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Models\Subdomain;
+namespace Realm\Models\Subdomain;
 
-use Pterodactyl\Models\Egg;
+use Realm\Models\Egg;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

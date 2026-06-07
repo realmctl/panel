@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Servers;
+namespace Realm\Http\Requests\Api\Client\Servers;
 
 use Illuminate\Validation\Rule;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Models\Permission;
+use Realm\Models\Server;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
 
 class GetPlayersRequest extends ClientApiRequest
 {

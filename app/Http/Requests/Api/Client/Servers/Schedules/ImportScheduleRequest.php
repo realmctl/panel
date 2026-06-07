@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Servers\Schedules;
+namespace Realm\Http\Requests\Api\Client\Servers\Schedules;
 
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Services\Schedules\TaskActionRegistry;
+use Realm\Models\Permission;
+use Realm\Services\Schedules\TaskActionRegistry;
 use Illuminate\Validation\Rule;
 
 class ImportScheduleRequest extends ViewScheduleRequest

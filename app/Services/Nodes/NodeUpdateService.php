@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Services\Nodes;
+namespace Realm\Services\Nodes;
 
 use Throwable;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Repositories\Eloquent\NodeRepository;
-use Pterodactyl\Repositories\Wings\DaemonConfigurationRepository;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
-use Pterodactyl\Exceptions\Service\Node\ConfigurationNotPersistedException;
+use Realm\Repositories\Eloquent\NodeRepository;
+use Realm\Repositories\Wings\DaemonConfigurationRepository;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Service\Node\ConfigurationNotPersistedException;
 
 class NodeUpdateService
 {

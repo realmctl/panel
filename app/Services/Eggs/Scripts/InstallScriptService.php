@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs\Scripts;
+namespace Realm\Services\Eggs\Scripts;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
-use Pterodactyl\Exceptions\Service\Egg\InvalidCopyFromException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Egg;
+use Realm\Contracts\Repository\EggRepositoryInterface;
+use Realm\Exceptions\Service\Egg\InvalidCopyFromException;
 
 class InstallScriptService
 {

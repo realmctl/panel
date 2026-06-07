@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\ViewComposers;
+namespace Realm\Http\ViewComposers;
 
 use Illuminate\View\View;
-use Pterodactyl\Services\Helpers\AssetHashService;
-use Pterodactyl\Services\Helpers\SoftwareVersionService;
-use Pterodactyl\Services\Setup\PanelSetupService;
+use Realm\Services\Helpers\AssetHashService;
+use Realm\Services\Helpers\SoftwareVersionService;
+use Realm\Services\Setup\PanelSetupService;
 
 class AssetComposer
 {
@@ -28,7 +28,7 @@ class AssetComposer
 
         $view->with('asset', $this->assetHashService);
         $view->with('siteConfiguration', [
-            'name' => config('app.name') ?? 'Pterodactyl',
+            'name' => config('app.name') ?? 'Realm',
             'locale' => config('app.locale') ?? 'en',
             'recaptcha' => [
                 'enabled' => $provider === 'recaptcha',
@@ -47,7 +47,7 @@ class AssetComposer
                 'discord' => (bool) config('oauth.discord.enabled', false),
                 'github' => (bool) config('oauth.github.enabled', false),
             ],
-            'registration' => (bool) config('pterodactyl.auth.registration_enabled', false),
+            'registration' => (bool) config('realm.auth.registration_enabled', false),
             'setup' => $this->setupService->toSiteConfiguration(),
             'version' => [
                 'current' => config('app.version'),

@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Repositories\Wings;
+namespace Realm\Repositories\Wings;
 
 use GuzzleHttp\Client;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Contracts\Foundation\Application;
 
 abstract class DaemonRepository
@@ -53,8 +53,8 @@ abstract class DaemonRepository
         return new Client([
             'verify' => $this->app->environment('production'),
             'base_uri' => $this->node->getConnectionAddress(),
-            'timeout' => config('pterodactyl.guzzle.timeout'),
-            'connect_timeout' => config('pterodactyl.guzzle.connect_timeout'),
+            'timeout' => config('realm.guzzle.timeout'),
+            'connect_timeout' => config('realm.guzzle.connect_timeout'),
             'headers' => array_merge($headers, [
                 'Authorization' => 'Bearer ' . $this->node->getDecryptedKey(),
                 'Accept' => 'application/json',

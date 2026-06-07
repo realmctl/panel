@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Providers;
+namespace Realm\Providers;
 
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Enum\ResourceLimit;
+use Realm\Models\Database;
+use Realm\Enum\ResourceLimit;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
-use Pterodactyl\Http\Middleware\TrimStrings;
-use Pterodactyl\Http\Middleware\AdminAuthenticate;
-use Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication;
+use Realm\Http\Middleware\TrimStrings;
+use Realm\Http\Middleware\AdminAuthenticate;
+use Realm\Http\Middleware\RequireTwoFactorAuthentication;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -39,10 +39,6 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')->group(function () {
                 Route::middleware(['auth.session', RequireTwoFactorAuthentication::class])
                     ->group(base_path('routes/base.php'));
-
-                Route::middleware(['auth.session', RequireTwoFactorAuthentication::class, AdminAuthenticate::class])
-                    ->prefix('/admin')
-                    ->group(base_path('routes/admin.php'));
 
                 Route::middleware(['auth.session', RequireTwoFactorAuthentication::class, AdminAuthenticate::class])
                     ->prefix('/api/admin')

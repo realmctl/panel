@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Services\Acl\Api;
+namespace Realm\Services\Acl\Api;
 
 use ReflectionClass;
 use ReflectionException;
-use Pterodactyl\Models\ApiKey;
+use Realm\Models\ApiKey;
 
 class AdminAcl
 {

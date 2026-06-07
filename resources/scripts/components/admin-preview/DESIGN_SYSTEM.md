@@ -1,8 +1,8 @@
 # Admin Preview Design System
 
-Design language for the Realm admin preview UI (`/admin-preview`). Use this document when building or refactoring pages under `panel/resources/scripts/components/admin-preview/`.
+Design language for the Realm admin UI (`/admin`). Use this document when building or refactoring pages under `panel/resources/scripts/components/admin-preview/`.
 
-The preview admin is a React SPA that replaces legacy Blade admin pages. All new work should follow these patterns—not legacy `adminTable` layouts unless explicitly migrating an unmigrated page.
+The admin area is a React SPA served at `/admin`. All new work should follow these patterns.
 
 ---
 
@@ -35,7 +35,7 @@ AdminPreviewContent          ← Page title (h1) + description
 | `*ViewPanel.tsx` / `*EditPanel.tsx` | Single resource edit or read-only detail | `UserViewPanel.tsx` |
 | `*FormFields.tsx` | Reusable field groups (`SettingRow`s) | `DomainFormFields.tsx` |
 
-**Routes:** Base path is `adminPreviewBasePath` (`/admin-preview`) from `@/routers/adminPreviewRoutes`. Always build links as `` `${adminPreviewBasePath}/…` ``.
+**Routes:** Base path is `adminPreviewBasePath` (`/admin`) from `@/routers/adminPreviewRoutes`. Always build links as `` `${adminPreviewBasePath}/…` ``.
 
 **Reference implementations:**
 
@@ -489,6 +489,4 @@ Register route in `adminPreviewRoutes.ts` and add to overview `managementSection
 
 ## Migration note
 
-All admin-preview panels follow this design system. Multi-step wizards (e.g. `NodeCreatePanel`, `ServerCreatePanel`) reuse the same sidebar + `SettingsSection` pattern.
-
-Legacy admin Blade pages under `/admin` are unrelated—only `/admin-preview` follows this document.
+All admin panels follow this design system. Multi-step wizards (e.g. `NodeCreatePanel`, `ServerCreatePanel`) reuse the same sidebar + `SettingsSection` pattern.

@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Services\Files;
+namespace Realm\Services\Files;
 
 use Throwable;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\FileRevision;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Repositories\Wings\DaemonFileRepository;
+use Realm\Models\Server;
+use Realm\Models\FileRevision;
+use Realm\Facades\Activity;
+use Realm\Repositories\Wings\DaemonFileRepository;
 use Illuminate\Database\ConnectionInterface;
 
 class FileRevisionService
@@ -113,9 +113,9 @@ class FileRevisionService
      */
     public function pruneIfNeeded(Server $server, string $filePath): void
     {
-        $maxRevisions = config('pterodactyl.files.revisions.max_per_file');
-        $maxAgeDays = config('pterodactyl.files.revisions.max_age_days');
-        $maxStorageBytes = config('pterodactyl.files.revisions.max_storage_per_server');
+        $maxRevisions = config('realm.files.revisions.max_per_file');
+        $maxAgeDays = config('realm.files.revisions.max_age_days');
+        $maxStorageBytes = config('realm.files.revisions.max_storage_per_server');
 
         $normalizedPath = $this->normalizePath($filePath);
 

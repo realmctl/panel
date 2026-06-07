@@ -1,25 +1,25 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Service\Egg\HasChildrenException;
-use Pterodactyl\Exceptions\Service\Egg\NoParentConfigurationFoundException;
-use Pterodactyl\Exceptions\Service\HasActiveServersException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\Egg\EggFormRequest;
-use Pterodactyl\Http\Requests\Admin\Egg\EggImportFormRequest;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
-use Pterodactyl\Services\Eggs\EggCreationService;
-use Pterodactyl\Services\Eggs\EggDeletionService;
-use Pterodactyl\Services\Eggs\EggUpdateService;
-use Pterodactyl\Services\Eggs\Sharing\EggExporterService;
-use Pterodactyl\Services\Eggs\Sharing\EggImporterService;
-use Pterodactyl\Services\Eggs\Sharing\EggUpdateImporterService;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Service\Egg\HasChildrenException;
+use Realm\Exceptions\Service\Egg\NoParentConfigurationFoundException;
+use Realm\Exceptions\Service\HasActiveServersException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\Egg\EggFormRequest;
+use Realm\Http\Requests\Admin\Egg\EggImportFormRequest;
+use Realm\Models\Egg;
+use Realm\Contracts\Repository\EggRepositoryInterface;
+use Realm\Contracts\Repository\NestRepositoryInterface;
+use Realm\Services\Eggs\EggCreationService;
+use Realm\Services\Eggs\EggDeletionService;
+use Realm\Services\Eggs\EggUpdateService;
+use Realm\Services\Eggs\Sharing\EggExporterService;
+use Realm\Services\Eggs\Sharing\EggImporterService;
+use Realm\Services\Eggs\Sharing\EggUpdateImporterService;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class EggController extends Controller

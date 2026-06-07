@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Subdomain\Domain;
-use Pterodactyl\Models\Subdomain\EggRecord;
-use Pterodactyl\Models\Subdomain\Record;
+use Realm\Http\Controllers\Controller;
+use Realm\Models\Egg;
+use Realm\Models\Subdomain\Domain;
+use Realm\Models\Subdomain\EggRecord;
+use Realm\Models\Subdomain\Record;
 
 class SubdomainRecordController extends Controller
 {

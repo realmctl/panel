@@ -1,26 +1,26 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Server;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\Allocation;
+use Realm\Facades\Activity;
+use Realm\Models\Allocation;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Repositories\Eloquent\ServerRepository;
-use Pterodactyl\Transformers\Api\Client\AllocationTransformer;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Services\Allocations\FindAssignableAllocationService;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\GetNetworkRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\NewAllocationRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\DeleteAllocationRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\UpdateAllocationRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\SetPrimaryAllocationRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\UpdateAllocationWhitelistRequest;
-use Pterodactyl\Services\Allocations\AllocationWhitelistService;
+use Realm\Exceptions\DisplayException;
+use Realm\Repositories\Eloquent\ServerRepository;
+use Realm\Transformers\Api\Client\AllocationTransformer;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Services\Allocations\FindAssignableAllocationService;
+use Realm\Http\Requests\Api\Client\Servers\Network\GetNetworkRequest;
+use Realm\Http\Requests\Api\Client\Servers\Network\NewAllocationRequest;
+use Realm\Http\Requests\Api\Client\Servers\Network\DeleteAllocationRequest;
+use Realm\Http\Requests\Api\Client\Servers\Network\UpdateAllocationRequest;
+use Realm\Http\Requests\Api\Client\Servers\Network\SetPrimaryAllocationRequest;
+use Realm\Http\Requests\Api\Client\Servers\Network\UpdateAllocationWhitelistRequest;
+use Realm\Services\Allocations\AllocationWhitelistService;
 
 class NetworkAllocationController extends ClientApiController
 {

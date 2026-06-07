@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client;
+namespace Realm\Http\Controllers\Api\Client;
 
 use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\ServerGroup;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Transformers\Api\Client\ServerGroupTransformer;
+use Realm\Models\Server;
+use Realm\Models\ServerGroup;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Transformers\Api\Client\ServerGroupTransformer;
 
 class ServerGroupController extends ClientApiController
 {

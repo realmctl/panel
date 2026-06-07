@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs\Variables;
+namespace Realm\Services\Eggs\Variables;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Traits\Services\ValidatesValidationRules;
+use Realm\Models\EggVariable;
+use Realm\Exceptions\DisplayException;
+use Realm\Traits\Services\ValidatesValidationRules;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Pterodactyl\Contracts\Repository\EggVariableRepositoryInterface;
-use Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
+use Realm\Contracts\Repository\EggVariableRepositoryInterface;
+use Realm\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
 
 class VariableUpdateService
 {

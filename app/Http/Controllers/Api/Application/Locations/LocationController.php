@@ -1,24 +1,24 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Locations;
+namespace Realm\Http\Controllers\Api\Application\Locations;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Exceptions\Service\Location\HasActiveNodesException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Service\Location\HasActiveNodesException;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Location;
+use Realm\Models\Location;
 use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
-use Pterodactyl\Services\Locations\LocationUpdateService;
-use Pterodactyl\Services\Locations\LocationCreationService;
-use Pterodactyl\Services\Locations\LocationDeletionService;
-use Pterodactyl\Transformers\Api\Application\LocationTransformer;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
-use Pterodactyl\Http\Requests\Api\Application\Locations\GetLocationRequest;
-use Pterodactyl\Http\Requests\Api\Application\Locations\GetLocationsRequest;
-use Pterodactyl\Http\Requests\Api\Application\Locations\StoreLocationRequest;
-use Pterodactyl\Http\Requests\Api\Application\Locations\DeleteLocationRequest;
-use Pterodactyl\Http\Requests\Api\Application\Locations\UpdateLocationRequest;
+use Realm\Services\Locations\LocationUpdateService;
+use Realm\Services\Locations\LocationCreationService;
+use Realm\Services\Locations\LocationDeletionService;
+use Realm\Transformers\Api\Application\LocationTransformer;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Http\Requests\Api\Application\Locations\GetLocationRequest;
+use Realm\Http\Requests\Api\Application\Locations\GetLocationsRequest;
+use Realm\Http\Requests\Api\Application\Locations\StoreLocationRequest;
+use Realm\Http\Requests\Api\Application\Locations\DeleteLocationRequest;
+use Realm\Http\Requests\Api\Application\Locations\UpdateLocationRequest;
 
 class LocationController extends ApplicationApiController
 {

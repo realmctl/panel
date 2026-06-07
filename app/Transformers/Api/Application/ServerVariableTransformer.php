@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Application;
+namespace Realm\Transformers\Api\Application;
 
-use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
+use Realm\Exceptions\Transformer\InvalidTransformerLevelException;
 use League\Fractal\Resource\Item;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Models\ServerVariable;
+use Realm\Models\EggVariable;
+use Realm\Models\ServerVariable;
 use League\Fractal\Resource\NullResource;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
+use Realm\Services\Acl\Api\AdminAcl;
 
 class ServerVariableTransformer extends BaseTransformer
 {

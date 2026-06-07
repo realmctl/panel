@@ -6,7 +6,7 @@ return [
     |--------------------------------------------------------------------------
     | Application Version
     |--------------------------------------------------------------------------
-    | This value is set when creating a Pterodactyl release. You should not
+    | This value is set when creating a Realm release. You should not
     | change this value if you are not maintaining your own internal versions.
     */
 
@@ -190,17 +190,17 @@ return [
         /*
          * Application Service Providers...
          */
-        Pterodactyl\Providers\ActivityLogServiceProvider::class,
-        Pterodactyl\Providers\AppServiceProvider::class,
-        Pterodactyl\Providers\AuthServiceProvider::class,
-        Pterodactyl\Providers\BackupsServiceProvider::class,
-        Pterodactyl\Providers\BladeServiceProvider::class,
-        Pterodactyl\Providers\EventServiceProvider::class,
-        Pterodactyl\Providers\HashidsServiceProvider::class,
-        Pterodactyl\Providers\RouteServiceProvider::class,
-        Pterodactyl\Providers\RepositoryServiceProvider::class,
-        Pterodactyl\Providers\ScheduleServiceProvider::class,
-        Pterodactyl\Providers\ViewComposerServiceProvider::class,
+        Realm\Providers\ActivityLogServiceProvider::class,
+        Realm\Providers\AppServiceProvider::class,
+        Realm\Providers\AuthServiceProvider::class,
+        Realm\Providers\BackupsServiceProvider::class,
+        Realm\Providers\BladeServiceProvider::class,
+        Realm\Providers\EventServiceProvider::class,
+        Realm\Providers\HashidsServiceProvider::class,
+        Realm\Providers\RouteServiceProvider::class,
+        Realm\Providers\RepositoryServiceProvider::class,
+        Realm\Providers\ScheduleServiceProvider::class,
+        Realm\Providers\ViewComposerServiceProvider::class,
 
         /*
          * Additional Dependencies
@@ -223,11 +223,10 @@ return [
         'Alert' => Prologue\Alerts\Facades\Alert::class,
         'Carbon' => Carbon\Carbon::class,
         'JavaScript' => Laracasts\Utilities\JavaScript\JavaScriptFacade::class,
-        'Theme' => Pterodactyl\Extensions\Facades\Theme::class,
 
         // Custom Facades
-        'Activity' => Pterodactyl\Facades\Activity::class,
-        'LogBatch' => Pterodactyl\Facades\LogBatch::class,
-        'LogTarget' => Pterodactyl\Facades\LogTarget::class,
+        'Activity' => Realm\Facades\Activity::class,
+        'LogBatch' => Realm\Facades\LogBatch::class,
+        'LogTarget' => Realm\Facades\LogTarget::class,
     ])->toArray(),
 ];

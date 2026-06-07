@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Contracts\Repository;
+namespace Realm\Contracts\Repository;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Location;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Location;
 use Illuminate\Support\Collection;
 
 interface LocationRepositoryInterface extends RepositoryInterface

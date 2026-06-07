@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Providers;
+namespace Realm\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Pterodactyl\Services\Schedules\Actions\BackupTaskAction;
-use Pterodactyl\Services\Schedules\Actions\CommandTaskAction;
-use Pterodactyl\Services\Schedules\Actions\DeleteFilesTaskAction;
-use Pterodactyl\Services\Schedules\Actions\EmailTaskAction;
-use Pterodactyl\Services\Schedules\Actions\PowerTaskAction;
-use Pterodactyl\Services\Schedules\Actions\WebhookTaskAction;
-use Pterodactyl\Services\Schedules\TaskActionRegistry;
+use Realm\Services\Schedules\Actions\BackupTaskAction;
+use Realm\Services\Schedules\Actions\CommandTaskAction;
+use Realm\Services\Schedules\Actions\DeleteFilesTaskAction;
+use Realm\Services\Schedules\Actions\EmailTaskAction;
+use Realm\Services\Schedules\Actions\PowerTaskAction;
+use Realm\Services\Schedules\Actions\WebhookTaskAction;
+use Realm\Services\Schedules\TaskActionRegistry;
 
 class ScheduleServiceProvider extends ServiceProvider
 {

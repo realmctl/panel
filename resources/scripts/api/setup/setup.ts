@@ -95,7 +95,7 @@ export const updateSetupSettings = (data: {
     http.post('/setup/settings', {
         'app:name': data.name,
         'app:locale': data.locale,
-        'pterodactyl:auth:registration_enabled': data.registrationEnabled ? 'true' : 'false',
+        'realm:auth:registration_enabled': data.registrationEnabled ? 'true' : 'false',
     }).then((response) => unwrap<SetupStatus>(response));
 
 export const createSetupLocation = (data: { short: string; long: string }): Promise<SetupStatus> =>

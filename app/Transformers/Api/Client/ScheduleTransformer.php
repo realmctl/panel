@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Client;
+namespace Realm\Transformers\Api\Client;
 
-use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Models\Schedule;
+use Realm\Exceptions\Transformer\InvalidTransformerLevelException;
+use Realm\Models\Task;
+use Realm\Models\Schedule;
 use League\Fractal\Resource\Collection;
 
 class ScheduleTransformer extends BaseClientTransformer

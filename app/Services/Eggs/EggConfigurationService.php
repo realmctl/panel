@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs;
+namespace Realm\Services\Eggs;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Services\Servers\ServerConfigurationStructureService;
+use Realm\Models\Server;
+use Realm\Services\Servers\ServerConfigurationStructureService;
 
 class EggConfigurationService
 {

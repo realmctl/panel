@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Exceptions;
+namespace Realm\Exceptions;
 
 use PDOException;
 use Throwable;
@@ -22,7 +22,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -33,7 +33,7 @@ class Handler extends ExceptionHandler
      * resulting in some weird rule names. This string will be parsed out and
      * replaced with 'p_' in the response code.
      */
-    private const PTERODACTYL_RULE_STRING = 'pterodactyl\_rules\_';
+    private const REALM_RULE_STRING = 'realm\_rules\_';
 
     /**
      * A list of the exception types that should not be reported.
@@ -166,7 +166,7 @@ class Handler extends ExceptionHandler
             foreach ($errors as $key => $error) {
                 $meta = [
                     'source_field' => $field,
-                    'rule' => str_replace(self::PTERODACTYL_RULE_STRING, 'p_', Arr::get(
+                    'rule' => str_replace(self::REALM_RULE_STRING, 'p_', Arr::get(
                         $codes,
                         str_replace('.', '_', $field) . '.' . $key
                     )),

@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
+namespace Realm\Http\Controllers\Api\Application\Servers;
 
 use Throwable;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Services\Servers\SuspensionService;
-use Pterodactyl\Services\Servers\ReinstallServerService;
-use Pterodactyl\Http\Requests\Api\Application\Servers\ServerWriteRequest;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Models\Server;
+use Realm\Services\Servers\SuspensionService;
+use Realm\Services\Servers\ReinstallServerService;
+use Realm\Http\Requests\Api\Application\Servers\ServerWriteRequest;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
 
 class ServerManagementController extends ApplicationApiController
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Servers;
+namespace Realm\Services\Servers;
 
 use Throwable;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Repositories\Wings\DaemonServerRepository;
+use Realm\Repositories\Wings\DaemonServerRepository;
 
 class ReinstallServerService
 {

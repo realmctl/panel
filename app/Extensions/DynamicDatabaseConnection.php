@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Extensions;
+namespace Realm\Extensions;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\DatabaseHost;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\DatabaseHost;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Config\Repository as ConfigRepository;
-use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
+use Realm\Contracts\Repository\DatabaseHostRepositoryInterface;
 
 class DynamicDatabaseConnection
 {

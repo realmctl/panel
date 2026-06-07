@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware\Api\Application;
+namespace Realm\Http\Middleware\Api\Application;
 
 use Closure;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 

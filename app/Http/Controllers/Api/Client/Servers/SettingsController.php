@@ -1,21 +1,21 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Throwable;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Repositories\Eloquent\ServerRepository;
-use Pterodactyl\Services\Servers\ReinstallServerService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Facades\Activity;
+use Realm\Repositories\Eloquent\ServerRepository;
+use Realm\Services\Servers\ReinstallServerService;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\RenameServerRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\SetDockerImageRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\ReinstallServerRequest;
+use Realm\Http\Requests\Api\Client\Servers\Settings\RenameServerRequest;
+use Realm\Http\Requests\Api\Client\Servers\Settings\SetDockerImageRequest;
+use Realm\Http\Requests\Api\Client\Servers\Settings\ReinstallServerRequest;
 
 class SettingsController extends ClientApiController
 {

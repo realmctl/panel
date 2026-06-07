@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\Api\StoreApplicationApiKeyRequest;
-use Pterodactyl\Models\ApiKey;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
-use Pterodactyl\Services\Api\KeyCreationService;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\Api\StoreApplicationApiKeyRequest;
+use Realm\Models\ApiKey;
+use Realm\Services\Acl\Api\AdminAcl;
+use Realm\Services\Api\KeyCreationService;
 use ReflectionException;
 
 class ApplicationApiController extends Controller

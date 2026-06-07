@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Contracts\Repository;
+namespace Realm\Contracts\Repository;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Nest;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Nest;
 use Illuminate\Database\Eloquent\Collection;
 
 interface NestRepositoryInterface extends RepositoryInterface

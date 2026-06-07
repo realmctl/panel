@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Observers;
+namespace Realm\Observers;
 
-use Pterodactyl\Events\User\Creating;
-use Pterodactyl\Events\User\Created;
-use Pterodactyl\Events\User\Deleting;
-use Pterodactyl\Events\User\Deleted;
-use Pterodactyl\Events;
-use Pterodactyl\Models\User;
+use Realm\Events\User\Creating;
+use Realm\Events\User\Created;
+use Realm\Events\User\Deleting;
+use Realm\Events\User\Deleted;
+use Realm\Events;
+use Realm\Models\User;
 
 class UserObserver
 {

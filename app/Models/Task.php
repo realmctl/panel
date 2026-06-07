@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Carbon\Carbon;
 use Database\Factories\TaskFactory;
@@ -8,7 +8,7 @@ use Illuminate\Container\Container;
 use Znck\Eloquent\Traits\BelongsToThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Pterodactyl\Contracts\Extensions\HashidsInterface;
+use Realm\Contracts\Extensions\HashidsInterface;
 
 /**
  * @property int $id
@@ -39,7 +39,7 @@ class Task extends Model
     public const RESOURCE_NAME = 'schedule_task';
 
     /**
-     * The default actions that can exist for a task in Pterodactyl.
+     * The default actions that can exist for a task in Realm.
      */
     public const ACTION_POWER = 'power';
     public const ACTION_COMMAND = 'command';

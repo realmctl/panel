@@ -1,18 +1,18 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Service\HasActiveServersException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\Nest\StoreNestFormRequest;
-use Pterodactyl\Models\Nest;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
-use Pterodactyl\Services\Nests\NestCreationService;
-use Pterodactyl\Services\Nests\NestDeletionService;
-use Pterodactyl\Services\Nests\NestUpdateService;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Service\HasActiveServersException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\Nest\StoreNestFormRequest;
+use Realm\Models\Nest;
+use Realm\Contracts\Repository\NestRepositoryInterface;
+use Realm\Services\Nests\NestCreationService;
+use Realm\Services\Nests\NestDeletionService;
+use Realm\Services\Nests\NestUpdateService;
 
 class NestController extends Controller
 {

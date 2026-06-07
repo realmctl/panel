@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Tests\Traits\Http;
+namespace Realm\Tests\Traits\Http;
 
 use Mockery as m;
 use Mockery\Mock;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 trait RequestMockHelpers

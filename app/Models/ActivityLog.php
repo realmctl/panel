@@ -1,23 +1,23 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use LogicException;
 use Illuminate\Support\Collection;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
-use Pterodactyl\Events\ActivityLogged;
+use Realm\Events\ActivityLogged;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\MassPrunable;
-use Pterodactyl\Contracts\Models\Identifiable;
+use Realm\Contracts\Models\Identifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Pterodactyl\Models\Traits\HasRealtimeIdentifier;
+use Realm\Models\Traits\HasRealtimeIdentifier;
 use Illuminate\Database\Eloquent\Model as IlluminateModel;
 
 /**
- * \Pterodactyl\Models\ActivityLog.
+ * \Realm\Models\ActivityLog.
  *
  * @property int $id
  * @property string|null $batch

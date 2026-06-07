@@ -1,21 +1,21 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Client;
+namespace Realm\Transformers\Api\Client;
 
-use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subuser;
+use Realm\Exceptions\Transformer\InvalidTransformerLevelException;
+use Realm\Models\Egg;
+use Realm\Models\Server;
+use Realm\Models\Subuser;
 use League\Fractal\Resource\Item;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Models\Permission;
+use Realm\Models\Allocation;
+use Realm\Models\Permission;
 use Illuminate\Container\Container;
-use Pterodactyl\Models\EggVariable;
+use Realm\Models\EggVariable;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\NullResource;
-use Pterodactyl\Services\Eggs\EggCategoryMappingService;
-use Pterodactyl\Services\Geolocation\IpGeolocationService;
-use Pterodactyl\Services\Servers\StartupCommandService;
+use Realm\Services\Eggs\EggCategoryMappingService;
+use Realm\Services\Geolocation\IpGeolocationService;
+use Realm\Services\Servers\StartupCommandService;
 
 class ServerTransformer extends BaseClientTransformer
 {
@@ -70,11 +70,11 @@ class ServerTransformer extends BaseClientTransformer
 
         return [
             'server_owner' => $user->id === $server->owner_id,
-            'identifier' => config('pterodactyl.features.new_server_identifiers')
+            'identifier' => config('realm.features.new_server_identifiers')
                 ? $server->identifier
                 : $server->uuidShort,
             '__deprecated_uuid_short' => $server->uuidShort,
-            // In Pterodactyl 2.0 we'll be replacing `identifier` above with the actual
+            // In a future release we'll be replacing `identifier` above with the actual
             // "identifier" used internally. This is a completely different value compared
             // to the current however, and would be quite a breaking change to URLs.
             'server_identifier' => $server->identifier,

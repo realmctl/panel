@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Tests\Unit\Rules;
+namespace Realm\Tests\Unit\Rules;
 
-use Pterodactyl\Rules\Username;
-use Pterodactyl\Tests\TestCase;
+use Realm\Rules\Username;
+use Realm\Tests\TestCase;
 
 class UsernameTest extends TestCase
 {

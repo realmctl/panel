@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Auth;
+namespace Realm\Http\Controllers\Auth;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 use Illuminate\Validation\ValidationException;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\UserOAuthLink;
+use Realm\Models\User;
+use Realm\Models\UserOAuthLink;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
+use Realm\Facades\Activity;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 

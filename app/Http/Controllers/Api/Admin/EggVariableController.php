@@ -1,20 +1,20 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException;
-use Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\Egg\EggVariableFormRequest;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
-use Pterodactyl\Contracts\Repository\EggVariableRepositoryInterface;
-use Pterodactyl\Services\Eggs\Variables\VariableCreationService;
-use Pterodactyl\Services\Eggs\Variables\VariableUpdateService;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Service\Egg\Variable\BadValidationRuleException;
+use Realm\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\Egg\EggVariableFormRequest;
+use Realm\Models\Egg;
+use Realm\Models\EggVariable;
+use Realm\Contracts\Repository\EggRepositoryInterface;
+use Realm\Contracts\Repository\EggVariableRepositoryInterface;
+use Realm\Services\Eggs\Variables\VariableCreationService;
+use Realm\Services\Eggs\Variables\VariableUpdateService;
 
 class EggVariableController extends Controller
 {

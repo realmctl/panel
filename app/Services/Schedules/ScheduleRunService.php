@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Services\Schedules;
+namespace Realm\Services\Schedules;
 
 use Carbon\CarbonImmutable;
-use Pterodactyl\Events\Schedule\ScheduleRunCompleted;
-use Pterodactyl\Events\Schedule\ScheduleRunStarted;
-use Pterodactyl\Models\Schedule;
-use Pterodactyl\Models\ScheduleRun;
-use Pterodactyl\Models\ScheduleRunTask;
+use Realm\Events\Schedule\ScheduleRunCompleted;
+use Realm\Events\Schedule\ScheduleRunStarted;
+use Realm\Models\Schedule;
+use Realm\Models\ScheduleRun;
+use Realm\Models\ScheduleRunTask;
 
 class ScheduleRunService
 {

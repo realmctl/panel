@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,18 +12,18 @@ use Exception;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Query\JoinClause;
 use Znck\Eloquent\Traits\BelongsToThrough;
-use Pterodactyl\Contracts\Models\Identifiable;
+use Realm\Contracts\Models\Identifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Pterodactyl\Models\Traits\HasRealtimeIdentifier;
+use Realm\Models\Traits\HasRealtimeIdentifier;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
+use Realm\Exceptions\Http\Server\ServerStateConflictException;
 
 /**
- * \Pterodactyl\Models\Server.
+ * \Realm\Models\Server.
  *
  * @property int $id
  * @property string|null $external_id
@@ -341,11 +341,11 @@ class Server extends Model implements Identifiable
     }
 
     /**
-     * @return HasMany<\Pterodactyl\Models\Subdomain\Subdomain, $this>
+     * @return HasMany<\Realm\Models\Subdomain\Subdomain, $this>
      */
     public function subdomains(): HasMany
     {
-        return $this->hasMany(\Pterodactyl\Models\Subdomain\Subdomain::class);
+        return $this->hasMany(\Realm\Models\Subdomain\Subdomain::class);
     }
 
     /**

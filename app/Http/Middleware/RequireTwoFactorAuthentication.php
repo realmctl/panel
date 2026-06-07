@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware;
+namespace Realm\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Prologue\Alerts\AlertsMessageBag;
-use Pterodactyl\Exceptions\Http\TwoFactorAuthRequiredException;
+use Realm\Exceptions\Http\TwoFactorAuthRequiredException;
 
 class RequireTwoFactorAuthentication
 {
@@ -44,7 +44,7 @@ class RequireTwoFactorAuthentication
             return $next($request);
         }
 
-        $level = (int) config('pterodactyl.auth.2fa_required');
+        $level = (int) config('realm.auth.2fa_required');
         // If this setting is not configured, or the user is already using 2FA then we can just
         // send them right through, nothing else needs to be checked.
         //

@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Services\Subdomains\Dns;
+namespace Realm\Services\Subdomains\Dns;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subdomain\Domain;
-use Pterodactyl\Models\Subdomain\Subdomain;
+use Realm\Models\Server;
+use Realm\Models\Subdomain\Domain;
+use Realm\Models\Subdomain\Subdomain;
 
 interface DnsProviderInterface
 {

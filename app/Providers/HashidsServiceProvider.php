@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Providers;
+namespace Realm\Providers;
 
 use Illuminate\Contracts\Config\Repository;
-use Pterodactyl\Extensions\Hashids;
+use Realm\Extensions\Hashids;
 use Illuminate\Support\ServiceProvider;
-use Pterodactyl\Contracts\Extensions\HashidsInterface;
+use Realm\Contracts\Extensions\HashidsInterface;
 
 class HashidsServiceProvider extends ServiceProvider
 {

@@ -1,20 +1,20 @@
 <?php
 
-namespace Pterodactyl\Providers;
+namespace Realm\Providers;
 
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Models\ApiKey;
-use Pterodactyl\Models\Backup;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Models\Schedule;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\UserSSHKey;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Subdomain\Subdomain;
-use Pterodactyl\Models;
+use Realm\Models\Allocation;
+use Realm\Models\ApiKey;
+use Realm\Models\Backup;
+use Realm\Models\Database;
+use Realm\Models\Egg;
+use Realm\Models\EggVariable;
+use Realm\Models\Schedule;
+use Realm\Models\Server;
+use Realm\Models\UserSSHKey;
+use Realm\Models\Task;
+use Realm\Models\User;
+use Realm\Models\Subdomain\Subdomain;
+use Realm\Models;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Pagination\Paginator;
@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
-use Pterodactyl\Extensions\Themes\Theme;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
@@ -39,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer(
             'vendor.tablar.partials.header.notifications',
-            \Pterodactyl\Http\ViewComposers\AdminNotificationComposer::class
+            \Realm\Http\ViewComposers\AdminNotificationComposer::class
         );
 
         Paginator::useBootstrap();
@@ -76,18 +75,14 @@ class AppServiceProvider extends ServiceProvider
     {
         // Only load the settings service provider if the environment
         // is configured to allow it.
-        if (!config('pterodactyl.load_environment_only', false) && $this->app->environment() !== 'testing') {
+        if (!config('realm.load_environment_only', false) && $this->app->environment() !== 'testing') {
             $this->app->register(SettingsServiceProvider::class);
             $this->app->register(OAuthServiceProvider::class);
         }
 
-        $this->app->singleton('extensions.themes', function () {
-            return new Theme();
-        });
-
         // Bind the setup service as a singleton so the per-request setup summary is
         // only computed once even though the asset view composer runs for every view.
-        $this->app->singleton(\Pterodactyl\Services\Setup\PanelSetupService::class);
+        $this->app->singleton(\Realm\Services\Setup\PanelSetupService::class);
     }
 
     /**

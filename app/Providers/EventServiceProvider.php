@@ -1,20 +1,20 @@
 <?php
 
-namespace Pterodactyl\Providers;
+namespace Realm\Providers;
 
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Observers\UserObserver;
-use Pterodactyl\Observers\ServerObserver;
-use Pterodactyl\Observers\SubuserObserver;
-use Pterodactyl\Listeners\TwoFactorListener;
-use Pterodactyl\Listeners\RevocationListener;
-use Pterodactyl\Observers\EggVariableObserver;
-use Pterodactyl\Listeners\AuthenticationListener;
-use Pterodactyl\Events\Server\Installed as ServerInstalledEvent;
-use Pterodactyl\Notifications\ServerInstalled as ServerInstalledNotification;
+use Realm\Models\User;
+use Realm\Models\Server;
+use Realm\Models\Subuser;
+use Realm\Models\EggVariable;
+use Realm\Observers\UserObserver;
+use Realm\Observers\ServerObserver;
+use Realm\Observers\SubuserObserver;
+use Realm\Listeners\TwoFactorListener;
+use Realm\Listeners\RevocationListener;
+use Realm\Observers\EggVariableObserver;
+use Realm\Listeners\AuthenticationListener;
+use Realm\Events\Server\Installed as ServerInstalledEvent;
+use Realm\Notifications\ServerInstalled as ServerInstalledNotification;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Discord\DiscordExtendSocialite;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

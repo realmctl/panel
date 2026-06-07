@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Facades;
+namespace Realm\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Pterodactyl\Services\Activity\ActivityLogTargetableService;
+use Realm\Services\Activity\ActivityLogTargetableService;
 
 /**
  * @mixin ActivityLogTargetableService

@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs\Variables;
+namespace Realm\Services\Eggs\Variables;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Traits\Services\ValidatesValidationRules;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Service\Egg\Variable\BadValidationRuleException;
+use Realm\Models\EggVariable;
+use Realm\Traits\Services\ValidatesValidationRules;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Pterodactyl\Contracts\Repository\EggVariableRepositoryInterface;
-use Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
+use Realm\Contracts\Repository\EggVariableRepositoryInterface;
+use Realm\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
 
 class VariableCreationService
 {

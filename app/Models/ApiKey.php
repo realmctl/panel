@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Illuminate\Support\Carbon;
 use Database\Factories\ApiKeyFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
+use Realm\Services\Acl\Api\AdminAcl;
 use Laravel\Sanctum\Contracts\HasAbilities;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Pterodactyl\Models\ApiKey.
+ * Realm\Models\ApiKey.
  *
  * @property int $id
  * @property int $user_id
@@ -219,7 +219,7 @@ class ApiKey extends Model implements HasAbilities
     {
         Assert::oneOf($type, [self::TYPE_ACCOUNT, self::TYPE_APPLICATION]);
 
-        return $type === self::TYPE_ACCOUNT ? 'ptlc_' : 'ptla_';
+        return $type === self::TYPE_ACCOUNT ? 'rlmc_' : 'rlma_';
     }
 
     /**

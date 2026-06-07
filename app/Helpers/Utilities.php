@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Helpers;
+namespace Realm\Helpers;
 
 use Exception;
 use Carbon\Carbon;

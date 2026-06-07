@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Repositories\Wings;
+namespace Realm\Repositories\Wings;
 
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Illuminate\Support\Arr;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
-use Pterodactyl\Exceptions\Http\Server\FileSizeTooLargeException;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Http\Server\FileSizeTooLargeException;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 /**
  * @method DaemonFileRepository setNode(Node $node)

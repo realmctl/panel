@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Transformer;
+namespace Realm\Exceptions\Transformer;
 
-use Pterodactyl\Exceptions\PterodactylException;
+use Realm\Exceptions\RealmException;
 
-class InvalidTransformerLevelException extends PterodactylException
+class InvalidTransformerLevelException extends RealmException
 {
 }

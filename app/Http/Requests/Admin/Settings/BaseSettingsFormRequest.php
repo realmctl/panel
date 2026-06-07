@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Admin\Settings;
+namespace Realm\Http\Requests\Admin\Settings;
 
 use Illuminate\Validation\Rule;
-use Pterodactyl\Traits\Helpers\AvailableLanguages;
-use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
+use Realm\Traits\Helpers\AvailableLanguages;
+use Realm\Http\Requests\Admin\AdminFormRequest;
 
 class BaseSettingsFormRequest extends AdminFormRequest
 {
@@ -14,9 +14,9 @@ class BaseSettingsFormRequest extends AdminFormRequest
     {
         return [
             'app:name' => 'required|string|max:191',
-            'pterodactyl:auth:2fa_required' => 'required|integer|in:0,1,2',
+            'realm:auth:2fa_required' => 'required|integer|in:0,1,2',
             'app:locale' => ['required', 'string', Rule::in(array_keys($this->getAvailableLanguages()))],
-            'pterodactyl:auth:registration_enabled' => 'required|in:true,false',
+            'realm:auth:registration_enabled' => 'required|in:true,false',
         ];
     }
 
@@ -24,9 +24,9 @@ class BaseSettingsFormRequest extends AdminFormRequest
     {
         return [
             'app:name' => 'Company Name',
-            'pterodactyl:auth:2fa_required' => 'Require 2-Factor Authentication',
+            'realm:auth:2fa_required' => 'Require 2-Factor Authentication',
             'app:locale' => 'Default Language',
-            'pterodactyl:auth:registration_enabled' => 'User Registration',
+            'realm:auth:registration_enabled' => 'User Registration',
         ];
     }
 }

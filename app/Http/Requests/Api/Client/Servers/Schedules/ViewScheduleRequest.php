@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Servers\Schedules;
+namespace Realm\Http\Requests\Api\Client\Servers\Schedules;
 
-use Pterodactyl\Models\Task;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Schedule;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Models\Task;
+use Realm\Models\Server;
+use Realm\Models\Schedule;
+use Realm\Models\Permission;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ViewScheduleRequest extends ClientApiRequest

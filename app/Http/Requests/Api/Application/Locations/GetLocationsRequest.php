@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Application\Locations;
+namespace Realm\Http\Requests\Api\Application\Locations;
 
-use Pterodactyl\Services\Acl\Api\AdminAcl;
-use Pterodactyl\Http\Requests\Api\Application\ApplicationApiRequest;
+use Realm\Services\Acl\Api\AdminAcl;
+use Realm\Http\Requests\Api\Application\ApplicationApiRequest;
 
 class GetLocationsRequest extends ApplicationApiRequest
 {

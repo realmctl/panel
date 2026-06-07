@@ -1,42 +1,42 @@
 <?php
 
-namespace Pterodactyl\Providers;
+namespace Realm\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Pterodactyl\Repositories\Eloquent\EggRepository;
-use Pterodactyl\Repositories\Eloquent\NestRepository;
-use Pterodactyl\Repositories\Eloquent\NodeRepository;
-use Pterodactyl\Repositories\Eloquent\TaskRepository;
-use Pterodactyl\Repositories\Eloquent\UserRepository;
-use Pterodactyl\Repositories\Eloquent\ApiKeyRepository;
-use Pterodactyl\Repositories\Eloquent\ServerRepository;
-use Pterodactyl\Repositories\Eloquent\SessionRepository;
-use Pterodactyl\Repositories\Eloquent\SubuserRepository;
-use Pterodactyl\Repositories\Eloquent\DatabaseRepository;
-use Pterodactyl\Repositories\Eloquent\LocationRepository;
-use Pterodactyl\Repositories\Eloquent\ScheduleRepository;
-use Pterodactyl\Repositories\Eloquent\SettingsRepository;
-use Pterodactyl\Repositories\Eloquent\AllocationRepository;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
-use Pterodactyl\Repositories\Eloquent\EggVariableRepository;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
-use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
-use Pterodactyl\Contracts\Repository\TaskRepositoryInterface;
-use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
-use Pterodactyl\Repositories\Eloquent\DatabaseHostRepository;
-use Pterodactyl\Contracts\Repository\ApiKeyRepositoryInterface;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
-use Pterodactyl\Repositories\Eloquent\ServerVariableRepository;
-use Pterodactyl\Contracts\Repository\SessionRepositoryInterface;
-use Pterodactyl\Contracts\Repository\SubuserRepositoryInterface;
-use Pterodactyl\Contracts\Repository\DatabaseRepositoryInterface;
-use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
-use Pterodactyl\Contracts\Repository\ScheduleRepositoryInterface;
-use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
-use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
-use Pterodactyl\Contracts\Repository\EggVariableRepositoryInterface;
-use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
-use Pterodactyl\Contracts\Repository\ServerVariableRepositoryInterface;
+use Realm\Repositories\Eloquent\EggRepository;
+use Realm\Repositories\Eloquent\NestRepository;
+use Realm\Repositories\Eloquent\NodeRepository;
+use Realm\Repositories\Eloquent\TaskRepository;
+use Realm\Repositories\Eloquent\UserRepository;
+use Realm\Repositories\Eloquent\ApiKeyRepository;
+use Realm\Repositories\Eloquent\ServerRepository;
+use Realm\Repositories\Eloquent\SessionRepository;
+use Realm\Repositories\Eloquent\SubuserRepository;
+use Realm\Repositories\Eloquent\DatabaseRepository;
+use Realm\Repositories\Eloquent\LocationRepository;
+use Realm\Repositories\Eloquent\ScheduleRepository;
+use Realm\Repositories\Eloquent\SettingsRepository;
+use Realm\Repositories\Eloquent\AllocationRepository;
+use Realm\Contracts\Repository\EggRepositoryInterface;
+use Realm\Repositories\Eloquent\EggVariableRepository;
+use Realm\Contracts\Repository\NestRepositoryInterface;
+use Realm\Contracts\Repository\NodeRepositoryInterface;
+use Realm\Contracts\Repository\TaskRepositoryInterface;
+use Realm\Contracts\Repository\UserRepositoryInterface;
+use Realm\Repositories\Eloquent\DatabaseHostRepository;
+use Realm\Contracts\Repository\ApiKeyRepositoryInterface;
+use Realm\Contracts\Repository\ServerRepositoryInterface;
+use Realm\Repositories\Eloquent\ServerVariableRepository;
+use Realm\Contracts\Repository\SessionRepositoryInterface;
+use Realm\Contracts\Repository\SubuserRepositoryInterface;
+use Realm\Contracts\Repository\DatabaseRepositoryInterface;
+use Realm\Contracts\Repository\LocationRepositoryInterface;
+use Realm\Contracts\Repository\ScheduleRepositoryInterface;
+use Realm\Contracts\Repository\SettingsRepositoryInterface;
+use Realm\Contracts\Repository\AllocationRepositoryInterface;
+use Realm\Contracts\Repository\EggVariableRepositoryInterface;
+use Realm\Contracts\Repository\DatabaseHostRepositoryInterface;
+use Realm\Contracts\Repository\ServerVariableRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Commands\Environment;
+namespace Realm\Tests\Integration\Commands\Environment;
 
-use Pterodactyl\Tests\Integration\IntegrationTestCase;
+use Realm\Tests\Integration\IntegrationTestCase;
 
 class EmailSettingsCommandTest extends IntegrationTestCase
 {

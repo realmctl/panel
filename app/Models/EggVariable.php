@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Carbon\CarbonImmutable;
 use Database\Factories\EggVariableFactory;

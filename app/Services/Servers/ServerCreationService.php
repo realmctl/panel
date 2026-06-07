@@ -1,30 +1,30 @@
 <?php
 
-namespace Pterodactyl\Services\Servers;
+namespace Realm\Services\Servers;
 
 use Throwable;
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 use Illuminate\Validation\ValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Service\Deployment\NoViableNodeException;
+use Realm\Exceptions\Service\Deployment\NoViableAllocationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Arr;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\User;
+use Realm\Models\Egg;
+use Realm\Models\User;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Support\Collection;
-use Pterodactyl\Models\Allocation;
+use Realm\Models\Allocation;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Models\Objects\DeploymentObject;
-use Pterodactyl\Repositories\Eloquent\ServerRepository;
-use Pterodactyl\Repositories\Wings\DaemonServerRepository;
-use Pterodactyl\Services\Deployment\FindViableNodesService;
-use Pterodactyl\Repositories\Eloquent\ServerVariableRepository;
-use Pterodactyl\Services\Deployment\AllocationSelectionService;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Models\Objects\DeploymentObject;
+use Realm\Repositories\Eloquent\ServerRepository;
+use Realm\Repositories\Wings\DaemonServerRepository;
+use Realm\Services\Deployment\FindViableNodesService;
+use Realm\Repositories\Eloquent\ServerVariableRepository;
+use Realm\Services\Deployment\AllocationSelectionService;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 class ServerCreationService
 {

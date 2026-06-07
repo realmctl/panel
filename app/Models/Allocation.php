@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Carbon\Carbon;
 use Database\Factories\AllocationFactory;
@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Pterodactyl\Models\Allocation.
+ * Realm\Models\Allocation.
  *
  * @property int $id
  * @property int $node_id

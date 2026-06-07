@@ -1,33 +1,33 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 use Throwable;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
-use Pterodactyl\Enum\JwtScope;
-use Pterodactyl\Models\Server;
+use Realm\Enum\JwtScope;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\FileRevision;
-use Pterodactyl\Services\Nodes\NodeJWTService;
-use Pterodactyl\Services\Files\FileRevisionService;
-use Pterodactyl\Repositories\Wings\DaemonFileRepository;
-use Pterodactyl\Transformers\Api\Client\FileObjectTransformer;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CopyFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\PullFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListArchiveDirectoryRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ChmodFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DeleteFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\RenameFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CreateFolderRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CompressFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DecompressFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\GetFileContentsRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\WriteFileContentRequest;
+use Realm\Facades\Activity;
+use Realm\Models\FileRevision;
+use Realm\Services\Nodes\NodeJWTService;
+use Realm\Services\Files\FileRevisionService;
+use Realm\Repositories\Wings\DaemonFileRepository;
+use Realm\Transformers\Api\Client\FileObjectTransformer;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\Files\CopyFileRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\PullFileRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\ListArchiveDirectoryRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\ChmodFilesRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\DeleteFileRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\RenameFileRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\CreateFolderRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\CompressFilesRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\DecompressFilesRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\GetFileContentsRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\WriteFileContentRequest;
 
 class FileController extends ClientApiController
 {
@@ -88,7 +88,7 @@ class FileController extends ClientApiController
 
         $response = $this->fileRepository->setServer($server)->getContent(
             $file,
-            config('pterodactyl.files.max_edit_size')
+            config('realm.files.max_edit_size')
         );
 
         Activity::event('server:file.read')->property('file', $file)->log();

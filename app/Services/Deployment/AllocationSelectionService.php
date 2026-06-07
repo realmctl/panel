@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Deployment;
+namespace Realm\Services\Deployment;
 
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Services\Allocations\AssignmentService;
-use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException;
+use Realm\Models\Allocation;
+use Realm\Exceptions\DisplayException;
+use Realm\Services\Allocations\AssignmentService;
+use Realm\Contracts\Repository\AllocationRepositoryInterface;
+use Realm\Exceptions\Service\Deployment\NoViableAllocationException;
 
 class AllocationSelectionService
 {

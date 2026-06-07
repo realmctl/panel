@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Observers;
+namespace Realm\Observers;
 
-use Pterodactyl\Models\EggVariable;
+use Realm\Models\EggVariable;
 
 class EggVariableObserver
 {

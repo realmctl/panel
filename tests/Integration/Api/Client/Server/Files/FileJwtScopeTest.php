@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Api\Client\Server\Files;
+namespace Realm\Tests\Integration\Api\Client\Server\Files;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
@@ -8,9 +8,9 @@ use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
-use Pterodactyl\Enum\JwtScope;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
+use Realm\Enum\JwtScope;
+use Realm\Models\Permission;
+use Realm\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
 
 class FileJwtScopeTest extends ClientApiIntegrationTestCase
 {

@@ -1,37 +1,37 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
 use Exception;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Throwable;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Schedule;
+use Realm\Models\Server;
+use Realm\Models\Schedule;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Helpers\Utilities;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Repositories\Eloquent\ScheduleRepository;
-use Pterodactyl\Services\Schedules\ProcessScheduleService;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Services\Schedules\TaskActionRegistry;
-use Pterodactyl\Transformers\Api\Client\ScheduleTransformer;
-use Pterodactyl\Transformers\Api\Client\ScheduleRunTransformer;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Facades\Activity;
+use Realm\Helpers\Utilities;
+use Realm\Exceptions\DisplayException;
+use Realm\Repositories\Eloquent\ScheduleRepository;
+use Realm\Services\Schedules\ProcessScheduleService;
+use Realm\Models\Task;
+use Realm\Services\Schedules\TaskActionRegistry;
+use Realm\Transformers\Api\Client\ScheduleTransformer;
+use Realm\Transformers\Api\Client\ScheduleRunTransformer;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\ViewScheduleRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\StoreScheduleRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\ImportScheduleRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\DuplicateScheduleRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\DeleteScheduleRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\UpdateScheduleRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\TriggerScheduleRequest;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Exceptions\Http\HttpForbiddenException;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\ViewScheduleRequest;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\StoreScheduleRequest;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\ImportScheduleRequest;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\DuplicateScheduleRequest;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\DeleteScheduleRequest;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\UpdateScheduleRequest;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\TriggerScheduleRequest;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
 
 class ScheduleController extends ClientApiController
 {
@@ -311,7 +311,7 @@ class ScheduleController extends ClientApiController
 
     public function bulkUpdate(ClientApiRequest $request, Server $server): JsonResponse
     {
-        if (!$request->user()->can(\Pterodactyl\Models\Permission::ACTION_SCHEDULE_UPDATE, $server)) {
+        if (!$request->user()->can(\Realm\Models\Permission::ACTION_SCHEDULE_UPDATE, $server)) {
             throw new HttpForbiddenException('You do not have permission to perform this action.');
         }
 

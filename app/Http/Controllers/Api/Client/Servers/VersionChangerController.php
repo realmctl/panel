@@ -24,17 +24,17 @@
 // 6. SERVER_JARFILE VARIABLE — updateOrCreate on the egg variable assumes the egg always uses SERVER_JARFILE.
 //    This will silently do nothing for eggs that use a different variable name.
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Controllers\Api\Client\Servers\Concerns\ChecksEggCategoryFeature;
+use Realm\Models\Server;
+use Realm\Facades\Activity;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Controllers\Api\Client\Servers\Concerns\ChecksEggCategoryFeature;
 use Illuminate\Support\Facades\Http;
-use Pterodactyl\Repositories\Wings\DaemonFileRepository;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\ListVersionsRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\GetDownloadUrlRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Versions\InstallVersionRequest;
+use Realm\Repositories\Wings\DaemonFileRepository;
+use Realm\Http\Requests\Api\Client\Servers\Versions\ListVersionsRequest;
+use Realm\Http\Requests\Api\Client\Servers\Versions\GetDownloadUrlRequest;
+use Realm\Http\Requests\Api\Client\Servers\Versions\InstallVersionRequest;
 
 class VersionChangerController extends ClientApiController
 {
@@ -298,7 +298,7 @@ class VersionChangerController extends ClientApiController
         // Update the SERVER_JARFILE variable to server.jar
         $eggVariable = $server->egg->variables()->where('env_variable', 'SERVER_JARFILE')->first();
         if ($eggVariable) {
-            \Pterodactyl\Models\ServerVariable::updateOrCreate(
+            \Realm\Models\ServerVariable::updateOrCreate(
                 ['server_id' => $server->id, 'variable_id' => $eggVariable->id],
                 ['variable_value' => 'server.jar']
             );

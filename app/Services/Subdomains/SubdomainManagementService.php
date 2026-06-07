@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Services\Subdomains;
+namespace Realm\Services\Subdomains;
 
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subdomain\Record;
-use Pterodactyl\Models\Subdomain\Subdomain;
-use Pterodactyl\Services\Subdomains\Dns\DnsProviderFactory;
-use Pterodactyl\Services\Subdomains\Dns\DnsRecordData;
+use Realm\Exceptions\DisplayException;
+use Realm\Facades\Activity;
+use Realm\Models\Server;
+use Realm\Models\Subdomain\Record;
+use Realm\Models\Subdomain\Subdomain;
+use Realm\Services\Subdomains\Dns\DnsProviderFactory;
+use Realm\Services\Subdomains\Dns\DnsRecordData;
 
 class SubdomainManagementService
 {

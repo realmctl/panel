@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Models\Subdomain\Domain;
-use Pterodactyl\Services\Subdomains\Dns\DnsProviderRegistry;
+use Realm\Http\Controllers\Controller;
+use Realm\Models\Subdomain\Domain;
+use Realm\Services\Subdomains\Dns\DnsProviderRegistry;
 
 class SubdomainDomainController extends Controller
 {

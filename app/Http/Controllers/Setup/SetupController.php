@@ -1,29 +1,29 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Setup;
+namespace Realm\Http\Controllers\Setup;
 
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Node;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Location;
+use Realm\Models\Node;
+use Realm\Models\User;
+use Realm\Models\Location;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Services\Setup\PanelSetupService;
-use Pterodactyl\Services\Setup\SetupEnvironmentService;
-use Pterodactyl\Services\Users\UserCreationService;
-use Pterodactyl\Services\Nodes\NodeCreationService;
-use Pterodactyl\Http\Controllers\Auth\AbstractLoginController;
-use Pterodactyl\Services\Locations\LocationCreationService;
-use Pterodactyl\Services\Allocations\AssignmentService;
-use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
-use Pterodactyl\Repositories\Wings\DaemonConfigurationRepository;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
-use Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException;
-use Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException;
-use Pterodactyl\Traits\Helpers\AvailableLanguages;
+use Realm\Exceptions\DisplayException;
+use Realm\Services\Setup\PanelSetupService;
+use Realm\Services\Setup\SetupEnvironmentService;
+use Realm\Services\Users\UserCreationService;
+use Realm\Services\Nodes\NodeCreationService;
+use Realm\Http\Controllers\Auth\AbstractLoginController;
+use Realm\Services\Locations\LocationCreationService;
+use Realm\Services\Allocations\AssignmentService;
+use Realm\Contracts\Repository\SettingsRepositoryInterface;
+use Realm\Repositories\Wings\DaemonConfigurationRepository;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Service\Allocation\CidrOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\InvalidPortMappingException;
+use Realm\Exceptions\Service\Allocation\PortOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\TooManyPortsInRangeException;
+use Realm\Traits\Helpers\AvailableLanguages;
 use Illuminate\Validation\Rule;
 
 class SetupController extends AbstractLoginController
@@ -84,7 +84,7 @@ class SetupController extends AbstractLoginController
             $this->environmentService->configure($request->only([
                 'author', 'url', 'timezone', 'cache', 'session', 'queue', 'redisHost', 'redisPort', 'redisPassword',
             ]));
-        } catch (\Pterodactyl\Exceptions\PterodactylException $exception) {
+        } catch (\Realm\Exceptions\RealmException $exception) {
             throw new DisplayException($exception->getMessage());
         }
 
@@ -128,10 +128,10 @@ class SetupController extends AbstractLoginController
         $request->validate([
             'app:name' => 'required|string|max:191',
             'app:locale' => ['required', 'string', Rule::in(array_keys($this->getAvailableLanguages()))],
-            'pterodactyl:auth:registration_enabled' => 'required|in:true,false',
+            'realm:auth:registration_enabled' => 'required|in:true,false',
         ]);
 
-        foreach ($request->only(['app:name', 'app:locale', 'pterodactyl:auth:registration_enabled']) as $key => $value) {
+        foreach ($request->only(['app:name', 'app:locale', 'realm:auth:registration_enabled']) as $key => $value) {
             $this->settings->set('settings::' . $key, $value);
         }
 

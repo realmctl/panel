@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Schedules\Actions;
+namespace Realm\Services\Schedules\Actions;
 
-use Pterodactyl\Contracts\Schedules\TaskActionInterface;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
+use Realm\Contracts\Schedules\TaskActionInterface;
+use Realm\Models\Server;
+use Realm\Models\Task;
+use Realm\Repositories\Wings\DaemonPowerRepository;
 
 class PowerTaskAction implements TaskActionInterface
 {

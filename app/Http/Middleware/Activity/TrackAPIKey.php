@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware\Activity;
+namespace Realm\Http\Middleware\Activity;
 
 use Closure;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\ApiKey;
-use Pterodactyl\Facades\LogTarget;
+use Realm\Models\ApiKey;
+use Realm\Facades\LogTarget;
 
 class TrackAPIKey
 {

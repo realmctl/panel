@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Services\Subdomains\Dns\Providers;
+namespace Realm\Services\Subdomains\Dns\Providers;
 
 use Illuminate\Support\Facades\Http;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subdomain\Domain;
-use Pterodactyl\Models\Subdomain\Subdomain;
-use Pterodactyl\Services\Subdomains\Dns\DnsProviderInterface;
-use Pterodactyl\Services\Subdomains\Dns\DnsRecordData;
+use Realm\Exceptions\DisplayException;
+use Realm\Models\Server;
+use Realm\Models\Subdomain\Domain;
+use Realm\Models\Subdomain\Subdomain;
+use Realm\Services\Subdomains\Dns\DnsProviderInterface;
+use Realm\Services\Subdomains\Dns\DnsRecordData;
 use SimpleXMLElement;
 
 class NamecheapDnsProvider implements DnsProviderInterface

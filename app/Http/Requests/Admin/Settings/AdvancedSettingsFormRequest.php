@@ -1,27 +1,27 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Admin\Settings;
+namespace Realm\Http\Requests\Admin\Settings;
 
-use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
+use Realm\Http\Requests\Admin\AdminFormRequest;
 
 class AdvancedSettingsFormRequest extends AdminFormRequest
 {
     public function rules(): array
     {
         return [
-            'pterodactyl:client_features:allocations:enabled' => 'required|in:true,false',
-            'pterodactyl:client_features:allocations:range_start' => [
+            'realm:client_features:allocations:enabled' => 'required|in:true,false',
+            'realm:client_features:allocations:range_start' => [
                 'nullable',
-                'required_if:pterodactyl:client_features:allocations:enabled,true',
+                'required_if:realm:client_features:allocations:enabled,true',
                 'integer',
                 'between:1024,65535',
             ],
-            'pterodactyl:client_features:allocations:range_end' => [
+            'realm:client_features:allocations:range_end' => [
                 'nullable',
-                'required_if:pterodactyl:client_features:allocations:enabled,true',
+                'required_if:realm:client_features:allocations:enabled,true',
                 'integer',
                 'between:1024,65535',
-                'gt:pterodactyl:client_features:allocations:range_start',
+                'gt:realm:client_features:allocations:range_start',
             ],
         ];
     }
@@ -29,9 +29,9 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'pterodactyl:client_features:allocations:enabled' => 'Auto Create Allocations Enabled',
-            'pterodactyl:client_features:allocations:range_start' => 'Starting Port',
-            'pterodactyl:client_features:allocations:range_end' => 'Ending Port',
+            'realm:client_features:allocations:enabled' => 'Auto Create Allocations Enabled',
+            'realm:client_features:allocations:range_start' => 'Starting Port',
+            'realm:client_features:allocations:range_end' => 'Ending Port',
         ];
     }
 }

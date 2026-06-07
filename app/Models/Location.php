@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Carbon\Carbon;
 use Database\Factories\LocationFactory;

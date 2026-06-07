@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Console\Commands\Setup;
+namespace Realm\Console\Commands\Setup;
 
 use Illuminate\Console\Command;
-use Pterodactyl\Services\Setup\PanelSetupService;
+use Realm\Services\Setup\PanelSetupService;
 
 class ResetSetupCommand extends Command
 {

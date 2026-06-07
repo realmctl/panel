@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Users;
+namespace Realm\Services\Users;
 
 use Throwable;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
-use Pterodactyl\Events\User\PasswordChanged;
-use Pterodactyl\Traits\Services\HasUserLevels;
+use Realm\Events\User\PasswordChanged;
+use Realm\Traits\Services\HasUserLevels;
 
 class UserUpdateService
 {

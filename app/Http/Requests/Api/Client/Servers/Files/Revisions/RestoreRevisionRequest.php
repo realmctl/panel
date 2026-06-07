@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Servers\Files\Revisions;
+namespace Realm\Http\Requests\Api\Client\Servers\Files\Revisions;
 
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Contracts\Http\ClientPermissionsRequest;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Models\Permission;
+use Realm\Contracts\Http\ClientPermissionsRequest;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
 
 class RestoreRevisionRequest extends ClientApiRequest implements ClientPermissionsRequest
 {

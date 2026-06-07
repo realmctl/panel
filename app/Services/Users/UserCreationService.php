@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Services\Users;
+namespace Realm\Services\Users;
 
 use Exception;
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\PasswordBroker;
-use Pterodactyl\Notifications\AccountCreated;
-use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
+use Realm\Notifications\AccountCreated;
+use Realm\Contracts\Repository\UserRepositoryInterface;
 
 class UserCreationService
 {

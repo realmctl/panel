@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs\Sharing;
+namespace Realm\Services\Eggs\Sharing;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Carbon\Carbon;
-use Pterodactyl\Models\Egg;
+use Realm\Models\Egg;
 use Illuminate\Support\Collection;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
+use Realm\Models\EggVariable;
+use Realm\Contracts\Repository\EggRepositoryInterface;
 
 class EggExporterService
 {
@@ -28,7 +28,7 @@ class EggExporterService
         $egg = $this->repository->getWithExportAttributes($egg);
 
         $struct = [
-            '_comment' => 'DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO',
+            '_comment' => 'DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY REALM PANEL - REALMCTL.COM',
             'meta' => [
                 'version' => Egg::EXPORT_VERSION,
                 'update_url' => $egg->update_url,

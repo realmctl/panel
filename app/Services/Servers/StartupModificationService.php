@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Services\Servers;
+namespace Realm\Services\Servers;
 
 use Throwable;
 use Illuminate\Support\Arr;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\ServerVariable;
+use Realm\Models\Egg;
+use Realm\Models\User;
+use Realm\Models\Server;
+use Realm\Models\ServerVariable;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Traits\Services\HasUserLevels;
+use Realm\Traits\Services\HasUserLevels;
 
 class StartupModificationService
 {

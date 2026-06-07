@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Servers\Subusers;
+namespace Realm\Http\Requests\Api\Client\Servers\Subusers;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
-use Pterodactyl\Services\Servers\GetUserPermissionsService;
+use Realm\Models\User;
+use Realm\Models\Subuser;
+use Realm\Exceptions\Http\HttpForbiddenException;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Services\Servers\GetUserPermissionsService;
 
 abstract class SubuserRequest extends ClientApiRequest
 {

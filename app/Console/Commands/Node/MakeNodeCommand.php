@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Console\Commands\Node;
+namespace Realm\Console\Commands\Node;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Illuminate\Console\Command;
-use Pterodactyl\Services\Nodes\NodeCreationService;
+use Realm\Services\Nodes\NodeCreationService;
 
 class MakeNodeCommand extends Command
 {

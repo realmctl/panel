@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Carbon\CarbonImmutable;
@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Illuminate\Database\Eloquent\Model as IlluminateModel;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 

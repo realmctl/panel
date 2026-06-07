@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware\Api;
+namespace Realm\Http\Middleware\Api;
 
 use Closure;
 use JsonException;

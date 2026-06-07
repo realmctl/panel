@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Http\ViewComposers;
+namespace Realm\Http\ViewComposers;
 
 use Illuminate\View\View;
-use Pterodactyl\Models\ActivityLog;
+use Realm\Models\ActivityLog;
 
 class AdminNotificationComposer
 {

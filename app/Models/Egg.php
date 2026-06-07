@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Database\Factories\EggFactory;
-use Pterodactyl\Contracts\Models\Identifiable;
+use Realm\Contracts\Models\Identifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Pterodactyl\Models\Traits\HasRealtimeIdentifier;
+use Realm\Models\Traits\HasRealtimeIdentifier;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

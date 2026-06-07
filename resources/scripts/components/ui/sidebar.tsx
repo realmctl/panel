@@ -1,15 +1,8 @@
 import React, { useMemo } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import {
-    ChevronDown,
-    ExternalLink,
-    LayoutDashboard,
-    LogOut,
-    Users,
-} from 'lucide-react';
+import { ChevronDown, LayoutDashboard, LogOut, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -85,17 +78,7 @@ const NavLinkItem = ({
             title={item.name}
         >
             <Icon className="h-4 w-4 shrink-0" />
-            <span className="ml-2 hidden min-w-0 items-center gap-2 truncate text-sm font-medium md:flex">
-                {item.name}
-                {item.badge && (
-                    <Badge
-                        className="flex h-fit w-fit items-center gap-1.5 rounded border-none bg-blue-500/10 px-1.5 text-blue-400"
-                        variant="outline"
-                    >
-                        {item.badge}
-                    </Badge>
-                )}
-            </span>
+            <span className="ml-2 hidden min-w-0 truncate text-sm font-medium md:block">{item.name}</span>
         </Link>
     );
 };
@@ -144,15 +127,6 @@ export function AdminPreviewSidebar() {
                                         >
                                             <LayoutDashboard className="h-4 w-4" />
                                             Client area
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            className="flex items-center gap-2"
-                                            onSelect={() => {
-                                                window.location.href = '/admin';
-                                            }}
-                                        >
-                                            <ExternalLink className="h-4 w-4" />
-                                            Legacy admin
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>

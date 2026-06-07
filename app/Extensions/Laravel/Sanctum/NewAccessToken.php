@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Extensions\Laravel\Sanctum;
+namespace Realm\Extensions\Laravel\Sanctum;
 
-use Pterodactyl\Models\ApiKey;
+use Realm\Models\ApiKey;
 use Laravel\Sanctum\NewAccessToken as SanctumAccessToken;
 
 /**

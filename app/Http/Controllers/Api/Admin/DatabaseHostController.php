@@ -1,22 +1,22 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use PDOException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\DatabaseHostFormRequest;
-use Pterodactyl\Models\DatabaseHost;
-use Pterodactyl\Services\Databases\Hosts\HostCreationService;
-use Pterodactyl\Services\Databases\Hosts\HostDeletionService;
-use Pterodactyl\Services\Databases\Hosts\HostUpdateService;
-use Pterodactyl\Contracts\Repository\DatabaseRepositoryInterface;
-use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
-use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\DatabaseHostFormRequest;
+use Realm\Models\DatabaseHost;
+use Realm\Services\Databases\Hosts\HostCreationService;
+use Realm\Services\Databases\Hosts\HostDeletionService;
+use Realm\Services\Databases\Hosts\HostUpdateService;
+use Realm\Contracts\Repository\DatabaseRepositoryInterface;
+use Realm\Contracts\Repository\LocationRepositoryInterface;
+use Realm\Contracts\Repository\DatabaseHostRepositoryInterface;
 use Throwable;
 
 class DatabaseHostController extends Controller

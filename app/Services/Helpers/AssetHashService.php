@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Helpers;
+namespace Realm\Services\Helpers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Pterodactyl\Exceptions\ManifestDoesNotExistException;
+use Realm\Exceptions\ManifestDoesNotExistException;
 
 class AssetHashService
 {
@@ -61,7 +61,7 @@ class AssetHashService
             'referrerpolicy' => 'no-referrer',
         ];
 
-        if (config('pterodactyl.assets.use_hash')) {
+        if (config('realm.assets.use_hash')) {
             $attributes['integrity'] = $this->integrity($resource);
         }
 
@@ -83,7 +83,7 @@ class AssetHashService
             'crossorigin' => 'anonymous',
         ];
 
-        if (config('pterodactyl.assets.use_hash')) {
+        if (config('realm.assets.use_hash')) {
             $attributes['integrity'] = $this->integrity($resource);
         }
 

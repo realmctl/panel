@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Account;
+namespace Realm\Http\Requests\Api\Client\Account;
 
 use Exception;
 use phpseclib3\Crypt\DSA;
 use phpseclib3\Crypt\RSA;
-use Pterodactyl\Models\UserSSHKey;
+use Realm\Models\UserSSHKey;
 use Illuminate\Validation\Validator;
 use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Crypt\Common\PublicKey;
 use phpseclib3\Exception\NoKeyLoadedException;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
 
 class StoreSSHKeyRequest extends ClientApiRequest
 {

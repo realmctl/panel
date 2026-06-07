@@ -1,18 +1,18 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Models\Subdomain\EggRecord;
-use Pterodactyl\Models\Subdomain\Record;
-use Pterodactyl\Models\Subdomain\Subdomain;
-use Pterodactyl\Services\Subdomains\SubdomainManagementService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\GetSubdomainsRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\StoreSubdomainRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Network\DeleteSubdomainRequest;
+use Realm\Models\Server;
+use Realm\Facades\Activity;
+use Realm\Exceptions\DisplayException;
+use Realm\Models\Subdomain\EggRecord;
+use Realm\Models\Subdomain\Record;
+use Realm\Models\Subdomain\Subdomain;
+use Realm\Services\Subdomains\SubdomainManagementService;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\Network\GetSubdomainsRequest;
+use Realm\Http\Requests\Api\Client\Servers\Network\StoreSubdomainRequest;
+use Realm\Http\Requests\Api\Client\Servers\Network\DeleteSubdomainRequest;
 
 class NetworkSubdomainController extends ClientApiController
 {

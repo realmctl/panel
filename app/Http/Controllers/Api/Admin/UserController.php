@@ -1,22 +1,22 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\NewUserFormRequest;
-use Pterodactyl\Http\Requests\Admin\UserFormRequest;
-use Pterodactyl\Models\User;
-use Pterodactyl\Services\Users\UserCreationService;
-use Pterodactyl\Services\Users\UserDeletionService;
-use Pterodactyl\Services\Users\UserUpdateService;
-use Pterodactyl\Traits\Helpers\AvailableLanguages;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\NewUserFormRequest;
+use Realm\Http\Requests\Admin\UserFormRequest;
+use Realm\Models\User;
+use Realm\Services\Users\UserCreationService;
+use Realm\Services\Users\UserDeletionService;
+use Realm\Services\Users\UserUpdateService;
+use Realm\Traits\Helpers\AvailableLanguages;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Throwable;

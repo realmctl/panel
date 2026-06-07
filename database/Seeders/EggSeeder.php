@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Nest;
+use Realm\Models\Egg;
+use Realm\Models\Nest;
 use Illuminate\Database\Seeder;
 use Illuminate\Http\UploadedFile;
-use Pterodactyl\Services\Eggs\Sharing\EggImporterService;
-use Pterodactyl\Services\Eggs\Sharing\EggUpdateImporterService;
+use Realm\Services\Eggs\Sharing\EggImporterService;
+use Realm\Services\Eggs\Sharing\EggUpdateImporterService;
 
 class EggSeeder extends Seeder
 {

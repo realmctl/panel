@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Nodes;
+namespace Realm\Services\Nodes;
 
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Illuminate\Contracts\Translation\Translator;
-use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
-use Pterodactyl\Exceptions\Service\HasActiveServersException;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
+use Realm\Contracts\Repository\NodeRepositoryInterface;
+use Realm\Exceptions\Service\HasActiveServersException;
+use Realm\Contracts\Repository\ServerRepositoryInterface;
 
 class NodeDeletionService
 {

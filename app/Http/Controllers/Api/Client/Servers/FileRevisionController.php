@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\FileRevision;
-use Pterodactyl\Services\Files\FileRevisionService;
-use Pterodactyl\Transformers\Api\Client\FileRevisionTransformer;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\Revisions\ListRevisionsRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\Revisions\ViewRevisionRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\Revisions\RestoreRevisionRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\Revisions\DeleteRevisionRequest;
+use Realm\Facades\Activity;
+use Realm\Models\FileRevision;
+use Realm\Services\Files\FileRevisionService;
+use Realm\Transformers\Api\Client\FileRevisionTransformer;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\Files\Revisions\ListRevisionsRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\Revisions\ViewRevisionRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\Revisions\RestoreRevisionRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\Revisions\DeleteRevisionRequest;
 
 class FileRevisionController extends ClientApiController
 {

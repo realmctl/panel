@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Services\Geolocation;
+namespace Realm\Services\Geolocation;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;

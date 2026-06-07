@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Providers;
+namespace Realm\Providers;
 
 use Psr\Log\LoggerInterface as Log;
 use Illuminate\Database\QueryException;
@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
+use Realm\Contracts\Repository\SettingsRepositoryInterface;
 
 class SettingsServiceProvider extends ServiceProvider
 {
@@ -27,15 +27,15 @@ class SettingsServiceProvider extends ServiceProvider
         'captcha:recaptcha:website_key',
         'captcha:turnstile:secret_key',
         'captcha:turnstile:website_key',
-        'pterodactyl:guzzle:timeout',
-        'pterodactyl:guzzle:connect_timeout',
-        'pterodactyl:console:count',
-        'pterodactyl:console:frequency',
-        'pterodactyl:auth:2fa_required',
-        'pterodactyl:auth:registration_enabled',
-        'pterodactyl:client_features:allocations:enabled',
-        'pterodactyl:client_features:allocations:range_start',
-        'pterodactyl:client_features:allocations:range_end',
+        'realm:guzzle:timeout',
+        'realm:guzzle:connect_timeout',
+        'realm:console:count',
+        'realm:console:frequency',
+        'realm:auth:2fa_required',
+        'realm:auth:registration_enabled',
+        'realm:client_features:allocations:enabled',
+        'realm:client_features:allocations:range_start',
+        'realm:client_features:allocations:range_end',
         'oauth:google:enabled',
         'oauth:google:client_id',
         'oauth:google:client_secret',

@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Services\Servers;
+namespace Realm\Services\Servers;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\EggVariable;
+use Realm\Models\Server;
+use Realm\Models\EggVariable;
 
 class EnvironmentService
 {
@@ -44,7 +44,7 @@ class EnvironmentService
         }
 
         // Process variables set in the configuration file.
-        foreach (config('pterodactyl.environment_variables', []) as $key => $object) {
+        foreach (config('realm.environment_variables', []) as $key => $object) {
             $variables->put(
                 $key,
                 is_callable($object) ? call_user_func($object, $server) : object_get($server, $object)

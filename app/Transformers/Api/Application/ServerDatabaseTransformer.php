@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Application;
+namespace Realm\Transformers\Api\Application;
 
-use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
-use Pterodactyl\Models\Database;
+use Realm\Exceptions\Transformer\InvalidTransformerLevelException;
+use Realm\Models\Database;
 use League\Fractal\Resource\Item;
-use Pterodactyl\Models\DatabaseHost;
+use Realm\Models\DatabaseHost;
 use League\Fractal\Resource\NullResource;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
+use Realm\Services\Acl\Api\AdminAcl;
 use Illuminate\Contracts\Encryption\Encrypter;
 
 class ServerDatabaseTransformer extends BaseTransformer

@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Service\Egg\InvalidCopyFromException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\Egg\EggScriptFormRequest;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
-use Pterodactyl\Services\Eggs\Scripts\InstallScriptService;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Service\Egg\InvalidCopyFromException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\Egg\EggScriptFormRequest;
+use Realm\Models\Egg;
+use Realm\Contracts\Repository\EggRepositoryInterface;
+use Realm\Services\Eggs\Scripts\InstallScriptService;
 
 class EggScriptController extends Controller
 {

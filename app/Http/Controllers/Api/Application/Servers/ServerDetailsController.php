@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
+namespace Realm\Http\Controllers\Api\Application\Servers;
 
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Services\Servers\BuildModificationService;
-use Pterodactyl\Services\Servers\DetailsModificationService;
-use Pterodactyl\Transformers\Api\Application\ServerTransformer;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
-use Pterodactyl\Http\Requests\Api\Application\Servers\UpdateServerDetailsRequest;
-use Pterodactyl\Http\Requests\Api\Application\Servers\UpdateServerBuildConfigurationRequest;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Server;
+use Realm\Services\Servers\BuildModificationService;
+use Realm\Services\Servers\DetailsModificationService;
+use Realm\Transformers\Api\Application\ServerTransformer;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Http\Requests\Api\Application\Servers\UpdateServerDetailsRequest;
+use Realm\Http\Requests\Api\Application\Servers\UpdateServerBuildConfigurationRequest;
 
 class ServerDetailsController extends ApplicationApiController
 {

@@ -1,23 +1,25 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Http\Controllers\Admin\UserController;
+namespace Realm\Tests\Integration\Http\Controllers\Admin\UserController;
 
-use Pterodactyl\Models\User;
-use Pterodactyl\Tests\Integration\Http\HttpTestCase;
+use Realm\Models\User;
+use Realm\Tests\Integration\Http\HttpTestCase;
 
 class DeleteUserTest extends HttpTestCase
 {
     public function testNonAdminCannotAccessEndpoint(): void
     {
+        $user = User::factory()->create();
+
         $this->actingAs(User::factory()->create())
-            ->delete(route('admin.users.delete', ['user' => User::factory()->create()]))
+            ->deleteJson("/api/admin/users/{$user->id}")
             ->assertForbidden();
     }
 
     public function testCannotDeleteSelf(): void
     {
         $this->actingAs($user = User::factory()->admin()->create())
-            ->delete(route('admin.users.delete', ['user' => $user]))
+            ->deleteJson("/api/admin/users/{$user->id}")
             ->assertBadRequest()
             ->assertJsonPath('errors.0.detail', __('admin/user.exceptions.delete_self'));
 
@@ -29,8 +31,8 @@ class DeleteUserTest extends HttpTestCase
         $user = User::factory()->create();
 
         $this->actingAs(User::factory()->admin()->create())
-            ->delete(route('admin.users.delete', ['user' => $user]))
-            ->assertRedirectToRoute('admin.users');
+            ->deleteJson("/api/admin/users/{$user->id}")
+            ->assertNoContent();
 
         $this->assertModelMissing($user);
     }

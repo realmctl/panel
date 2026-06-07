@@ -115,9 +115,9 @@ export default () => {
                     <select
                         id="two-factor"
                         className={selectClass}
-                        value={String(form['pterodactyl:auth:2fa_required'])}
+                        value={String(form['realm:auth:2fa_required'])}
                         onChange={(e) =>
-                            updateField('pterodactyl:auth:2fa_required', Number(e.target.value))
+                            updateField('realm:auth:2fa_required', Number(e.target.value))
                         }
                     >
                         <option value="0">Not required</option>
@@ -134,10 +134,10 @@ export default () => {
                     <select
                         id="registration"
                         className={selectClass}
-                        value={form['pterodactyl:auth:registration_enabled']}
+                        value={form['realm:auth:registration_enabled']}
                         onChange={(e) =>
                             updateField(
-                                'pterodactyl:auth:registration_enabled',
+                                'realm:auth:registration_enabled',
                                 e.target.value as 'true' | 'false'
                             )
                         }

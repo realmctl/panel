@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Auth;
+namespace Realm\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Event;
-use Pterodactyl\Events\Auth\DirectLogin;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Http\Controllers\Controller;
+use Realm\Events\Auth\DirectLogin;
+use Realm\Exceptions\DisplayException;
+use Realm\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 

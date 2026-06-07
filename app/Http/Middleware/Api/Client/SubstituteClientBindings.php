@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware\Api\Client;
+namespace Realm\Http\Middleware\Api\Client;
 
 use Closure;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Models\Server;
+use Realm\Models\Subuser;
+use Realm\Models\Server;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class SubstituteClientBindings extends SubstituteBindings

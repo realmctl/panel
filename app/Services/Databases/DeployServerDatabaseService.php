@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Services\Databases;
+namespace Realm\Services\Databases;
 
 use Throwable;
-use Pterodactyl\Exceptions\Service\Database\TooManyDatabasesException;
-use Pterodactyl\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException;
+use Realm\Exceptions\Service\Database\TooManyDatabasesException;
+use Realm\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Models\DatabaseHost;
-use Pterodactyl\Exceptions\Service\Database\NoSuitableDatabaseHostException;
+use Realm\Models\Server;
+use Realm\Models\Database;
+use Realm\Models\DatabaseHost;
+use Realm\Exceptions\Service\Database\NoSuitableDatabaseHostException;
 
 class DeployServerDatabaseService
 {
@@ -36,7 +36,7 @@ class DeployServerDatabaseService
         } else {
             $nodeHosts = $hosts->where('node_id', $server->node_id)->toBase();
 
-            if ($nodeHosts->isEmpty() && !config('pterodactyl.client_features.databases.allow_random')) {
+            if ($nodeHosts->isEmpty() && !config('realm.client_features.databases.allow_random')) {
                 throw new NoSuitableDatabaseHostException();
             }
         }

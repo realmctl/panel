@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Carbon\CarbonImmutable;
 use Database\Factories\BackupFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Pterodactyl\Contracts\Models\Identifiable;
-use Pterodactyl\Models\Traits\HasRealtimeIdentifier;
+use Realm\Contracts\Models\Identifiable;
+use Realm\Models\Traits\HasRealtimeIdentifier;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

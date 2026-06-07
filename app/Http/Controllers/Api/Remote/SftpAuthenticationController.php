@@ -1,21 +1,21 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Remote;
+namespace Realm\Http\Controllers\Api\Remote;
 
 use Illuminate\Http\Request;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Server;
+use Realm\Models\User;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\Permission;
+use Realm\Facades\Activity;
+use Realm\Models\Permission;
 use phpseclib3\Crypt\PublicKeyLoader;
-use Pterodactyl\Http\Controllers\Controller;
+use Realm\Http\Controllers\Controller;
 use phpseclib3\Exception\NoKeyLoadedException;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
-use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Pterodactyl\Services\Servers\GetUserPermissionsService;
+use Realm\Exceptions\Http\HttpForbiddenException;
+use Realm\Services\Servers\GetUserPermissionsService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Pterodactyl\Http\Requests\Api\Remote\SftpAuthenticationFormRequest;
+use Realm\Http\Requests\Api\Remote\SftpAuthenticationFormRequest;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class SftpAuthenticationController extends Controller

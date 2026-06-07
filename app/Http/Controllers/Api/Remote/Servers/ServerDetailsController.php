@@ -1,23 +1,23 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Remote\Servers;
+namespace Realm\Http\Controllers\Api\Remote\Servers;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Throwable;
-use Pterodactyl\Models\ActivityLog;
+use Realm\Models\ActivityLog;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
+use Realm\Facades\Activity;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Services\Eggs\EggConfigurationService;
-use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Pterodactyl\Repositories\Eloquent\ServerRepository;
-use Pterodactyl\Http\Resources\Wings\ServerConfigurationCollection;
-use Pterodactyl\Services\Servers\ServerConfigurationStructureService;
+use Realm\Http\Controllers\Controller;
+use Realm\Services\Eggs\EggConfigurationService;
+use Realm\Exceptions\Http\HttpForbiddenException;
+use Realm\Repositories\Eloquent\ServerRepository;
+use Realm\Http\Resources\Wings\ServerConfigurationCollection;
+use Realm\Services\Servers\ServerConfigurationStructureService;
 
 class ServerDetailsController extends Controller
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Services\Minecraft;
+namespace Realm\Services\Minecraft;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Models\Server;
+use Realm\Exceptions\DisplayException;
+use Realm\Models\Allocation;
+use Realm\Models\Server;
 
 class MinecraftServerStatusService
 {

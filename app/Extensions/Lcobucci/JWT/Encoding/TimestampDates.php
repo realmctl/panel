@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Extensions\Lcobucci\JWT\Encoding;
+namespace Realm\Extensions\Lcobucci\JWT\Encoding;
 
 use DateTimeImmutable;
 use Lcobucci\JWT\ClaimsFormatter;

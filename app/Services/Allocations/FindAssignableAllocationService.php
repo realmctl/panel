@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Services\Allocations;
+namespace Realm\Services\Allocations;
 
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException;
-use Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Service\Allocation\CidrOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\InvalidPortMappingException;
+use Realm\Exceptions\Service\Allocation\PortOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\TooManyPortsInRangeException;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Exceptions\Service\Allocation\AutoAllocationNotEnabledException;
-use Pterodactyl\Exceptions\Service\Allocation\NoAutoAllocationSpaceAvailableException;
+use Realm\Models\Server;
+use Realm\Models\Allocation;
+use Realm\Exceptions\Service\Allocation\AutoAllocationNotEnabledException;
+use Realm\Exceptions\Service\Allocation\NoAutoAllocationSpaceAvailableException;
 
 class FindAssignableAllocationService
 {
@@ -35,7 +35,7 @@ class FindAssignableAllocationService
      */
     public function handle(Server $server): Allocation
     {
-        if (!config('pterodactyl.client_features.allocations.enabled')) {
+        if (!config('realm.client_features.allocations.enabled')) {
             throw new AutoAllocationNotEnabledException();
         }
 
@@ -70,8 +70,8 @@ class FindAssignableAllocationService
      */
     protected function createNewAllocation(Server $server): Allocation
     {
-        $start = config('pterodactyl.client_features.allocations.range_start', null);
-        $end = config('pterodactyl.client_features.allocations.range_end', null);
+        $start = config('realm.client_features.allocations.range_start', null);
+        $end = config('realm.client_features.allocations.range_end', null);
 
         if (!$start || !$end) {
             throw new NoAutoAllocationSpaceAvailableException();

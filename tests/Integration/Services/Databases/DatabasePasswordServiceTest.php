@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Services\Databases;
+namespace Realm\Tests\Integration\Services\Databases;
 
 use Mockery\MockInterface;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Models\DatabaseHost;
-use Pterodactyl\Tests\Integration\IntegrationTestCase;
-use Pterodactyl\Repositories\Eloquent\DatabaseRepository;
-use Pterodactyl\Services\Databases\DatabasePasswordService;
+use Realm\Models\Database;
+use Realm\Models\DatabaseHost;
+use Realm\Tests\Integration\IntegrationTestCase;
+use Realm\Repositories\Eloquent\DatabaseRepository;
+use Realm\Services\Databases\DatabasePasswordService;
 
 class DatabasePasswordServiceTest extends IntegrationTestCase
 {

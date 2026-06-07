@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Schedules;
+namespace Realm\Services\Schedules;
 
 use Exception;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Repositories\Wings\DaemonServerRepository;
+use Realm\Models\Server;
+use Realm\Models\Task;
+use Realm\Repositories\Wings\DaemonServerRepository;
 
 class TaskConditionEvaluator
 {

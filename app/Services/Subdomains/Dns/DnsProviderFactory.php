@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Services\Subdomains\Dns;
+namespace Realm\Services\Subdomains\Dns;
 
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Services\Subdomains\Dns\Providers\CloudflareDnsProvider;
-use Pterodactyl\Services\Subdomains\Dns\Providers\GoDaddyDnsProvider;
-use Pterodactyl\Services\Subdomains\Dns\Providers\NamecheapDnsProvider;
-use Pterodactyl\Services\Subdomains\Dns\Providers\NameComDnsProvider;
-use Pterodactyl\Services\Subdomains\Dns\Providers\OvhDnsProvider;
+use Realm\Exceptions\DisplayException;
+use Realm\Services\Subdomains\Dns\Providers\CloudflareDnsProvider;
+use Realm\Services\Subdomains\Dns\Providers\GoDaddyDnsProvider;
+use Realm\Services\Subdomains\Dns\Providers\NamecheapDnsProvider;
+use Realm\Services\Subdomains\Dns\Providers\NameComDnsProvider;
+use Realm\Services\Subdomains\Dns\Providers\OvhDnsProvider;
 
 class DnsProviderFactory
 {

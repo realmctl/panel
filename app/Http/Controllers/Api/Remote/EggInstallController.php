@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Remote;
+namespace Realm\Http\Controllers\Api\Remote;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Server;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Server;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Services\Servers\EnvironmentService;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
+use Realm\Http\Controllers\Controller;
+use Realm\Services\Servers\EnvironmentService;
+use Realm\Contracts\Repository\ServerRepositoryInterface;
 
 class EggInstallController extends Controller
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Api;
+namespace Realm\Services\Api;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Models\ApiKey;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Models\ApiKey;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Contracts\Repository\ApiKeyRepositoryInterface;
+use Realm\Contracts\Repository\ApiKeyRepositoryInterface;
 
 class KeyCreationService
 {

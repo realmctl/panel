@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Client;
+namespace Realm\Transformers\Api\Client;
 
-use Pterodactyl\Models\ScheduleRun;
-use Pterodactyl\Models\ScheduleRunTask;
+use Realm\Models\ScheduleRun;
+use Realm\Models\ScheduleRunTask;
 use League\Fractal\Resource\Collection;
 
 class ScheduleRunTransformer extends BaseClientTransformer

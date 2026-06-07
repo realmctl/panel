@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Admin\Settings;
+namespace Realm\Http\Requests\Admin\Settings;
 
-use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
+use Realm\Http\Requests\Admin\AdminFormRequest;
 
 class SecuritySettingsFormRequest extends AdminFormRequest
 {
@@ -14,8 +14,8 @@ class SecuritySettingsFormRequest extends AdminFormRequest
             'captcha:recaptcha:website_key' => 'required_if:captcha:provider,recaptcha|nullable|string|max:191',
             'captcha:turnstile:secret_key' => 'required_if:captcha:provider,turnstile|nullable|string|max:191',
             'captcha:turnstile:website_key' => 'required_if:captcha:provider,turnstile|nullable|string|max:191',
-            'pterodactyl:guzzle:timeout' => 'required|integer|between:1,60',
-            'pterodactyl:guzzle:connect_timeout' => 'required|integer|between:1,60',
+            'realm:guzzle:timeout' => 'required|integer|between:1,60',
+            'realm:guzzle:connect_timeout' => 'required|integer|between:1,60',
         ];
     }
 
@@ -27,8 +27,8 @@ class SecuritySettingsFormRequest extends AdminFormRequest
             'captcha:recaptcha:website_key' => 'reCAPTCHA Website Key',
             'captcha:turnstile:secret_key' => 'Turnstile Secret Key',
             'captcha:turnstile:website_key' => 'Turnstile Website Key',
-            'pterodactyl:guzzle:timeout' => 'HTTP Request Timeout',
-            'pterodactyl:guzzle:connect_timeout' => 'HTTP Connection Timeout',
+            'realm:guzzle:timeout' => 'HTTP Request Timeout',
+            'realm:guzzle:connect_timeout' => 'HTTP Connection Timeout',
         ];
     }
 }

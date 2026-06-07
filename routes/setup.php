@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Pterodactyl\Http\Controllers\Setup\SetupController;
+use Realm\Http\Controllers\Setup\SetupController;
 
 /*
 |--------------------------------------------------------------------------

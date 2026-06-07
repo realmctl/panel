@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware;
+namespace Realm\Http\Middleware;
 
 /**
  * @deprecated Use VerifyCaptcha instead. Kept for backward compatibility with

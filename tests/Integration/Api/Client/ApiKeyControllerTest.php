@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Api\Client;
+namespace Realm\Tests\Integration\Api\Client;
 
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\ApiKey;
+use Realm\Models\ApiKey;
 use Illuminate\Support\Facades\Event;
-use Pterodactyl\Events\ActivityLogged;
+use Realm\Events\ActivityLogged;
 
 class ApiKeyControllerTest extends ClientApiIntegrationTestCase
 {

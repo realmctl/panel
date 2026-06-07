@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Auth;
+namespace Realm\Http\Controllers\Auth;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Services\Users\UserCreationService;
+use Realm\Http\Controllers\Controller;
+use Realm\Services\Users\UserCreationService;
 
 class RegisterController extends Controller
 {
@@ -19,7 +19,7 @@ class RegisterController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        if (!config('pterodactyl.auth.registration_enabled', false)) {
+        if (!config('realm.auth.registration_enabled', false)) {
             return response()->json(['error' => 'Registration is disabled.'], 403);
         }
 

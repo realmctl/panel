@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Services\Databases\Hosts;
+namespace Realm\Services\Databases\Hosts;
 
 use Throwable;
-use Pterodactyl\Models\DatabaseHost;
+use Realm\Models\DatabaseHost;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Extensions\DynamicDatabaseConnection;
-use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
+use Realm\Extensions\DynamicDatabaseConnection;
+use Realm\Contracts\Repository\DatabaseHostRepositoryInterface;
 
 class HostUpdateService
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Services\Nests;
+namespace Realm\Services\Nests;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
-use Pterodactyl\Models\Nest;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
+use Realm\Models\Nest;
+use Realm\Contracts\Repository\NestRepositoryInterface;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class NestCreationService
@@ -26,7 +26,7 @@ class NestCreationService
     {
         return $this->repository->create([
             'uuid' => Uuid::uuid4()->toString(),
-            'author' => $author ?? $this->config->get('pterodactyl.service.author'),
+            'author' => $author ?? $this->config->get('realm.service.author'),
             'name' => array_get($data, 'name'),
             'description' => array_get($data, 'description'),
         ], true, true);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models\Attributes;
+namespace Realm\Models\Attributes;
 
 use Attribute;
 

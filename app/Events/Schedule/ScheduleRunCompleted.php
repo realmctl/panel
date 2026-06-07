@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Events\Schedule;
+namespace Realm\Events\Schedule;
 
-use Pterodactyl\Models\ScheduleRun;
+use Realm\Models\ScheduleRun;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 

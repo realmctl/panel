@@ -1,28 +1,28 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Service\Subuser\ServerSubuserExistsException;
-use Pterodactyl\Exceptions\Service\Subuser\UserIsServerOwnerException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Service\Subuser\ServerSubuserExistsException;
+use Realm\Exceptions\Service\Subuser\UserIsServerOwnerException;
 use Throwable;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Subuser;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Subuser;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Jobs\RevokeSftpAccessJob;
-use Pterodactyl\Repositories\Eloquent\SubuserRepository;
-use Pterodactyl\Services\Subusers\SubuserCreationService;
-use Pterodactyl\Transformers\Api\Client\SubuserTransformer;
-use Pterodactyl\Repositories\Wings\DaemonRevocationRepository;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Subusers\GetSubuserRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Subusers\StoreSubuserRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Subusers\DeleteSubuserRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Subusers\UpdateSubuserRequest;
+use Realm\Facades\Activity;
+use Realm\Models\Permission;
+use Realm\Jobs\RevokeSftpAccessJob;
+use Realm\Repositories\Eloquent\SubuserRepository;
+use Realm\Services\Subusers\SubuserCreationService;
+use Realm\Transformers\Api\Client\SubuserTransformer;
+use Realm\Repositories\Wings\DaemonRevocationRepository;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\Subusers\GetSubuserRequest;
+use Realm\Http\Requests\Api\Client\Servers\Subusers\StoreSubuserRequest;
+use Realm\Http\Requests\Api\Client\Servers\Subusers\DeleteSubuserRequest;
+use Realm\Http\Requests\Api\Client\Servers\Subusers\UpdateSubuserRequest;
 
 class SubuserController extends ClientApiController
 {

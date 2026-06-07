@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Servers;
+namespace Realm\Services\Servers;
 
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Support\Collection;
-use Pterodactyl\Models\EggVariable;
+use Realm\Models\EggVariable;
 use Illuminate\Validation\ValidationException;
-use Pterodactyl\Traits\Services\HasUserLevels;
+use Realm\Traits\Services\HasUserLevels;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 class VariableValidatorService

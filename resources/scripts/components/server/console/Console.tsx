@@ -51,7 +51,7 @@ const powersettings = {
 };
 
 const DAEMON_PREFIX_PATTERN = /\x1B\[33m\x1B\[1m\[[^\]]+ Daemon\]:\x1B\[39m ?/g;
-const LEGACY_SHELL_PROMPT_PATTERN = /\x1B\[1m\x1B\[33mcontainer@(pterodactyl|realm)~ \x1B\[0m/g;
+const SHELL_PROMPT_PATTERN = /\x1B\[1m\x1B\[33mcontainer@realm~ \x1B\[0m/g;
 const PLAIN_DAEMON_PREFIX_PATTERN = /\[[^\]]+ Daemon\]: ?/g;
 
 const customsettings: Record<string, string> = {
@@ -126,7 +126,7 @@ export default () => {
         });
 
         return normalized
-            .replace(LEGACY_SHELL_PROMPT_PATTERN, TERMINAL_PRELUDE)
+            .replace(SHELL_PROMPT_PATTERN, TERMINAL_PRELUDE)
             .replace(DAEMON_PREFIX_PATTERN, TERMINAL_PRELUDE)
             .replace(PLAIN_DAEMON_PREFIX_PATTERN, TERMINAL_PRELUDE);
     };

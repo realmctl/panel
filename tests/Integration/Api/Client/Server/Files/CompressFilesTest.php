@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Api\Client\Server\Files;
+namespace Realm\Tests\Integration\Api\Client\Server\Files;
 
 use Mockery\MockInterface;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Repositories\Wings\DaemonFileRepository;
-use Pterodactyl\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
+use Realm\Models\Permission;
+use Realm\Repositories\Wings\DaemonFileRepository;
+use Realm\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
 
 class CompressFilesTest extends ClientApiIntegrationTestCase
 {

@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 use Carbon\Carbon;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Cache\Repository;
-use Pterodactyl\Transformers\Api\Client\StatsTransformer;
-use Pterodactyl\Repositories\Wings\DaemonServerRepository;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\GetServerRequest;
+use Realm\Transformers\Api\Client\StatsTransformer;
+use Realm\Repositories\Wings\DaemonServerRepository;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\GetServerRequest;
 
 class ResourceUtilizationController extends ClientApiController
 {

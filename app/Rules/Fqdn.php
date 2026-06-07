@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Rules;
+namespace Realm\Rules;
 
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Validation\Rule;

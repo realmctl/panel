@@ -1,34 +1,34 @@
 <?php
 
-namespace Pterodactyl\Services\Setup;
+namespace Realm\Services\Setup;
 
-use Pterodactyl\Models\Node;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Traits\Helpers\AvailableLanguages;
-use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
+use Realm\Models\Node;
+use Realm\Models\User;
+use Realm\Models\Server;
+use Realm\Models\Location;
+use Realm\Models\Allocation;
+use Realm\Traits\Helpers\AvailableLanguages;
+use Realm\Contracts\Repository\SettingsRepositoryInterface;
 
 class PanelSetupService
 {
     use AvailableLanguages;
 
-    public const KEY_COMPLETE = 'pterodactyl:setup:completed';
+    public const KEY_COMPLETE = 'realm:setup:completed';
 
-    public const KEY_WINGS_VERIFIED = 'pterodactyl:setup:wings_verified';
+    public const KEY_WINGS_VERIFIED = 'realm:setup:wings_verified';
 
-    public const KEY_SERVER_SKIPPED = 'pterodactyl:setup:server_skipped';
+    public const KEY_SERVER_SKIPPED = 'realm:setup:server_skipped';
 
-    public const KEY_SETTINGS_DONE = 'pterodactyl:setup:settings_done';
+    public const KEY_SETTINGS_DONE = 'realm:setup:settings_done';
 
-    public const KEY_WELCOME_DONE = 'pterodactyl:setup:welcome_done';
+    public const KEY_WELCOME_DONE = 'realm:setup:welcome_done';
 
     public const KEY_ENVIRONMENT_DONE = SetupEnvironmentService::KEY_ENVIRONMENT_DONE;
 
-    public const KEY_LOCATION_DONE = 'pterodactyl:setup:location_done';
+    public const KEY_LOCATION_DONE = 'realm:setup:location_done';
 
-    public const KEY_FORCE_REOPEN = 'pterodactyl:setup:force_reopen';
+    public const KEY_FORCE_REOPEN = 'realm:setup:force_reopen';
 
     /**
      * @var array<int, string>

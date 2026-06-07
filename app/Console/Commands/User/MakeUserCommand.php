@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Console\Commands\User;
+namespace Realm\Console\Commands\User;
 
 use Exception;
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Illuminate\Console\Command;
-use Pterodactyl\Services\Users\UserCreationService;
+use Realm\Services\Users\UserCreationService;
 
 class MakeUserCommand extends Command
 {

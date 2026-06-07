@@ -1,34 +1,34 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\DatabaseNotification;
 use Database\Factories\UserFactory;
-use Pterodactyl\Rules\Username;
-use Pterodactyl\Facades\Activity;
+use Realm\Rules\Username;
+use Realm\Facades\Activity;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
-use Pterodactyl\Contracts\Models\Identifiable;
-use Pterodactyl\Models\Traits\HasAccessTokens;
+use Realm\Contracts\Models\Identifiable;
+use Realm\Models\Traits\HasAccessTokens;
 use Illuminate\Auth\Passwords\CanResetPassword;
-use Pterodactyl\Traits\Helpers\AvailableLanguages;
+use Realm\Traits\Helpers\AvailableLanguages;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
-use Pterodactyl\Models\Traits\HasRealtimeIdentifier;
+use Realm\Models\Traits\HasRealtimeIdentifier;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Pterodactyl\Notifications\SendPasswordReset as ResetPasswordNotification;
+use Realm\Notifications\SendPasswordReset as ResetPasswordNotification;
 
 /**
- * Pterodactyl\Models\User.
+ * Realm\Models\User.
  *
  * @property int $id
  * @property string|null $external_id

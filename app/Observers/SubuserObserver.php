@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Observers;
+namespace Realm\Observers;
 
-use Pterodactyl\Events\Subuser\Creating;
-use Pterodactyl\Events\Subuser\Created;
-use Pterodactyl\Events\Subuser\Deleting;
-use Pterodactyl\Events\Subuser\Deleted;
-use Pterodactyl\Events;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Notifications\AddedToServer;
-use Pterodactyl\Notifications\RemovedFromServer;
+use Realm\Events\Subuser\Creating;
+use Realm\Events\Subuser\Created;
+use Realm\Events\Subuser\Deleting;
+use Realm\Events\Subuser\Deleted;
+use Realm\Events;
+use Realm\Models\Subuser;
+use Realm\Notifications\AddedToServer;
+use Realm\Notifications\RemovedFromServer;
 
 class SubuserObserver
 {

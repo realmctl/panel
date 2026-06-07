@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Tests\Unit\Http\Middleware;
+namespace Realm\Tests\Unit\Http\Middleware;
 
 use Mockery as m;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
-use Pterodactyl\Events\Auth\FailedCaptcha;
-use Pterodactyl\Http\Middleware\VerifyCaptcha;
-use Pterodactyl\Services\Captcha\CaptchaVerificationService;
-use Pterodactyl\Tests\TestCase;
+use Realm\Events\Auth\FailedCaptcha;
+use Realm\Http\Middleware\VerifyCaptcha;
+use Realm\Services\Captcha\CaptchaVerificationService;
+use Realm\Tests\TestCase;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpKernel\Exception\HttpException;

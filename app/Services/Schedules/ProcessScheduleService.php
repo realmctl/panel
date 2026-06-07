@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Services\Schedules;
+namespace Realm\Services\Schedules;
 
 use Throwable;
 use Exception;
-use Pterodactyl\Models\Schedule;
-use Pterodactyl\Models\ScheduleRun;
+use Realm\Models\Schedule;
+use Realm\Models\ScheduleRun;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Pterodactyl\Jobs\Schedule\RunTaskJob;
+use Realm\Jobs\Schedule\RunTaskJob;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Repositories\Wings\DaemonServerRepository;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\DisplayException;
+use Realm\Repositories\Wings\DaemonServerRepository;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 class ProcessScheduleService
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Service\Database;
+namespace Realm\Exceptions\Service\Database;
 
-use Pterodactyl\Exceptions\PterodactylException;
+use Realm\Exceptions\RealmException;
 
-class DatabaseClientFeatureNotEnabledException extends PterodactylException
+class DatabaseClientFeatureNotEnabledException extends RealmException
 {
     public function __construct()
     {

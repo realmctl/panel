@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Events\Server;
+namespace Realm\Events\Server;
 
-use Pterodactyl\Events\Event;
-use Pterodactyl\Models\Server;
+use Realm\Events\Event;
+use Realm\Models\Server;
 use Illuminate\Queue\SerializesModels;
 
 class Updated extends Event

@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Tests\Traits\Integration;
+namespace Realm\Tests\Traits\Integration;
 
 use Ramsey\Uuid\Uuid;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Node;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Models\Allocation;
+use Realm\Models\Egg;
+use Realm\Models\Node;
+use Realm\Models\User;
+use Realm\Models\Server;
+use Realm\Models\Subuser;
+use Realm\Models\Location;
+use Realm\Models\Allocation;
 
 trait CreatesTestModels
 {
@@ -81,7 +81,7 @@ trait CreatesTestModels
      *
      * @param string[] $permissions
      *
-     * @return array{\Pterodactyl\Models\User, \Pterodactyl\Models\Server}
+     * @return array{\Realm\Models\User, \Realm\Models\Server}
      */
     public function generateTestAccount(array $permissions = []): array
     {

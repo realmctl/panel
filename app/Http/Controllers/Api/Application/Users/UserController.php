@@ -1,23 +1,23 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Users;
+namespace Realm\Http\Controllers\Api\Application\Users;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Exception;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Models\User;
+use Realm\Exceptions\DisplayException;
+use Realm\Models\User;
 use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
-use Pterodactyl\Services\Users\UserUpdateService;
-use Pterodactyl\Services\Users\UserCreationService;
-use Pterodactyl\Services\Users\UserDeletionService;
-use Pterodactyl\Transformers\Api\Application\UserTransformer;
-use Pterodactyl\Http\Requests\Api\Application\Users\GetUsersRequest;
-use Pterodactyl\Http\Requests\Api\Application\Users\StoreUserRequest;
-use Pterodactyl\Http\Requests\Api\Application\Users\DeleteUserRequest;
-use Pterodactyl\Http\Requests\Api\Application\Users\UpdateUserRequest;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Services\Users\UserUpdateService;
+use Realm\Services\Users\UserCreationService;
+use Realm\Services\Users\UserDeletionService;
+use Realm\Transformers\Api\Application\UserTransformer;
+use Realm\Http\Requests\Api\Application\Users\GetUsersRequest;
+use Realm\Http\Requests\Api\Application\Users\StoreUserRequest;
+use Realm\Http\Requests\Api\Application\Users\DeleteUserRequest;
+use Realm\Http\Requests\Api\Application\Users\UpdateUserRequest;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
 
 class UserController extends ApplicationApiController
 {

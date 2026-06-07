@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Admin\Egg;
+namespace Realm\Http\Requests\Admin\Egg;
 
-use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
+use Realm\Http\Requests\Admin\AdminFormRequest;
 
 class EggScriptFormRequest extends AdminFormRequest
 {

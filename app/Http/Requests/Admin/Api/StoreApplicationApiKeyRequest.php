@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Admin\Api;
+namespace Realm\Http\Requests\Admin\Api;
 
 use ReflectionException;
-use Pterodactyl\Models\ApiKey;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
-use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
+use Realm\Models\ApiKey;
+use Realm\Services\Acl\Api\AdminAcl;
+use Realm\Http\Requests\Admin\AdminFormRequest;
 
 class StoreApplicationApiKeyRequest extends AdminFormRequest
 {

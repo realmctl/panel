@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Services\Files\FileEditingPresenceService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ClearFileEditingPresenceRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\GetFileEditingPresenceRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\UpdateFileEditingPresenceRequest;
+use Realm\Models\Server;
+use Realm\Services\Files\FileEditingPresenceService;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\Files\ClearFileEditingPresenceRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\GetFileEditingPresenceRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\UpdateFileEditingPresenceRequest;
 
 class FileEditingPresenceController extends ClientApiController
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Services\Files;
+namespace Realm\Services\Files;
 
 use Carbon\CarbonImmutable;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\User;
+use Realm\Models\Server;
+use Realm\Models\User;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
 class FileEditingPresenceService

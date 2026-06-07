@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Services\Minecraft;
+namespace Realm\Services\Minecraft;
 
 class MinecraftAvatarService
 {

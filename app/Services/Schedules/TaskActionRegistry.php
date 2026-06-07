@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Services\Schedules;
+namespace Realm\Services\Schedules;
 
 use InvalidArgumentException;
-use Pterodactyl\Contracts\Schedules\TaskActionInterface;
+use Realm\Contracts\Schedules\TaskActionInterface;
 
 class TaskActionRegistry
 {

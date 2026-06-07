@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Api\Client\Server\Database;
+namespace Realm\Tests\Integration\Api\Client\Server\Database;
 
 use Illuminate\Http\Response;
 use Mockery\MockInterface;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Models\DatabaseHost;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Contracts\Extensions\HashidsInterface;
-use Pterodactyl\Repositories\Eloquent\DatabaseRepository;
-use Pterodactyl\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
+use Realm\Models\Database;
+use Realm\Models\DatabaseHost;
+use Realm\Models\Permission;
+use Realm\Contracts\Extensions\HashidsInterface;
+use Realm\Repositories\Eloquent\DatabaseRepository;
+use Realm\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
 
 class RotateDatabasePasswordTest extends ClientApiIntegrationTestCase
 {

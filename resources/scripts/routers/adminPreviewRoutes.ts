@@ -57,11 +57,9 @@ export interface AdminPreviewRouteDefinition {
     icon: LucideIcon;
     section: AdminPreviewSection;
     exact?: boolean;
-    legacyPath?: string;
-    badge?: string;
 }
 
-export const adminPreviewBasePath = '/admin-preview';
+export const adminPreviewBasePath = '/admin';
 
 export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
     {
@@ -71,7 +69,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         exact: true,
         icon: LayoutDashboard,
         section: 'top',
-        badge: 'Preview',
     },
     {
         path: '/settings',
@@ -79,7 +76,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewSettingsContainer,
         icon: Settings,
         section: 'top',
-        legacyPath: '/admin/settings',
     },
     {
         path: '/api',
@@ -87,7 +83,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewApiContainer,
         icon: Blocks,
         section: 'top',
-        legacyPath: '/admin/api',
     },
     {
         path: '/databases',
@@ -95,7 +90,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewDatabasesContainer,
         icon: Database,
         section: 'management',
-        legacyPath: '/admin/databases',
     },
     {
         path: '/locations',
@@ -103,7 +97,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewLocationsContainer,
         icon: Globe,
         section: 'management',
-        legacyPath: '/admin/locations',
     },
     {
         path: '/nodes',
@@ -111,7 +104,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewNodesContainer,
         icon: Network,
         section: 'management',
-        legacyPath: '/admin/nodes',
     },
     {
         path: '/servers',
@@ -119,7 +111,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewServersContainer,
         icon: Server,
         section: 'management',
-        legacyPath: '/admin/servers',
     },
     {
         path: '/subdomains',
@@ -127,7 +118,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewSubdomainsContainer,
         icon: Globe2,
         section: 'management',
-        legacyPath: '/admin/subdomains',
     },
     {
         path: '/users',
@@ -135,7 +125,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewUsersContainer,
         icon: Users,
         section: 'management',
-        legacyPath: '/admin/users',
     },
     {
         path: '/mounts',
@@ -143,7 +132,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewMountsContainer,
         icon: Folder,
         section: 'services',
-        legacyPath: '/admin/mounts',
     },
     {
         path: '/nests',
@@ -151,7 +139,6 @@ export const adminPreviewRoutes: AdminPreviewRouteDefinition[] = [
         component: AdminPreviewNestsContainer,
         icon: Egg,
         section: 'services',
-        legacyPath: '/admin/nests',
     },
 ];
 

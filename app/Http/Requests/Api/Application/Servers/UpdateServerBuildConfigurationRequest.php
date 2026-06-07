@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Application\Servers;
+namespace Realm\Http\Requests\Api\Application\Servers;
 
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Support\Collection;
 
 class UpdateServerBuildConfigurationRequest extends ServerWriteRequest

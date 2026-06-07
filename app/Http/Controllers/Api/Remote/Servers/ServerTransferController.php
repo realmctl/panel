@@ -1,24 +1,24 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Remote\Servers;
+namespace Realm\Http\Controllers\Api\Remote\Servers;
 
 use Throwable;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Webmozart\Assert\Assert;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Models\Allocation;
+use Realm\Models\Allocation;
 use Illuminate\Support\Facades\Log;
-use Pterodactyl\Models\ServerTransfer;
+use Realm\Models\ServerTransfer;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Pterodactyl\Repositories\Eloquent\ServerRepository;
-use Pterodactyl\Repositories\Wings\DaemonServerRepository;
+use Realm\Http\Controllers\Controller;
+use Realm\Exceptions\Http\HttpForbiddenException;
+use Realm\Repositories\Eloquent\ServerRepository;
+use Realm\Repositories\Wings\DaemonServerRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 class ServerTransferController extends Controller
 {

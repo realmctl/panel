@@ -212,8 +212,8 @@ export default () => {
                 >
                     <TimeoutInput
                         id="connect-timeout"
-                        value={form['pterodactyl:guzzle:connect_timeout']}
-                        onChange={(value) => updateField('pterodactyl:guzzle:connect_timeout', value)}
+                        value={form['realm:guzzle:connect_timeout']}
+                        onChange={(value) => updateField('realm:guzzle:connect_timeout', value)}
                     />
                 </SettingRow>
                 <SettingRow
@@ -223,8 +223,8 @@ export default () => {
                 >
                     <TimeoutInput
                         id="request-timeout"
-                        value={form['pterodactyl:guzzle:timeout']}
-                        onChange={(value) => updateField('pterodactyl:guzzle:timeout', value)}
+                        value={form['realm:guzzle:timeout']}
+                        onChange={(value) => updateField('realm:guzzle:timeout', value)}
                     />
                 </SettingRow>
             </SettingsSection>

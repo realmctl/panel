@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Services\Nests;
+namespace Realm\Services\Nests;
 
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
-use Pterodactyl\Exceptions\Service\HasActiveServersException;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
+use Realm\Contracts\Repository\NestRepositoryInterface;
+use Realm\Exceptions\Service\HasActiveServersException;
+use Realm\Contracts\Repository\ServerRepositoryInterface;
 
 class NestDeletionService
 {

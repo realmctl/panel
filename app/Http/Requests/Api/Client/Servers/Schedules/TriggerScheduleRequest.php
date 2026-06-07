@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Servers\Schedules;
+namespace Realm\Http\Requests\Api\Client\Servers\Schedules;
 
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Models\Permission;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
 
 class TriggerScheduleRequest extends ClientApiRequest
 {

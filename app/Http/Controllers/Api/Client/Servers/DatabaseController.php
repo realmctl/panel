@@ -1,25 +1,25 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
 use Throwable;
-use Pterodactyl\Exceptions\Service\Database\TooManyDatabasesException;
-use Pterodactyl\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Service\Database\TooManyDatabasesException;
+use Realm\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Services\Databases\DatabasePasswordService;
-use Pterodactyl\Transformers\Api\Client\DatabaseTransformer;
-use Pterodactyl\Services\Databases\DatabaseManagementService;
-use Pterodactyl\Services\Databases\DeployServerDatabaseService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Databases\GetDatabasesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Databases\StoreDatabaseRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Databases\DeleteDatabaseRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Databases\RotatePasswordRequest;
+use Realm\Models\Server;
+use Realm\Models\Database;
+use Realm\Facades\Activity;
+use Realm\Exceptions\DisplayException;
+use Realm\Services\Databases\DatabasePasswordService;
+use Realm\Transformers\Api\Client\DatabaseTransformer;
+use Realm\Services\Databases\DatabaseManagementService;
+use Realm\Services\Databases\DeployServerDatabaseService;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\Databases\GetDatabasesRequest;
+use Realm\Http\Requests\Api\Client\Servers\Databases\StoreDatabaseRequest;
+use Realm\Http\Requests\Api\Client\Servers\Databases\DeleteDatabaseRequest;
+use Realm\Http\Requests\Api\Client\Servers\Databases\RotatePasswordRequest;
 
 class DatabaseController extends ClientApiController
 {

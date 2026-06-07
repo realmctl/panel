@@ -1,20 +1,20 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
+namespace Realm\Http\Controllers\Api\Application\Servers;
 
 use Throwable;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Database;
+use Realm\Models\Server;
+use Realm\Models\Database;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Services\Databases\DatabasePasswordService;
-use Pterodactyl\Services\Databases\DatabaseManagementService;
-use Pterodactyl\Transformers\Api\Application\ServerDatabaseTransformer;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
-use Pterodactyl\Http\Requests\Api\Application\Servers\Databases\GetServerDatabaseRequest;
-use Pterodactyl\Http\Requests\Api\Application\Servers\Databases\GetServerDatabasesRequest;
-use Pterodactyl\Http\Requests\Api\Application\Servers\Databases\ServerDatabaseWriteRequest;
-use Pterodactyl\Http\Requests\Api\Application\Servers\Databases\StoreServerDatabaseRequest;
+use Realm\Services\Databases\DatabasePasswordService;
+use Realm\Services\Databases\DatabaseManagementService;
+use Realm\Transformers\Api\Application\ServerDatabaseTransformer;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Http\Requests\Api\Application\Servers\Databases\GetServerDatabaseRequest;
+use Realm\Http\Requests\Api\Application\Servers\Databases\GetServerDatabasesRequest;
+use Realm\Http\Requests\Api\Application\Servers\Databases\ServerDatabaseWriteRequest;
+use Realm\Http\Requests\Api\Application\Servers\Databases\StoreServerDatabaseRequest;
 
 class DatabaseController extends ApplicationApiController
 {

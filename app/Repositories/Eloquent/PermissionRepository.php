@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Repositories\Eloquent;
+namespace Realm\Repositories\Eloquent;
 
 use Exception;
-use Pterodactyl\Contracts\Repository\PermissionRepositoryInterface;
+use Realm\Contracts\Repository\PermissionRepositoryInterface;
 
 class PermissionRepository extends EloquentRepository implements PermissionRepositoryInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Service\Backup;
+namespace Realm\Exceptions\Service\Backup;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 
 class TooManyBackupsException extends DisplayException
 {

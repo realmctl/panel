@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Application\Users;
+namespace Realm\Http\Requests\Api\Application\Users;
 
-use Pterodactyl\Models\User;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
-use Pterodactyl\Http\Requests\Api\Application\ApplicationApiRequest;
+use Realm\Models\User;
+use Realm\Services\Acl\Api\AdminAcl;
+use Realm\Http\Requests\Api\Application\ApplicationApiRequest;
 
 class StoreUserRequest extends ApplicationApiRequest
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Tests\Assertions;
+namespace Realm\Tests\Assertions;
 
 use PHPUnit\Framework\Assert;
 use Illuminate\Support\Facades\Event;
-use Pterodactyl\Events\ActivityLogged;
+use Realm\Events\ActivityLogged;
 use Illuminate\Database\Eloquent\Model;
-use Pterodactyl\Models\ActivityLogSubject;
+use Realm\Models\ActivityLogSubject;
 
 trait AssertsActivityLogged
 {

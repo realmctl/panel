@@ -1,21 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Pterodactyl\Http\Controllers\Api\Admin\ApplicationApiController;
-use Pterodactyl\Http\Controllers\Api\Admin\OverviewController;
-use Pterodactyl\Http\Controllers\Api\Admin\DatabaseHostController;
-use Pterodactyl\Http\Controllers\Api\Admin\LocationController;
-use Pterodactyl\Http\Controllers\Api\Admin\NodeController;
-use Pterodactyl\Http\Controllers\Api\Admin\ServerController;
-use Pterodactyl\Http\Controllers\Api\Admin\SettingsController;
-use Pterodactyl\Http\Controllers\Api\Admin\EggController;
-use Pterodactyl\Http\Controllers\Api\Admin\EggScriptController;
-use Pterodactyl\Http\Controllers\Api\Admin\EggVariableController;
-use Pterodactyl\Http\Controllers\Api\Admin\MountController;
-use Pterodactyl\Http\Controllers\Api\Admin\NestController;
-use Pterodactyl\Http\Controllers\Api\Admin\SubdomainDomainController;
-use Pterodactyl\Http\Controllers\Api\Admin\SubdomainRecordController;
-use Pterodactyl\Http\Controllers\Api\Admin\UserController;
+use Realm\Http\Controllers\Api\Admin\ApplicationApiController;
+use Realm\Http\Controllers\Api\Admin\OverviewController;
+use Realm\Http\Controllers\Api\Admin\DatabaseHostController;
+use Realm\Http\Controllers\Api\Admin\LocationController;
+use Realm\Http\Controllers\Api\Admin\NodeController;
+use Realm\Http\Controllers\Api\Admin\ServerController;
+use Realm\Http\Controllers\Api\Admin\SettingsController;
+use Realm\Http\Controllers\Api\Admin\EggController;
+use Realm\Http\Controllers\Api\Admin\EggScriptController;
+use Realm\Http\Controllers\Api\Admin\EggVariableController;
+use Realm\Http\Controllers\Api\Admin\MountController;
+use Realm\Http\Controllers\Api\Admin\NestController;
+use Realm\Http\Controllers\Api\Admin\SubdomainDomainController;
+use Realm\Http\Controllers\Api\Admin\SubdomainRecordController;
+use Realm\Http\Controllers\Api\Admin\UserController;
 
 Route::get('/overview', [OverviewController::class, 'index']);
 

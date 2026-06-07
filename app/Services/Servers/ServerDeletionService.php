@@ -1,18 +1,18 @@
 <?php
 
-namespace Pterodactyl\Services\Servers;
+namespace Realm\Services\Servers;
 
 use Exception;
 use Throwable;
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Repositories\Wings\DaemonServerRepository;
-use Pterodactyl\Services\Databases\DatabaseManagementService;
-use Pterodactyl\Services\Subdomains\SubdomainManagementService;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Repositories\Wings\DaemonServerRepository;
+use Realm\Services\Databases\DatabaseManagementService;
+use Realm\Services\Subdomains\SubdomainManagementService;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 class ServerDeletionService
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Services\Subdomains\Dns;
+namespace Realm\Services\Subdomains\Dns;
 
 readonly class DnsRecordData
 {

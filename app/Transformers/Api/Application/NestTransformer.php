@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Application;
+namespace Realm\Transformers\Api\Application;
 
-use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Nest;
-use Pterodactyl\Models\Server;
+use Realm\Exceptions\Transformer\InvalidTransformerLevelException;
+use Realm\Models\Egg;
+use Realm\Models\Nest;
+use Realm\Models\Server;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\NullResource;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
+use Realm\Services\Acl\Api\AdminAcl;
 
 class NestTransformer extends BaseTransformer
 {

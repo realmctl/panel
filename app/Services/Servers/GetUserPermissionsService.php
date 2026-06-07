@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Services\Servers;
+namespace Realm\Services\Servers;
 
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Server;
+use Realm\Models\Subuser;
+use Realm\Models\User;
+use Realm\Models\Server;
 
 class GetUserPermissionsService
 {

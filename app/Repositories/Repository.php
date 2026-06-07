@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Repositories;
+namespace Realm\Repositories;
 
 use InvalidArgumentException;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
-use Pterodactyl\Contracts\Repository\RepositoryInterface;
+use Realm\Contracts\Repository\RepositoryInterface;
 
 abstract class Repository implements RepositoryInterface
 {

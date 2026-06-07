@@ -2,7 +2,6 @@ export interface NodeTab {
     id: string;
     label: string;
     path: string;
-    legacyPath?: (nodeId: number) => string;
 }
 
 export const nodeTabs: NodeTab[] = [

@@ -1,21 +1,21 @@
 <?php
 
-namespace Pterodactyl\Services\Setup;
+namespace Realm\Services\Setup;
 
 use Illuminate\Http\Request;
-use Pterodactyl\Exceptions\PterodactylException;
-use Pterodactyl\Traits\Commands\EnvironmentWriterTrait;
+use Realm\Exceptions\RealmException;
+use Realm\Traits\Commands\EnvironmentWriterTrait;
 
 class SetupEnvironmentService
 {
     use EnvironmentWriterTrait;
 
-    public const KEY_ENVIRONMENT_DONE = 'pterodactyl:setup:environment_done';
+    public const KEY_ENVIRONMENT_DONE = 'realm:setup:environment_done';
 
     /**
      * @param array{author: string, url: string, timezone: string, cache?: string, session?: string, queue?: string, redisHost?: string, redisPort?: string, redisPassword?: string|null} $data
      *
-     * @throws PterodactylException
+     * @throws RealmException
      */
     public function configure(array $data): void
     {
@@ -32,7 +32,6 @@ class SetupEnvironmentService
         $variables['SESSION_DRIVER'] = $data['session'] ?? 'redis';
         $variables['QUEUE_CONNECTION'] = $data['queue'] ?? 'redis';
         $variables['APP_ENVIRONMENT_ONLY'] = 'false';
-        $variables['PTERODACTYL_TELEMETRY_ENABLED'] = 'false';
 
         if (str_starts_with($variables['APP_URL'], 'https://')) {
             $variables['SESSION_SECURE_COOKIE'] = 'true';
@@ -51,7 +50,7 @@ class SetupEnvironmentService
     public function isConfigured(): bool
     {
         $url = config('app.url', '');
-        $author = config('pterodactyl.service.author', '');
+        $author = config('realm.service.author', '');
         $salt = config('hashids.salt', '');
 
         $hasCustomUrl = !empty($url)
@@ -70,7 +69,7 @@ class SetupEnvironmentService
         $requestUrl = $request->getSchemeAndHttpHost();
 
         return [
-            'author' => config('pterodactyl.service.author', ''),
+            'author' => config('realm.service.author', ''),
             'url' => $this->isConfigured() ? config('app.url') : $requestUrl,
             'timezone' => config('app.timezone', 'UTC'),
             'cache' => config('cache.default', 'redis'),

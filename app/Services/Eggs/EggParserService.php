@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs;
+namespace Realm\Services\Eggs;
 
 use JsonException;
 use Illuminate\Support\Arr;
-use Pterodactyl\Models\Egg;
+use Realm\Models\Egg;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
-use Pterodactyl\Exceptions\Service\InvalidFileUploadException;
+use Realm\Exceptions\Service\InvalidFileUploadException;
 
 class EggParserService
 {

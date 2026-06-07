@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models;
+namespace Realm\Models;
 
 use Carbon\Carbon;
 use Database\Factories\DatabaseFactory;
@@ -8,7 +8,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Pterodactyl\Contracts\Extensions\HashidsInterface;
+use Realm\Contracts\Extensions\HashidsInterface;
 
 /**
  * @property int $id

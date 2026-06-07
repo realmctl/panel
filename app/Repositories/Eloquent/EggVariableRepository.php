@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Repositories\Eloquent;
+namespace Realm\Repositories\Eloquent;
 
 use Illuminate\Support\Collection;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Contracts\Repository\EggVariableRepositoryInterface;
+use Realm\Models\EggVariable;
+use Realm\Contracts\Repository\EggVariableRepositoryInterface;
 
 class EggVariableRepository extends EloquentRepository implements EggVariableRepositoryInterface
 {

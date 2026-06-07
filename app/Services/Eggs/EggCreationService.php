@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs;
+namespace Realm\Services\Eggs;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
+use Realm\Models\Egg;
+use Realm\Contracts\Repository\EggRepositoryInterface;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Pterodactyl\Exceptions\Service\Egg\NoParentConfigurationFoundException;
+use Realm\Exceptions\Service\Egg\NoParentConfigurationFoundException;
 
-// When a mommy and a daddy pterodactyl really like each other...
+// When a mommy and a daddy egg really like each other...
 class EggCreationService
 {
     /**
@@ -41,7 +41,7 @@ class EggCreationService
 
         return $this->repository->create(array_merge($data, [
             'uuid' => Uuid::uuid4()->toString(),
-            'author' => $this->config->get('pterodactyl.service.author'),
+            'author' => $this->config->get('realm.service.author'),
         ]), true, true);
     }
 }

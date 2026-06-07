@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
 use Illuminate\Validation\ValidationException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Services\Servers\StartupCommandService;
-use Pterodactyl\Repositories\Eloquent\ServerVariableRepository;
-use Pterodactyl\Transformers\Api\Client\EggVariableTransformer;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Server;
+use Realm\Facades\Activity;
+use Realm\Services\Servers\StartupCommandService;
+use Realm\Repositories\Eloquent\ServerVariableRepository;
+use Realm\Transformers\Api\Client\EggVariableTransformer;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Startup\GetStartupRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Startup\UpdateStartupVariableRequest;
+use Realm\Http\Requests\Api\Client\Servers\Startup\GetStartupRequest;
+use Realm\Http\Requests\Api\Client\Servers\Startup\UpdateStartupVariableRequest;
 
 class StartupController extends ClientApiController
 {

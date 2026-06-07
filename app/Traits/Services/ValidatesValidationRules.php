@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Traits\Services;
+namespace Realm\Traits\Services;
 
 use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException;
+use Realm\Exceptions\Service\Egg\Variable\BadValidationRuleException;
 
 trait ValidatesValidationRules
 {

@@ -20,7 +20,7 @@ return [
     |
     | Each panel installation is assigned a unique UUID to identify the
     | author of custom services, and make upgrades easier by identifying
-    | standard Pterodactyl shipped services.
+    | standard Realm shipped services.
     */
 
     'service' => [
@@ -106,19 +106,19 @@ return [
 
     'client_features' => [
         'databases' => [
-            'enabled' => env('PTERODACTYL_CLIENT_DATABASES_ENABLED', true),
-            'allow_random' => env('PTERODACTYL_CLIENT_DATABASES_ALLOW_RANDOM', true),
+            'enabled' => env('REALM_CLIENT_DATABASES_ENABLED', true),
+            'allow_random' => env('REALM_CLIENT_DATABASES_ALLOW_RANDOM', true),
         ],
 
         'schedules' => [
             // The total number of tasks that can exist for any given schedule at once.
-            'per_schedule_task_limit' => env('PTERODACTYL_PER_SCHEDULE_TASK_LIMIT', 10),
+            'per_schedule_task_limit' => env('REALM_PER_SCHEDULE_TASK_LIMIT', 10),
         ],
 
         'allocations' => [
-            'enabled' => env('PTERODACTYL_CLIENT_ALLOCATIONS_ENABLED', false),
-            'range_start' => env('PTERODACTYL_CLIENT_ALLOCATIONS_RANGE_START'),
-            'range_end' => env('PTERODACTYL_CLIENT_ALLOCATIONS_RANGE_END'),
+            'enabled' => env('REALM_CLIENT_ALLOCATIONS_ENABLED', false),
+            'range_start' => env('REALM_CLIENT_ALLOCATIONS_RANGE_START'),
+            'range_end' => env('REALM_CLIENT_ALLOCATIONS_RANGE_END'),
         ],
     ],
 
@@ -131,14 +131,14 @@ return [
     */
 
     'files' => [
-        'max_edit_size' => env('PTERODACTYL_FILES_MAX_EDIT_SIZE', 1024 * 1024 * 4),
+        'max_edit_size' => env('REALM_FILES_MAX_EDIT_SIZE', 1024 * 1024 * 4),
         'revisions' => [
             // Maximum number of revisions to keep per file. Set to null to disable.
-            'max_per_file' => env('PTERODACTYL_FILE_REVISIONS_MAX_PER_FILE', null),
+            'max_per_file' => env('REALM_FILE_REVISIONS_MAX_PER_FILE', null),
             // Maximum age of revisions in days. Set to null to disable.
-            'max_age_days' => env('PTERODACTYL_FILE_REVISIONS_MAX_AGE_DAYS', null),
+            'max_age_days' => env('REALM_FILE_REVISIONS_MAX_AGE_DAYS', null),
             // Maximum total revision storage per server in bytes. Set to null to disable.
-            'max_storage_per_server' => env('PTERODACTYL_FILE_REVISIONS_MAX_STORAGE', null),
+            'max_storage_per_server' => env('REALM_FILE_REVISIONS_MAX_STORAGE', null),
         ],
     ],
 
@@ -169,7 +169,7 @@ return [
     */
 
     'assets' => [
-        'use_hash' => env('PTERODACTYL_USE_ASSET_HASH', false),
+        'use_hash' => env('REALM_USE_ASSET_HASH', false),
     ],
 
     /*
@@ -182,24 +182,12 @@ return [
 
     'email' => [
         // Should an email be sent to a server owner once their server has completed it's first install process?
-        'send_install_notification' => env('PTERODACTYL_SEND_INSTALL_NOTIFICATION', true),
+        'send_install_notification' => env('REALM_SEND_INSTALL_NOTIFICATION', true),
         // Should an email be sent to a server owner whenever their server is reinstalled?
-        'send_reinstall_notification' => env('PTERODACTYL_SEND_REINSTALL_NOTIFICATION', true),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Telemetry Settings
-    |--------------------------------------------------------------------------
-    |
-    | This section controls the telemetry sent by Pterodactyl.
-    */
-
-    'telemetry' => [
-        'enabled' => env('PTERODACTYL_TELEMETRY_ENABLED', true),
+        'send_reinstall_notification' => env('REALM_SEND_REINSTALL_NOTIFICATION', true),
     ],
 
     'features' => [
-        'new_server_identifiers' => (bool) env('PTERODACTYL_USE_SERVER_IDENTIFIERS', false),
+        'new_server_identifiers' => (bool) env('REALM_USE_SERVER_IDENTIFIERS', false),
     ],
 ];

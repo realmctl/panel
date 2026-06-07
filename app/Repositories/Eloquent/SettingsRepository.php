@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Repositories\Eloquent;
+namespace Realm\Repositories\Eloquent;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Models\Setting;
-use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Models\Setting;
+use Realm\Contracts\Repository\SettingsRepositoryInterface;
 
 class SettingsRepository extends EloquentRepository implements SettingsRepositoryInterface
 {

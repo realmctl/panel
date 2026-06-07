@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Api\Application\Nodes\NodeController;
+namespace Realm\Tests\Integration\Api\Application\Nodes\NodeController;
 
 use Mockery\MockInterface;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use GuzzleHttp\Psr7\Response;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Repositories\Wings\DaemonConfigurationRepository;
-use Pterodactyl\Tests\Integration\Api\Application\ApplicationApiIntegrationTestCase;
+use Realm\Models\Location;
+use Realm\Repositories\Wings\DaemonConfigurationRepository;
+use Realm\Tests\Integration\Api\Application\ApplicationApiIntegrationTestCase;
 
 class UpdateNodeTest extends ApplicationApiIntegrationTestCase
 {

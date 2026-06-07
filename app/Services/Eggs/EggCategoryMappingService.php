@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs;
+namespace Realm\Services\Eggs;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Models\EggCategoryMapping;
-use Pterodactyl\Models\Server;
+use Realm\Exceptions\DisplayException;
+use Realm\Models\EggCategoryMapping;
+use Realm\Models\Server;
 
 class EggCategoryMappingService
 {

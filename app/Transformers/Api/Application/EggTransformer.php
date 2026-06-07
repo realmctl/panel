@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Application;
+namespace Realm\Transformers\Api\Application;
 
 use stdClass;
 use JsonException;
-use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
+use Realm\Exceptions\Transformer\InvalidTransformerLevelException;
 use Illuminate\Support\Arr;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Nest;
-use Pterodactyl\Models\Server;
+use Realm\Models\Egg;
+use Realm\Models\Nest;
+use Realm\Models\Server;
 use League\Fractal\Resource\Item;
-use Pterodactyl\Models\EggVariable;
+use Realm\Models\EggVariable;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\NullResource;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
+use Realm\Services\Acl\Api\AdminAcl;
 
 class EggTransformer extends BaseTransformer
 {

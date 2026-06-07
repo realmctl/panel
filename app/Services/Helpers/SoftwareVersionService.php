@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Services\Helpers;
+namespace Realm\Services\Helpers;
 
 use Exception;
 use GuzzleHttp\Client;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Pterodactyl\Exceptions\Service\Helper\CdnVersionFetchingException;
+use Realm\Exceptions\Service\Helper\CdnVersionFetchingException;
 
 class SoftwareVersionService
 {
-    public const VERSION_CACHE_KEY = 'pterodactyl:versioning_data';
+    public const VERSION_CACHE_KEY = 'realm:versioning_data';
 
     private static array $result;
 
@@ -86,9 +86,9 @@ class SoftwareVersionService
      */
     protected function cacheVersionData(): array
     {
-        return $this->cache->remember(self::VERSION_CACHE_KEY, CarbonImmutable::now()->addMinutes(config('pterodactyl.cdn.cache_time', 60)), function () {
+        return $this->cache->remember(self::VERSION_CACHE_KEY, CarbonImmutable::now()->addMinutes(config('realm.cdn.cache_time', 60)), function () {
             try {
-                $response = $this->client->request('GET', config('pterodactyl.cdn.url'));
+                $response = $this->client->request('GET', config('realm.cdn.url'));
 
                 if ($response->getStatusCode() === 200) {
                     return json_decode($response->getBody(), true);

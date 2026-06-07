@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware\Api\Client\Server;
+namespace Realm\Http\Middleware\Api\Client\Server;
 
 use Closure;
 use InvalidArgumentException;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Backup;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Models\Schedule;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Models\Subdomain\Subdomain;
+use Realm\Models\Task;
+use Realm\Models\User;
+use Realm\Models\Backup;
+use Realm\Models\Server;
+use Realm\Models\Subuser;
+use Realm\Models\Database;
+use Realm\Models\Schedule;
+use Realm\Models\Allocation;
+use Realm\Models\Subdomain\Subdomain;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

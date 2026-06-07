@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Client;
+namespace Realm\Transformers\Api\Client;
 
-use Pterodactyl\Models\ScheduleRunTask;
+use Realm\Models\ScheduleRunTask;
 
 class ScheduleRunTaskTransformer extends BaseClientTransformer
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Contracts\Extensions;
+namespace Realm\Contracts\Extensions;
 
 use InvalidArgumentException;
 use Hashids\HashidsInterface as VendorHashidsInterface;

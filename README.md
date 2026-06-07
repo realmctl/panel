@@ -13,14 +13,13 @@ UI to end users.
 
 Stop settling for less. Make game servers a first class citizen on your platform.
 
-![Image](https://cdn.pterodactyl.io/site-assets/pterodactyl_v1_demo.gif)
 
 ## Documentation
 
 * [Panel Documentation](https://realmctl.com/panel/1.0/getting_started.html)
 * [Wings Documentation](https://realmctl.com/wings/1.0/installing.html)
 * [Community Guides](https://realmctl.com/community/about.html)
-* Or, get additional help [via Discord](https://discord.gg/realopensource)
+* Or, get additional help [via Discord](https://discord.gg/TAWz2MNqtA)
 
 ### Supported Games
 

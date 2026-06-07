@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Admin\Settings;
+namespace Realm\Http\Requests\Admin\Settings;
 
 use Illuminate\Validation\Rule;
-use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
-use Pterodactyl\Http\Controllers\Admin\Settings\MailController;
+use Realm\Http\Requests\Admin\AdminFormRequest;
+use Realm\Support\Mail\SupportedMailDrivers;
 
 class MailSettingsFormRequest extends AdminFormRequest
 {
@@ -16,7 +16,7 @@ class MailSettingsFormRequest extends AdminFormRequest
         $driver = $this->input('mail:default', config('mail.default'));
 
         $rules = [
-            'mail:default' => ['required', 'string', Rule::in(MailController::SUPPORTED_DRIVERS)],
+            'mail:default' => ['required', 'string', Rule::in(SupportedMailDrivers::DRIVERS)],
             'mail:from:address' => 'required|string|email',
             'mail:from:name' => 'nullable|string|max:191',
         ];

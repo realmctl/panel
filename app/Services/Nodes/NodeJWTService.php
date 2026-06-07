@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Services\Nodes;
+namespace Realm\Services\Nodes;
 
 use DateTimeImmutable;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\Node;
-use Pterodactyl\Models\User;
+use Realm\Models\Node;
+use Realm\Models\User;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Enum\JwtScope;
+use Realm\Enum\JwtScope;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\UnencryptedToken;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
-use Pterodactyl\Extensions\Lcobucci\JWT\Encoding\TimestampDates;
+use Realm\Extensions\Lcobucci\JWT\Encoding\TimestampDates;
 
 class NodeJWTService
 {

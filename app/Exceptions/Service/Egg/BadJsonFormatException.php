@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Service\Egg;
+namespace Realm\Exceptions\Service\Egg;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 
 class BadJsonFormatException extends DisplayException
 {

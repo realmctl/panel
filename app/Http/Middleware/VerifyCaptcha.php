@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware;
+namespace Realm\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Pterodactyl\Events\Auth\FailedCaptcha;
+use Realm\Events\Auth\FailedCaptcha;
 use Illuminate\Contracts\Events\Dispatcher;
-use Pterodactyl\Services\Captcha\CaptchaVerificationService;
+use Realm\Services\Captcha\CaptchaVerificationService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class VerifyCaptcha

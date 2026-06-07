@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Repositories\Eloquent;
+namespace Realm\Repositories\Eloquent;
 
-use Pterodactyl\Models\ServerVariable;
-use Pterodactyl\Contracts\Repository\ServerVariableRepositoryInterface;
+use Realm\Models\ServerVariable;
+use Realm\Contracts\Repository\ServerVariableRepositoryInterface;
 
 class ServerVariableRepository extends EloquentRepository implements ServerVariableRepositoryInterface
 {

@@ -1,26 +1,26 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
+namespace Realm\Http\Controllers\Api\Application\Servers;
 
 use Throwable;
 use Illuminate\Validation\ValidationException;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Service\Deployment\NoViableAllocationException;
+use Realm\Exceptions\Service\Deployment\NoViableNodeException;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
-use Pterodactyl\Services\Servers\ServerCreationService;
-use Pterodactyl\Services\Servers\ServerDeletionService;
-use Pterodactyl\Transformers\Api\Application\ServerTransformer;
-use Pterodactyl\Http\Requests\Api\Application\Servers\GetServerRequest;
-use Pterodactyl\Http\Requests\Api\Application\Servers\GetServersRequest;
-use Pterodactyl\Http\Requests\Api\Application\Servers\ServerWriteRequest;
-use Pterodactyl\Http\Requests\Api\Application\Servers\StoreServerRequest;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Services\Servers\ServerCreationService;
+use Realm\Services\Servers\ServerDeletionService;
+use Realm\Transformers\Api\Application\ServerTransformer;
+use Realm\Http\Requests\Api\Application\Servers\GetServerRequest;
+use Realm\Http\Requests\Api\Application\Servers\GetServersRequest;
+use Realm\Http\Requests\Api\Application\Servers\ServerWriteRequest;
+use Realm\Http\Requests\Api\Application\Servers\StoreServerRequest;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
 
 class ServerController extends ApplicationApiController
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Schedules\Actions;
+namespace Realm\Services\Schedules\Actions;
 
 use GuzzleHttp\Client;
 use InvalidArgumentException;
-use Pterodactyl\Contracts\Schedules\TaskActionInterface;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Task;
+use Realm\Contracts\Schedules\TaskActionInterface;
+use Realm\Models\Server;
+use Realm\Models\Task;
 
 class WebhookTaskAction implements TaskActionInterface
 {

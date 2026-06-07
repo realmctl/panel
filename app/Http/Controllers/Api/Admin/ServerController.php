@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Carbon\CarbonImmutable;
 use Exception;
@@ -9,43 +9,43 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
-use Pterodactyl\Enum\JwtScope;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableAllocationException;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
-use Pterodactyl\Http\Requests\Admin\ServerFormRequest;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Models\Node;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\Servers\Databases\StoreServerDatabaseRequest;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Models\Database;
-use Pterodactyl\Models\Filters\AdminServerFilter;
-use Pterodactyl\Models\Mount;
-use Pterodactyl\Models\MountServer;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\ServerTransfer;
-use Pterodactyl\Models\User;
-use Pterodactyl\Repositories\Eloquent\DatabaseHostRepository;
-use Pterodactyl\Repositories\Eloquent\MountRepository;
-use Pterodactyl\Repositories\Eloquent\NodeRepository;
-use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
-use Pterodactyl\Services\Databases\DatabaseManagementService;
-use Pterodactyl\Services\Databases\DatabasePasswordService;
-use Pterodactyl\Services\Nodes\NodeJWTService;
-use Pterodactyl\Services\Servers\BuildModificationService;
-use Pterodactyl\Services\Servers\DetailsModificationService;
-use Pterodactyl\Services\Servers\EnvironmentService;
-use Pterodactyl\Services\Servers\ReinstallServerService;
-use Pterodactyl\Services\Servers\ServerCreationService;
-use Pterodactyl\Services\Servers\ServerDeletionService;
-use Pterodactyl\Services\Servers\StartupModificationService;
-use Pterodactyl\Services\Servers\SuspensionService;
-use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
+use Realm\Enum\JwtScope;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Service\Deployment\NoViableAllocationException;
+use Realm\Exceptions\Service\Deployment\NoViableNodeException;
+use Realm\Http\Requests\Admin\ServerFormRequest;
+use Realm\Models\Location;
+use Realm\Models\Node;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\Servers\Databases\StoreServerDatabaseRequest;
+use Realm\Models\Allocation;
+use Realm\Models\Database;
+use Realm\Models\Filters\AdminServerFilter;
+use Realm\Models\Mount;
+use Realm\Models\MountServer;
+use Realm\Models\Server;
+use Realm\Models\ServerTransfer;
+use Realm\Models\User;
+use Realm\Repositories\Eloquent\DatabaseHostRepository;
+use Realm\Repositories\Eloquent\MountRepository;
+use Realm\Repositories\Eloquent\NodeRepository;
+use Realm\Repositories\Wings\DaemonTransferRepository;
+use Realm\Services\Databases\DatabaseManagementService;
+use Realm\Services\Databases\DatabasePasswordService;
+use Realm\Services\Nodes\NodeJWTService;
+use Realm\Services\Servers\BuildModificationService;
+use Realm\Services\Servers\DetailsModificationService;
+use Realm\Services\Servers\EnvironmentService;
+use Realm\Services\Servers\ReinstallServerService;
+use Realm\Services\Servers\ServerCreationService;
+use Realm\Services\Servers\ServerDeletionService;
+use Realm\Services\Servers\StartupModificationService;
+use Realm\Services\Servers\SuspensionService;
+use Realm\Contracts\Repository\AllocationRepositoryInterface;
+use Realm\Contracts\Repository\NestRepositoryInterface;
+use Realm\Contracts\Repository\ServerRepositoryInterface;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Throwable;
@@ -147,7 +147,7 @@ class ServerController extends Controller
                 AllowedFilter::exact('owner_id'),
                 AllowedFilter::custom('*', new AdminServerFilter()),
             ])
-            ->paginate(config()->get('pterodactyl.paginate.admin.servers'));
+            ->paginate(config()->get('realm.paginate.admin.servers'));
 
         return response()->json([
             'servers' => collect($servers->items())->map(fn (Server $server) => $this->transformListItem($server))->values(),

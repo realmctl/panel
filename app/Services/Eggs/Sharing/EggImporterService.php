@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Services\Eggs\Sharing;
+namespace Realm\Services\Eggs\Sharing;
 
-use Pterodactyl\Exceptions\Service\InvalidFileUploadException;
+use Realm\Exceptions\Service\InvalidFileUploadException;
 use Throwable;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Arr;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Nest;
+use Realm\Models\Egg;
+use Realm\Models\Nest;
 use Illuminate\Http\UploadedFile;
-use Pterodactyl\Models\EggVariable;
+use Realm\Models\EggVariable;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Services\Eggs\EggParserService;
+use Realm\Services\Eggs\EggParserService;
 
 class EggImporterService
 {

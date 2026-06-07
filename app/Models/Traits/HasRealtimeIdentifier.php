@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Models\Traits;
+namespace Realm\Models\Traits;
 
 use ReflectionClass;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 use ParagonIE\ConstantTime\Base32;
 use Illuminate\Database\Eloquent\Builder;
-use Pterodactyl\Models\Attributes\Identifiable;
+use Realm\Models\Attributes\Identifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**

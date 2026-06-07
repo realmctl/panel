@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client\Servers\Schedules;
+namespace Realm\Http\Requests\Api\Client\Servers\Schedules;
 
 use Illuminate\Validation\Rule;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Services\Schedules\TaskActionRegistry;
+use Realm\Models\Permission;
+use Realm\Models\Task;
+use Realm\Services\Schedules\TaskActionRegistry;
 
 class StoreTaskRequest extends ViewScheduleRequest
 {

@@ -1,20 +1,20 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Remote;
+namespace Realm\Http\Controllers\Api\Remote;
 
 use DateTimeInterface;
 use Exception;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Support\Facades\Log;
-use Pterodactyl\Models\ActivityLog;
-use Pterodactyl\Models\ActivityLogSubject;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Api\Remote\ActivityEventRequest;
+use Realm\Models\ActivityLog;
+use Realm\Models\ActivityLogSubject;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Api\Remote\ActivityEventRequest;
 
 class ActivityProcessingController extends Controller
 {

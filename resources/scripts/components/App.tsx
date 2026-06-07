@@ -1,6 +1,6 @@
 import React, { lazy } from 'react';
 import { hot } from 'react-hot-loader/root';
-import { Route, Router, Switch } from 'react-router-dom';
+import { Redirect, Route, Router, Switch, useLocation } from 'react-router-dom';
 import { StoreProvider } from 'easy-peasy';
 import { store } from '@/state';
 import { SiteSettings } from '@/state/settings';
@@ -22,11 +22,25 @@ const DashboardRouter = lazy(() => import(/* webpackChunkName: "dashboard" */ '@
 const ServerRouter = lazy(() => import(/* webpackChunkName: "server" */ '@/routers/ServerRouter'));
 const AuthenticationRouter = lazy(() => import(/* webpackChunkName: "auth" */ '@/routers/AuthenticationRouter'));
 const SetupRouter = lazy(() => import(/* webpackChunkName: "setup" */ '@/routers/SetupRouter'));
-const AdminPreviewRouter = lazy(() => import(/* webpackChunkName: "admin-preview" */ '@/routers/AdminPreviewRouter'));
+const AdminPreviewRouter = lazy(() => import(/* webpackChunkName: "admin" */ '@/routers/AdminPreviewRouter'));
+
+const AdminLegacyPathRedirect = () => {
+    const location = useLocation();
+
+    return (
+        <Redirect
+            to={{
+                pathname: location.pathname.replace(/^\/admin-preview/, '/admin'),
+                search: location.search,
+                hash: location.hash,
+            }}
+        />
+    );
+};
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
-    PterodactylUser?: {
+    RealmUser?: {
         uuid: string;
         username: string;
         email: string;
@@ -44,18 +58,18 @@ interface ExtendedWindow extends Window {
 setupInterceptors(history);
 
 const App = () => {
-    const { PterodactylUser, SiteConfiguration } = window as ExtendedWindow;
-    if (PterodactylUser && !store.getState().user.data) {
+    const { RealmUser, SiteConfiguration } = window as ExtendedWindow;
+    if (RealmUser && !store.getState().user.data) {
         store.getActions().user.setUserData({
-            uuid: PterodactylUser.uuid,
-            username: PterodactylUser.username,
-            email: PterodactylUser.email,
-            language: PterodactylUser.language,
-            nameFirst: PterodactylUser.name_first,
-            rootAdmin: PterodactylUser.root_admin,
-            useTotp: PterodactylUser.use_totp,
-            createdAt: new Date(PterodactylUser.created_at),
-            updatedAt: new Date(PterodactylUser.updated_at),
+            uuid: RealmUser.uuid,
+            username: RealmUser.username,
+            email: RealmUser.email,
+            language: RealmUser.language,
+            nameFirst: RealmUser.name_first,
+            rootAdmin: RealmUser.root_admin,
+            useTotp: RealmUser.use_totp,
+            createdAt: new Date(RealmUser.created_at),
+            updatedAt: new Date(RealmUser.updated_at),
         });
     }
 
@@ -100,6 +114,9 @@ const App = () => {
                                     </Spinner.Suspense>
                                 </AuthenticatedRoute>
                                 <AuthenticatedRoute path={'/admin-preview'}>
+                                    <AdminLegacyPathRedirect />
+                                </AuthenticatedRoute>
+                                <AuthenticatedRoute path={'/admin'}>
                                     <RootAdminRoute>
                                         <Spinner.Suspense>
                                             <AdminPreviewRouter />

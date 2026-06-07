@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Notifications;
+namespace Realm\Notifications;
 
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Bus\Queueable;
-use Pterodactyl\Events\Event;
-use Pterodactyl\Models\Server;
+use Realm\Events\Event;
+use Realm\Models\Server;
 use Illuminate\Container\Container;
-use Pterodactyl\Events\Server\Installed;
+use Realm\Events\Server\Installed;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Pterodactyl\Contracts\Core\ReceivesEvents;
+use Realm\Contracts\Core\ReceivesEvents;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Notifications\Messages\MailMessage;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\Http\Requests\Api\Client;
+namespace Realm\Http\Requests\Api\Client;
 
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Contracts\Http\ClientPermissionsRequest;
-use Pterodactyl\Http\Requests\Api\Application\ApplicationApiRequest;
+use Realm\Models\User;
+use Realm\Models\Server;
+use Realm\Contracts\Http\ClientPermissionsRequest;
+use Realm\Http\Requests\Api\Application\ApplicationApiRequest;
 
 /**
  * @method User user($guard = null)

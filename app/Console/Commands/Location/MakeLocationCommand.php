@@ -1,10 +1,10 @@
 <?php
 
-namespace Pterodactyl\Console\Commands\Location;
+namespace Realm\Console\Commands\Location;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Illuminate\Console\Command;
-use Pterodactyl\Services\Locations\LocationCreationService;
+use Realm\Services\Locations\LocationCreationService;
 
 class MakeLocationCommand extends Command
 {

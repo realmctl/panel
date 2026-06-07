@@ -1,31 +1,31 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Pterodactyl\Http\Controllers\Admin\Settings\MailController;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Models\Nest;
-use Pterodactyl\Notifications\MailTested;
-use Pterodactyl\Providers\SettingsServiceProvider;
-use Pterodactyl\Services\Eggs\EggCategoryMappingService;
-use Pterodactyl\Traits\Helpers\AvailableLanguages;
+use Realm\Http\Controllers\Controller;
+use Realm\Support\Mail\SupportedMailDrivers;
+use Realm\Models\Nest;
+use Realm\Notifications\MailTested;
+use Realm\Providers\SettingsServiceProvider;
+use Realm\Services\Eggs\EggCategoryMappingService;
+use Realm\Traits\Helpers\AvailableLanguages;
 use Illuminate\Support\Facades\Notification;
-use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
-use Pterodactyl\Http\Requests\Admin\Settings\AdvancedSettingsFormRequest;
-use Pterodactyl\Http\Requests\Admin\Settings\BaseSettingsFormRequest;
-use Pterodactyl\Http\Requests\Admin\Settings\EggMappingsFormRequest;
-use Pterodactyl\Http\Requests\Admin\Settings\MailSettingsFormRequest;
-use Pterodactyl\Http\Requests\Admin\Settings\OAuthSettingsFormRequest;
-use Pterodactyl\Http\Requests\Admin\Settings\SecuritySettingsFormRequest;
+use Realm\Contracts\Repository\SettingsRepositoryInterface;
+use Realm\Http\Requests\Admin\Settings\AdvancedSettingsFormRequest;
+use Realm\Http\Requests\Admin\Settings\BaseSettingsFormRequest;
+use Realm\Http\Requests\Admin\Settings\EggMappingsFormRequest;
+use Realm\Http\Requests\Admin\Settings\MailSettingsFormRequest;
+use Realm\Http\Requests\Admin\Settings\OAuthSettingsFormRequest;
+use Realm\Http\Requests\Admin\Settings\SecuritySettingsFormRequest;
 
 class SettingsController extends Controller
 {
@@ -45,9 +45,9 @@ class SettingsController extends Controller
         return response()->json([
             'general' => [
                 'app:name' => config('app.name'),
-                'pterodactyl:auth:2fa_required' => (int) config('pterodactyl.auth.2fa_required'),
+                'realm:auth:2fa_required' => (int) config('realm.auth.2fa_required'),
                 'app:locale' => config('app.locale'),
-                'pterodactyl:auth:registration_enabled' => config('pterodactyl.auth.registration_enabled') ? 'true' : 'false',
+                'realm:auth:registration_enabled' => config('realm.auth.registration_enabled') ? 'true' : 'false',
             ],
             'languages' => $this->getAvailableLanguages(true),
         ]);
@@ -76,9 +76,9 @@ class SettingsController extends Controller
         $driver = $this->config->get('mail.default');
 
         return response()->json([
-            'disabled' => !in_array($driver, MailController::SUPPORTED_DRIVERS, true),
+            'disabled' => !in_array($driver, SupportedMailDrivers::DRIVERS, true),
             'driver' => $driver,
-            'providers' => MailController::SUPPORTED_DRIVERS,
+            'providers' => SupportedMailDrivers::DRIVERS,
             'settings' => [
                 'mail:default' => $driver,
                 'mail:from:address' => $this->config->get('mail.from.address'),
@@ -158,8 +158,8 @@ class SettingsController extends Controller
                 'captcha:recaptcha:secret_key' => $this->config->get('captcha.recaptcha.secret_key'),
                 'captcha:turnstile:website_key' => $this->config->get('captcha.turnstile.website_key'),
                 'captcha:turnstile:secret_key' => $this->config->get('captcha.turnstile.secret_key'),
-                'pterodactyl:guzzle:connect_timeout' => (int) $this->config->get('pterodactyl.guzzle.connect_timeout'),
-                'pterodactyl:guzzle:timeout' => (int) $this->config->get('pterodactyl.guzzle.timeout'),
+                'realm:guzzle:connect_timeout' => (int) $this->config->get('realm.guzzle.connect_timeout'),
+                'realm:guzzle:timeout' => (int) $this->config->get('realm.guzzle.timeout'),
             ],
         ]);
     }
@@ -264,9 +264,9 @@ class SettingsController extends Controller
     {
         return response()->json([
             'settings' => [
-                'pterodactyl:client_features:allocations:enabled' => config('pterodactyl.client_features.allocations.enabled') ? 'true' : 'false',
-                'pterodactyl:client_features:allocations:range_start' => config('pterodactyl.client_features.allocations.range_start'),
-                'pterodactyl:client_features:allocations:range_end' => config('pterodactyl.client_features.allocations.range_end'),
+                'realm:client_features:allocations:enabled' => config('realm.client_features.allocations.enabled') ? 'true' : 'false',
+                'realm:client_features:allocations:range_start' => config('realm.client_features.allocations.range_start'),
+                'realm:client_features:allocations:range_end' => config('realm.client_features.allocations.range_end'),
             ],
         ]);
     }

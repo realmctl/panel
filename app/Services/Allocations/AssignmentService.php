@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Services\Allocations;
+namespace Realm\Services\Allocations;
 
 use Exception;
 use IPTools\Network;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
-use Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException;
-use Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException;
+use Realm\Exceptions\DisplayException;
+use Realm\Contracts\Repository\AllocationRepositoryInterface;
+use Realm\Exceptions\Service\Allocation\CidrOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\PortOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\InvalidPortMappingException;
+use Realm\Exceptions\Service\Allocation\TooManyPortsInRangeException;
 
 class AssignmentService
 {

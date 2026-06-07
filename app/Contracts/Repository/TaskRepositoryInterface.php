@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Contracts\Repository;
+namespace Realm\Contracts\Repository;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Task;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Task;
 
 interface TaskRepositoryInterface extends RepositoryInterface
 {

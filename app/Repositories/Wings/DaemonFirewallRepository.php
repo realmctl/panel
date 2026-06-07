@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Repositories\Wings;
+namespace Realm\Repositories\Wings;
 
-use Pterodactyl\Models\Allocation;
+use Realm\Models\Allocation;
 use GuzzleHttp\Exception\GuzzleException;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 
 /**
  * @method DaemonFirewallRepository setServer(Server $server)

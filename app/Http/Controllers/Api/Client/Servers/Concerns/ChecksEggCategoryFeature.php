@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers\Concerns;
+namespace Realm\Http\Controllers\Api\Client\Servers\Concerns;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Services\Eggs\EggCategoryMappingService;
+use Realm\Models\Server;
+use Realm\Services\Eggs\EggCategoryMappingService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ChecksEggCategoryFeature

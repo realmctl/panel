@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Models\Permission;
+use Realm\Models\Subuser;
+use Realm\Models\Permission;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SubuserFactory extends Factory

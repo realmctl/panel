@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Services\Schedules;
+namespace Realm\Tests\Integration\Services\Schedules;
 
 use Exception;
 use Carbon\CarbonImmutable;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Models\Schedule;
+use Realm\Models\Task;
+use Realm\Models\Schedule;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Pterodactyl\Jobs\Schedule\RunTaskJob;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Tests\Integration\IntegrationTestCase;
-use Pterodactyl\Services\Schedules\ProcessScheduleService;
+use Realm\Jobs\Schedule\RunTaskJob;
+use Realm\Exceptions\DisplayException;
+use Realm\Tests\Integration\IntegrationTestCase;
+use Realm\Services\Schedules\ProcessScheduleService;
 
 class ProcessScheduleServiceTest extends IntegrationTestCase
 {

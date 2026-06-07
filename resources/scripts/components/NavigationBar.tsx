@@ -324,22 +324,13 @@ export default () => {
                                     <span>My Account</span>
                                 </Link>
                                 {rootAdmin && (
-                                    <>
-                                        <Link
-                                            to={'/admin-preview'}
-                                            className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 no-underline transition-colors duration-150'}
-                                        >
-                                            <FontAwesomeIcon icon={faCogs} className={'w-4'} />
-                                            <span>Admin</span>
-                                        </Link>
-                                        <a
-                                            href={'/admin'}
-                                            className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-500 hover:text-neutral-300 hover:bg-neutral-700/50 no-underline transition-colors duration-150'}
-                                        >
-                                            <FontAwesomeIcon icon={faCogs} className={'w-4'} />
-                                            <span>Legacy Admin</span>
-                                        </a>
-                                    </>
+                                    <Link
+                                        to={'/admin'}
+                                        className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 no-underline transition-colors duration-150'}
+                                    >
+                                        <FontAwesomeIcon icon={faCogs} className={'w-4'} />
+                                        <span>Admin</span>
+                                    </Link>
                                 )}
                                 <button
                                     onClick={onTriggerLogout}

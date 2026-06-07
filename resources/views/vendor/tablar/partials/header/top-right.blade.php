@@ -11,7 +11,7 @@
             <a href="{{ route('account') }}" class="dropdown-item">
                 <i class="ti ti-user me-2"></i> Account
             </a>
-            <a href="{{ route('admin.settings') }}" class="dropdown-item">
+            <a href="/admin/settings" class="dropdown-item">
                 <i class="ti ti-settings me-2"></i> Settings
             </a>
             <div class="dropdown-divider"></div>

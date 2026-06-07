@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Contracts\Repository;
+namespace Realm\Contracts\Repository;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Models\Egg;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\Egg;
 use Illuminate\Database\Eloquent\Collection;
 
 interface EggRepositoryInterface extends RepositoryInterface

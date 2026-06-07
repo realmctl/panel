@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Services\Nodes;
+namespace Realm\Services\Nodes;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\Node;
+use Realm\Models\Node;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
+use Realm\Contracts\Repository\NodeRepositoryInterface;
 
 class NodeCreationService
 {

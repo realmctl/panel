@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
 use Carbon\CarbonImmutable;
-use Pterodactyl\Enum\JwtScope;
-use Pterodactyl\Models\Server;
+use Realm\Enum\JwtScope;
+use Realm\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Services\Nodes\NodeJWTService;
-use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
-use Pterodactyl\Services\Servers\GetUserPermissionsService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Models\Permission;
+use Realm\Services\Nodes\NodeJWTService;
+use Realm\Exceptions\Http\HttpForbiddenException;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Services\Servers\GetUserPermissionsService;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
 
 class WebsocketController extends ClientApiController
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Console\Commands\Location;
+namespace Realm\Console\Commands\Location;
 
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Exceptions\Service\Location\HasActiveNodesException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Service\Location\HasActiveNodesException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Pterodactyl\Services\Locations\LocationDeletionService;
-use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
+use Realm\Services\Locations\LocationDeletionService;
+use Realm\Contracts\Repository\LocationRepositoryInterface;
 
 class DeleteLocationCommand extends Command
 {

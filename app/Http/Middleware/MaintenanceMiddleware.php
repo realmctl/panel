@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware;
+namespace Realm\Http\Middleware;
 
 use Closure;
-use Pterodactyl\Models\Server;
+use Realm\Models\Server;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Routing\ResponseFactory;
 

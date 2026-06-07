@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Service\Subuser;
+namespace Realm\Exceptions\Service\Subuser;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 
 class UserIsServerOwnerException extends DisplayException
 {

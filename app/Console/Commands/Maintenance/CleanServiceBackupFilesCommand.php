@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Console\Commands\Maintenance;
+namespace Realm\Console\Commands\Maintenance;
 
 use SplFileInfo;
 use Carbon\Carbon;

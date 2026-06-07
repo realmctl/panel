@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Allocations;
+namespace Realm\Services\Allocations;
 
 use Illuminate\Support\Facades\Log;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Repositories\Wings\DaemonFirewallRepository;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Models\Server;
+use Realm\Models\Allocation;
+use Realm\Repositories\Wings\DaemonFirewallRepository;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 class AllocationWhitelistService
 {

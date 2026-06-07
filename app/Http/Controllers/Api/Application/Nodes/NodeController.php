@@ -1,23 +1,23 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Nodes;
+namespace Realm\Http\Controllers\Api\Application\Nodes;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Throwable;
-use Pterodactyl\Exceptions\Service\HasActiveServersException;
-use Pterodactyl\Models\Node;
+use Realm\Exceptions\Service\HasActiveServersException;
+use Realm\Models\Node;
 use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
-use Pterodactyl\Services\Nodes\NodeUpdateService;
-use Pterodactyl\Services\Nodes\NodeCreationService;
-use Pterodactyl\Services\Nodes\NodeDeletionService;
-use Pterodactyl\Transformers\Api\Application\NodeTransformer;
-use Pterodactyl\Http\Requests\Api\Application\Nodes\GetNodeRequest;
-use Pterodactyl\Http\Requests\Api\Application\Nodes\GetNodesRequest;
-use Pterodactyl\Http\Requests\Api\Application\Nodes\StoreNodeRequest;
-use Pterodactyl\Http\Requests\Api\Application\Nodes\DeleteNodeRequest;
-use Pterodactyl\Http\Requests\Api\Application\Nodes\UpdateNodeRequest;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Services\Nodes\NodeUpdateService;
+use Realm\Services\Nodes\NodeCreationService;
+use Realm\Services\Nodes\NodeDeletionService;
+use Realm\Transformers\Api\Application\NodeTransformer;
+use Realm\Http\Requests\Api\Application\Nodes\GetNodeRequest;
+use Realm\Http\Requests\Api\Application\Nodes\GetNodesRequest;
+use Realm\Http\Requests\Api\Application\Nodes\StoreNodeRequest;
+use Realm\Http\Requests\Api\Application\Nodes\DeleteNodeRequest;
+use Realm\Http\Requests\Api\Application\Nodes\UpdateNodeRequest;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
 
 class NodeController extends ApplicationApiController
 {

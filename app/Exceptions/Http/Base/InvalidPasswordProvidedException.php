@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Http\Base;
+namespace Realm\Exceptions\Http\Base;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 
 class InvalidPasswordProvidedException extends DisplayException
 {

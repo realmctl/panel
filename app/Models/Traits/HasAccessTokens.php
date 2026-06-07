@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Models\Traits;
+namespace Realm\Models\Traits;
 
-use Pterodactyl\Models\Model;
+use Realm\Models\Model;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
-use Pterodactyl\Models\ApiKey;
+use Realm\Models\ApiKey;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Pterodactyl\Extensions\Laravel\Sanctum\NewAccessToken;
+use Realm\Extensions\Laravel\Sanctum\NewAccessToken;
 
 /**
  * @template TToken of \Laravel\Sanctum\Contracts\HasAbilities

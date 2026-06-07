@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Http\Requests\Admin\MountFormRequest;
-use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Models\Mount;
-use Pterodactyl\Models\Nest;
-use Pterodactyl\Repositories\Eloquent\MountRepository;
+use Realm\Http\Controllers\Controller;
+use Realm\Http\Requests\Admin\MountFormRequest;
+use Realm\Models\Egg;
+use Realm\Models\Location;
+use Realm\Models\Mount;
+use Realm\Models\Nest;
+use Realm\Repositories\Eloquent\MountRepository;
 use Ramsey\Uuid\Uuid;
 use Throwable;
 

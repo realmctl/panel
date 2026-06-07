@@ -1,21 +1,21 @@
 <?php
 
-namespace Pterodactyl\Jobs\Schedule;
+namespace Realm\Jobs\Schedule;
 
 use Exception;
 use Throwable;
 use Carbon\CarbonImmutable;
-use Pterodactyl\Models\Task;
+use Realm\Models\Task;
 use Illuminate\Bus\Queueable;
-use Pterodactyl\Models\ScheduleRun;
+use Realm\Models\ScheduleRun;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Pterodactyl\Events\Schedule\ScheduleTaskExecuted;
-use Pterodactyl\Services\Schedules\ScheduleRunService;
-use Pterodactyl\Services\Schedules\TaskActionRegistry;
-use Pterodactyl\Services\Schedules\TaskConditionEvaluator;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Events\Schedule\ScheduleTaskExecuted;
+use Realm\Services\Schedules\ScheduleRunService;
+use Realm\Services\Schedules\TaskActionRegistry;
+use Realm\Services\Schedules\TaskConditionEvaluator;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 class RunTaskJob implements ShouldQueue
 {
@@ -102,7 +102,7 @@ class RunTaskJob implements ShouldQueue
             $run = ScheduleRun::query()->find($this->scheduleRunId);
             if ($run) {
                 $runTask = $run->runTasks()->where('task_id', $this->task->id)->first();
-                if ($runTask && $runTask->status === \Pterodactyl\Models\ScheduleRunTask::STATUS_RUNNING) {
+                if ($runTask && $runTask->status === \Realm\Models\ScheduleRunTask::STATUS_RUNNING) {
                     $runService->markTaskFailed($runTask, $exception?->getMessage() ?? 'Task failed.');
                 }
 

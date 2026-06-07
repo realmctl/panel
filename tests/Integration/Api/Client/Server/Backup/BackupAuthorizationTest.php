@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Api\Client\Server\Backup;
+namespace Realm\Tests\Integration\Api\Client\Server\Backup;
 
 use Carbon\CarbonImmutable;
-use Pterodactyl\Models\Backup;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Services\Backups\DeleteBackupService;
-use Pterodactyl\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
+use Realm\Models\Backup;
+use Realm\Models\Subuser;
+use Realm\Services\Backups\DeleteBackupService;
+use Realm\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
 
 class BackupAuthorizationTest extends ClientApiIntegrationTestCase
 {

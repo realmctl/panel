@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Contracts\Schedules;
+namespace Realm\Contracts\Schedules;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Task;
+use Realm\Models\Server;
+use Realm\Models\Task;
 
 interface TaskActionInterface
 {

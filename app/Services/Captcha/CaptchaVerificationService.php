@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Services\Captcha;
+namespace Realm\Services\Captcha;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;

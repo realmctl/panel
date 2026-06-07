@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Nodes;
+namespace Realm\Http\Controllers\Api\Application\Nodes;
 
-use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
-use Pterodactyl\Services\Deployment\FindViableNodesService;
-use Pterodactyl\Transformers\Api\Application\NodeTransformer;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
-use Pterodactyl\Http\Requests\Api\Application\Nodes\GetDeployableNodesRequest;
+use Realm\Exceptions\Service\Deployment\NoViableNodeException;
+use Realm\Services\Deployment\FindViableNodesService;
+use Realm\Transformers\Api\Application\NodeTransformer;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Http\Requests\Api\Application\Nodes\GetDeployableNodesRequest;
 
 class NodeDeploymentController extends ApplicationApiController
 {

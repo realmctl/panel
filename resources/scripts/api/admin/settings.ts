@@ -2,9 +2,9 @@ import { adminHttp } from '@/api/admin/http';
 
 export interface GeneralSettings {
     'app:name': string;
-    'pterodactyl:auth:2fa_required': number;
+    'realm:auth:2fa_required': number;
     'app:locale': string;
-    'pterodactyl:auth:registration_enabled': 'true' | 'false';
+    'realm:auth:registration_enabled': 'true' | 'false';
 }
 
 export interface AdminSettingsResponse {
@@ -41,8 +41,8 @@ export interface SecuritySettings {
     'captcha:recaptcha:secret_key': string;
     'captcha:turnstile:website_key': string;
     'captcha:turnstile:secret_key': string;
-    'pterodactyl:guzzle:connect_timeout': number;
-    'pterodactyl:guzzle:timeout': number;
+    'realm:guzzle:connect_timeout': number;
+    'realm:guzzle:timeout': number;
 }
 
 export interface SecuritySettingsResponse {
@@ -93,9 +93,9 @@ export interface MappingsSettingsResponse {
 }
 
 export interface AdvancedSettings {
-    'pterodactyl:client_features:allocations:enabled': 'true' | 'false';
-    'pterodactyl:client_features:allocations:range_start': number | string | null;
-    'pterodactyl:client_features:allocations:range_end': number | string | null;
+    'realm:client_features:allocations:enabled': 'true' | 'false';
+    'realm:client_features:allocations:range_start': number | string | null;
+    'realm:client_features:allocations:range_end': number | string | null;
 }
 
 export interface AdvancedSettingsResponse {

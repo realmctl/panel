@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Transformers\Api\Client;
+namespace Realm\Transformers\Api\Client;
 
-use Pterodactyl\Exceptions\Transformer\InvalidTransformerLevelException;
-use Pterodactyl\Models\Subuser;
+use Realm\Exceptions\Transformer\InvalidTransformerLevelException;
+use Realm\Models\Subuser;
 
 class SubuserTransformer extends BaseClientTransformer
 {

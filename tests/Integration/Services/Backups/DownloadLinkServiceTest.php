@@ -1,16 +1,16 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Services\Backups;
+namespace Realm\Tests\Integration\Services\Backups;
 
 use Carbon\CarbonImmutable;
-use Pterodactyl\Enum\JwtScope;
-use Pterodactyl\Models\Backup;
+use Realm\Enum\JwtScope;
+use Realm\Models\Backup;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
-use Pterodactyl\Services\Backups\DownloadLinkService;
-use Pterodactyl\Tests\Integration\IntegrationTestCase;
+use Realm\Services\Backups\DownloadLinkService;
+use Realm\Tests\Integration\IntegrationTestCase;
 
 class DownloadLinkServiceTest extends IntegrationTestCase
 {

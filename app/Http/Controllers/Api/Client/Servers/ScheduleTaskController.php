@@ -1,26 +1,26 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Exception;
-use Pterodactyl\Models\Task;
+use Realm\Models\Task;
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Schedule;
+use Realm\Models\Server;
+use Realm\Models\Schedule;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\Permission;
+use Realm\Facades\Activity;
+use Realm\Models\Permission;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Repositories\Eloquent\TaskRepository;
-use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Pterodactyl\Transformers\Api\Client\TaskTransformer;
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Exceptions\Service\ServiceLimitExceededException;
+use Realm\Repositories\Eloquent\TaskRepository;
+use Realm\Exceptions\Http\HttpForbiddenException;
+use Realm\Transformers\Api\Client\TaskTransformer;
+use Realm\Http\Requests\Api\Client\ClientApiRequest;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Exceptions\Service\ServiceLimitExceededException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\StoreTaskRequest;
+use Realm\Http\Requests\Api\Client\Servers\Schedules\StoreTaskRequest;
 
 class ScheduleTaskController extends ClientApiController
 {
@@ -42,7 +42,7 @@ class ScheduleTaskController extends ClientApiController
      */
     public function store(StoreTaskRequest $request, Server $server, Schedule $schedule): array
     {
-        $limit = config('pterodactyl.client_features.schedules.per_schedule_task_limit', 10);
+        $limit = config('realm.client_features.schedules.per_schedule_task_limit', 10);
         if ($schedule->tasks()->count() >= $limit) {
             throw new ServiceLimitExceededException("Schedules may not have more than $limit tasks associated with them. Creating this task would put this schedule over the limit.");
         }

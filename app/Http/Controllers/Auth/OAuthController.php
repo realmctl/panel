@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Auth;
+namespace Realm\Http\Controllers\Auth;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
@@ -9,11 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\UserOAuthLink;
-use Pterodactyl\Services\Users\UserCreationService;
+use Realm\Facades\Activity;
+use Realm\Http\Controllers\Controller;
+use Realm\Models\User;
+use Realm\Models\UserOAuthLink;
+use Realm\Services\Users\UserCreationService;
 
 class OAuthController extends Controller
 {
@@ -91,7 +91,7 @@ class OAuthController extends Controller
             return redirect('/auth/login')->with('error', trans('auth.oauth.link_required'));
         }
 
-        if (!config('pterodactyl.auth.registration_enabled', false)) {
+        if (!config('realm.auth.registration_enabled', false)) {
             return redirect('/auth/login');
         }
 

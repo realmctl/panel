@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Http\Middleware\Api;
+namespace Realm\Http\Middleware\Api;
 
 use Closure;
 use Exception;
-use Pterodactyl\Models\ApiKey;
+use Realm\Models\ApiKey;
 use IPTools\IP;
 use IPTools\Range;
 use Illuminate\Http\Request;
-use Pterodactyl\Facades\Activity;
+use Realm\Facades\Activity;
 use Laravel\Sanctum\TransientToken;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 

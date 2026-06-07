@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Services\Schedules\Actions;
+namespace Realm\Services\Schedules\Actions;
 
 use InvalidArgumentException;
-use Pterodactyl\Contracts\Schedules\TaskActionInterface;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Task;
-use Pterodactyl\Repositories\Wings\DaemonFileRepository;
+use Realm\Contracts\Schedules\TaskActionInterface;
+use Realm\Models\Server;
+use Realm\Models\Task;
+use Realm\Repositories\Wings\DaemonFileRepository;
 
 class DeleteFilesTaskAction implements TaskActionInterface
 {

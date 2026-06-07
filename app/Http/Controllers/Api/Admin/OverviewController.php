@@ -1,17 +1,17 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Admin;
+namespace Realm\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Models\DatabaseHost;
-use Pterodactyl\Models\Location;
-use Pterodactyl\Models\Mount;
-use Pterodactyl\Models\Nest;
-use Pterodactyl\Models\Node;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subdomain\Domain;
-use Pterodactyl\Models\User;
+use Realm\Http\Controllers\Controller;
+use Realm\Models\DatabaseHost;
+use Realm\Models\Location;
+use Realm\Models\Mount;
+use Realm\Models\Nest;
+use Realm\Models\Node;
+use Realm\Models\Server;
+use Realm\Models\Subdomain\Domain;
+use Realm\Models\User;
 
 class OverviewController extends Controller
 {

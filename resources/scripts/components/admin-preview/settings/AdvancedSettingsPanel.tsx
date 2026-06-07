@@ -63,7 +63,7 @@ export default () => {
         return <p className="text-sm text-muted-foreground">Unable to load advanced settings.</p>;
     }
 
-    const allocationsEnabled = form['pterodactyl:client_features:allocations:enabled'] === 'true';
+    const allocationsEnabled = form['realm:client_features:allocations:enabled'] === 'true';
 
     return (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -79,10 +79,10 @@ export default () => {
                     <select
                         id="allocations-enabled"
                         className={selectClass}
-                        value={form['pterodactyl:client_features:allocations:enabled']}
+                        value={form['realm:client_features:allocations:enabled']}
                         onChange={(e) =>
                             updateField(
-                                'pterodactyl:client_features:allocations:enabled',
+                                'realm:client_features:allocations:enabled',
                                 e.target.value as 'true' | 'false'
                             )
                         }
@@ -103,9 +103,9 @@ export default () => {
                             min={1024}
                             max={65535}
                             className={fieldClass}
-                            value={form['pterodactyl:client_features:allocations:range_start'] ?? ''}
+                            value={form['realm:client_features:allocations:range_start'] ?? ''}
                             onChange={(e) =>
-                                updateField('pterodactyl:client_features:allocations:range_start', e.target.value)
+                                updateField('realm:client_features:allocations:range_start', e.target.value)
                             }
                             placeholder="Start"
                             required={allocationsEnabled}
@@ -118,9 +118,9 @@ export default () => {
                             min={1024}
                             max={65535}
                             className={fieldClass}
-                            value={form['pterodactyl:client_features:allocations:range_end'] ?? ''}
+                            value={form['realm:client_features:allocations:range_end'] ?? ''}
                             onChange={(e) =>
-                                updateField('pterodactyl:client_features:allocations:range_end', e.target.value)
+                                updateField('realm:client_features:allocations:range_end', e.target.value)
                             }
                             placeholder="End"
                             required={allocationsEnabled}

@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Exceptions;
+namespace Realm\Exceptions;
 
 use Exception;
-use Pterodactyl\Exceptions\Solutions\ManifestDoesNotExistSolution;
+use Realm\Exceptions\Solutions\ManifestDoesNotExistSolution;
 use Spatie\Ignition\Contracts\Solution;
 use Spatie\Ignition\Contracts\ProvidesSolution;
 

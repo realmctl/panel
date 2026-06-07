@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\Repositories\Wings;
+namespace Realm\Repositories\Wings;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Node;
+use Realm\Models\Server;
+use Realm\Models\Node;
 use Lcobucci\JWT\Token\Plain;
 use GuzzleHttp\Exception\GuzzleException;
-use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Realm\Exceptions\Http\Connection\DaemonConnectionException;
 
 /**
  * @method DaemonTransferRepository setNode(Node $node)

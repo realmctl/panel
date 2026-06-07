@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Service\Database;
+namespace Realm\Exceptions\Service\Database;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 
 class TooManyDatabasesException extends DisplayException
 {

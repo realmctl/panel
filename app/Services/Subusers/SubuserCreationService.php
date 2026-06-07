@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Services\Subusers;
+namespace Realm\Services\Subusers;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Model\DataValidationException;
 use Throwable;
 use Illuminate\Support\Str;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\Subuser;
+use Realm\Models\Server;
+use Realm\Models\Subuser;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Services\Users\UserCreationService;
-use Pterodactyl\Repositories\Eloquent\SubuserRepository;
-use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
-use Pterodactyl\Exceptions\Service\Subuser\UserIsServerOwnerException;
-use Pterodactyl\Exceptions\Service\Subuser\ServerSubuserExistsException;
+use Realm\Services\Users\UserCreationService;
+use Realm\Repositories\Eloquent\SubuserRepository;
+use Realm\Contracts\Repository\UserRepositoryInterface;
+use Realm\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Service\Subuser\UserIsServerOwnerException;
+use Realm\Exceptions\Service\Subuser\ServerSubuserExistsException;
 
 class SubuserCreationService
 {

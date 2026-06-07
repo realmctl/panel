@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Tests\Integration\Api\Application\Users;
+namespace Realm\Tests\Integration\Api\Application\Users;
 
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Illuminate\Http\Response;
-use Pterodactyl\Services\Acl\Api\AdminAcl;
-use Pterodactyl\Transformers\Api\Application\UserTransformer;
-use Pterodactyl\Transformers\Api\Application\ServerTransformer;
-use Pterodactyl\Tests\Integration\Api\Application\ApplicationApiIntegrationTestCase;
+use Realm\Services\Acl\Api\AdminAcl;
+use Realm\Transformers\Api\Application\UserTransformer;
+use Realm\Transformers\Api\Application\ServerTransformer;
+use Realm\Tests\Integration\Api\Application\ApplicationApiIntegrationTestCase;
 
 class UserControllerTest extends ApplicationApiIntegrationTestCase
 {

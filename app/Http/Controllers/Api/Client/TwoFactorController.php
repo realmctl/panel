@@ -1,19 +1,19 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client;
+namespace Realm\Http\Controllers\Api\Client;
 
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Throwable;
 use Illuminate\Validation\ValidationException;
-use Pterodactyl\Models\User;
+use Realm\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Services\Users\TwoFactorSetupService;
-use Pterodactyl\Services\Users\ToggleTwoFactorService;
+use Realm\Facades\Activity;
+use Realm\Services\Users\TwoFactorSetupService;
+use Realm\Services\Users\ToggleTwoFactorService;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 

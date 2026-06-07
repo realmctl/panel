@@ -1,23 +1,23 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Auth;
+namespace Realm\Http\Controllers\Auth;
 
 use Illuminate\Contracts\Auth\CanResetPassword;
-use Pterodactyl\Models\User;
-use Pterodactyl\Exceptions\Model\DataValidationException;
-use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
+use Realm\Models\User;
+use Realm\Exceptions\Model\DataValidationException;
+use Realm\Exceptions\Repository\RecordNotFoundException;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Events\Dispatcher;
-use Pterodactyl\Events\User\PasswordChanged;
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Http\Controllers\Controller;
+use Realm\Events\User\PasswordChanged;
+use Realm\Exceptions\DisplayException;
+use Realm\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
-use Pterodactyl\Http\Requests\Auth\ResetPasswordRequest;
-use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
+use Realm\Http\Requests\Auth\ResetPasswordRequest;
+use Realm\Contracts\Repository\UserRepositoryInterface;
 
 class ResetPasswordController extends Controller
 {

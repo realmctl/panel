@@ -1,9 +1,9 @@
 <?php
 
-namespace Pterodactyl\Events\Auth;
+namespace Realm\Events\Auth;
 
-use Pterodactyl\Models\User;
-use Pterodactyl\Events\Event;
+use Realm\Models\User;
+use Realm\Events\Event;
 
 class ProvidedAuthenticationToken extends Event
 {

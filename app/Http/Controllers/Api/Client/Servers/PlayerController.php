@@ -1,13 +1,13 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Realm\Http\Controllers\Api\Client\Servers;
 
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Models\Allocation;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Services\Minecraft\MinecraftServerStatusService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\GetPlayersRequest;
+use Realm\Models\Allocation;
+use Realm\Models\Server;
+use Realm\Services\Minecraft\MinecraftServerStatusService;
+use Realm\Http\Controllers\Api\Client\ClientApiController;
+use Realm\Http\Requests\Api\Client\Servers\GetPlayersRequest;
 
 class PlayerController extends ClientApiController
 {

@@ -1,15 +1,15 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Model;
+namespace Realm\Exceptions\Model;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Validation\Validator;
-use Pterodactyl\Exceptions\PterodactylException;
+use Realm\Exceptions\RealmException;
 use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-class DataValidationException extends PterodactylException implements HttpExceptionInterface, MessageProvider
+class DataValidationException extends RealmException implements HttpExceptionInterface, MessageProvider
 {
     /**
      * DataValidationException constructor.

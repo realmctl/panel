@@ -1,8 +1,8 @@
 <?php
 
-namespace Pterodactyl\Exceptions\Service\Node;
+namespace Realm\Exceptions\Service\Node;
 
-use Pterodactyl\Exceptions\DisplayException;
+use Realm\Exceptions\DisplayException;
 
 class ConfigurationNotPersistedException extends DisplayException
 {

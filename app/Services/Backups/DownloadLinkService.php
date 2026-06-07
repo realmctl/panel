@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\Services\Backups;
+namespace Realm\Services\Backups;
 
-use Pterodactyl\Extensions\Filesystem\S3Filesystem;
+use Realm\Extensions\Filesystem\S3Filesystem;
 use Carbon\CarbonImmutable;
-use Pterodactyl\Models\User;
-use Pterodactyl\Enum\JwtScope;
-use Pterodactyl\Models\Backup;
-use Pterodactyl\Services\Nodes\NodeJWTService;
-use Pterodactyl\Extensions\Backups\BackupManager;
+use Realm\Models\User;
+use Realm\Enum\JwtScope;
+use Realm\Models\Backup;
+use Realm\Services\Nodes\NodeJWTService;
+use Realm\Extensions\Backups\BackupManager;
 
 class DownloadLinkService
 {

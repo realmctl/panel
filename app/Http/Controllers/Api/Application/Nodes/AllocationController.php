@@ -1,26 +1,26 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Application\Nodes;
+namespace Realm\Http\Controllers\Api\Application\Nodes;
 
-use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\InvalidPortMappingException;
-use Pterodactyl\Exceptions\Service\Allocation\PortOutOfRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\TooManyPortsInRangeException;
-use Pterodactyl\Exceptions\Service\Allocation\ServerUsingAllocationException;
-use Pterodactyl\Models\Node;
+use Realm\Exceptions\DisplayException;
+use Realm\Exceptions\Service\Allocation\CidrOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\InvalidPortMappingException;
+use Realm\Exceptions\Service\Allocation\PortOutOfRangeException;
+use Realm\Exceptions\Service\Allocation\TooManyPortsInRangeException;
+use Realm\Exceptions\Service\Allocation\ServerUsingAllocationException;
+use Realm\Models\Node;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Models\Allocation;
+use Realm\Models\Allocation;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Pterodactyl\Services\Allocations\AssignmentService;
-use Pterodactyl\Services\Allocations\AllocationDeletionService;
-use Pterodactyl\Transformers\Api\Application\AllocationTransformer;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
-use Pterodactyl\Http\Requests\Api\Application\Allocations\GetAllocationsRequest;
-use Pterodactyl\Http\Requests\Api\Application\Allocations\StoreAllocationRequest;
-use Pterodactyl\Http\Requests\Api\Application\Allocations\DeleteAllocationRequest;
+use Realm\Services\Allocations\AssignmentService;
+use Realm\Services\Allocations\AllocationDeletionService;
+use Realm\Transformers\Api\Application\AllocationTransformer;
+use Realm\Http\Controllers\Api\Application\ApplicationApiController;
+use Realm\Http\Requests\Api\Application\Allocations\GetAllocationsRequest;
+use Realm\Http\Requests\Api\Application\Allocations\StoreAllocationRequest;
+use Realm\Http\Requests\Api\Application\Allocations\DeleteAllocationRequest;
 
 class AllocationController extends ApplicationApiController
 {
