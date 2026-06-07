@@ -22,15 +22,15 @@ interface Props {
 }
 
 const baseClass =
-    'inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm no-underline transition-colors';
+    'relative -mb-px inline-flex items-center gap-1.5 border-b-2 border-transparent px-4 py-2.5 text-sm no-underline transition-colors';
 
 const idleClass = (destructive?: boolean) =>
     destructive
-        ? 'text-destructive hover:bg-destructive/10'
-        : 'text-muted-foreground hover:bg-muted hover:text-foreground';
+        ? 'text-destructive/80 hover:text-destructive'
+        : 'text-muted-foreground hover:text-foreground';
 
 const activeClass = (destructive?: boolean) =>
-    destructive ? 'bg-destructive/10 text-destructive' : 'bg-muted text-primary';
+    destructive ? 'border-destructive text-destructive' : 'border-primary text-primary';
 
 const renderInner = (item: TabItem) => (
     <>
@@ -40,7 +40,7 @@ const renderInner = (item: TabItem) => (
 );
 
 export default ({ items, className, children }: Props) => (
-    <div className={cn('mb-6 flex flex-wrap items-center gap-1 border-b border-border pb-1', className)}>
+    <div className={cn('mb-6 flex flex-wrap items-center gap-0 border-b border-border', className)}>
         {items
             .filter((item) => !item.hidden)
             .map((item) =>
@@ -67,6 +67,6 @@ export default ({ items, className, children }: Props) => (
                     </NavLink>
                 )
             )}
-        {children && <div className="ml-auto flex items-center gap-1">{children}</div>}
+        {children && <div className="ml-auto flex items-center gap-1 pb-1">{children}</div>}
     </div>
 );
