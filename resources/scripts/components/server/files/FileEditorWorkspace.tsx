@@ -173,10 +173,10 @@ export default ({
                 </div>
             ) : (
                 <div className={styles.editor_panel}>
-                    {activeTab.path.endsWith('.pteroignore') && (
+                    {activeTab.path.endsWith('.realmignore') && (
                         <div className={'mx-4 mt-3 p-3 border-l-4 bg-neutral-900 rounded border-cyan-400'}>
                             <p className={'text-neutral-300 text-xs m-0'}>
-                                You&apos;re editing a <code className={'font-mono bg-black rounded py-px px-1'}>.pteroignore</code>{' '}
+                                You&apos;re editing a <code className={'font-mono bg-black rounded py-px px-1'}>.realmignore</code>{' '}
                                 file. Listed paths are excluded from backups. Wildcards use{' '}
                                 <code className={'font-mono bg-black rounded py-px px-1'}>*</code>; negate with{' '}
                                 <code className={'font-mono bg-black rounded py-px px-1'}>!</code>.
