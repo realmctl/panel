@@ -459,7 +459,9 @@ export default () => {
                         description={
                             transferInProgress
                                 ? `In progress since ${server.transfer?.created_at}.`
-                                : 'Move this server to a different Wings node. The server is stopped during the transfer.'
+                                : !data.can_transfer
+                                  ? 'No other nodes are available to transfer this server to.'
+                                  : 'Move this server to a different Wings node. The server is stopped during the transfer.'
                         }
                         accent="info"
                     >
@@ -473,11 +475,6 @@ export default () => {
                             <Truck className="mr-2 h-4 w-4" />
                             {transferInProgress ? 'Transfer in progress' : 'Transfer server'}
                         </Button>
-                        {!data.can_transfer && !transferInProgress && (
-                            <p className="mt-2 text-xs text-muted-foreground">
-                                No other nodes are available to transfer this server to.
-                            </p>
-                        )}
                     </ActionCard>
                 </div>
             </div>
