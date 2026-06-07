@@ -4,6 +4,7 @@ namespace Pterodactyl\Http\ViewComposers;
 
 use Illuminate\View\View;
 use Pterodactyl\Services\Helpers\AssetHashService;
+use Pterodactyl\Services\Helpers\SoftwareVersionService;
 use Pterodactyl\Services\Setup\PanelSetupService;
 
 class AssetComposer
@@ -14,6 +15,7 @@ class AssetComposer
     public function __construct(
         private AssetHashService $assetHashService,
         private PanelSetupService $setupService,
+        private SoftwareVersionService $versionService,
     ) {
     }
 
@@ -47,6 +49,13 @@ class AssetComposer
             ],
             'registration' => (bool) config('pterodactyl.auth.registration_enabled', false),
             'setup' => $this->setupService->toSiteConfiguration(),
+            'version' => [
+                'current' => config('app.version'),
+                'latest' => $this->versionService->getPanel(),
+                'isLatest' => $this->versionService->isLatestPanel(),
+                'discord' => $this->versionService->getDiscord(),
+                'donations' => $this->versionService->getDonations(),
+            ],
         ]);
     }
 }

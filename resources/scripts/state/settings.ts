@@ -25,6 +25,14 @@ export interface SetupConfiguration {
     };
 }
 
+export interface PanelVersionInfo {
+    current: string;
+    latest: string;
+    isLatest: boolean;
+    discord: string;
+    donations: string;
+}
+
 export interface SiteSettings {
     name: string;
     locale: string;
@@ -40,6 +48,7 @@ export interface SiteSettings {
     };
     registration: boolean;
     setup: SetupConfiguration;
+    version?: PanelVersionInfo;
 }
 
 export interface SettingsStore {

@@ -11,6 +11,7 @@ import GlobalStylesheet from '@/assets/css/GlobalStylesheet';
 import { history } from '@/components/history';
 import { setupInterceptors } from '@/api/interceptors';
 import AuthenticatedRoute from '@/components/elements/AuthenticatedRoute';
+import RootAdminRoute from '@/components/elements/RootAdminRoute';
 import { ServerContext } from '@/state/server';
 import '@/assets/tailwind.css';
 import Spinner from '@/components/elements/Spinner';
@@ -21,6 +22,7 @@ const DashboardRouter = lazy(() => import(/* webpackChunkName: "dashboard" */ '@
 const ServerRouter = lazy(() => import(/* webpackChunkName: "server" */ '@/routers/ServerRouter'));
 const AuthenticationRouter = lazy(() => import(/* webpackChunkName: "auth" */ '@/routers/AuthenticationRouter'));
 const SetupRouter = lazy(() => import(/* webpackChunkName: "setup" */ '@/routers/SetupRouter'));
+const AdminPreviewRouter = lazy(() => import(/* webpackChunkName: "admin-preview" */ '@/routers/AdminPreviewRouter'));
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
@@ -96,6 +98,13 @@ const App = () => {
                                             <ServerRouter />
                                         </ServerContext.Provider>
                                     </Spinner.Suspense>
+                                </AuthenticatedRoute>
+                                <AuthenticatedRoute path={'/admin-preview'}>
+                                    <RootAdminRoute>
+                                        <Spinner.Suspense>
+                                            <AdminPreviewRouter />
+                                        </Spinner.Suspense>
+                                    </RootAdminRoute>
                                 </AuthenticatedRoute>
                                 <AuthenticatedRoute path={'/'}>
                                     <Spinner.Suspense>

@@ -88,6 +88,7 @@ module.exports = {
             },
             borderColor: {
                 DEFAULT: "hsl(var(--border))",
+                border: "hsl(var(--border))",
             },
         },
     },
