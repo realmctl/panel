@@ -1,8 +1,12 @@
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { NestEggOption } from '@/api/admin/nests';
 import { eggBackgroundOptions } from '@/components/admin-preview/nests/eggBackgrounds';
-import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
+import { fieldClass, textareaClass } from '@/components/admin-preview/settings/fieldClass';
+import {
+    SegmentedControl,
+    SettingRow,
+    SettingsSection,
+} from '@/components/admin-preview/settings/settingsLayout';
 
 export interface EggFormState {
     nest_id: number | null;
@@ -33,183 +37,195 @@ export default ({ form, nests, nestEggs, currentEggId, showNestSelect, onChange 
     const configEggs = (nestEggs ?? []).filter((egg) => egg.id !== currentEggId);
 
     return (
-        <div className="space-y-6">
-            {showNestSelect && nests && (
-                <div className="space-y-2">
-                    <Label htmlFor="egg-nest">Associated nest</Label>
-                    <select
-                        id="egg-nest"
+        <>
+            <SettingsSection title="General" description="Identity and display options for this egg.">
+                {showNestSelect && nests && (
+                    <SettingRow label="Nest" htmlFor="egg-nest" description="Category this egg belongs to.">
+                        <select
+                            id="egg-nest"
+                            className={fieldClass}
+                            value={form.nest_id ?? ''}
+                            onChange={(e) => onChange('nest_id', Number(e.target.value))}
+                            required
+                        >
+                            {nests.map((nest) => (
+                                <option key={nest.id} value={nest.id}>
+                                    {nest.name} ({nest.author})
+                                </option>
+                            ))}
+                        </select>
+                    </SettingRow>
+                )}
+                <SettingRow label="Name" htmlFor="egg-name" description="Display name shown to customers.">
+                    <input
+                        id="egg-name"
                         className={fieldClass}
-                        value={form.nest_id ?? ''}
-                        onChange={(e) => onChange('nest_id', Number(e.target.value))}
+                        value={form.name}
+                        onChange={(e) => onChange('name', e.target.value)}
                         required
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Description"
+                    htmlFor="egg-desc"
+                    description="Short summary of what this egg deploys."
+                    wide
+                >
+                    <textarea
+                        id="egg-desc"
+                        className={textareaClass}
+                        rows={4}
+                        value={form.description}
+                        onChange={(e) => onChange('description', e.target.value)}
+                    />
+                </SettingRow>
+                <SettingRow label="Card background" htmlFor="egg-bg" description="Background style on the server card.">
+                    <select
+                        id="egg-bg"
+                        className={fieldClass}
+                        value={form.background}
+                        onChange={(e) => onChange('background', e.target.value)}
                     >
-                        {nests.map((nest) => (
-                            <option key={nest.id} value={nest.id}>
-                                {nest.name} &lt;{nest.author}&gt;
+                        {eggBackgroundOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.label}
                             </option>
                         ))}
                     </select>
-                </div>
-            )}
+                </SettingRow>
+                <SettingRow
+                    label="Force outgoing IP"
+                    description="NAT outgoing traffic to the server's primary allocation IP."
+                >
+                    <SegmentedControl
+                        value={form.force_outgoing_ip}
+                        options={[
+                            { value: false, label: 'No' },
+                            { value: true, label: 'Yes' },
+                        ]}
+                        onChange={(value) => onChange('force_outgoing_ip', value)}
+                    />
+                </SettingRow>
+            </SettingsSection>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-name">Name</Label>
-                        <input
-                            id="egg-name"
-                            className={fieldClass}
-                            value={form.name}
-                            onChange={(e) => onChange('name', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-desc">Description</Label>
-                        <textarea
-                            id="egg-desc"
-                            className={fieldClass}
-                            rows={6}
-                            value={form.description}
-                            onChange={(e) => onChange('description', e.target.value)}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-bg">Card background</Label>
-                        <select
-                            id="egg-bg"
-                            className={fieldClass}
-                            value={form.background}
-                            onChange={(e) => onChange('background', e.target.value)}
-                        >
-                            {eggBackgroundOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <label className="flex items-start gap-2 text-sm">
-                        <input
-                            type="checkbox"
-                            className="mt-1"
-                            checked={form.force_outgoing_ip}
-                            onChange={(e) => onChange('force_outgoing_ip', e.target.checked)}
-                        />
-                        <span>
-                            <span className="font-medium text-foreground">Force outgoing IP</span>
-                            <span className="mt-1 block text-xs text-muted-foreground">
-                                NATs outgoing traffic to the server&apos;s primary allocation IP.
-                            </span>
-                        </span>
-                    </label>
-                </div>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-docker">Docker images</Label>
-                        <textarea
-                            id="egg-docker"
-                            className={fieldClass}
-                            rows={4}
-                            value={form.docker_images}
-                            onChange={(e) => onChange('docker_images', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-startup">Startup command</Label>
-                        <textarea
-                            id="egg-startup"
-                            className={fieldClass}
-                            rows={6}
-                            value={form.startup}
-                            onChange={(e) => onChange('startup', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-features">Features</Label>
-                        <textarea
-                            id="egg-features"
-                            className={fieldClass}
-                            rows={2}
-                            placeholder="One feature per line"
-                            value={form.features}
-                            onChange={(e) => onChange('features', e.target.value)}
-                        />
-                    </div>
-                </div>
-            </div>
+            <SettingsSection title="Docker & startup" description="Container image and boot command.">
+                <SettingRow
+                    label="Docker images"
+                    htmlFor="egg-docker"
+                    description="One image per line. First image is the default."
+                    wide
+                >
+                    <textarea
+                        id="egg-docker"
+                        className={textareaClass}
+                        rows={4}
+                        value={form.docker_images}
+                        onChange={(e) => onChange('docker_images', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Startup command"
+                    htmlFor="egg-startup"
+                    description="Command run when the server starts."
+                    wide
+                >
+                    <textarea
+                        id="egg-startup"
+                        className={textareaClass}
+                        rows={4}
+                        value={form.startup}
+                        onChange={(e) => onChange('startup', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Features"
+                    htmlFor="egg-features"
+                    description="One feature flag per line."
+                    wide
+                >
+                    <textarea
+                        id="egg-features"
+                        className={textareaClass}
+                        rows={2}
+                        placeholder="One feature per line"
+                        value={form.features}
+                        onChange={(e) => onChange('features', e.target.value)}
+                    />
+                </SettingRow>
+            </SettingsSection>
 
-            <div className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-muted-foreground">
-                Process management fields are required unless copying settings from another egg.
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-config-from">Copy settings from</Label>
-                        <select
-                            id="egg-config-from"
-                            className={fieldClass}
-                            value={form.config_from ?? ''}
-                            onChange={(e) =>
-                                onChange('config_from', e.target.value ? Number(e.target.value) : null)
-                            }
-                        >
-                            <option value="">None</option>
-                            {configEggs.map((egg) => (
-                                <option key={egg.id} value={egg.id}>
-                                    {egg.name} &lt;{egg.author}&gt;
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-stop">Stop command</Label>
-                        <input
-                            id="egg-stop"
-                            className={fieldClass}
-                            value={form.config_stop}
-                            onChange={(e) => onChange('config_stop', e.target.value)}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-logs">Log configuration</Label>
-                        <textarea
-                            id="egg-logs"
-                            className={fieldClass}
-                            rows={5}
-                            value={form.config_logs}
-                            onChange={(e) => onChange('config_logs', e.target.value)}
-                        />
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-files">Configuration files</Label>
-                        <textarea
-                            id="egg-files"
-                            className={fieldClass}
-                            rows={5}
-                            value={form.config_files}
-                            onChange={(e) => onChange('config_files', e.target.value)}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="egg-config-startup">Start configuration</Label>
-                        <textarea
-                            id="egg-config-startup"
-                            className={fieldClass}
-                            rows={5}
-                            value={form.config_startup}
-                            onChange={(e) => onChange('config_startup', e.target.value)}
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
+            <SettingsSection
+                title="Process management"
+                description="Required unless copying settings from another egg in this nest."
+            >
+                <SettingRow
+                    label="Copy settings from"
+                    htmlFor="egg-config-from"
+                    description="Reuse process config from another egg."
+                >
+                    <select
+                        id="egg-config-from"
+                        className={fieldClass}
+                        value={form.config_from ?? ''}
+                        onChange={(e) => onChange('config_from', e.target.value ? Number(e.target.value) : null)}
+                    >
+                        <option value="">None</option>
+                        {configEggs.map((egg) => (
+                            <option key={egg.id} value={egg.id}>
+                                {egg.name} ({egg.author})
+                            </option>
+                        ))}
+                    </select>
+                </SettingRow>
+                <SettingRow label="Stop command" htmlFor="egg-stop" description="Command sent to stop the server.">
+                    <input
+                        id="egg-stop"
+                        className={fieldClass}
+                        value={form.config_stop}
+                        onChange={(e) => onChange('config_stop', e.target.value)}
+                    />
+                </SettingRow>
+                <SettingRow label="Log configuration" htmlFor="egg-logs" description="JSON log parser config." wide>
+                    <textarea
+                        id="egg-logs"
+                        className={textareaClass}
+                        rows={4}
+                        value={form.config_logs}
+                        onChange={(e) => onChange('config_logs', e.target.value)}
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Configuration files"
+                    htmlFor="egg-files"
+                    description="JSON file parser definitions."
+                    wide
+                >
+                    <textarea
+                        id="egg-files"
+                        className={textareaClass}
+                        rows={4}
+                        value={form.config_files}
+                        onChange={(e) => onChange('config_files', e.target.value)}
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Start configuration"
+                    htmlFor="egg-config-startup"
+                    description="JSON startup detection config."
+                    wide
+                >
+                    <textarea
+                        id="egg-config-startup"
+                        className={textareaClass}
+                        rows={4}
+                        value={form.config_startup}
+                        onChange={(e) => onChange('config_startup', e.target.value)}
+                    />
+                </SettingRow>
+            </SettingsSection>
+        </>
     );
 };
 

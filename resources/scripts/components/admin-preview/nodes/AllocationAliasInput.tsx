@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { updateNodeAllocationAlias } from '@/api/admin/nodes';
-import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -9,9 +7,10 @@ interface Props {
     allocationId: number;
     initialValue: string | null;
     onUpdated?: (alias: string) => void;
+    className?: string;
 }
 
-export default ({ nodeId, allocationId, initialValue, onUpdated }: Props) => {
+export default ({ nodeId, allocationId, initialValue, onUpdated, className }: Props) => {
     const serverValue = initialValue ?? '';
     const [value, setValue] = useState(serverValue);
     const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -69,16 +68,16 @@ export default ({ nodeId, allocationId, initialValue, onUpdated }: Props) => {
     };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className={cn('min-w-0', className)}>
             <input
                 className={cn(
-                    fieldClass,
-                    'py-1 text-xs',
-                    status === 'saved' && 'border-green-500/50',
+                    'h-9 w-full min-w-0 rounded-md border border-border bg-background px-2.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    status === 'saved' && 'border-emerald-500/50',
                     status === 'error' && 'border-red-500/50'
                 )}
                 value={value}
-                placeholder="none"
+                placeholder="No alias"
+                aria-label="IP alias"
                 onChange={(event) => {
                     setValue(event.target.value);
                     if (status === 'error') {
@@ -88,7 +87,7 @@ export default ({ nodeId, allocationId, initialValue, onUpdated }: Props) => {
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
             />
-            {status === 'saving' && <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" />}
+            {status === 'saving' && <p className="mt-1 text-xs text-muted-foreground">Saving…</p>}
         </div>
     );
 };

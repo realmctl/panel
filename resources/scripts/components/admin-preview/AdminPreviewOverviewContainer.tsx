@@ -4,191 +4,48 @@ import { Link } from 'react-router-dom';
 import {
     ArrowUpRight,
     BookOpen,
-    ChevronRight,
-    Code2,
-    Database,
-    Egg,
-    Folder,
-    Globe,
-    Globe2,
-    Heart,
-    Info,
-    LifeBuoy,
-    LucideIcon,
-    MapPin,
-    Network,
-    Plug,
-    Server,
-    Settings,
-    UserPlus,
-    Users,
 } from 'lucide-react';
 import { useStoreState } from '@/state/hooks';
 import AdminPreviewContent from '@/components/admin-preview/AdminPreviewContent';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 import { getOverview, OverviewStats } from '@/api/admin/overview';
-import { Badge } from '@/components/ui/badge';
 import Spinner from '@/components/elements/Spinner';
 import { cn } from '@/lib/utils';
-
-type QuickAction = {
-    label: string;
-    href: string;
-    icon: LucideIcon;
-    external?: boolean;
-    legacy?: boolean;
-};
 
 type ManagementSection = {
     label: string;
     href: string;
-    icon: LucideIcon;
     statKey?: keyof OverviewStats;
-    description: string;
 };
 
-const quickActions: QuickAction[] = [
-    { label: 'New Server', href: `${adminPreviewBasePath}/servers/new`, icon: Server },
-    { label: 'New User', href: `${adminPreviewBasePath}/users/new`, icon: UserPlus },
-    { label: 'New Node', href: `${adminPreviewBasePath}/nodes/new`, icon: Network },
-    { label: 'New Egg', href: `${adminPreviewBasePath}/nests/eggs/new`, icon: Egg },
-    { label: 'New Database Host', href: `${adminPreviewBasePath}/databases/new`, icon: Database },
-    { label: 'Settings', href: `${adminPreviewBasePath}/settings`, icon: Settings },
-];
+const quickActions = [
+    { label: 'New server', href: `${adminPreviewBasePath}/servers/new` },
+    { label: 'New user', href: `${adminPreviewBasePath}/users/new` },
+    { label: 'New node', href: `${adminPreviewBasePath}/nodes/new` },
+    { label: 'New egg', href: `${adminPreviewBasePath}/nests/eggs/new` },
+    { label: 'New database host', href: `${adminPreviewBasePath}/databases/new` },
+    { label: 'Settings', href: `${adminPreviewBasePath}/settings` },
+] as const;
 
 const managementSections: ManagementSection[] = [
-    {
-        label: 'Settings',
-        href: `${adminPreviewBasePath}/settings`,
-        icon: Settings,
-        description: 'General, mail, security, and OAuth',
-    },
-    {
-        label: 'API',
-        href: `${adminPreviewBasePath}/api`,
-        icon: Plug,
-        description: 'Application API keys',
-    },
-    {
-        label: 'Databases',
-        href: `${adminPreviewBasePath}/databases`,
-        icon: Database,
-        statKey: 'database_hosts',
-        description: 'Database hosts',
-    },
-    {
-        label: 'Locations',
-        href: `${adminPreviewBasePath}/locations`,
-        icon: MapPin,
-        statKey: 'locations',
-        description: 'Geographic locations',
-    },
-    {
-        label: 'Nodes',
-        href: `${adminPreviewBasePath}/nodes`,
-        icon: Network,
-        statKey: 'nodes',
-        description: 'Wings nodes and allocations',
-    },
-    {
-        label: 'Servers',
-        href: `${adminPreviewBasePath}/servers`,
-        icon: Server,
-        statKey: 'servers',
-        description: 'Game and application servers',
-    },
-    {
-        label: 'Subdomains',
-        href: `${adminPreviewBasePath}/subdomains`,
-        icon: Globe2,
-        statKey: 'subdomain_domains',
-        description: 'DNS domains and records',
-    },
-    {
-        label: 'Users',
-        href: `${adminPreviewBasePath}/users`,
-        icon: Users,
-        statKey: 'users',
-        description: 'Panel accounts and permissions',
-    },
-    {
-        label: 'Mounts',
-        href: `${adminPreviewBasePath}/mounts`,
-        icon: Folder,
-        statKey: 'mounts',
-        description: 'Shared volume mounts',
-    },
-    {
-        label: 'Nests',
-        href: `${adminPreviewBasePath}/nests`,
-        icon: Egg,
-        statKey: 'nests',
-        description: 'Eggs and service templates',
-    },
+    { label: 'Settings', href: `${adminPreviewBasePath}/settings` },
+    { label: 'API', href: `${adminPreviewBasePath}/api` },
+    { label: 'Servers', href: `${adminPreviewBasePath}/servers`, statKey: 'servers' },
+    { label: 'Users', href: `${adminPreviewBasePath}/users`, statKey: 'users' },
+    { label: 'Nodes', href: `${adminPreviewBasePath}/nodes`, statKey: 'nodes' },
+    { label: 'Locations', href: `${adminPreviewBasePath}/locations`, statKey: 'locations' },
+    { label: 'Nests', href: `${adminPreviewBasePath}/nests`, statKey: 'nests' },
+    { label: 'Mounts', href: `${adminPreviewBasePath}/mounts`, statKey: 'mounts' },
+    { label: 'Databases', href: `${adminPreviewBasePath}/databases`, statKey: 'database_hosts' },
+    { label: 'Subdomains', href: `${adminPreviewBasePath}/subdomains`, statKey: 'subdomain_domains' },
 ];
 
-const StatCard = ({
-    label,
-    value,
-    href,
-    icon: Icon,
-    loading,
-}: {
-    label: string;
-    value: number | undefined;
-    href: string;
-    icon: LucideIcon;
-    loading: boolean;
-}) => (
-    <Link
-        to={href}
-        className="group flex flex-col rounded-lg border border-border bg-card p-4 no-underline transition-colors hover:bg-muted/50"
-    >
-        <div className="mb-3 flex items-center justify-between">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Icon className="h-4 w-4" />
-            </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-        </div>
-        <p className="text-2xl font-semibold tabular-nums text-foreground">
-            {loading ? <Spinner size="small" /> : (value ?? '—')}
-        </p>
-        <p className="mt-0.5 text-sm text-muted-foreground">{label}</p>
-    </Link>
-);
-
-const QuickActionLink = ({ action }: { action: QuickAction }) => {
-    const Icon = action.icon;
-    const className =
-        'flex items-center gap-3 rounded-md border border-border bg-background px-4 py-3 text-sm text-foreground no-underline transition-colors hover:bg-muted';
-
-    const content = (
-        <>
-            <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <span className="min-w-0 flex-1">{action.label}</span>
-            {action.legacy && (
-                <Badge variant="outline" className="shrink-0 border-none bg-muted text-[10px] text-muted-foreground">
-                    Legacy
-                </Badge>
-            )}
-            {action.external && <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
-        </>
-    );
-
-    if (action.external) {
-        return (
-            <a href={action.href} className={className}>
-                {content}
-            </a>
-        );
-    }
-
-    return (
-        <Link to={action.href} className={className}>
-            {content}
-        </Link>
-    );
-};
+const overviewStats: { label: string; statKey: keyof OverviewStats; href: string }[] = [
+    { label: 'Servers', statKey: 'servers', href: `${adminPreviewBasePath}/servers` },
+    { label: 'Users', statKey: 'users', href: `${adminPreviewBasePath}/users` },
+    { label: 'Nodes', statKey: 'nodes', href: `${adminPreviewBasePath}/nodes` },
+    { label: 'Locations', statKey: 'locations', href: `${adminPreviewBasePath}/locations` },
+];
 
 export default () => {
     const panelName = useStoreState((state) => state.settings.data?.name || 'Realm');
@@ -204,35 +61,15 @@ export default () => {
     const isLatest = version?.isLatest ?? true;
 
     const resourceLinks = [
+        { label: 'Get help', description: 'Discord', href: version?.discord || 'https://realmctl.com/discord' },
+        { label: 'Documentation', description: 'realmctl.com', href: 'https://realmctl.com' },
+        { label: 'GitHub', description: 'Source code', href: 'https://github.com/realmopensource/panel' },
         {
-            label: 'Get Help',
-            description: 'via Discord',
-            href: version?.discord || 'https://realmctl.com/discord',
-            icon: LifeBuoy,
-            iconClass: 'text-amber-400 bg-amber-500/10',
-        },
-        {
-            label: 'Documentation',
-            description: 'realmctl.com',
-            href: 'https://realmctl.com',
-            icon: BookOpen,
-            iconClass: 'text-primary bg-primary/10',
-        },
-        {
-            label: 'GitHub',
-            description: 'Source code',
-            href: 'https://github.com/realmopensource/panel',
-            icon: Code2,
-            iconClass: 'text-neutral-300 bg-neutral-500/10',
-        },
-        {
-            label: 'Support the Project',
+            label: 'Support the project',
             description: 'Donate',
             href: version?.donations || 'https://realmctl.com/sponsor',
-            icon: Heart,
-            iconClass: 'text-emerald-400 bg-emerald-500/10',
         },
-    ];
+    ] as const;
 
     return (
         <AdminPreviewContent
@@ -240,41 +77,27 @@ export default () => {
             description={`Welcome back, ${username} · managing ${panelName}`}
         >
             <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                    <StatCard
-                        label="Servers"
-                        value={stats?.servers}
-                        href={`${adminPreviewBasePath}/servers`}
-                        icon={Server}
-                        loading={loadingStats}
-                    />
-                    <StatCard
-                        label="Users"
-                        value={stats?.users}
-                        href={`${adminPreviewBasePath}/users`}
-                        icon={Users}
-                        loading={loadingStats}
-                    />
-                    <StatCard
-                        label="Nodes"
-                        value={stats?.nodes}
-                        href={`${adminPreviewBasePath}/nodes`}
-                        icon={Network}
-                        loading={loadingStats}
-                    />
-                    <StatCard
-                        label="Locations"
-                        value={stats?.locations}
-                        href={`${adminPreviewBasePath}/locations`}
-                        icon={Globe}
-                        loading={loadingStats}
-                    />
+                <div className="grid grid-cols-2 overflow-hidden rounded-md border border-border bg-card divide-x divide-y divide-border lg:grid-cols-4 lg:divide-y-0">
+                    {overviewStats.map((item) => (
+                        <Link
+                            key={item.label}
+                            to={item.href}
+                            className="group flex items-center justify-between gap-3 px-4 py-3 no-underline transition-colors hover:bg-muted/50"
+                        >
+                            <span className="text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+                                {item.label}
+                            </span>
+                            <span className="text-lg font-semibold tabular-nums text-foreground">
+                                {loadingStats ? <Spinner size="small" /> : (stats?.[item.statKey] ?? '—')}
+                            </span>
+                        </Link>
+                    ))}
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                     <div
                         className={cn(
-                            'relative overflow-hidden rounded-lg border bg-card p-5',
+                            'relative h-full overflow-hidden rounded-md border bg-card p-5',
                             isLatest ? 'border-emerald-500/20' : 'border-amber-500/30'
                         )}
                     >
@@ -284,29 +107,20 @@ export default () => {
                                 isLatest ? 'bg-emerald-500' : 'bg-amber-500'
                             )}
                         />
-                        <div className="flex items-start gap-4 pl-3">
-                            <div
-                                className={cn(
-                                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
-                                    isLatest ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                                )}
-                            >
-                                <Info className="h-5 w-5" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <div className="pl-3">
+                            <div className="min-w-0">
+                                <div className="mb-2">
                                     <h2 className="text-base font-semibold text-foreground">System information</h2>
-                                    <Badge
-                                        variant="outline"
+                                    <p
                                         className={cn(
-                                            'border-none',
-                                            isLatest
-                                                ? 'bg-emerald-500/10 text-emerald-400'
-                                                : 'bg-amber-500/10 text-amber-400'
+                                            'mt-0.5 text-sm',
+                                            isLatest ? 'text-muted-foreground' : 'text-amber-400'
                                         )}
                                     >
-                                        {isLatest ? 'Up to date' : 'Update available'}
-                                    </Badge>
+                                        {isLatest
+                                            ? 'Your panel is on the latest public release.'
+                                            : `Version ${latestVersion} is available.`}
+                                    </p>
                                 </div>
                                 {isLatest ? (
                                     <div className="space-y-2 text-sm text-muted-foreground">
@@ -369,33 +183,70 @@ export default () => {
                                         </a>
                                     </div>
                                 )}
+                                <div className="mt-4 grid grid-cols-2 overflow-hidden rounded-md border border-border bg-muted/30 divide-x divide-border">
+                                    <div className="flex min-w-0 items-center justify-between gap-2 px-4 py-2.5">
+                                        <span className="shrink-0 text-sm text-muted-foreground">Panel</span>
+                                        <span className="min-w-0 truncate text-right text-sm text-foreground">
+                                            <code className="text-xs">{currentVersion}</code>
+                                            {isLatest ? (
+                                                <span className="ml-1.5 text-xs text-emerald-400">· Installed</span>
+                                            ) : (
+                                                <a
+                                                    href={`https://github.com/realmopensource/panel/releases/v${latestVersion}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ml-1.5 inline-flex items-center gap-0.5 text-xs text-blue-400 no-underline hover:text-blue-300"
+                                                >
+                                                    · <code>{latestVersion}</code> available
+                                                    <ArrowUpRight className="h-3 w-3 shrink-0" />
+                                                </a>
+                                            )}
+                                        </span>
+                                    </div>
+                                    <div className="flex min-w-0 items-center justify-between gap-2 px-4 py-2.5">
+                                        <span className="shrink-0 text-sm text-muted-foreground">Wings</span>
+                                        <span className="min-w-0 truncate text-right text-sm text-foreground">
+                                            Same major version
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="rounded-lg border border-border bg-card">
-                        <div className="border-b border-border px-5 py-4">
+                    <div className="flex h-full flex-col overflow-hidden rounded-md border border-border bg-card">
+                        <div className="shrink-0 border-b border-border px-5 py-4">
                             <h2 className="text-base font-semibold text-foreground">Quick actions</h2>
-                            <p className="mt-1 text-sm text-muted-foreground">Create resources and open settings.</p>
+                            <p className="mt-0.5 text-sm text-muted-foreground">
+                                Create something new.
+                            </p>
                         </div>
-                        <div className="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2">
+                        <div className="grid flex-1 auto-rows-fr grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:grid-rows-3 sm:divide-x sm:divide-y">
                             {quickActions.map((action) => (
-                                <QuickActionLink key={action.label} action={action} />
+                                <Link
+                                    key={action.label}
+                                    to={action.href}
+                                    className="group flex h-full items-center justify-between gap-3 px-5 py-4 no-underline transition-colors hover:bg-muted/50"
+                                >
+                                    <span className="text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+                                        {action.label}
+                                    </span>
+                                    <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                                </Link>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                <div className="rounded-lg border border-border bg-card">
+                <div className="overflow-hidden rounded-md border border-border bg-card">
                     <div className="border-b border-border px-5 py-4">
                         <h2 className="text-base font-semibold text-foreground">Administration</h2>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Jump to any section in the admin preview.
+                        <p className="mt-0.5 text-sm text-muted-foreground">
+                            All admin sections in one place.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:divide-x lg:grid-cols-3">
                         {managementSections.map((section) => {
-                            const Icon = section.icon;
                             const count =
                                 section.statKey && stats ? stats[section.statKey] : undefined;
 
@@ -403,60 +254,52 @@ export default () => {
                                 <Link
                                     key={section.label}
                                     to={section.href}
-                                    className="group flex items-start gap-3 rounded-md border border-border bg-background px-4 py-3 no-underline transition-colors hover:bg-muted"
+                                    className="group flex items-center justify-between gap-3 px-5 py-3 no-underline transition-colors hover:bg-muted/50"
                                 >
-                                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                                        <Icon className="h-4 w-4" />
+                                    <span className="text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+                                        {section.label}
                                     </span>
-                                    <span className="min-w-0 flex-1">
-                                        <span className="flex items-center gap-2">
-                                            <span className="text-sm font-medium text-foreground">
-                                                {section.label}
-                                            </span>
-                                            {count !== undefined && (
-                                                <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] tabular-nums text-muted-foreground">
-                                                    {count}
-                                                </span>
-                                            )}
+                                    {section.statKey ? (
+                                        <span className="text-sm font-semibold tabular-nums text-foreground">
+                                            {loadingStats ? <Spinner size="small" /> : (count ?? '—')}
                                         </span>
-                                        <span className="mt-0.5 block text-xs text-muted-foreground">
-                                            {section.description}
-                                        </span>
-                                    </span>
-                                    <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                                    ) : (
+                                        <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                                    )}
                                 </Link>
                             );
                         })}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {resourceLinks.map((link) => {
-                        const Icon = link.icon;
-
-                        return (
+                <div className="overflow-hidden rounded-md border border-border bg-card">
+                    <div className="border-b border-border px-5 py-4">
+                        <h2 className="text-base font-semibold text-foreground">Resources</h2>
+                        <p className="mt-0.5 text-sm text-muted-foreground">
+                            Help, docs, and community links.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:divide-x lg:grid-cols-4 lg:divide-y-0">
+                        {resourceLinks.map((link) => (
                             <a
                                 key={link.label}
                                 href={link.href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 no-underline transition-colors hover:bg-muted"
+                                className="group flex items-center justify-between gap-3 px-5 py-3 no-underline transition-colors hover:bg-muted/50"
                             >
-                                <span
-                                    className={cn(
-                                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
-                                        link.iconClass
-                                    )}
-                                >
-                                    <Icon className="h-5 w-5" />
+                                <span className="min-w-0">
+                                    <span className="block text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+                                        {link.label}
+                                    </span>
+                                    <span className="block truncate text-xs text-muted-foreground/80">
+                                        {link.description}
+                                    </span>
                                 </span>
-                                <div className="min-w-0">
-                                    <p className="text-sm font-medium text-foreground">{link.label}</p>
-                                    <p className="text-xs text-muted-foreground">{link.description}</p>
-                                </div>
+                                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                             </a>
-                        );
-                    })}
+                        ))}
+                    </div>
                 </div>
             </div>
         </AdminPreviewContent>

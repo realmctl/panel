@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Link, useHistory } from 'react-router-dom';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { createSubdomainDomain, getSubdomainDomainCreateMeta } from '@/api/admin/subdomains';
 import DomainFormFields, { DomainFormState } from '@/components/admin-preview/subdomains/DomainFormFields';
+import { SettingsFooter, SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 
 const defaultForm = (): DomainFormState => ({
@@ -79,29 +80,25 @@ export default () => {
     }
 
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
-            <Link
-                to={`${adminPreviewBasePath}/subdomains`}
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground"
+        <form onSubmit={onSubmit} className="space-y-4">
+            <SettingsSection
+                title="New domain"
+                description="Connect a DNS provider so customers can create subdomains."
             >
-                <ArrowLeft className="h-4 w-4" />
-                Back to domains
-            </Link>
+                <DomainFormFields form={form} providers={data.providers} onChange={updateField} />
+            </SettingsSection>
 
-            <div className="rounded-lg border border-border bg-card">
-                <div className="border-b border-border px-5 py-4">
-                    <h2 className="text-base font-semibold text-foreground">New domain</h2>
-                </div>
-                <div className="p-5">
-                    <DomainFormFields form={form} providers={data.providers} onChange={updateField} />
-                </div>
-                <div className="flex justify-end border-t border-border px-5 py-4">
-                    <Button type="submit" disabled={saving}>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save
+            <SettingsFooter>
+                <Link to={`${adminPreviewBasePath}/subdomains`} className="no-underline">
+                    <Button type="button" variant="outline">
+                        Cancel
                     </Button>
-                </div>
-            </div>
+                </Link>
+                <Button type="submit" disabled={saving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? 'Creating...' : 'Create domain'}
+                </Button>
+            </SettingsFooter>
         </form>
     );
 };

@@ -1,43 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { ExternalLink, Plus, Search, Server } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { getServers } from '@/api/admin/servers';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
-import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
-import { cn } from '@/lib/utils';
 
-const statusBadge = (status: 'active' | 'installing' | 'suspended') => {
+const statusLabel = (status: 'active' | 'installing' | 'suspended') => {
     switch (status) {
         case 'suspended':
-            return (
-                <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-500">
-                    Suspended
-                </span>
-            );
+            return <span className="text-red-500">Suspended</span>;
         case 'installing':
-            return (
-                <span className="rounded-full bg-yellow-500/15 px-2 py-0.5 text-xs font-medium text-yellow-500">
-                    Installing
-                </span>
-            );
+            return <span className="text-yellow-600 dark:text-yellow-500">Installing</span>;
         default:
-            return (
-                <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-xs font-medium text-green-500">
-                    Active
-                </span>
-            );
+            return <span className="text-emerald-600 dark:text-emerald-500">Active</span>;
     }
 };
 
@@ -45,8 +23,6 @@ export default () => {
     const location = useLocation();
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const [page, setPage] = useState(1);
-    const [search, setSearch] = useState('');
-    const [query, setQuery] = useState('');
     const [ownerId, setOwnerId] = useState<number | undefined>();
 
     useEffect(() => {
@@ -56,13 +32,10 @@ export default () => {
         setPage(1);
     }, [location.search]);
 
-    const { data, error, isValidating } = useSWR(['admin-servers', page, query, ownerId], () =>
+    const { data, error, isValidating } = useSWR(['admin-servers', page, ownerId], () =>
         getServers({
             page,
-            filter: {
-                ...(query ? { '*': query } : {}),
-                ...(ownerId ? { owner_id: ownerId } : {}),
-            },
+            filter: ownerId ? { owner_id: ownerId } : undefined,
         })
     );
 
@@ -74,12 +47,6 @@ export default () => {
         }
     }, [error]);
 
-    const onSearch = (event: React.FormEvent) => {
-        event.preventDefault();
-        setPage(1);
-        setQuery(search.trim());
-    };
-
     if (!data && isValidating) {
         return <Spinner centered />;
     }
@@ -88,120 +55,113 @@ export default () => {
     const pagination = data?.pagination;
 
     return (
-        <div className="rounded-lg border border-border bg-card">
+        <div className="overflow-hidden rounded-md border border-border bg-card">
             <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 className="text-base font-semibold text-foreground">Server list</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">All servers on this panel.</p>
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <form onSubmit={onSearch} className="flex gap-2">
-                        <input
-                            className={cn(fieldClass, 'w-48')}
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search..."
-                        />
-                        <Button type="submit" variant="outline" size="icon">
-                            <Search className="h-4 w-4" />
-                        </Button>
-                    </form>
-                    <Link to={`${adminPreviewBasePath}/servers/new`} className="shrink-0 no-underline">
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Create new
-                        </Button>
-                    </Link>
-                </div>
-            </div>
-
-            {servers.length === 0 ? (
-                <div className="flex flex-col items-center px-5 py-12 text-center">
-                    <Server className="mb-4 h-10 w-10 text-muted-foreground" />
-                    <p className="text-base font-medium text-foreground">No servers</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        {query ? 'No servers match your search.' : 'No servers have been created yet.'}
+                    <h2 className="text-base font-semibold text-foreground">Servers</h2>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                        {ownerId ? 'Filtered by owner.' : 'All servers on this panel.'}
                     </p>
                 </div>
+                <Link to={`${adminPreviewBasePath}/servers/new`} className="shrink-0 no-underline">
+                    <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create server
+                    </Button>
+                </Link>
+            </div>
+
+            {ownerId && (
+                <div className="flex items-center justify-between border-b border-border bg-muted/20 px-5 py-3 text-sm">
+                    <span className="text-muted-foreground">Showing servers for user #{ownerId}</span>
+                    <Link
+                        to={`${adminPreviewBasePath}/servers`}
+                        className="text-blue-400 no-underline hover:text-blue-300"
+                    >
+                        Clear filter
+                    </Link>
+                </div>
+            )}
+
+            {servers.length === 0 ? (
+                <p className="px-5 py-8 text-sm text-muted-foreground">
+                    {ownerId ? (
+                        'No servers for this user.'
+                    ) : (
+                        <>
+                            No servers yet.{' '}
+                            <Link
+                                to={`${adminPreviewBasePath}/servers/new`}
+                                className="text-blue-400 no-underline hover:text-blue-300"
+                            >
+                                Create your first server
+                            </Link>
+                            .
+                        </>
+                    )}
+                </p>
             ) : (
-                <div className={tableWrapClass}>
-                    <table className={tableClass}>
-                        <thead>
-                            <tr className={tableHeadRowClass}>
-                                <th className={tableHeadCellClass}>Server name</th>
-                                <th className={tableHeadCellClass}>UUID</th>
-                                <th className={tableHeadCellClass}>Owner</th>
-                                <th className={tableHeadCellClass}>Node</th>
-                                <th className={tableHeadCellClass}>Connection</th>
-                                <th className={tableHeadCellClass}>Status</th>
-                                <th className={cn(tableHeadCellClass, 'w-10')} />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {servers.map((server) => (
-                                <tr key={server.id} className={tableBodyRowClass}>
-                                    <td className={tableBodyCellClass}>
-                                        <a
-                                            href={`${adminPreviewBasePath}/servers/${server.id}`}
-                                            className="font-medium text-primary no-underline hover:underline"
-                                        >
-                                            {server.name}
-                                        </a>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        <code className="text-xs" title={server.uuid}>
-                                            {server.uuid_short}
-                                        </code>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        {server.owner ? (
+                <div className="divide-y divide-border">
+                    {servers.map((server) => (
+                        <div
+                            key={server.id}
+                            className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div className="min-w-0">
+                                <Link
+                                    to={`${adminPreviewBasePath}/servers/${server.id}`}
+                                    className="text-sm font-medium text-blue-400 no-underline hover:text-blue-300"
+                                >
+                                    {server.name}
+                                </Link>
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    <code>{server.uuid_short}</code>
+                                    {server.owner && (
+                                        <>
+                                            {' · '}
                                             <Link
                                                 to={`${adminPreviewBasePath}/users/${server.owner.id}`}
-                                                className="text-primary no-underline hover:underline"
+                                                className="text-blue-400 no-underline hover:text-blue-300"
                                             >
                                                 {server.owner.username}
                                             </Link>
-                                        ) : (
-                                            <span className="text-sm text-muted-foreground">—</span>
-                                        )}
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        {server.node ? (
-                                            <a
-                                                href={`${adminPreviewBasePath}/nodes/${server.node.id}`}
-                                                className="text-primary no-underline hover:underline"
+                                        </>
+                                    )}
+                                    {server.node && (
+                                        <>
+                                            {' · '}
+                                            <Link
+                                                to={`${adminPreviewBasePath}/nodes/${server.node.id}`}
+                                                className="text-blue-400 no-underline hover:text-blue-300"
                                             >
                                                 {server.node.name}
-                                            </a>
-                                        ) : (
-                                            <span className="text-sm text-muted-foreground">—</span>
-                                        )}
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        {server.allocation ? (
-                                            <code className="text-xs">
+                                            </Link>
+                                        </>
+                                    )}
+                                    {server.allocation && (
+                                        <>
+                                            {' · '}
+                                            <code>
                                                 {server.allocation.alias ?? ''}:{server.allocation.port}
                                             </code>
-                                        ) : (
-                                            <span className="text-sm text-muted-foreground">—</span>
-                                        )}
-                                    </td>
-                                    <td className={tableBodyCellClass}>{statusBadge(server.status)}</td>
-                                    <td className={tableBodyCellClass}>
-                                        <a
-                                            href={`/server/${server.uuid_short}`}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            title="Open client panel"
-                                            className="text-muted-foreground hover:text-foreground"
-                                        >
-                                            <ExternalLink className="h-4 w-4" />
-                                        </a>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        </>
+                                    )}
+                                </p>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-3 text-xs">
+                                {statusLabel(server.status)}
+                                <a
+                                    href={`/server/${server.uuid_short}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-blue-400 no-underline hover:text-blue-300"
+                                >
+                                    Open panel
+                                </a>
+                                <code className="text-muted-foreground">#{server.id}</code>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
 

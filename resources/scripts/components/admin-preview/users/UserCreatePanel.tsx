@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Link, useHistory } from 'react-router-dom';
-import { ArrowLeft, Info, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { createUser, getUserCreateMeta } from '@/api/admin/users';
 import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
+import {
+    SegmentedControl,
+    SettingRow,
+    SettingsFooter,
+    SettingsSection,
+} from '@/components/admin-preview/settings/settingsLayout';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 
 export default () => {
@@ -78,140 +83,112 @@ export default () => {
     }
 
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
-            <Link
-                to={`${adminPreviewBasePath}/users`}
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground"
+        <form onSubmit={onSubmit} className="space-y-4">
+            <SettingsSection title="New user" description="Create a panel account for a customer or team member.">
+                <SettingRow label="Email" htmlFor="user-email" description="Login address and account identifier.">
+                    <input
+                        id="user-email"
+                        type="email"
+                        autoComplete="off"
+                        className={fieldClass}
+                        value={form.email}
+                        onChange={(e) => updateField('email', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow label="Username" htmlFor="user-username" description="Unique handle shown across the panel.">
+                    <input
+                        id="user-username"
+                        autoComplete="off"
+                        className={fieldClass}
+                        value={form.username}
+                        onChange={(e) => updateField('username', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow label="First name" htmlFor="user-first" description="Given name for the account.">
+                    <input
+                        id="user-first"
+                        autoComplete="off"
+                        className={fieldClass}
+                        value={form.name_first}
+                        onChange={(e) => updateField('name_first', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow label="Last name" htmlFor="user-last" description="Family name for the account.">
+                    <input
+                        id="user-last"
+                        autoComplete="off"
+                        className={fieldClass}
+                        value={form.name_last}
+                        onChange={(e) => updateField('name_last', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Default language"
+                    htmlFor="user-language"
+                    description="Language used when the user first signs in."
+                >
+                    <select
+                        id="user-language"
+                        className={fieldClass}
+                        value={form.language}
+                        onChange={(e) => updateField('language', e.target.value)}
+                    >
+                        {Object.entries(data.languages).map(([code, label]) => (
+                            <option key={code} value={code}>
+                                {label}
+                            </option>
+                        ))}
+                    </select>
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsSection title="Permissions" description="Administrative access for this account.">
+                <SettingRow
+                    label="Administrator"
+                    description="Grants full access to the admin area and all servers."
+                >
+                    <SegmentedControl
+                        value={form.root_admin}
+                        options={[
+                            { value: false, label: 'No' },
+                            { value: true, label: 'Yes' },
+                        ]}
+                        onChange={(value) => updateField('root_admin', value)}
+                    />
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsSection
+                title="Password"
+                description="Optional. New users are prompted to set one on first login if left blank."
             >
-                <ArrowLeft className="h-4 w-4" />
-                Back to users
-            </Link>
+                <SettingRow label="Password" htmlFor="user-password" description="Leave blank to require setup on login.">
+                    <input
+                        id="user-password"
+                        type="password"
+                        autoComplete="new-password"
+                        className={fieldClass}
+                        value={form.password}
+                        onChange={(e) => updateField('password', e.target.value)}
+                    />
+                </SettingRow>
+            </SettingsSection>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Identity</h2>
-                    </div>
-                    <div className="space-y-5 p-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="user-email">Email</Label>
-                            <input
-                                id="user-email"
-                                type="email"
-                                autoComplete="off"
-                                className={fieldClass}
-                                value={form.email}
-                                onChange={(e) => updateField('email', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="user-username">Username</Label>
-                            <input
-                                id="user-username"
-                                autoComplete="off"
-                                className={fieldClass}
-                                value={form.username}
-                                onChange={(e) => updateField('username', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="user-first">First name</Label>
-                            <input
-                                id="user-first"
-                                autoComplete="off"
-                                className={fieldClass}
-                                value={form.name_first}
-                                onChange={(e) => updateField('name_first', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="user-last">Last name</Label>
-                            <input
-                                id="user-last"
-                                autoComplete="off"
-                                className={fieldClass}
-                                value={form.name_last}
-                                onChange={(e) => updateField('name_last', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="user-language">Default language</Label>
-                            <select
-                                id="user-language"
-                                className={fieldClass}
-                                value={form.language}
-                                onChange={(e) => updateField('language', e.target.value)}
-                            >
-                                {Object.entries(data.languages).map(([code, label]) => (
-                                    <option key={code} value={code}>
-                                        {label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    <div className="flex justify-end border-t border-border px-5 py-4">
-                        <Button type="submit" disabled={saving}>
-                            <Save className="mr-2 h-4 w-4" />
-                            Create user
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    <div className="rounded-lg border border-border bg-card">
-                        <div className="border-b border-border px-5 py-4">
-                            <h2 className="text-base font-semibold text-foreground">Permissions</h2>
-                        </div>
-                        <div className="space-y-5 p-5">
-                            <div className="space-y-2">
-                                <Label htmlFor="user-admin">Administrator</Label>
-                                <select
-                                    id="user-admin"
-                                    className={fieldClass}
-                                    value={form.root_admin ? '1' : '0'}
-                                    onChange={(e) => updateField('root_admin', e.target.value === '1')}
-                                >
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
-                                <p className="text-xs text-muted-foreground">
-                                    Setting this to &quot;Yes&quot; gives a user full administrative access.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="rounded-lg border border-border bg-card">
-                        <div className="border-b border-border px-5 py-4">
-                            <h2 className="text-base font-semibold text-foreground">Password</h2>
-                        </div>
-                        <div className="space-y-5 p-5">
-                            <div className="flex gap-2 rounded-md border border-blue-500/30 bg-blue-500/10 px-4 py-3 text-sm text-muted-foreground">
-                                <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
-                                <p>
-                                    Providing a password is optional. New users will be prompted to create one on first
-                                    login.
-                                </p>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="user-password">Password</Label>
-                                <input
-                                    id="user-password"
-                                    type="password"
-                                    className={fieldClass}
-                                    value={form.password}
-                                    onChange={(e) => updateField('password', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <SettingsFooter>
+                <Link to={`${adminPreviewBasePath}/users`} className="no-underline">
+                    <Button type="button" variant="outline">
+                        Cancel
+                    </Button>
+                </Link>
+                <Button type="submit" disabled={saving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? 'Creating...' : 'Create user'}
+                </Button>
+            </SettingsFooter>
         </form>
     );
 };

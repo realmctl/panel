@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Link, useHistory } from 'react-router-dom';
-import { AlertTriangle, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { createDatabaseHost, getDatabaseHostCreateMeta } from '@/api/admin/databases';
 import DatabaseNodeSelect from '@/components/admin-preview/databases/DatabaseNodeSelect';
 import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow, SettingsFooter, SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
+import { cn } from '@/lib/utils';
 
 export default () => {
     const history = useHistory();
@@ -69,114 +70,93 @@ export default () => {
     }
 
     return (
-        <form onSubmit={onSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2">
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Connection details</h2>
-                    </div>
-                    <div className="space-y-5 p-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="db-name">Name</Label>
-                            <input
-                                id="db-name"
-                                className={fieldClass}
-                                value={form.name}
-                                onChange={(e) => updateField('name', e.target.value)}
-                                required
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                A short identifier used to distinguish this host from others.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                            <div className="space-y-2 md:col-span-2">
-                                <Label htmlFor="db-host">Host</Label>
-                                <input
-                                    id="db-host"
-                                    className={fieldClass}
-                                    value={form.host}
-                                    onChange={(e) => updateField('host', e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="db-port">Port</Label>
-                                <input
-                                    id="db-port"
-                                    className={fieldClass}
-                                    value={form.port}
-                                    onChange={(e) => updateField('port', e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="db-username">Username</Label>
-                                <input
-                                    id="db-username"
-                                    className={fieldClass}
-                                    value={form.username}
-                                    onChange={(e) => updateField('username', e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="db-password">Password</Label>
-                                <input
-                                    id="db-password"
-                                    type="password"
-                                    className={fieldClass}
-                                    value={form.password}
-                                    onChange={(e) => updateField('password', e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <DatabaseNodeSelect
-                            id="db-node"
-                            locations={data.locations}
-                            value={form.node_id}
-                            onChange={(nodeId) => updateField('node_id', nodeId)}
+        <form onSubmit={onSubmit} className="space-y-4">
+            <SettingsSection
+                title="Connection"
+                description="MySQL host details. The account must have WITH GRANT OPTION. Do not reuse the panel's own MySQL credentials."
+            >
+                <SettingRow
+                    label="Name"
+                    htmlFor="db-name"
+                    description="A short identifier to distinguish this host."
+                >
+                    <input
+                        id="db-name"
+                        className={fieldClass}
+                        value={form.name}
+                        onChange={(e) => updateField('name', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow label="Host & port" description="Hostname or IP and MySQL port.">
+                    <div className="grid grid-cols-3 gap-2">
+                        <input
+                            id="db-host"
+                            className={cn(fieldClass, 'col-span-2')}
+                            value={form.host}
+                            onChange={(e) => updateField('host', e.target.value)}
+                            placeholder="Host"
+                            required
+                            aria-label="Host"
+                        />
+                        <input
+                            id="db-port"
+                            className={fieldClass}
+                            value={form.port}
+                            onChange={(e) => updateField('port', e.target.value)}
+                            placeholder="Port"
+                            required
+                            aria-label="Port"
                         />
                     </div>
-                </div>
-            </div>
+                </SettingRow>
+                <SettingRow
+                    label="Linked node"
+                    htmlFor="db-node"
+                    description="Default host when adding a database on this node."
+                >
+                    <DatabaseNodeSelect
+                        id="db-node"
+                        locations={data.locations}
+                        value={form.node_id}
+                        onChange={(nodeId) => updateField('node_id', nodeId)}
+                    />
+                </SettingRow>
+            </SettingsSection>
 
-            <div>
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Important</h2>
-                    </div>
-                    <div className="p-5">
-                        <div className="flex gap-3 rounded-md border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-foreground">
-                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-500" />
-                            <div>
-                                <p>
-                                    The account defined for this database host <strong>must</strong> have the{' '}
-                                    <code>WITH GRANT OPTION</code> permission.
-                                </p>
-                                <p className="mt-2">
-                                    <strong>Do not use the same account details for MySQL that you have defined for
-                                    this panel.</strong>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex justify-end gap-2 border-t border-border px-5 py-4">
-                        <Link to={`${adminPreviewBasePath}/databases`} className="no-underline">
-                            <Button type="button" variant="outline">
-                                Cancel
-                            </Button>
-                        </Link>
-                        <Button type="submit" disabled={saving}>
-                            <Save className="mr-2 h-4 w-4" />
-                            {saving ? 'Creating...' : 'Create host'}
-                        </Button>
-                    </div>
-                </div>
-            </div>
+            <SettingsSection title="Credentials" description="MySQL user the panel uses to create databases.">
+                <SettingRow label="Username" htmlFor="db-username" description="Database user with grant permissions.">
+                    <input
+                        id="db-username"
+                        className={fieldClass}
+                        value={form.username}
+                        onChange={(e) => updateField('username', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow label="Password" htmlFor="db-password" description="Password for the database user.">
+                    <input
+                        id="db-password"
+                        type="password"
+                        className={fieldClass}
+                        value={form.password}
+                        onChange={(e) => updateField('password', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsFooter>
+                <Link to={`${adminPreviewBasePath}/databases`} className="no-underline">
+                    <Button type="button" variant="outline">
+                        Cancel
+                    </Button>
+                </Link>
+                <Button type="submit" disabled={saving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? 'Creating...' : 'Create host'}
+                </Button>
+            </SettingsFooter>
         </form>
     );
 };

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Key, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
@@ -13,18 +13,7 @@ import {
     getApplicationApiKeys,
     revokeApplicationApiKey,
 } from '@/api/admin/applicationApi';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableMetaLabelClass,
-    tableMetaValueClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
-import { cn } from '@/lib/utils';
 
 const formatDate = (value: string | null) => {
     if (!value) return null;
@@ -88,116 +77,91 @@ export default () => {
                 Once this API key is revoked, any applications currently using it will stop working.
             </Dialog.Confirm>
 
-            <div className="rounded-lg border border-border bg-card">
+            <div className="overflow-hidden rounded-md border border-border bg-card">
                 <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 className="text-base font-semibold text-foreground">API credentials</h2>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Application API keys for integrating with the panel programmatically.
+                        <p className="mt-0.5 text-sm text-muted-foreground">
+                            Keys for integrating with the panel programmatically.
                         </p>
                     </div>
                     <Link to={`${adminPreviewBasePath}/api/new`} className="shrink-0 no-underline">
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
-                            Create new
+                            Create key
                         </Button>
                     </Link>
                 </div>
 
                 {keys.length === 0 ? (
-                    <div className="flex flex-col items-center px-5 py-12 text-center">
-                        <Key className="mb-4 h-10 w-10 text-muted-foreground" />
-                        <p className="text-base font-medium text-foreground">No API keys</p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Create your first API key to get started.
-                        </p>
-                        <Link to={`${adminPreviewBasePath}/api/new`} className="mt-5 no-underline">
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create new
-                            </Button>
+                    <p className="px-5 py-8 text-sm text-muted-foreground">
+                        No API keys yet.{' '}
+                        <Link
+                            to={`${adminPreviewBasePath}/api/new`}
+                            className="text-blue-400 no-underline hover:text-blue-300"
+                        >
+                            Create your first key
                         </Link>
-                    </div>
+                        .
+                    </p>
                 ) : (
-                    <div className={tableWrapClass}>
-                        <table className={tableClass}>
-                            <thead>
-                                <tr className={tableHeadRowClass}>
-                                    <th className={tableHeadCellClass}>Description</th>
-                                    <th className={tableHeadCellClass}>Key</th>
-                                    <th className={tableHeadCellClass}>Last used</th>
-                                    <th className={tableHeadCellClass}>Created</th>
-                                    <th className={tableHeadCellClass}>Created by</th>
-                                    <th className={cn(tableHeadCellClass, 'w-16 text-right')}> </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {keys.map((key: ApplicationApiKey) => {
-                                    const lastUsed = formatDate(key.last_used_at);
-                                    const created = formatDate(key.created_at);
+                    <div className="divide-y divide-border">
+                        {keys.map((key: ApplicationApiKey) => {
+                            const lastUsed = formatDate(key.last_used_at);
+                            const created = formatDate(key.created_at);
 
-                                    return (
-                                        <tr key={key.identifier} className={tableBodyRowClass}>
-                                            <td className={tableBodyCellClass}>
-                                                <p className="font-medium text-foreground">{key.memo || 'Untitled key'}</p>
-                                                <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                                                    {key.identifier}
-                                                </p>
-                                            </td>
-                                            <td className={tableBodyCellClass}>
-                                                <CopyOnClick text={key.display_key.endsWith('****') ? undefined : key.display_key}>
-                                                    <code
-                                                        className="block max-w-xs truncate rounded-md border border-border bg-muted/60 px-2.5 py-1.5 font-mono text-xs text-foreground sm:max-w-sm"
-                                                        title={key.display_key}
-                                                    >
-                                                        {key.display_key}
-                                                    </code>
-                                                </CopyOnClick>
-                                            </td>
-                                            <td className={tableBodyCellClass}>
-                                                {lastUsed ? (
-                                                    <span className={tableMetaValueClass}>{lastUsed}</span>
-                                                ) : (
-                                                    <span className={tableMetaLabelClass}>Never</span>
-                                                )}
-                                            </td>
-                                            <td className={tableBodyCellClass}>
-                                                {created ? (
-                                                    <span className={tableMetaValueClass}>{created}</span>
-                                                ) : (
-                                                    <span className={tableMetaLabelClass}>—</span>
-                                                )}
-                                            </td>
-                                            <td className={tableBodyCellClass}>
-                                                {key.user ? (
+                            return (
+                                <div
+                                    key={key.identifier}
+                                    className="flex items-start justify-between gap-4 px-5 py-4"
+                                >
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <span className="text-sm font-medium text-foreground">
+                                                {key.memo || 'Untitled key'}
+                                            </span>
+                                            <code className="text-xs text-muted-foreground">{key.identifier}</code>
+                                        </div>
+                                        <CopyOnClick
+                                            text={key.display_key.endsWith('****') ? undefined : key.display_key}
+                                        >
+                                            <code
+                                                className="mt-2 inline-block max-w-full truncate rounded bg-muted/50 px-2 py-1 font-mono text-xs text-foreground"
+                                                title={key.display_key}
+                                            >
+                                                {key.display_key}
+                                            </code>
+                                        </CopyOnClick>
+                                        <p className="mt-2 text-xs text-muted-foreground">
+                                            {lastUsed ? `Last used ${lastUsed}` : 'Never used'}
+                                            {created ? ` · Created ${created}` : ''}
+                                            {key.user ? (
+                                                <>
+                                                    {' · '}
                                                     <Link
                                                         to={`${adminPreviewBasePath}/users/${key.user.id}`}
-                                                        className="inline-flex rounded-md bg-muted/60 px-2.5 py-1 text-sm font-medium text-foreground no-underline transition-colors hover:bg-muted hover:text-primary"
+                                                        className="text-foreground no-underline hover:text-blue-400"
                                                     >
                                                         {key.user.username}
                                                     </Link>
-                                                ) : (
-                                                    <span className={tableMetaLabelClass}>—</span>
-                                                )}
-                                            </td>
-                                            <td className={cn(tableBodyCellClass, 'text-right')}>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                                    disabled={revoking}
-                                                    onClick={() => setRevokeIdentifier(key.identifier)}
-                                                    title="Revoke"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                                                </>
+                                            ) : null}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                                        disabled={revoking}
+                                        onClick={() => setRevokeIdentifier(key.identifier)}
+                                        title="Revoke"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import useFlash from '@/plugins/useFlash';
 import { createNest } from '@/api/admin/nests';
-import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
+import { fieldClass, textareaClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow, SettingsFooter, SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 
 export default () => {
@@ -24,52 +24,52 @@ export default () => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Nest created', message: response.message });
                 history.push(`${adminPreviewBasePath}/nests/${response.nest!.id}`);
             })
-            .catch((e) => clearAndAddHttpError({ key: 'admin-nests', error: e }))
+            .catch((submitError) => clearAndAddHttpError({ key: 'admin-nests', error: submitError }))
             .finally(() => setSaving(false));
     };
 
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
-            <Link
-                to={`${adminPreviewBasePath}/nests`}
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground"
+        <form onSubmit={onSubmit} className="space-y-4">
+            <SettingsSection
+                title="New nest"
+                description="A category for grouping related eggs, e.g. Minecraft or Source Engine."
             >
-                <ArrowLeft className="h-4 w-4" />
-                Back to nests
-            </Link>
-            <div className="rounded-lg border border-border bg-card">
-                <div className="border-b border-border px-5 py-4">
-                    <h2 className="text-base font-semibold text-foreground">New nest</h2>
-                </div>
-                <div className="space-y-4 p-5">
-                    <div className="space-y-2">
-                        <Label htmlFor="nest-name">Name</Label>
-                        <input
-                            id="nest-name"
-                            className={fieldClass}
-                            value={form.name}
-                            onChange={(e) => setForm((c) => ({ ...c, name: e.target.value }))}
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="nest-desc">Description</Label>
-                        <textarea
-                            id="nest-desc"
-                            className={fieldClass}
-                            rows={5}
-                            value={form.description}
-                            onChange={(e) => setForm((c) => ({ ...c, description: e.target.value }))}
-                        />
-                    </div>
-                </div>
-                <div className="flex justify-end border-t border-border px-5 py-4">
-                    <Button type="submit" disabled={saving}>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save
+                <SettingRow label="Name" htmlFor="nest-name" description="Display name for this nest.">
+                    <input
+                        id="nest-name"
+                        className={fieldClass}
+                        value={form.name}
+                        onChange={(e) => setForm((current) => ({ ...current, name: e.target.value }))}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Description"
+                    htmlFor="nest-desc"
+                    description="Optional summary shown in the admin area."
+                    wide
+                >
+                    <textarea
+                        id="nest-desc"
+                        className={textareaClass}
+                        rows={5}
+                        value={form.description}
+                        onChange={(e) => setForm((current) => ({ ...current, description: e.target.value }))}
+                    />
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsFooter>
+                <Link to={`${adminPreviewBasePath}/nests`} className="no-underline">
+                    <Button type="button" variant="outline">
+                        Cancel
                     </Button>
-                </div>
-            </div>
+                </Link>
+                <Button type="submit" disabled={saving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? 'Creating...' : 'Create nest'}
+                </Button>
+            </SettingsFooter>
         </form>
     );
 };

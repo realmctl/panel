@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import useFlash from '@/plugins/useFlash';
 import { createNodeAllocations } from '@/api/admin/nodes';
 import { fieldClass, textareaClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow } from '@/components/admin-preview/settings/settingsLayout';
+import { Button } from '@/components/ui/button';
 
 const parsePorts = (value: string): string[] => value.split(/[\s,]+/).filter(Boolean);
 
@@ -66,71 +65,83 @@ export default ({ nodeId, ips, onCreated }: Props) => {
     };
 
     return (
-        <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card">
+        <form onSubmit={onSubmit} className="overflow-hidden rounded-md border border-border bg-card">
             <div className="border-b border-border px-5 py-4">
-                <h2 className="text-base font-semibold text-foreground">Assign new allocations</h2>
+                <h2 className="text-base font-semibold text-foreground">New allocations</h2>
+                <p className="mt-0.5 text-sm text-muted-foreground">Assign IP addresses and ports to this node.</p>
             </div>
-            <div className="space-y-5 p-5">
-                <div className="space-y-2">
-                    <Label htmlFor="allocation-ip">IP address</Label>
+
+            <div className="divide-y divide-border">
+                {ips.length > 0 && (
+                    <SettingRow label="Known IPs" description="IPs already used on this node." stacked>
+                        <p className="flex flex-wrap gap-x-2 gap-y-1 text-xs">
+                            {ips.map((ip) => (
+                                <code key={ip} className="text-foreground">
+                                    {ip}
+                                </code>
+                            ))}
+                        </p>
+                    </SettingRow>
+                )}
+                <SettingRow
+                    label="IP address"
+                    description="An IP address or CIDR block."
+                    htmlFor="allocation-ip"
+                    stacked
+                >
                     <input
                         id="allocation-ip"
-                        list="allocation-ip-options"
+                        list={ips.length > 0 ? 'allocation-ip-options' : undefined}
                         className={fieldClass}
                         value={form.allocation_ip}
                         onChange={(event) => {
-                            const value = event.target.value;
-                            setForm((current) => ({ ...current, allocation_ip: value }));
+                            setForm((current) => ({ ...current, allocation_ip: event.target.value }));
                         }}
                         placeholder="192.168.1.1"
                         required
                     />
-                    <datalist id="allocation-ip-options">
-                        {ips.map((ip) => (
-                            <option key={ip} value={ip} />
-                        ))}
-                    </datalist>
-                    <p className="text-xs text-muted-foreground">
-                        Enter an IP address or CIDR block to assign ports to.
-                    </p>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="allocation-alias">IP alias</Label>
+                    {ips.length > 0 && (
+                        <datalist id="allocation-ip-options">
+                            {ips.map((ip) => (
+                                <option key={ip} value={ip} />
+                            ))}
+                        </datalist>
+                    )}
+                </SettingRow>
+                <SettingRow label="IP alias" description="Optional default alias." htmlFor="allocation-alias" stacked>
                     <input
                         id="allocation-alias"
                         className={fieldClass}
                         value={form.allocation_alias}
                         onChange={(event) => {
-                            const value = event.target.value;
-                            setForm((current) => ({ ...current, allocation_alias: value }));
+                            setForm((current) => ({ ...current, allocation_alias: event.target.value }));
                         }}
                         placeholder="alias"
                     />
-                    <p className="text-xs text-muted-foreground">Optional default alias for these allocations.</p>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="allocation-ports">Ports</Label>
+                </SettingRow>
+                <SettingRow
+                    label="Ports"
+                    description="Individual ports or ranges, comma or space separated."
+                    htmlFor="allocation-ports"
+                    stacked
+                >
                     <textarea
                         id="allocation-ports"
                         className={textareaClass}
                         value={form.allocation_ports}
                         onChange={(event) => {
-                            const value = event.target.value;
-                            setForm((current) => ({ ...current, allocation_ports: value }));
+                            setForm((current) => ({ ...current, allocation_ports: event.target.value }));
                         }}
                         placeholder="25565, 25566, 3000-3100"
                         rows={4}
                         required
                     />
-                    <p className="text-xs text-muted-foreground">
-                        Individual ports or ranges, separated by commas or spaces.
-                    </p>
-                </div>
+                </SettingRow>
             </div>
-            <div className="flex justify-end border-t border-border px-5 py-4">
-                <Button type="submit" disabled={creating}>
-                    <Save className="mr-2 h-4 w-4" />
-                    {creating ? 'Submitting...' : 'Submit'}
+
+            <div className="border-t border-border px-5 py-4">
+                <Button type="submit" className="w-full" disabled={creating}>
+                    {creating ? 'Submitting...' : 'Create allocations'}
                 </Button>
             </div>
         </form>

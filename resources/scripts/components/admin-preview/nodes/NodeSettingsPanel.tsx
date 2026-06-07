@@ -3,11 +3,43 @@ import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { getNodeSettings, updateNode } from '@/api/admin/nodes';
 import { fieldClass, selectClass, textareaClass } from '@/components/admin-preview/settings/fieldClass';
+import {
+    SegmentedControl,
+    SettingRow,
+    SettingsFooter,
+    SettingsSection,
+} from '@/components/admin-preview/settings/settingsLayout';
+import { cn } from '@/lib/utils';
+
+const UnitInput = ({
+    id,
+    value,
+    onChange,
+    unit,
+    className,
+}: {
+    id?: string;
+    value: string;
+    onChange: (value: string) => void;
+    unit: string;
+    className?: string;
+}) => (
+    <div className={cn('flex min-w-0', className)}>
+        <input
+            id={id}
+            className={cn(fieldClass, 'min-w-0 rounded-r-none')}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+        />
+        <span className="inline-flex shrink-0 items-center rounded-r-md border border-l-0 border-border bg-muted px-3 text-sm text-muted-foreground">
+            {unit}
+        </span>
+    </div>
+);
 
 export default () => {
     const { id } = useParams<{ id: string }>();
@@ -108,272 +140,212 @@ export default () => {
     const panelSecure = data.panel_secure;
 
     return (
-        <form onSubmit={onSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div className="space-y-6">
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Settings</h2>
-                    </div>
-                    <div className="space-y-5 p-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="settings-name">Node name</Label>
-                            <input
-                                id="settings-name"
-                                className={fieldClass}
-                                value={form.name}
-                                onChange={(e) => updateField('name', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="settings-description">Description</Label>
-                            <textarea
-                                id="settings-description"
-                                className={textareaClass}
-                                value={form.description}
-                                onChange={(e) => updateField('description', e.target.value)}
-                                rows={4}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="settings-location">Location</Label>
-                            <select
-                                id="settings-location"
-                                className={selectClass}
-                                value={form.location_id}
-                                onChange={(e) => updateField('location_id', Number(e.target.value))}
-                            >
-                                {data.locations.map((location) => (
-                                    <option key={location.id} value={location.id}>
-                                        {location.long || location.short} ({location.short})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Allow automatic allocation</Label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.public === 1}
-                                        onChange={() => updateField('public', 1)}
-                                    />
-                                    Yes
-                                </label>
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.public === 0}
-                                        onChange={() => updateField('public', 0)}
-                                    />
-                                    No
-                                </label>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="settings-fqdn">Fully qualified domain name</Label>
-                            <input
-                                id="settings-fqdn"
-                                className={fieldClass}
-                                value={form.fqdn}
-                                onChange={(e) => updateField('fqdn', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Communicate over SSL</Label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.scheme === 'https'}
-                                        onChange={() => updateField('scheme', 'https')}
-                                    />
-                                    Use SSL connection
-                                </label>
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.scheme === 'http'}
-                                        disabled={panelSecure}
-                                        onChange={() => updateField('scheme', 'http')}
-                                    />
-                                    Use HTTP connection
-                                </label>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Behind proxy</Label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.behind_proxy === 0}
-                                        onChange={() => updateField('behind_proxy', 0)}
-                                    />
-                                    Not behind proxy
-                                </label>
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.behind_proxy === 1}
-                                        onChange={() => updateField('behind_proxy', 1)}
-                                    />
-                                    Behind proxy
-                                </label>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Maintenance mode</Label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.maintenance_mode === 0}
-                                        onChange={() => updateField('maintenance_mode', 0)}
-                                    />
-                                    Disabled
-                                </label>
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="radio"
-                                        checked={form.maintenance_mode === 1}
-                                        onChange={() => updateField('maintenance_mode', 1)}
-                                    />
-                                    Enabled
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <form onSubmit={onSubmit} className="space-y-4">
+            <SettingsSection title="General" description="Name, location, and notes.">
+                <SettingRow label="Node name" description="Display name for this node." htmlFor="settings-name" wide>
+                    <input
+                        id="settings-name"
+                        className={fieldClass}
+                        value={form.name}
+                        onChange={(e) => updateField('name', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow label="Description" description="Optional notes about this node." htmlFor="settings-description" wide>
+                    <textarea
+                        id="settings-description"
+                        className={textareaClass}
+                        value={form.description}
+                        onChange={(e) => updateField('description', e.target.value)}
+                        rows={2}
+                    />
+                </SettingRow>
+                <SettingRow label="Location" description="Geographic or logical grouping." htmlFor="settings-location" wide>
+                    <select
+                        id="settings-location"
+                        className={selectClass}
+                        value={form.location_id}
+                        onChange={(e) => updateField('location_id', Number(e.target.value))}
+                    >
+                        {data.locations.map((location) => (
+                            <option key={location.id} value={location.id}>
+                                {location.long || location.short} ({location.short})
+                            </option>
+                        ))}
+                    </select>
+                </SettingRow>
+            </SettingsSection>
 
-            <div className="space-y-6">
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Allocation limits</h2>
-                    </div>
-                    <div className="space-y-5 p-5">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="settings-memory">Total memory</Label>
-                                <div className="flex">
-                                    <input
-                                        id="settings-memory"
-                                        className={fieldClass}
-                                        value={form.memory}
-                                        onChange={(e) => updateField('memory', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="settings-memory-over">Overallocate</Label>
-                                <input
-                                    id="settings-memory-over"
-                                    className={fieldClass}
-                                    value={form.memory_overallocate}
-                                    onChange={(e) => updateField('memory_overallocate', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="settings-disk">Disk space</Label>
-                                <input
-                                    id="settings-disk"
-                                    className={fieldClass}
-                                    value={form.disk}
-                                    onChange={(e) => updateField('disk', e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="settings-disk-over">Overallocate</Label>
-                                <input
-                                    id="settings-disk-over"
-                                    className={fieldClass}
-                                    value={form.disk_overallocate}
-                                    onChange={(e) => updateField('disk_overallocate', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <SettingsSection title="Connection" description="How the panel reaches Wings.">
+                <SettingRow label="FQDN" description="Domain Wings listens on." htmlFor="settings-fqdn" wide>
+                    <input
+                        id="settings-fqdn"
+                        className={cn(fieldClass, 'font-mono')}
+                        value={form.fqdn}
+                        onChange={(e) => updateField('fqdn', e.target.value)}
+                        required
+                    />
+                </SettingRow>
+                <SettingRow label="Panel connects via" description="Connection URL used by the panel." wide>
+                    <code className="block w-full rounded-md border border-border bg-muted/30 px-3 py-2.5 text-sm">
+                        {form.scheme}://{form.fqdn || 'node.example.com'}
+                    </code>
+                </SettingRow>
+                <SettingRow label="Visibility" description="Controls auto-deployment to this node." wide>
+                    <SegmentedControl
+                        value={form.public}
+                        onChange={(value) => updateField('public', value as 0 | 1)}
+                        options={[
+                            { value: 1, label: 'Public' },
+                            { value: 0, label: 'Private' },
+                        ]}
+                    />
+                </SettingRow>
+                <SettingRow
+                    label="Transport"
+                    description={
+                        panelSecure
+                            ? 'Your panel uses HTTPS — this node must use SSL too.'
+                            : 'How the panel talks to Wings.'
+                    }
+                    wide
+                >
+                    <SegmentedControl
+                        value={form.scheme}
+                        onChange={(value) => updateField('scheme', value as 'https' | 'http')}
+                        options={[
+                            { value: 'https', label: 'HTTPS' },
+                            { value: 'http', label: 'HTTP', disabled: panelSecure },
+                        ]}
+                    />
+                </SettingRow>
+                <SettingRow label="Network path" description="Whether Wings sits behind a reverse proxy." wide>
+                    <SegmentedControl
+                        value={form.behind_proxy}
+                        onChange={(value) => updateField('behind_proxy', value as 0 | 1)}
+                        options={[
+                            { value: 0, label: 'Direct' },
+                            { value: 1, label: 'Proxy' },
+                        ]}
+                    />
+                </SettingRow>
+                <SettingRow label="Maintenance" description="Prevent new servers from being deployed." wide>
+                    <SegmentedControl
+                        value={form.maintenance_mode}
+                        onChange={(value) => updateField('maintenance_mode', value as 0 | 1)}
+                        options={[
+                            { value: 0, label: 'Off' },
+                            { value: 1, label: 'On' },
+                        ]}
+                    />
+                </SettingRow>
+            </SettingsSection>
 
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">General configuration</h2>
+            <SettingsSection title="Capacity" description="Memory and disk limits for this node.">
+                <SettingRow label="Memory" description="Total assignable and over-allocation %." wide>
+                    <div className="grid grid-cols-2 gap-3">
+                        <UnitInput
+                            id="settings-memory"
+                            value={form.memory}
+                            onChange={(value) => updateField('memory', value)}
+                            unit="MiB"
+                        />
+                        <UnitInput
+                            id="settings-memory-over"
+                            value={form.memory_overallocate}
+                            onChange={(value) => updateField('memory_overallocate', value)}
+                            unit="%"
+                        />
                     </div>
-                    <div className="space-y-5 p-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="settings-upload">Maximum web upload filesize</Label>
-                            <input
-                                id="settings-upload"
-                                className={fieldClass}
-                                value={form.upload_size}
-                                onChange={(e) => updateField('upload_size', e.target.value)}
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="settings-daemon-listen">Daemon port</Label>
-                                <input
-                                    id="settings-daemon-listen"
-                                    className={fieldClass}
-                                    value={form.daemonListen}
-                                    onChange={(e) => updateField('daemonListen', e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="settings-daemon-sftp">Daemon SFTP port</Label>
-                                <input
-                                    id="settings-daemon-sftp"
-                                    className={fieldClass}
-                                    value={form.daemonSFTP}
-                                    onChange={(e) => updateField('daemonSFTP', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="settings-daemon-base">Server files directory</Label>
-                            <input
-                                id="settings-daemon-base"
-                                className={fieldClass}
-                                value={form.daemonBase}
-                                onChange={(e) => updateField('daemonBase', e.target.value)}
-                            />
-                        </div>
+                </SettingRow>
+                <SettingRow label="Disk" description="-1 disables overcommit checks, 0 blocks it." wide>
+                    <div className="grid grid-cols-2 gap-3">
+                        <UnitInput
+                            id="settings-disk"
+                            value={form.disk}
+                            onChange={(value) => updateField('disk', value)}
+                            unit="MiB"
+                        />
+                        <UnitInput
+                            id="settings-disk-over"
+                            value={form.disk_overallocate}
+                            onChange={(value) => updateField('disk_overallocate', value)}
+                            unit="%"
+                        />
                     </div>
-                </div>
+                </SettingRow>
+            </SettingsSection>
 
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Save settings</h2>
+            <SettingsSection title="Daemon" description="Wings paths, ports, and upload limits.">
+                <SettingRow
+                    label="Max upload size"
+                    description="Maximum web upload filesize."
+                    htmlFor="settings-upload"
+                    wide
+                >
+                    <UnitInput
+                        id="settings-upload"
+                        value={form.upload_size}
+                        onChange={(value) => updateField('upload_size', value)}
+                        unit="MiB"
+                    />
+                </SettingRow>
+                <SettingRow label="Ports" description="Daemon and SFTP listen ports." wide>
+                    <div className="grid grid-cols-2 gap-3">
+                        <input
+                            id="settings-daemon-listen"
+                            className={fieldClass}
+                            value={form.daemonListen}
+                            onChange={(e) => updateField('daemonListen', e.target.value)}
+                            placeholder="Daemon"
+                        />
+                        <input
+                            id="settings-daemon-sftp"
+                            className={fieldClass}
+                            value={form.daemonSFTP}
+                            onChange={(e) => updateField('daemonSFTP', e.target.value)}
+                            placeholder="SFTP"
+                        />
                     </div>
-                    <div className="space-y-4 p-5">
-                        <label className="flex items-start gap-3 text-sm">
-                            <input
-                                type="checkbox"
-                                className="mt-1"
-                                checked={form.reset_secret}
-                                onChange={(e) => updateField('reset_secret', e.target.checked)}
-                            />
-                            <span>
-                                <span className="font-medium text-foreground">Reset daemon master key</span>
-                                <span className="mt-1 block text-xs text-muted-foreground">
-                                    Resetting the daemon master key will void any request coming from the old key.
-                                </span>
-                            </span>
-                        </label>
-                    </div>
-                    <div className="flex justify-end border-t border-border px-5 py-4">
-                        <Button type="submit" disabled={saving}>
-                            <Save className="mr-2 h-4 w-4" />
-                            {saving ? 'Saving...' : 'Save changes'}
-                        </Button>
-                    </div>
-                </div>
-            </div>
+                </SettingRow>
+                <SettingRow
+                    label="Server files directory"
+                    description="Where Wings stores server data."
+                    htmlFor="settings-daemon-base"
+                    wide
+                >
+                    <input
+                        id="settings-daemon-base"
+                        className={cn(fieldClass, 'font-mono')}
+                        value={form.daemonBase}
+                        onChange={(e) => updateField('daemonBase', e.target.value)}
+                    />
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsSection title="Advanced" description="Dangerous options — use with care.">
+                <SettingRow
+                    label="Reset master key"
+                    description="Invalidates the current daemon key. Wings must be reconfigured."
+                    wide
+                >
+                    <SegmentedControl
+                        value={form.reset_secret}
+                        onChange={(value) => updateField('reset_secret', value)}
+                        options={[
+                            { value: false, label: 'Keep key' },
+                            { value: true, label: 'Reset on save' },
+                        ]}
+                    />
+                </SettingRow>
+            </SettingsSection>
+
+            <SettingsFooter>
+                <Button type="submit" disabled={saving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? 'Saving...' : 'Save changes'}
+                </Button>
+            </SettingsFooter>
         </form>
     );
 };

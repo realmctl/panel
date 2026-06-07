@@ -1,22 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Link } from 'react-router-dom';
-import { LayoutTemplate, Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
 import { deleteSubdomainRecord, getSubdomainRecords } from '@/api/admin/subdomains';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
-import { cn } from '@/lib/utils';
 
 export default () => {
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
@@ -79,88 +70,65 @@ export default () => {
                 Remove this record template?
             </Dialog.Confirm>
 
-            <div className="rounded-lg border border-border bg-card">
+            <div className="overflow-hidden rounded-md border border-border bg-card">
                 <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 className="text-base font-semibold text-foreground">Record templates</h2>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="mt-0.5 text-sm text-muted-foreground">
                             Templates customers choose when creating a subdomain.
                         </p>
                     </div>
                     <Link to={`${adminPreviewBasePath}/subdomains/records/new`} className="shrink-0 no-underline">
                         <Button disabled={deleting}>
                             <Plus className="mr-2 h-4 w-4" />
-                            Create new
+                            Create template
                         </Button>
                     </Link>
                 </div>
 
                 {records.length === 0 ? (
-                    <div className="flex flex-col items-center px-5 py-12 text-center">
-                        <LayoutTemplate className="mb-4 h-10 w-10 text-muted-foreground" />
-                        <p className="text-base font-medium text-foreground">No record templates</p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Create a template to let customers create subdomains.
-                        </p>
-                        <Link to={`${adminPreviewBasePath}/subdomains/records/new`} className="mt-5 no-underline">
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create new
-                            </Button>
+                    <p className="px-5 py-8 text-sm text-muted-foreground">
+                        No record templates yet.{' '}
+                        <Link
+                            to={`${adminPreviewBasePath}/subdomains/records/new`}
+                            className="text-blue-400 no-underline hover:text-blue-300"
+                        >
+                            Create your first template
                         </Link>
-                    </div>
+                        .
+                    </p>
                 ) : (
-                    <div className={tableWrapClass}>
-                        <table className={tableClass}>
-                            <thead>
-                                <tr className={tableHeadRowClass}>
-                                    <th className={tableHeadCellClass}>ID</th>
-                                    <th className={tableHeadCellClass}>Name</th>
-                                    <th className={tableHeadCellClass}>Type</th>
-                                    <th className={tableHeadCellClass}>Domain</th>
-                                    <th className={cn(tableHeadCellClass, 'text-right')}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {records.map((record) => (
-                                    <tr key={record.id} className={tableBodyRowClass}>
-                                        <td className={tableBodyCellClass}>
-                                            <code className="text-xs text-muted-foreground">{record.id}</code>
-                                        </td>
-                                        <td className={tableBodyCellClass}>
-                                            <Link
-                                                to={`${adminPreviewBasePath}/subdomains/records/${record.id}`}
-                                                className="font-medium text-primary no-underline hover:underline"
-                                            >
-                                                {record.name}
-                                            </Link>
-                                        </td>
-                                        <td className={tableBodyCellClass}>{record.type}</td>
-                                        <td className={tableBodyCellClass}>{record.domain.name}</td>
-                                        <td className={cn(tableBodyCellClass, 'text-right')}>
-                                            <div className="flex justify-end gap-2">
-                                                <Link
-                                                    to={`${adminPreviewBasePath}/subdomains/records/${record.id}`}
-                                                    className="no-underline"
-                                                >
-                                                    <Button variant="outline" size="sm">
-                                                        Edit
-                                                    </Button>
-                                                </Link>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    disabled={deleting}
-                                                    onClick={() => setConfirmDelete(record.id)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="divide-y divide-border">
+                        {records.map((record) => (
+                            <div
+                                key={record.id}
+                                className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/50"
+                            >
+                                <Link
+                                    to={`${adminPreviewBasePath}/subdomains/records/${record.id}`}
+                                    className="min-w-0 flex-1 no-underline"
+                                >
+                                    <p className="text-sm font-medium text-foreground">{record.name}</p>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        {record.type} · {record.domain.name}
+                                    </p>
+                                </Link>
+                                <div className="flex shrink-0 items-center gap-3">
+                                    <code className="text-xs text-muted-foreground">#{record.id}</code>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                        disabled={deleting}
+                                        onClick={() => setConfirmDelete(record.id)}
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
 

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
 import { createLocation } from '@/api/admin/locations';
 import { fieldClass, textareaClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow } from '@/components/admin-preview/settings/settingsLayout';
 
 export default ({
     open,
@@ -58,9 +58,12 @@ export default ({
 
     return (
         <Dialog appearance="admin" open={open} onClose={handleClose} title="Create location">
-            <form id="create-location-form" onSubmit={onSubmit} className="space-y-5">
-                <div className="space-y-2">
-                    <Label htmlFor="location-short">Short code</Label>
+            <form id="create-location-form" onSubmit={onSubmit} className="space-y-4">
+                <SettingRow
+                    label="Short code"
+                    htmlFor="location-short"
+                    description="A short identifier, e.g. us.nyc.lvl3 (1–60 characters)."
+                >
                     <input
                         id="location-short"
                         className={fieldClass}
@@ -69,23 +72,21 @@ export default ({
                         required
                         autoFocus
                     />
-                    <p className="text-xs text-muted-foreground">
-                        A short identifier (e.g. <code>us.nyc.lvl3</code>). Must be between 1 and 60 characters.
-                    </p>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="location-long">Description</Label>
+                </SettingRow>
+                <SettingRow
+                    label="Description"
+                    htmlFor="location-long"
+                    description="Optional longer description (max 191 characters)."
+                    wide
+                >
                     <textarea
                         id="location-long"
                         className={textareaClass}
                         value={long}
                         onChange={(e) => setLong(e.target.value)}
-                        rows={4}
+                        rows={3}
                     />
-                    <p className="text-xs text-muted-foreground">
-                        A longer description of this location. Must be less than 191 characters.
-                    </p>
-                </div>
+                </SettingRow>
             </form>
             <Dialog.Footer>
                 <Button type="button" variant="outline" disabled={saving} onClick={handleClose}>
@@ -93,7 +94,7 @@ export default ({
                 </Button>
                 <Button type="submit" form="create-location-form" disabled={saving}>
                     <Plus className="mr-2 h-4 w-4" />
-                    {saving ? 'Creating...' : 'Create'}
+                    {saving ? 'Creating...' : 'Create location'}
                 </Button>
             </Dialog.Footer>
         </Dialog>

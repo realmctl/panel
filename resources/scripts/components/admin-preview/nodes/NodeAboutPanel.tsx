@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useHistory, useParams } from 'react-router-dom';
-import { AlertTriangle, HardDrive, MemoryStick, Server, Trash2, Wrench } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
 import { deleteNode, getNode, getNodeSystemInformation } from '@/api/admin/nodes';
+import { SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,13 @@ const statBarColor = (css: 'green' | 'yellow' | 'red') => {
             return 'bg-red-500';
     }
 };
+
+const InfoRow = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div className="flex flex-col gap-1 px-5 py-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <span className="shrink-0 text-sm text-muted-foreground">{label}</span>
+        <span className="min-w-0 text-sm text-foreground sm:text-right">{children}</span>
+    </div>
+);
 
 export default () => {
     const { id } = useParams<{ id: string }>();
@@ -35,7 +43,8 @@ export default () => {
         system: string;
         cpus: number | string;
         loading: boolean;
-    }>({ version: '—', system: '—', cpus: '—', loading: true });
+        online: boolean;
+    }>({ version: '—', system: '—', cpus: '—', loading: true, online: false });
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
@@ -63,6 +72,7 @@ export default () => {
                         system: `${response.system.type} (${response.system.arch}) ${response.system.release}`,
                         cpus: response.system.cpus,
                         loading: false,
+                        online: true,
                     });
                 })
                 .catch(() => {
@@ -72,6 +82,7 @@ export default () => {
                         system: 'Could not connect to daemon',
                         cpus: '—',
                         loading: false,
+                        online: false,
                     });
                 });
         };
@@ -131,69 +142,71 @@ export default () => {
                 servers associated with it.
             </Dialog.Confirm>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div className="space-y-6 lg:col-span-2">
-                    <div className="rounded-lg border border-border bg-card">
-                        <div className="border-b border-border px-5 py-4">
-                            <h2 className="text-base font-semibold text-foreground">Information</h2>
-                        </div>
-                        <div className="divide-y divide-border">
-                            <div className="flex items-center justify-between px-5 py-4">
-                                <span className="text-sm text-muted-foreground">Daemon version</span>
-                                <span className="text-sm text-foreground">
-                                    <code>{systemInfo.loading ? '…' : systemInfo.version}</code>
-                                    <span className="ml-2 text-muted-foreground">
-                                        (Latest: <code>{latest_daemon_version}</code>)
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
+                <div className="flex flex-col gap-4 lg:col-span-2">
+                    <SettingsSection title="Information" description="Daemon and system details from Wings.">
+                        <InfoRow label="Daemon">
+                            {systemInfo.loading ? (
+                                'Checking…'
+                            ) : (
+                                <span>
+                                    <span
+                                        className={cn(
+                                            'font-medium',
+                                            systemInfo.online
+                                                ? 'text-emerald-600 dark:text-emerald-500'
+                                                : 'text-red-500'
+                                        )}
+                                    >
+                                        {systemInfo.online ? 'Online' : 'Offline'}
+                                    </span>
+                                    {systemInfo.online && (
+                                        <>
+                                            {' · '}
+                                            <code>{systemInfo.version}</code>
+                                        </>
+                                    )}
+                                    <span className="text-muted-foreground">
+                                        {' '}
+                                        (latest <code>{latest_daemon_version}</code>)
                                     </span>
                                 </span>
-                            </div>
-                            <div className="flex items-center justify-between px-5 py-4">
-                                <span className="text-sm text-muted-foreground">System information</span>
-                                <span className="text-sm text-foreground">
-                                    {systemInfo.loading ? '…' : systemInfo.system}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between px-5 py-4">
-                                <span className="text-sm text-muted-foreground">Total CPU threads</span>
-                                <span className="text-sm text-foreground">
-                                    {systemInfo.loading ? '…' : systemInfo.cpus}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between px-5 py-4">
-                                <span className="text-sm text-muted-foreground">FQDN</span>
-                                <code className="text-sm">{node.fqdn}</code>
-                            </div>
-                            <div className="flex items-center justify-between px-5 py-4">
-                                <span className="text-sm text-muted-foreground">Location</span>
-                                <span className="text-sm text-foreground">{node.location.short}</span>
-                            </div>
-                        </div>
-                    </div>
+                            )}
+                        </InfoRow>
+                        <InfoRow label="System">
+                            {systemInfo.loading ? (
+                                '…'
+                            ) : (
+                                <>
+                                    {systemInfo.system}
+                                    {systemInfo.online && (
+                                        <span className="text-muted-foreground"> · {systemInfo.cpus} threads</span>
+                                    )}
+                                </>
+                            )}
+                        </InfoRow>
+                        <InfoRow label="FQDN">
+                            <code>{node.fqdn}</code>
+                        </InfoRow>
+                        <InfoRow label="Location">{node.location.short}</InfoRow>
+                        {node.description && (
+                            <InfoRow label="Description">
+                                <span className="whitespace-pre-wrap">{node.description}</span>
+                            </InfoRow>
+                        )}
+                    </SettingsSection>
 
-                    {node.description && (
-                        <div className="rounded-lg border border-border bg-card">
-                            <div className="border-b border-border px-5 py-4">
-                                <h2 className="text-base font-semibold text-foreground">Description</h2>
-                            </div>
-                            <pre className="whitespace-pre-wrap p-5 text-sm text-foreground">{node.description}</pre>
-                        </div>
-                    )}
-
-                    <div className="rounded-lg border border-destructive/40 bg-card">
-                        <div className="border-b border-destructive/30 px-5 py-4">
-                            <h2 className="text-base font-semibold text-destructive">Delete node</h2>
-                        </div>
-                        <div className="p-5">
+                    <div className="overflow-hidden rounded-md border border-destructive/40 bg-card">
+                        <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <p className="text-sm text-muted-foreground">
-                                Deleting a node is irreversible and will immediately remove this node from the panel.
-                                There must be no servers associated with this node in order to continue.
+                                {canDelete
+                                    ? 'Permanently remove this node from the panel.'
+                                    : 'Remove all servers before deleting this node.'}
                             </p>
-                        </div>
-                        <div className="flex justify-end border-t border-destructive/30 px-5 py-4">
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                className="shrink-0 border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                 disabled={!canDelete || deleting}
                                 onClick={() => setConfirmDelete(true)}
                             >
@@ -204,25 +217,24 @@ export default () => {
                     </div>
                 </div>
 
-                <div className="rounded-lg border border-border bg-card">
+                <div className="overflow-hidden rounded-md border border-border bg-card">
                     <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">At-a-glance</h2>
+                        <h2 className="text-base font-semibold text-foreground">Capacity</h2>
+                        <p className="mt-0.5 text-sm text-muted-foreground">Resource usage on this node.</p>
                     </div>
-                    <div className="space-y-5 p-5">
+                    <div className="space-y-5 px-5 py-4">
                         {node.maintenance_mode && (
-                            <div className="flex gap-3 rounded-md border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm">
-                                <Wrench className="mt-0.5 h-4 w-4 shrink-0 text-yellow-500" />
-                                <div>
-                                    <p className="text-muted-foreground">This node is under</p>
-                                    <p className="font-semibold text-foreground">Maintenance</p>
-                                </div>
-                            </div>
+                            <p className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-700 dark:text-yellow-200">
+                                Maintenance mode enabled.
+                            </p>
                         )}
 
                         <div>
-                            <div className="mb-2 flex items-center gap-2 text-sm text-foreground">
-                                <HardDrive className="h-4 w-4 text-muted-foreground" />
-                                Disk space allocated
+                            <div className="mb-2 flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Disk</span>
+                                <span className="tabular-nums text-foreground">
+                                    {stats.disk.value} / {stats.disk.max} MiB
+                                </span>
                             </div>
                             <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                                 <div
@@ -230,15 +242,14 @@ export default () => {
                                     style={{ width: `${Math.min(100, stats.disk.percent)}%` }}
                                 />
                             </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                {stats.disk.value} / {stats.disk.max} MiB
-                            </p>
                         </div>
 
                         <div>
-                            <div className="mb-2 flex items-center gap-2 text-sm text-foreground">
-                                <MemoryStick className="h-4 w-4 text-muted-foreground" />
-                                Memory allocated
+                            <div className="mb-2 flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Memory</span>
+                                <span className="tabular-nums text-foreground">
+                                    {stats.memory.value} / {stats.memory.max} MiB
+                                </span>
                             </div>
                             <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                                 <div
@@ -246,27 +257,12 @@ export default () => {
                                     style={{ width: `${Math.min(100, stats.memory.percent)}%` }}
                                 />
                             </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                {stats.memory.value} / {stats.memory.max} MiB
-                            </p>
                         </div>
 
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="flex items-center gap-2 text-foreground">
-                                <Server className="h-4 w-4 text-muted-foreground" />
-                                Total servers
-                            </span>
-                            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
-                                {node.servers_count}
-                            </span>
+                        <div className="flex items-center justify-between border-t border-border pt-4 text-sm">
+                            <span className="text-muted-foreground">Servers</span>
+                            <span className="font-medium tabular-nums text-foreground">{node.servers_count}</span>
                         </div>
-
-                        {!canDelete && (
-                            <div className="flex gap-3 rounded-md border border-yellow-500/30 bg-yellow-500/10 p-3 text-xs text-foreground">
-                                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-yellow-500" />
-                                <span>Remove all servers from this node before deleting it.</span>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

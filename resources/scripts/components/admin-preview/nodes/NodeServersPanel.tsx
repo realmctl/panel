@@ -1,41 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Link, useParams } from 'react-router-dom';
-import { ExternalLink, Server } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { getNodeServers } from '@/api/admin/nodes';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
-import { cn } from '@/lib/utils';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 
-const statusBadge = (status: 'active' | 'installing' | 'suspended') => {
+const statusLabel = (status: 'active' | 'installing' | 'suspended') => {
     switch (status) {
         case 'suspended':
             return (
-                <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-500">
-                    Suspended
-                </span>
+                <span className="text-red-500">Suspended</span>
             );
         case 'installing':
             return (
-                <span className="rounded-full bg-yellow-500/15 px-2 py-0.5 text-xs font-medium text-yellow-500">
-                    Installing
-                </span>
+                <span className="text-yellow-600 dark:text-yellow-500">Installing</span>
             );
         default:
             return (
-                <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-xs font-medium text-green-500">
-                    Active
-                </span>
+                <span className="text-emerald-600 dark:text-emerald-500">Active</span>
             );
     }
 };
@@ -70,76 +54,56 @@ export default () => {
     const pagination = data.pagination;
 
     return (
-        <div className="rounded-lg border border-border bg-card">
+        <div className="overflow-hidden rounded-md border border-border bg-card">
             <div className="border-b border-border px-5 py-4">
-                <h2 className="text-base font-semibold text-foreground">Servers on this node</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{pagination.total} total</p>
+                <h2 className="text-base font-semibold text-foreground">Servers</h2>
+                <p className="mt-0.5 text-sm text-muted-foreground">{pagination.total} on this node</p>
             </div>
 
             {servers.length === 0 ? (
-                <div className="flex flex-col items-center px-5 py-12 text-center">
-                    <Server className="mb-4 h-10 w-10 text-muted-foreground" />
-                    <p className="text-base font-medium text-foreground">No servers</p>
-                    <p className="mt-1 text-sm text-muted-foreground">No servers are assigned to this node.</p>
-                </div>
+                <p className="px-5 py-8 text-sm text-muted-foreground">No servers are assigned to this node.</p>
             ) : (
-                <div className={tableWrapClass}>
-                    <table className={tableClass}>
-                        <thead>
-                            <tr className={tableHeadRowClass}>
-                                <th className={tableHeadCellClass}>Name</th>
-                                <th className={tableHeadCellClass}>UUID</th>
-                                <th className={tableHeadCellClass}>Owner</th>
-                                <th className={tableHeadCellClass}>Connection</th>
-                                <th className={tableHeadCellClass}>Status</th>
-                                <th className={cn(tableHeadCellClass, 'w-10')} />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {servers.map((server) => (
-                                <tr key={server.id} className={tableBodyRowClass}>
-                                    <td className={tableBodyCellClass}>
-                                        <a
-                                            href={`${adminPreviewBasePath}/servers/${server.id}`}
-                                            className="font-medium text-primary no-underline hover:underline"
-                                        >
-                                            {server.name}
-                                        </a>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        <code className="text-xs" title={server.uuid_short}>
-                                            {server.uuid_short}
-                                        </code>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        <Link
-                                            to={`${adminPreviewBasePath}/users/${server.owner.id}`}
-                                            className="text-primary no-underline hover:underline"
-                                        >
-                                            {server.owner.username}
-                                        </Link>
-                                    </td>
-                                    <td className={tableBodyCellClass}>
-                                        <code className="text-xs">
-                                            {server.allocation.alias}:{server.allocation.port}
-                                        </code>
-                                    </td>
-                                    <td className={tableBodyCellClass}>{statusBadge(server.status)}</td>
-                                    <td className={tableBodyCellClass}>
-                                        <a
-                                            href={`/server/${server.uuid_short}`}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            title="Open client panel"
-                                            className="text-muted-foreground hover:text-foreground"
-                                        >
-                                            <ExternalLink className="h-4 w-4" />
-                                        </a>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="divide-y divide-border">
+                    {servers.map((server) => (
+                        <div
+                            key={server.id}
+                            className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div className="min-w-0">
+                                <Link
+                                    to={`${adminPreviewBasePath}/servers/${server.id}`}
+                                    className="text-sm font-medium text-blue-400 no-underline hover:text-blue-300"
+                                >
+                                    {server.name}
+                                </Link>
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    <code>{server.uuid_short}</code>
+                                    {' · '}
+                                    <Link
+                                        to={`${adminPreviewBasePath}/users/${server.owner.id}`}
+                                        className="text-blue-400 no-underline hover:text-blue-300"
+                                    >
+                                        {server.owner.username}
+                                    </Link>
+                                    {' · '}
+                                    <code>
+                                        {server.allocation.alias}:{server.allocation.port}
+                                    </code>
+                                </p>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-3 text-xs">
+                                {statusLabel(server.status)}
+                                <a
+                                    href={`/server/${server.uuid_short}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-blue-400 no-underline hover:text-blue-300"
+                                >
+                                    Open panel
+                                </a>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
 

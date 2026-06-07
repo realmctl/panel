@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import useFlash from '@/plugins/useFlash';
 import { AdvancedSettings, getAdvancedSettings, updateAdvancedSettings } from '@/api/admin/settings';
 import { fieldClass, selectClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow, SettingsFooter, SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
 
 export default () => {
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
@@ -66,35 +66,37 @@ export default () => {
     const allocationsEnabled = form['pterodactyl:client_features:allocations:enabled'] === 'true';
 
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
-            <div className="rounded-lg border border-border bg-card">
-                <div className="border-b border-border px-5 py-4">
-                    <h2 className="text-base font-semibold text-foreground">Automatic allocation creation</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Allow users to automatically create new allocations for their server from the client area.
-                    </p>
-                </div>
+        <form onSubmit={onSubmit} className="space-y-4">
+            <SettingsSection
+                title="Automatic allocations"
+                description="Let users create new server allocations from the client area."
+            >
+                <SettingRow
+                    label="Status"
+                    htmlFor="allocations-enabled"
+                    description="When enabled, users can add allocations within the port range below."
+                >
+                    <select
+                        id="allocations-enabled"
+                        className={selectClass}
+                        value={form['pterodactyl:client_features:allocations:enabled']}
+                        onChange={(e) =>
+                            updateField(
+                                'pterodactyl:client_features:allocations:enabled',
+                                e.target.value as 'true' | 'false'
+                            )
+                        }
+                    >
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                    </select>
+                </SettingRow>
 
-                <div className="grid grid-cols-1 gap-5 p-5 md:grid-cols-3">
-                    <div className="space-y-2">
-                        <Label htmlFor="allocations-enabled">Status</Label>
-                        <select
-                            id="allocations-enabled"
-                            className={selectClass}
-                            value={form['pterodactyl:client_features:allocations:enabled']}
-                            onChange={(e) =>
-                                updateField(
-                                    'pterodactyl:client_features:allocations:enabled',
-                                    e.target.value as 'true' | 'false'
-                                )
-                            }
-                        >
-                            <option value="false">Disabled</option>
-                            <option value="true">Enabled</option>
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="range-start">Starting port</Label>
+                <SettingRow
+                    label="Port range"
+                    description="Ports users may assign when creating allocations (1024–65535)."
+                >
+                    <div className="grid grid-cols-2 gap-2">
                         <input
                             id="range-start"
                             type="number"
@@ -105,12 +107,11 @@ export default () => {
                             onChange={(e) =>
                                 updateField('pterodactyl:client_features:allocations:range_start', e.target.value)
                             }
+                            placeholder="Start"
                             required={allocationsEnabled}
                             disabled={!allocationsEnabled}
+                            aria-label="Starting port"
                         />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="range-end">Ending port</Label>
                         <input
                             id="range-end"
                             type="number"
@@ -121,19 +122,21 @@ export default () => {
                             onChange={(e) =>
                                 updateField('pterodactyl:client_features:allocations:range_end', e.target.value)
                             }
+                            placeholder="End"
                             required={allocationsEnabled}
                             disabled={!allocationsEnabled}
+                            aria-label="Ending port"
                         />
                     </div>
-                </div>
+                </SettingRow>
+            </SettingsSection>
 
-                <div className="flex justify-end border-t border-border px-5 py-4">
-                    <Button type="submit" disabled={saving}>
-                        <Save className="mr-2 h-4 w-4" />
-                        {saving ? 'Saving...' : 'Save changes'}
-                    </Button>
-                </div>
-            </div>
+            <SettingsFooter>
+                <Button type="submit" disabled={saving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? 'Saving...' : 'Save changes'}
+                </Button>
+            </SettingsFooter>
         </form>
     );
 };

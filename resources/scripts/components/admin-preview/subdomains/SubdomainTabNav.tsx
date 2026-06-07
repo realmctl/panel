@@ -1,5 +1,4 @@
 import React from 'react';
-import { Globe, LayoutTemplate } from 'lucide-react';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
 import TabNav, { TabItem } from '@/components/admin-preview/TabNav';
 
@@ -9,14 +8,12 @@ const items: TabItem[] = [
     {
         id: 'domains',
         label: 'Domains',
-        icon: Globe,
         to: base,
         isActive: (pathname) => !pathname.startsWith(`${base}/records`),
     },
     {
         id: 'records',
-        label: 'Record Templates',
-        icon: LayoutTemplate,
+        label: 'Record templates',
         to: `${base}/records`,
     },
 ];

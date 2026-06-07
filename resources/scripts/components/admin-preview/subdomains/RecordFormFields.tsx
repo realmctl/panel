@@ -1,8 +1,7 @@
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { SubdomainOption } from '@/api/admin/subdomains';
 import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
-import { cn } from '@/lib/utils';
+import { SegmentedControl, SettingRow } from '@/components/admin-preview/settings/settingsLayout';
 
 export interface RecordFormState {
     name: string;
@@ -28,9 +27,12 @@ export default ({ form, domains, eggs, onChange, onToggleEgg }: Props) => {
     const isSrv = form.type === 'SRV';
 
     return (
-        <div className="space-y-5">
-            <div className="space-y-2">
-                <Label htmlFor="record-name">Name</Label>
+        <>
+            <SettingRow
+                label="Name"
+                htmlFor="record-name"
+                description="Visible to customers when creating a subdomain."
+            >
                 <input
                     id="record-name"
                     className={fieldClass}
@@ -38,11 +40,13 @@ export default ({ form, domains, eggs, onChange, onToggleEgg }: Props) => {
                     onChange={(e) => onChange('name', e.target.value)}
                     required
                 />
-                <p className="text-xs text-muted-foreground">Visible to customers when creating a subdomain.</p>
-            </div>
+            </SettingRow>
 
-            <div className="space-y-2">
-                <Label htmlFor="record-domain">Domain</Label>
+            <SettingRow
+                label="Domain"
+                htmlFor="record-domain"
+                description="Which configured domain this template belongs to."
+            >
                 <select
                     id="record-domain"
                     className={fieldClass}
@@ -56,14 +60,12 @@ export default ({ form, domains, eggs, onChange, onToggleEgg }: Props) => {
                         </option>
                     ))}
                 </select>
-            </div>
+            </SettingRow>
 
-            <div className="space-y-2">
-                <Label>Eggs</Label>
-                <p className="text-xs text-muted-foreground">
-                    Servers only see templates linked to their egg. Select every egg that should be allowed to create
-                    this subdomain type.
-                </p>
+            <SettingRow
+                label="Eggs"
+                description="Servers only see templates linked to their egg. Select every egg that should allow this subdomain type."
+            >
                 <div className="max-h-48 overflow-y-auto rounded-md border border-border p-3">
                     {eggs.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No eggs available.</p>
@@ -86,73 +88,73 @@ export default ({ form, domains, eggs, onChange, onToggleEgg }: Props) => {
                         </div>
                     )}
                 </div>
-            </div>
+            </SettingRow>
 
-            <div className="space-y-2">
-                <Label htmlFor="record-type">Type</Label>
-                <select
-                    id="record-type"
-                    className={fieldClass}
+            <SettingRow label="Record type" description="DNS record type created for the subdomain.">
+                <SegmentedControl
                     value={form.type}
-                    onChange={(e) => onChange('type', e.target.value)}
-                >
-                    <option value="SRV">SRV</option>
-                    <option value="CNAME">CNAME</option>
-                </select>
-            </div>
+                    options={[
+                        { value: 'SRV', label: 'SRV' },
+                        { value: 'CNAME', label: 'CNAME' },
+                    ]}
+                    onChange={(value) => onChange('type', value)}
+                />
+            </SettingRow>
 
             {isSrv && (
-                <div className={cn('space-y-5 rounded-md border border-border p-4')}>
-                    <div className="space-y-2">
-                        <Label htmlFor="record-ttl">TTL</Label>
+                <>
+                    <SettingRow label="TTL" htmlFor="record-ttl" description="Time-to-live in seconds.">
                         <input
                             id="record-ttl"
                             className={fieldClass}
                             value={form.ttl}
                             onChange={(e) => onChange('ttl', e.target.value)}
                         />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="record-protocol">Protocol</Label>
-                        <select
-                            id="record-protocol"
-                            className={fieldClass}
+                    </SettingRow>
+
+                    <SettingRow label="Protocol" description="Transport protocol for the SRV record.">
+                        <SegmentedControl
                             value={form.protocol}
-                            onChange={(e) => onChange('protocol', e.target.value)}
-                        >
-                            <option value="tcp">TCP</option>
-                            <option value="udp">UDP</option>
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="record-priority">Priority</Label>
+                            options={[
+                                { value: 'tcp', label: 'TCP' },
+                                { value: 'udp', label: 'UDP' },
+                            ]}
+                            onChange={(value) => onChange('protocol', value)}
+                        />
+                    </SettingRow>
+
+                    <SettingRow label="Priority" htmlFor="record-priority" description="SRV priority value.">
                         <input
                             id="record-priority"
                             className={fieldClass}
                             value={form.priority}
                             onChange={(e) => onChange('priority', e.target.value)}
                         />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="record-weight">Weight</Label>
+                    </SettingRow>
+
+                    <SettingRow label="Weight" htmlFor="record-weight" description="SRV weight value.">
                         <input
                             id="record-weight"
                             className={fieldClass}
                             value={form.weight}
                             onChange={(e) => onChange('weight', e.target.value)}
                         />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="record-service">Service</Label>
+                    </SettingRow>
+
+                    <SettingRow
+                        label="Service"
+                        htmlFor="record-service"
+                        description="Service name prefix, e.g. _minecraft."
+                    >
                         <input
                             id="record-service"
                             className={fieldClass}
                             value={form.service}
                             onChange={(e) => onChange('service', e.target.value)}
                         />
-                    </div>
-                </div>
+                    </SettingRow>
+                </>
             )}
-        </div>
+        </>
     );
 };

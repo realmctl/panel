@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { useHistory, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { Save, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
 import { deleteLocation, getLocation, updateLocation } from '@/api/admin/locations';
 import { fieldClass, textareaClass } from '@/components/admin-preview/settings/fieldClass';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
+import { SettingRow, SettingsFooter, SettingsSection } from '@/components/admin-preview/settings/settingsLayout';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
-import { cn } from '@/lib/utils';
 
 export default () => {
     const { id } = useParams<{ id: string }>();
@@ -114,99 +105,89 @@ export default () => {
                 This will permanently delete this location. This action cannot be undone.
             </Dialog.Confirm>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <form onSubmit={onSave}>
-                    <div className="rounded-lg border border-border bg-card">
-                        <div className="border-b border-border px-5 py-4">
-                            <h2 className="text-base font-semibold text-foreground">Location details</h2>
-                        </div>
-                        <div className="space-y-5 p-5">
-                            <div className="space-y-2">
-                                <Label htmlFor="location-short-edit">Short code</Label>
-                                <input
-                                    id="location-short-edit"
-                                    className={fieldClass}
-                                    value={short}
-                                    onChange={(e) => setShort(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="location-long-edit">Description</Label>
-                                <textarea
-                                    id="location-long-edit"
-                                    className={textareaClass}
-                                    value={long}
-                                    onChange={(e) => setLong(e.target.value)}
-                                    rows={4}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between border-t border-border px-5 py-4">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                disabled={deleting || saving}
-                                onClick={() => setConfirmDelete(true)}
-                            >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                            </Button>
-                            <Button type="submit" disabled={saving || deleting}>
-                                <Save className="mr-2 h-4 w-4" />
-                                {saving ? 'Saving...' : 'Save changes'}
-                            </Button>
-                        </div>
-                    </div>
-                </form>
+            <form onSubmit={onSave} className="space-y-4">
+                <SettingsSection
+                    title="Location details"
+                    description="Short code and description for this grouping."
+                >
+                    <SettingRow
+                        label="Short code"
+                        htmlFor="location-short-edit"
+                        description="A short identifier, e.g. us.nyc.lvl3 (1–60 characters)."
+                    >
+                        <input
+                            id="location-short-edit"
+                            className={fieldClass}
+                            value={short}
+                            onChange={(e) => setShort(e.target.value)}
+                            required
+                        />
+                    </SettingRow>
+                    <SettingRow
+                        label="Description"
+                        htmlFor="location-long-edit"
+                        description="Optional longer description (max 191 characters)."
+                        wide
+                    >
+                        <textarea
+                            id="location-long-edit"
+                            className={textareaClass}
+                            value={long}
+                            onChange={(e) => setLong(e.target.value)}
+                            rows={3}
+                        />
+                    </SettingRow>
+                </SettingsSection>
 
-                <div className="rounded-lg border border-border bg-card">
-                    <div className="border-b border-border px-5 py-4">
-                        <h2 className="text-base font-semibold text-foreground">Nodes</h2>
-                    </div>
-                    {data.nodes.length === 0 ? (
-                        <p className="px-5 py-8 text-center text-sm text-muted-foreground">
-                            No nodes are assigned to this location.
-                        </p>
-                    ) : (
-                        <div className={tableWrapClass}>
-                            <table className={tableClass}>
-                                <thead>
-                                    <tr className={tableHeadRowClass}>
-                                        <th className={tableHeadCellClass}>ID</th>
-                                        <th className={tableHeadCellClass}>Name</th>
-                                        <th className={tableHeadCellClass}>FQDN</th>
-                                        <th className={cn(tableHeadCellClass, 'text-center')}>Servers</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {data.nodes.map((node) => (
-                                        <tr key={node.id} className={tableBodyRowClass}>
-                                            <td className={tableBodyCellClass}>
-                                                <code className="text-xs text-muted-foreground">{node.id}</code>
-                                            </td>
-                                            <td className={tableBodyCellClass}>
-                                                <a
-                                                    href={`/admin/nodes/view/${node.id}`}
-                                                    className="font-medium text-primary no-underline hover:underline"
-                                                >
-                                                    {node.name}
-                                                </a>
-                                            </td>
-                                            <td className={tableBodyCellClass}>
-                                                <code className="text-xs">{node.fqdn}</code>
-                                            </td>
-                                            <td className={cn(tableBodyCellClass, 'text-center')}>
-                                                {node.servers_count}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
+                <SettingsFooter>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="mr-auto border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        disabled={deleting || saving}
+                        onClick={() => setConfirmDelete(true)}
+                    >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                    </Button>
+                    <Button type="submit" disabled={saving || deleting}>
+                        <Save className="mr-2 h-4 w-4" />
+                        {saving ? 'Saving...' : 'Save changes'}
+                    </Button>
+                </SettingsFooter>
+            </form>
+
+            <div className="mt-4 overflow-hidden rounded-md border border-border bg-card">
+                <div className="border-b border-border px-5 py-4">
+                    <h2 className="text-base font-semibold text-foreground">Nodes</h2>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                        {data.nodes.length === 0
+                            ? 'No nodes in this location.'
+                            : `${data.nodes.length} node${data.nodes.length === 1 ? '' : 's'} in this location`}
+                    </p>
                 </div>
+                {data.nodes.length > 0 && (
+                    <div className="divide-y divide-border">
+                        {data.nodes.map((node) => (
+                            <Link
+                                key={node.id}
+                                to={`${adminPreviewBasePath}/nodes/${node.id}`}
+                                className="flex items-center justify-between gap-4 px-5 py-4 no-underline transition-colors hover:bg-muted/50"
+                            >
+                                <div className="min-w-0">
+                                    <p className="text-sm font-medium text-foreground">{node.name}</p>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        <code className="text-foreground">{node.fqdn}</code>
+                                        {' · '}
+                                        {node.servers_count}{' '}
+                                        {node.servers_count === 1 ? 'server' : 'servers'}
+                                    </p>
+                                </div>
+                                <code className="shrink-0 text-xs text-muted-foreground">#{node.id}</code>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
         </>
     );

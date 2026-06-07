@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { useParams } from 'react-router-dom';
-import { MinusSquare, Trash2 } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
@@ -15,17 +13,9 @@ import {
 } from '@/api/admin/nodes';
 import AllocationAliasInput from '@/components/admin-preview/nodes/AllocationAliasInput';
 import AllocationCreateForm from '@/components/admin-preview/nodes/AllocationCreateForm';
-import {
-    tableBodyCellClass,
-    tableBodyRowClass,
-    tableClass,
-    tableHeadCellClass,
-    tableHeadRowClass,
-    tableWrapClass,
-} from '@/components/admin-preview/adminTable';
-import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
+import { selectClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow } from '@/components/admin-preview/settings/settingsLayout';
 import { adminPreviewBasePath } from '@/routers/adminPreviewRoutes';
-import { cn } from '@/lib/utils';
 
 export default () => {
     const { id } = useParams<{ id: string }>();
@@ -144,6 +134,7 @@ export default () => {
                     message: response.message,
                 });
                 setConfirmMass(false);
+                setSelected(new Set());
                 mutate();
             })
             .catch((submitError) => {
@@ -188,6 +179,7 @@ export default () => {
     const ips = Array.isArray(data.ips) ? data.ips : [];
     const pagination = data.pagination ?? { current_page: 1, last_page: 1, total: 0 };
     const selectableCount = allocations.filter((allocation) => !allocation.server_id).length;
+    const assignedCount = allocations.filter((allocation) => allocation.server_id).length;
     const allSelectableSelected =
         selectableCount > 0 && allocations.filter((a) => !a.server_id).every((a) => selected.has(a.id));
 
@@ -219,25 +211,26 @@ export default () => {
                 appearance="admin"
                 open={blockOpen}
                 onClose={() => setBlockOpen(false)}
-                title="Delete allocations for IP block"
+                title="Delete IP block"
             >
                 <p className="text-sm text-muted-foreground">
                     Remove all unassigned allocations for a specific IP address.
                 </p>
-                <div className="mt-4 space-y-2">
-                    <Label htmlFor="block-ip">IP address</Label>
-                    <select
-                        id="block-ip"
-                        className={fieldClass}
-                        value={blockIp}
-                        onChange={(e) => setBlockIp(e.target.value)}
-                    >
-                        {ips.map((ip) => (
-                            <option key={ip} value={ip}>
-                                {ip}
-                            </option>
-                        ))}
-                    </select>
+                <div className="mt-4">
+                    <SettingRow label="IP address" description="Select the IP block to clear." stacked>
+                        <select
+                            id="block-ip"
+                            className={selectClass}
+                            value={blockIp}
+                            onChange={(e) => setBlockIp(e.target.value)}
+                        >
+                            {ips.map((ip) => (
+                                <option key={ip} value={ip}>
+                                    {ip}
+                                </option>
+                            ))}
+                        </select>
+                    </SettingRow>
                 </div>
                 <Dialog.Footer>
                     <Button type="button" variant="outline" onClick={() => setBlockOpen(false)}>
@@ -249,25 +242,52 @@ export default () => {
                 </Dialog.Footer>
             </Dialog>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2">
-                    <div className="rounded-lg border border-border bg-card">
-                        <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <h2 className="text-base font-semibold text-foreground">Existing allocations</h2>
-                                <p className="mt-1 text-sm text-muted-foreground">{pagination.total} total</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={selected.size === 0 || deleting}
-                                    onClick={() => setConfirmMass(true)}
-                                >
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete selected ({selected.size})
-                                </Button>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
+                <div className="order-1 lg:order-2 lg:col-span-1">
+                    <AllocationCreateForm nodeId={nodeId} ips={ips} onCreated={() => mutate()} />
+                </div>
+
+                <div className="order-2 lg:order-1 lg:col-span-2">
+                    <div className="overflow-hidden rounded-md border border-border bg-card">
+                        <div className="border-b border-border px-5 py-4">
+                            <h2 className="text-base font-semibold text-foreground">Allocations</h2>
+                            <p className="mt-0.5 text-sm text-muted-foreground">
+                                {pagination.total} total
+                                {allocations.length > 0 && (
+                                    <>
+                                        {' · '}
+                                        {assignedCount} assigned
+                                        {' · '}
+                                        {allocations.length - assignedCount} unassigned
+                                    </>
+                                )}
+                            </p>
+                        </div>
+
+                        {(selectableCount > 0 || ips.length > 0) && (
+                            <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/20 px-5 py-3">
+                                {selectableCount > 0 && (
+                                    <label className="mr-auto flex items-center gap-2 text-sm text-muted-foreground">
+                                        <input
+                                            type="checkbox"
+                                            className="rounded border-border accent-primary"
+                                            checked={allSelectableSelected}
+                                            onChange={toggleSelectAll}
+                                        />
+                                        Select all unassigned
+                                    </label>
+                                )}
+                                {selected.size > 0 && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={deleting}
+                                        onClick={() => setConfirmMass(true)}
+                                    >
+                                        Delete selected ({selected.size})
+                                    </Button>
+                                )}
                                 {ips.length > 0 && (
                                     <Button
                                         type="button"
@@ -279,96 +299,87 @@ export default () => {
                                             setBlockOpen(true);
                                         }}
                                     >
-                                        <MinusSquare className="mr-2 h-4 w-4" />
                                         Delete IP block
                                     </Button>
                                 )}
                             </div>
-                        </div>
+                        )}
 
                         {allocations.length === 0 ? (
-                            <div className="px-5 py-12 text-center text-sm text-muted-foreground">
-                                No allocations assigned to this node yet.
-                            </div>
+                            <p className="px-5 py-8 text-sm text-muted-foreground">
+                                No allocations on this node yet. Use the form to assign IP addresses and ports.
+                            </p>
                         ) : (
-                            <div className={tableWrapClass}>
-                                <table className={tableClass}>
-                                    <thead>
-                                        <tr className={tableHeadRowClass}>
-                                            <th className={cn(tableHeadCellClass, 'w-10')}>
+                            <div className="divide-y divide-border">
+                                {allocations.map((allocation) => {
+                                    const isAssigned = Boolean(allocation.server_id);
+
+                                    return (
+                                        <div key={allocation.id} className="px-5 py-4">
+                                            <div className="flex items-start gap-3">
                                                 <input
                                                     type="checkbox"
-                                                    className="rounded border-border accent-primary"
-                                                    checked={allSelectableSelected}
-                                                    disabled={selectableCount === 0}
-                                                    onChange={toggleSelectAll}
+                                                    className="mt-1 rounded border-border accent-primary"
+                                                    disabled={isAssigned}
+                                                    checked={selected.has(allocation.id)}
+                                                    onChange={(e) =>
+                                                        toggleSelect(allocation.id, e.target.checked)
+                                                    }
                                                 />
-                                            </th>
-                                            <th className={tableHeadCellClass}>IP address</th>
-                                            <th className={tableHeadCellClass}>IP alias</th>
-                                            <th className={tableHeadCellClass}>Port</th>
-                                            <th className={tableHeadCellClass}>Assigned to</th>
-                                            <th className={cn(tableHeadCellClass, 'w-10')} />
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {allocations.map((allocation) => (
-                                            <tr key={allocation.id} className={tableBodyRowClass}>
-                                                <td className={tableBodyCellClass}>
-                                                    <input
-                                                        type="checkbox"
-                                                        className="rounded border-border accent-primary"
-                                                        disabled={Boolean(allocation.server_id)}
-                                                        checked={selected.has(allocation.id)}
-                                                        onChange={(e) =>
-                                                            toggleSelect(allocation.id, e.target.checked)
-                                                        }
-                                                    />
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <code className="text-xs text-foreground">{allocation.ip}</code>
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <AllocationAliasInput
-                                                        nodeId={nodeId}
-                                                        allocationId={allocation.id}
-                                                        initialValue={allocation.ip_alias}
-                                                        onUpdated={(alias) => handleAliasUpdated(allocation.id, alias)}
-                                                    />
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <code className="text-xs text-foreground">{allocation.port}</code>
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    {allocation.server ? (
-                                                        <a
-                                                            href={`${adminPreviewBasePath}/servers/${allocation.server.id}`}
-                                                            className="text-sm text-primary no-underline hover:underline"
-                                                        >
-                                                            {allocation.server.name}
-                                                        </a>
-                                                    ) : (
-                                                        <span className="text-sm text-muted-foreground">—</span>
-                                                    )}
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    {!allocation.server_id && (
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                            disabled={deleting}
-                                                            onClick={() => setConfirmSingle(allocation.id)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                                        <div className="min-w-0">
+                                                            <p className="text-sm font-medium text-foreground">
+                                                                <code>{allocation.ip}</code>:
+                                                                <code>{allocation.port}</code>
+                                                            </p>
+                                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                                {isAssigned && allocation.server ? (
+                                                                    <>
+                                                                        Assigned to{' '}
+                                                                        <Link
+                                                                            to={`${adminPreviewBasePath}/servers/${allocation.server.id}`}
+                                                                            className="text-blue-400 no-underline hover:text-blue-300"
+                                                                        >
+                                                                            {allocation.server.name}
+                                                                        </Link>
+                                                                    </>
+                                                                ) : (
+                                                                    <span className="text-emerald-600 dark:text-emerald-500">
+                                                                        Unassigned
+                                                                    </span>
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                        {!isAssigned && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="shrink-0 border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                                disabled={deleting}
+                                                                onClick={() => setConfirmSingle(allocation.id)}
+                                                            >
+                                                                Delete
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                    <div className="mt-3 max-w-xs">
+                                                        <p className="mb-1.5 text-xs text-muted-foreground">Alias</p>
+                                                        <AllocationAliasInput
+                                                            nodeId={nodeId}
+                                                            allocationId={allocation.id}
+                                                            initialValue={allocation.ip_alias}
+                                                            onUpdated={(alias) =>
+                                                                handleAliasUpdated(allocation.id, alias)
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
 
@@ -399,8 +410,6 @@ export default () => {
                         )}
                     </div>
                 </div>
-
-                <AllocationCreateForm nodeId={nodeId} ips={ips} onCreated={() => mutate()} />
             </div>
         </>
     );

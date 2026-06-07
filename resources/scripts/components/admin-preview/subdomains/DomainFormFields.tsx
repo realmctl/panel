@@ -1,7 +1,7 @@
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { DnsProviderConfig, DnsProviders } from '@/api/admin/subdomains';
 import { fieldClass } from '@/components/admin-preview/settings/fieldClass';
+import { SettingRow } from '@/components/admin-preview/settings/settingsLayout';
 
 export interface DomainFormState {
     name: string;
@@ -27,9 +27,12 @@ export default ({ form, providers, onChange, isEdit }: Props) => {
     const config = providerConfig(providers, form.type);
 
     return (
-        <div className="space-y-5">
-            <div className="space-y-2">
-                <Label htmlFor="domain-name">Domain name</Label>
+        <>
+            <SettingRow
+                label="Domain name"
+                htmlFor="domain-name"
+                description="The root domain customers can create subdomains under."
+            >
                 <input
                     id="domain-name"
                     className={fieldClass}
@@ -37,10 +40,13 @@ export default ({ form, providers, onChange, isEdit }: Props) => {
                     onChange={(e) => onChange('name', e.target.value)}
                     required
                 />
-            </div>
+            </SettingRow>
 
-            <div className="space-y-2">
-                <Label htmlFor="domain-type">Provider</Label>
+            <SettingRow
+                label="Provider"
+                htmlFor="domain-type"
+                description="DNS provider used to manage records for this domain."
+            >
                 <select
                     id="domain-type"
                     className={fieldClass}
@@ -53,10 +59,17 @@ export default ({ form, providers, onChange, isEdit }: Props) => {
                         </option>
                     ))}
                 </select>
-            </div>
+            </SettingRow>
 
-            <div className="space-y-2">
-                <Label htmlFor="domain-key">Key / API Token</Label>
+            <SettingRow
+                label="Key / API token"
+                htmlFor="domain-key"
+                description={
+                    isEdit
+                        ? 'Re-enter credentials when editing. Values are stored encrypted.'
+                        : 'Credentials are stored encrypted.'
+                }
+            >
                 <input
                     id="domain-key"
                     className={fieldClass}
@@ -64,52 +77,55 @@ export default ({ form, providers, onChange, isEdit }: Props) => {
                     onChange={(e) => onChange('key', e.target.value)}
                     required
                 />
-                <p className="text-xs text-muted-foreground">
-                    {isEdit
-                        ? 'Re-enter credentials when editing. Values are stored encrypted.'
-                        : 'Credentials are stored encrypted.'}
-                </p>
-            </div>
+            </SettingRow>
 
             {config?.secret && (
-                <div className="space-y-2">
-                    <Label htmlFor="domain-secret">Secret</Label>
+                <SettingRow label="Secret" htmlFor="domain-secret" description="Provider secret key.">
                     <input
                         id="domain-secret"
                         className={fieldClass}
                         value={form.secret}
                         onChange={(e) => onChange('secret', e.target.value)}
                     />
-                </div>
+                </SettingRow>
             )}
 
             {config?.consumer && (
-                <div className="space-y-2">
-                    <Label htmlFor="domain-consumer">Consumer Key</Label>
+                <SettingRow
+                    label="Consumer key"
+                    htmlFor="domain-consumer"
+                    description="OAuth consumer key for this provider."
+                >
                     <input
                         id="domain-consumer"
                         className={fieldClass}
                         value={form.consumer}
                         onChange={(e) => onChange('consumer', e.target.value)}
                     />
-                </div>
+                </SettingRow>
             )}
 
             {config?.cloudflare_id && (
-                <div className="space-y-2">
-                    <Label htmlFor="domain-cloudflare-id">Cloudflare Zone ID</Label>
+                <SettingRow
+                    label="Cloudflare zone ID"
+                    htmlFor="domain-cloudflare-id"
+                    description="Zone ID from the Cloudflare dashboard."
+                >
                     <input
                         id="domain-cloudflare-id"
                         className={fieldClass}
                         value={form.cloudflare_id}
                         onChange={(e) => onChange('cloudflare_id', e.target.value)}
                     />
-                </div>
+                </SettingRow>
             )}
 
             {config?.ovh_api && (
-                <div className="space-y-2">
-                    <Label htmlFor="domain-ovh-api">OVH API Region</Label>
+                <SettingRow
+                    label="OVH API region"
+                    htmlFor="domain-ovh-api"
+                    description="API endpoint region for your OVH account."
+                >
                     <select
                         id="domain-ovh-api"
                         className={fieldClass}
@@ -120,8 +136,8 @@ export default ({ form, providers, onChange, isEdit }: Props) => {
                         <option value="us">US</option>
                         <option value="ca">CA</option>
                     </select>
-                </div>
+                </SettingRow>
             )}
-        </div>
+        </>
     );
 };
