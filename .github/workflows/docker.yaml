@@ -39,6 +39,12 @@ jobs:
 
       - name: Setup Docker buildx
         if: env.SKIP != 'true'
+        id: setup-buildx
+        uses: docker/setup-buildx-action@v3
+        continue-on-error: true
+
+      - name: Retry setup Docker buildx
+        if: env.SKIP != 'true' && steps.setup-buildx.outcome == 'failure'
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
@@ -109,6 +115,12 @@ jobs:
           merge-multiple: true
 
       - name: Setup Docker buildx
+        id: setup-buildx
+        uses: docker/setup-buildx-action@v3
+        continue-on-error: true
+
+      - name: Retry setup Docker buildx
+        if: steps.setup-buildx.outcome == 'failure'
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
