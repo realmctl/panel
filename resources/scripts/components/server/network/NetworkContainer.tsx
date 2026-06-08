@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
 import Spinner from '@/components/elements/Spinner';
 import { useFlashKey } from '@/plugins/useFlash';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
@@ -17,9 +18,23 @@ import SubdomainsPanel from '@/components/server/network/subdomains/SubdomainsPa
 
 type NetworkTab = 'allocations' | 'subdomains';
 
+const NETWORK_TABS: NetworkTab[] = ['allocations', 'subdomains'];
+
+const tabFromParam = (tab?: string): NetworkTab => {
+    if (tab && NETWORK_TABS.includes(tab as NetworkTab)) {
+        return tab as NetworkTab;
+    }
+
+    return 'allocations';
+};
+
 const NetworkContainer = () => {
+    const history = useHistory();
+    const { tab: tabParam } = useParams<{ tab?: string }>();
+    const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
+    const activeTab = tabFromParam(tabParam);
+
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<NetworkTab>('allocations');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const allocationLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.allocations);
     const allocations = ServerContext.useStoreState((state) => state.server.data!.allocations, isEqual);
@@ -40,6 +55,25 @@ const NetworkContainer = () => {
         if (!data) return;
         setServerFromState((state) => ({ ...state, allocations: data }));
     }, [data]);
+
+    const networkPath = useCallback(
+        (tab: NetworkTab) => {
+            const base = `${serverMatch!.url.replace(/\/?$/, '')}/network`;
+            return tab === 'allocations' ? base : `${base}/${tab}`;
+        },
+        [serverMatch]
+    );
+
+    const switchTab = useCallback(
+        (tab: NetworkTab) => {
+            if (activeTab === tab) {
+                return;
+            }
+
+            history.push(networkPath(tab));
+        },
+        [activeTab, history, networkPath]
+    );
 
     const onCreateAllocation = () => {
         clearFlashes();
@@ -67,7 +101,7 @@ const NetworkContainer = () => {
                         { id: 'subdomains', label: 'Subdomains' },
                     ]}
                     activeTab={activeTab}
-                    onTabChange={setActiveTab}
+                    onTabChange={switchTab}
                 />
             </div>
 

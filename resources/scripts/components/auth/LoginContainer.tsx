@@ -6,7 +6,6 @@ import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
-import AuthFooter from '@/components/auth/AuthFooter';
 import { REALM_LOGO } from '@/lib/branding';
 
 interface Values {
@@ -295,8 +294,6 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                 </p>
             </div>
 
-            {/* Footer */}
-            <AuthFooter />
         </div>
     );
 };

@@ -6,8 +6,8 @@ import { useHistory, useRouteMatch } from 'react-router-dom';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import ScheduleRow from '@/components/server/schedules/ScheduleRow';
 import { httpErrorToHuman } from '@/api/http';
-import EditScheduleModal from '@/components/server/schedules/EditScheduleModal';
-import AutomationTemplatesModal from '@/components/server/schedules/AutomationTemplatesModal';
+import CreateScheduleDrawer from '@/components/server/schedules/CreateScheduleDrawer';
+import AutomationTemplatesDrawer from '@/components/server/schedules/AutomationTemplatesDrawer';
 import Can from '@/components/elements/Can';
 import useFlash from '@/plugins/useFlash';
 import tw from 'twin.macro';
@@ -120,10 +120,10 @@ export default () => {
                             </p>
                             <Can action={'schedule.create'}>
                                 <div className={'mt-6 flex gap-3'}>
-                                    <EditScheduleModal visible={visible} onModalDismissed={() => setVisible(false)} />
-                                    <AutomationTemplatesModal
+                                    <CreateScheduleDrawer visible={visible} onDismissed={() => setVisible(false)} />
+                                    <AutomationTemplatesDrawer
                                         visible={templatesVisible}
-                                        onModalDismissed={() => setTemplatesVisible(false)}
+                                        onDismissed={() => setTemplatesVisible(false)}
                                         onSelect={onTemplateSelect}
                                     />
                                     <Button type={'button'} onClick={() => setVisible(true)}>
@@ -189,10 +189,10 @@ export default () => {
                         {schedules.length > 0 && (
                             <div css={tw`mt-8 flex justify-end gap-3 flex-wrap`}>
                                 <input ref={fileInputRef} type={'file'} accept={'.json'} css={tw`hidden`} onChange={onImportFile} />
-                                <EditScheduleModal visible={visible} onModalDismissed={() => setVisible(false)} />
-                                <AutomationTemplatesModal
+                                <CreateScheduleDrawer visible={visible} onDismissed={() => setVisible(false)} />
+                                <AutomationTemplatesDrawer
                                     visible={templatesVisible}
-                                    onModalDismissed={() => setTemplatesVisible(false)}
+                                    onDismissed={() => setTemplatesVisible(false)}
                                     onSelect={onTemplateSelect}
                                 />
                                 <Button type={'button'} variant={Button.Variants.Secondary} onClick={() => fileInputRef.current?.click()}>

@@ -24,10 +24,30 @@ interface Props {
     config: MinecraftConfigDefinition;
     embedded?: boolean;
     filePath?: string;
+    /** When opening from the file editor, reuse content already loaded in the tab. */
+    initialContent?: string;
     onSaved?: (content: string) => void;
 }
 
-export default ({ config, embedded = false, filePath, onSaved }: Props) => {
+const applyLoadedContent = (
+    config: MinecraftConfigDefinition,
+    content: string,
+    setPropertyLines: (lines: PropertiesLine[]) => void,
+    setRawContent: (content: string) => void,
+    initialContentRef: React.MutableRefObject<string>
+) => {
+    initialContentRef.current = content;
+
+    if (config.format === 'properties') {
+        setPropertyLines(parsePropertiesFile(content));
+        setRawContent('');
+    } else {
+        setRawContent(content);
+        setPropertyLines([]);
+    }
+};
+
+export default ({ config, embedded = false, filePath, initialContent, onSaved }: Props) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
     const { clearFlashes, addError } = useFlashKey(embedded ? 'files:editor' : 'server:configuration');
@@ -73,6 +93,16 @@ export default ({ config, embedded = false, filePath, onSaved }: Props) => {
 
             setResolvedPath(existingPath);
 
+            if (filePath && initialContent !== undefined) {
+                applyLoadedContent(config, initialContent, setPropertyLines, setRawContent, initialContentRef);
+
+                if (!cancelled) {
+                    setLoading(false);
+                }
+
+                return;
+            }
+
             try {
                 const content = await getFileContents(uuid, existingPath);
 
@@ -80,15 +110,7 @@ export default ({ config, embedded = false, filePath, onSaved }: Props) => {
                     return;
                 }
 
-                initialContentRef.current = content;
-
-                if (config.format === 'properties') {
-                    setPropertyLines(parsePropertiesFile(content));
-                    setRawContent('');
-                } else {
-                    setRawContent(content);
-                    setPropertyLines([]);
-                }
+                applyLoadedContent(config, content, setPropertyLines, setRawContent, initialContentRef);
             } catch (error) {
                 if (cancelled) {
                     return;
@@ -114,7 +136,7 @@ export default ({ config, embedded = false, filePath, onSaved }: Props) => {
         return () => {
             cancelled = true;
         };
-    }, [uuid, config.id, filePath]);
+    }, [uuid, config.id, filePath, initialContent]);
 
     useEffect(() => {
         if (loading) {

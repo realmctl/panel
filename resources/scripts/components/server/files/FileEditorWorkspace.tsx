@@ -182,8 +182,7 @@ export default ({
 
     const switchToTextEditor = useCallback(() => {
         setEditorView('text');
-        void reloadActive();
-    }, [reloadActive]);
+    }, []);
 
     const handleVisualSaved = useCallback(
         (content: string) => {
@@ -285,6 +284,7 @@ export default ({
                                 config={visualConfig}
                                 embedded
                                 filePath={activeTab.path}
+                                initialContent={activeTab.content}
                                 onSaved={handleVisualSaved}
                             />
                         ) : (

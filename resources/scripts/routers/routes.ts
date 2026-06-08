@@ -120,10 +120,11 @@ export default {
             exact: true,
         },
         {
-            path: '/network',
+            path: '/network/:tab(allocations|subdomains)?',
             permission: 'allocation.*',
             name: 'Networking',
             component: NetworkContainer,
+            exact: true,
         },
         {
             path: '/databases',

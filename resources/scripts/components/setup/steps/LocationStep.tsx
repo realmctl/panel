@@ -15,6 +15,9 @@ export default () => {
     const { clearAndAddHttpError } = useFlash();
     const [submitting, setSubmitting] = useState(false);
     const [form, setForm] = useState({ short: '', long: '' });
+    const updateField = <K extends keyof typeof form>(field: K, value: (typeof form)[K]) => {
+        setForm((current) => ({ ...current, [field]: value }));
+    };
     const hasExistingLocation = !!status?.context.locationId;
 
     const onSubmit = (event: React.FormEvent) => {
@@ -67,7 +70,7 @@ export default () => {
                         id={'short'}
                         className={inputClassName}
                         value={form.short}
-                        onChange={(event) => setForm((current) => ({ ...current, short: event.target.value }))}
+                        onChange={(event) => updateField('short', event.target.value)}
                         disabled={submitting}
                         required
                     />
@@ -78,7 +81,7 @@ export default () => {
                         id={'long'}
                         className={inputClassName}
                         value={form.long}
-                        onChange={(event) => setForm((current) => ({ ...current, long: event.target.value }))}
+                        onChange={(event) => updateField('long', event.target.value)}
                         disabled={submitting}
                     />
                 </SetupField>

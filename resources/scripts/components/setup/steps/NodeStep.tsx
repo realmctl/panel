@@ -31,6 +31,10 @@ export default () => {
         upload_size: '100',
     });
 
+    const updateField = <K extends keyof typeof form>(field: K, value: (typeof form)[K]) => {
+        setForm((current) => ({ ...current, [field]: value }));
+    };
+
     const onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         setSubmitting(true);
@@ -64,7 +68,7 @@ export default () => {
                         id={'nodeName'}
                         className={inputClassName}
                         value={form.name}
-                        onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                        onChange={(event) => updateField('name', event.target.value)}
                         disabled={submitting}
                         required
                     />
@@ -75,7 +79,7 @@ export default () => {
                         id={'fqdn'}
                         className={inputClassName}
                         value={form.fqdn}
-                        onChange={(event) => setForm((current) => ({ ...current, fqdn: event.target.value }))}
+                        onChange={(event) => updateField('fqdn', event.target.value)}
                         disabled={submitting}
                         required
                     />
@@ -87,7 +91,7 @@ export default () => {
                             id={'scheme'}
                             className={selectClassName}
                             value={form.scheme}
-                            onChange={(event) => setForm((current) => ({ ...current, scheme: event.target.value }))}
+                            onChange={(event) => updateField('scheme', event.target.value)}
                             disabled={submitting}
                         >
                             <option value={'https'}>HTTPS</option>
@@ -100,7 +104,7 @@ export default () => {
                             id={'daemonListen'}
                             className={inputClassName}
                             value={form.daemonListen}
-                            onChange={(event) => setForm((current) => ({ ...current, daemonListen: event.target.value }))}
+                            onChange={(event) => updateField('daemonListen', event.target.value)}
                             disabled={submitting}
                             required
                         />
@@ -113,7 +117,7 @@ export default () => {
                             id={'memory'}
                             className={inputClassName}
                             value={form.memory}
-                            onChange={(event) => setForm((current) => ({ ...current, memory: event.target.value }))}
+                            onChange={(event) => updateField('memory', event.target.value)}
                             disabled={submitting}
                             required
                         />
@@ -124,7 +128,7 @@ export default () => {
                             id={'disk'}
                             className={inputClassName}
                             value={form.disk}
-                            onChange={(event) => setForm((current) => ({ ...current, disk: event.target.value }))}
+                            onChange={(event) => updateField('disk', event.target.value)}
                             disabled={submitting}
                             required
                         />

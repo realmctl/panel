@@ -7,7 +7,6 @@ import { useFormikContext, withFormik } from 'formik';
 import useFlash from '@/plugins/useFlash';
 import { FlashStore } from '@/state/flashes';
 import FlashMessageRender from '@/components/FlashMessageRender';
-import AuthFooter from '@/components/auth/AuthFooter';
 
 interface Values {
     code: string;
@@ -87,8 +86,6 @@ const LoginCheckpointContainer = () => {
                     </Link>
                 </div>
             </div>
-
-            <AuthFooter />
         </div>
     );
 };

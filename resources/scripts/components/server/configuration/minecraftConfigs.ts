@@ -24,6 +24,8 @@ export interface ConfigGroupDefinition {
 
 export type MinecraftConfigFormat = 'properties' | 'eula' | 'raw';
 
+export type MinecraftConfigLanguage = 'yaml' | 'properties' | 'plaintext' | 'json' | 'toml';
+
 export interface ConfigCategoryDefinition {
     id: string;
     label: string;
@@ -37,8 +39,10 @@ export interface MinecraftConfigDefinition {
     description: string;
     path: string;
     alternatePaths?: string[];
+    /** Match opened file paths that are not fixed (e.g. per-world paper-world.yml). */
+    pathPatterns?: RegExp[];
     format: MinecraftConfigFormat;
-    language?: 'yaml' | 'properties' | 'plaintext';
+    language?: MinecraftConfigLanguage;
     groups?: ConfigGroupDefinition[];
     unavailableHint?: string;
 }
@@ -58,6 +62,16 @@ export const CONFIG_CATEGORIES: ConfigCategoryDefinition[] = [
         id: 'paper',
         label: 'Paper',
         description: 'Paper-specific performance and world settings.',
+    },
+    {
+        id: 'forks',
+        label: 'Forks',
+        description: 'Purpur, Pufferfish, and other Paper-based server forks.',
+    },
+    {
+        id: 'proxy',
+        label: 'Proxy',
+        description: 'BungeeCord and Velocity proxy configuration.',
     },
 ];
 
@@ -193,6 +207,44 @@ export const MINECRAFT_CONFIGS: MinecraftConfigDefinition[] = [
         unavailableHint: 'Created automatically when the server is installed or first started.',
     },
     {
+        id: 'ops',
+        category: 'core',
+        label: 'Operators',
+        description: 'Server operators and their permission levels.',
+        path: 'ops.json',
+        format: 'raw',
+        language: 'json',
+        unavailableHint: 'Created when operators are added. Vanilla and plugin servers use this file.',
+    },
+    {
+        id: 'whitelist',
+        category: 'core',
+        label: 'Whitelist',
+        description: 'Players allowed to join when the whitelist is enabled.',
+        path: 'whitelist.json',
+        format: 'raw',
+        language: 'json',
+        unavailableHint: 'Created when the whitelist is enabled and players are added.',
+    },
+    {
+        id: 'banned-players',
+        category: 'core',
+        label: 'Banned Players',
+        description: 'Players banned from the server.',
+        path: 'banned-players.json',
+        format: 'raw',
+        language: 'json',
+    },
+    {
+        id: 'banned-ips',
+        category: 'core',
+        label: 'Banned IPs',
+        description: 'IP addresses banned from the server.',
+        path: 'banned-ips.json',
+        format: 'raw',
+        language: 'json',
+    },
+    {
         id: 'bukkit',
         category: 'bukkit',
         label: 'Bukkit',
@@ -211,6 +263,36 @@ export const MINECRAFT_CONFIGS: MinecraftConfigDefinition[] = [
         format: 'raw',
         language: 'yaml',
         unavailableHint: 'Only available on Spigot-based servers. Vanilla servers do not use this file.',
+    },
+    {
+        id: 'commands',
+        category: 'bukkit',
+        label: 'Commands',
+        description: 'Custom command aliases and tab-completion overrides.',
+        path: 'commands.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only available on Bukkit-based servers such as Paper, Spigot, or Purpur.',
+    },
+    {
+        id: 'help',
+        category: 'bukkit',
+        label: 'Help',
+        description: 'Custom entries shown by the /help command.',
+        path: 'help.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only available on Bukkit-based servers such as Paper, Spigot, or Purpur.',
+    },
+    {
+        id: 'permissions',
+        category: 'bukkit',
+        label: 'Permissions',
+        description: 'Legacy Bukkit permission nodes (rarely used on modern servers).',
+        path: 'permissions.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only available on Bukkit-based servers. Most servers rely on plugin permissions instead.',
     },
     {
         id: 'paper-global',
@@ -233,6 +315,87 @@ export const MINECRAFT_CONFIGS: MinecraftConfigDefinition[] = [
         language: 'yaml',
         unavailableHint: 'Only available on Paper servers. The file is created after the first Paper start.',
     },
+    {
+        id: 'paper-legacy',
+        category: 'paper',
+        label: 'Paper (Legacy)',
+        description: 'Legacy Paper configuration used before the config/ split.',
+        path: 'paper.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only used on older Paper versions. Modern Paper uses config/paper-global.yml instead.',
+    },
+    {
+        id: 'paper-world',
+        category: 'paper',
+        label: 'Paper World',
+        description: 'Per-world Paper overrides inside a world folder.',
+        path: 'world/paper-world.yml',
+        pathPatterns: [/(^|\/)paper-world\.yml$/],
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Created inside each world folder after the first Paper start for that world.',
+    },
+    {
+        id: 'purpur',
+        category: 'forks',
+        label: 'Purpur',
+        description: 'Purpur-specific gameplay and performance tweaks.',
+        path: 'purpur.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only available on Purpur servers.',
+    },
+    {
+        id: 'pufferfish',
+        category: 'forks',
+        label: 'Pufferfish',
+        description: 'Pufferfish-specific performance settings.',
+        path: 'pufferfish.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only available on Pufferfish servers.',
+    },
+    {
+        id: 'leaves',
+        category: 'forks',
+        label: 'Leaves',
+        description: 'Leaves fork configuration.',
+        path: 'leaves.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only available on Leaves servers.',
+    },
+    {
+        id: 'bungeecord',
+        category: 'proxy',
+        label: 'BungeeCord',
+        description: 'BungeeCord proxy listeners, servers, and connection settings.',
+        path: 'config.yml',
+        format: 'raw',
+        language: 'yaml',
+        unavailableHint: 'Only available on BungeeCord proxy servers.',
+    },
+    {
+        id: 'velocity',
+        category: 'proxy',
+        label: 'Velocity',
+        description: 'Velocity proxy bind addresses, forwarding, and player limits.',
+        path: 'velocity.toml',
+        format: 'raw',
+        language: 'toml',
+        unavailableHint: 'Only available on Velocity proxy servers.',
+    },
+    {
+        id: 'velocity-forwarding-secret',
+        category: 'proxy',
+        label: 'Velocity Forwarding Secret',
+        description: 'Shared secret for Velocity modern IP forwarding on backend servers.',
+        path: 'forwarding.secret',
+        format: 'raw',
+        language: 'plaintext',
+        unavailableHint: 'Created when Velocity modern forwarding is enabled on a backend Minecraft server.',
+    },
 ];
 
 export const getMinecraftConfigById = (id: string): MinecraftConfigDefinition | undefined =>
@@ -243,13 +406,21 @@ const normalizeConfigPath = (filePath: string): string => filePath.replace(/^\/+
 export const getMinecraftConfigByPath = (filePath: string): MinecraftConfigDefinition | undefined => {
     const normalized = normalizeConfigPath(filePath);
 
-    return MINECRAFT_CONFIGS.find((config) =>
+    const exactMatch = MINECRAFT_CONFIGS.find((config) =>
         getConfigPaths(config).some((path) => normalizeConfigPath(path) === normalized)
+    );
+
+    if (exactMatch) {
+        return exactMatch;
+    }
+
+    return MINECRAFT_CONFIGS.find((config) =>
+        config.pathPatterns?.some((pattern) => pattern.test(normalized))
     );
 };
 
 export const isVisualEditorCompatible = (config: MinecraftConfigDefinition): boolean =>
-    config.format === 'properties' || config.format === 'eula';
+    config.format === 'properties' || config.format === 'eula' || config.format === 'raw';
 
 export const getConfigPaths = (config: MinecraftConfigDefinition): string[] => {
     const paths = [config.path];

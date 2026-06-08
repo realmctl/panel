@@ -19,6 +19,9 @@ export default () => {
         allocationAlias: '',
         allocationPorts: '25565-25600',
     });
+    const updateField = <K extends keyof typeof form>(field: K, value: (typeof form)[K]) => {
+        setForm((current) => ({ ...current, [field]: value }));
+    };
 
     useEffect(() => {
         refresh().catch(() => undefined);
@@ -61,7 +64,7 @@ export default () => {
                         id={'allocationIp'}
                         className={inputClassName}
                         value={form.allocationIp}
-                        onChange={(event) => setForm((current) => ({ ...current, allocationIp: event.target.value }))}
+                        onChange={(event) => updateField('allocationIp', event.target.value)}
                         disabled={submitting}
                         required
                     />
@@ -72,7 +75,7 @@ export default () => {
                         id={'allocationPorts'}
                         className={inputClassName}
                         value={form.allocationPorts}
-                        onChange={(event) => setForm((current) => ({ ...current, allocationPorts: event.target.value }))}
+                        onChange={(event) => updateField('allocationPorts', event.target.value)}
                         disabled={submitting}
                         required
                     />

@@ -8,7 +8,6 @@ import { object, string } from 'yup';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import FlashMessageRender from '@/components/FlashMessageRender';
-import AuthFooter from '@/components/auth/AuthFooter';
 
 interface Values {
     email: string;
@@ -204,8 +203,6 @@ export default () => {
                     </Link>
                 </p>
             </div>
-
-            <AuthFooter />
         </div>
     );
 };

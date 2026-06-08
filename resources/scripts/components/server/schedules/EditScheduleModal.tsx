@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Schedule } from '@/api/server/schedules/getServerSchedules';
-import Field from '@/components/elements/Field';
 import { Form, Formik, FormikHelpers } from 'formik';
-import FormikSwitch from '@/components/elements/FormikSwitch';
 import createOrUpdateSchedule from '@/api/server/schedules/createOrUpdateSchedule';
 import { ServerContext } from '@/state/server';
 import { httpErrorToHuman } from '@/api/http';
@@ -12,12 +10,11 @@ import tw from 'twin.macro';
 import { Button } from '@/components/elements/button/index';
 import ModalContext from '@/context/ModalContext';
 import asModal from '@/hoc/asModal';
-import Switch from '@/components/elements/Switch';
-import ScheduleCheatsheetCards from '@/components/server/schedules/ScheduleCheatsheetCards';
+import ScheduleFormFields from '@/components/server/schedules/ScheduleFormFields';
 
-interface Props {
-    schedule?: Schedule;
-}
+type Props = {
+    schedule: Schedule;
+};
 
 interface Values {
     name: string;
@@ -36,18 +33,19 @@ const EditScheduleModal = ({ schedule }: Props) => {
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const appendSchedule = ServerContext.useStoreActions((actions) => actions.schedules.appendSchedule);
-    const [showCheatsheet, setShowCheetsheet] = useState(false);
+    const [showCheatsheet, setShowCheatsheet] = useState(false);
 
-    useEffect(() => {
-        return () => {
+    useEffect(
+        () => () => {
             clearFlashes('automation:edit');
-        };
-    }, []);
+        },
+        [clearFlashes]
+    );
 
     const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         clearFlashes('automation:edit');
         createOrUpdateSchedule(uuid, {
-            id: schedule?.id,
+            id: schedule.id,
             name: values.name,
             cron: {
                 minute: values.minute,
@@ -59,14 +57,13 @@ const EditScheduleModal = ({ schedule }: Props) => {
             onlyWhenOnline: values.onlyWhenOnline,
             isActive: values.enabled,
         })
-            .then((schedule) => {
+            .then((updated) => {
                 setSubmitting(false);
-                appendSchedule(schedule);
+                appendSchedule(updated);
                 dismiss();
             })
             .catch((error) => {
                 console.error(error);
-
                 setSubmitting(false);
                 addError({ key: 'automation:edit', message: httpErrorToHuman(error) });
             });
@@ -77,68 +74,28 @@ const EditScheduleModal = ({ schedule }: Props) => {
             onSubmit={submit}
             initialValues={
                 {
-                    name: schedule?.name || '',
-                    minute: schedule?.cron.minute || '*/5',
-                    hour: schedule?.cron.hour || '*',
-                    dayOfMonth: schedule?.cron.dayOfMonth || '*',
-                    month: schedule?.cron.month || '*',
-                    dayOfWeek: schedule?.cron.dayOfWeek || '*',
-                    enabled: schedule?.isActive ?? true,
-                    onlyWhenOnline: schedule?.onlyWhenOnline ?? true,
+                    name: schedule.name,
+                    minute: schedule.cron.minute,
+                    hour: schedule.cron.hour,
+                    dayOfMonth: schedule.cron.dayOfMonth,
+                    month: schedule.cron.month,
+                    dayOfWeek: schedule.cron.dayOfWeek,
+                    enabled: schedule.isActive,
+                    onlyWhenOnline: schedule.onlyWhenOnline,
                 } as Values
             }
         >
             {({ isSubmitting }) => (
                 <Form>
-                    <h3 css={tw`text-2xl mb-6`}>{schedule ? 'Edit automation' : 'Create new automation'}</h3>
+                    <h3 css={tw`text-2xl mb-6`}>Edit automation</h3>
                     <FlashMessageRender byKey={'automation:edit'} css={tw`mb-6`} />
-                    <Field
-                        name={'name'}
-                        label={'Automation name'}
-                        description={'A human readable identifier for this automation.'}
+                    <ScheduleFormFields
+                        showCheatsheet={showCheatsheet}
+                        onToggleCheatsheet={() => setShowCheatsheet((value) => !value)}
                     />
-                    <div css={tw`grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6`}>
-                        <Field name={'minute'} label={'Minute'} />
-                        <Field name={'hour'} label={'Hour'} />
-                        <Field name={'dayOfMonth'} label={'Day of month'} />
-                        <Field name={'month'} label={'Month'} />
-                        <Field name={'dayOfWeek'} label={'Day of week'} />
-                    </div>
-                    <p css={tw`text-neutral-400 text-xs mt-2`}>
-                        Automations support Cronjob syntax for defining when tasks should run. Use the fields above
-                        to specify when these tasks should begin running.
-                    </p>
-                    <div css={tw`mt-6 bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
-                        <Switch
-                            name={'show_cheatsheet'}
-                            description={'Show the cron cheatsheet for some examples.'}
-                            label={'Show Cheatsheet'}
-                            defaultChecked={showCheatsheet}
-                            onChange={() => setShowCheetsheet((s) => !s)}
-                        />
-                        {showCheatsheet && (
-                            <div css={tw`block md:flex w-full`}>
-                                <ScheduleCheatsheetCards />
-                            </div>
-                        )}
-                    </div>
-                    <div css={tw`mt-6 bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
-                        <FormikSwitch
-                            name={'onlyWhenOnline'}
-                            description={'Only execute this automation when the server is in a running state.'}
-                            label={'Only When Server Is Online'}
-                        />
-                    </div>
-                    <div css={tw`mt-6 bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
-                        <FormikSwitch
-                            name={'enabled'}
-                            description={'This automation will be executed automatically if enabled.'}
-                            label={'Automation enabled'}
-                        />
-                    </div>
                     <div css={tw`mt-6 text-right`}>
                         <Button className={'w-full sm:w-auto'} type={'submit'} disabled={isSubmitting}>
-                            {schedule ? 'Save changes' : 'Create automation'}
+                            Save changes
                         </Button>
                     </div>
                 </Form>

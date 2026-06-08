@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import useFlash from '@/plugins/useFlash';
-import AuthFooter from '@/components/auth/AuthFooter';
 import http from '@/api/http';
 import { REALM_LOGO } from '@/lib/branding';
 
@@ -241,8 +240,6 @@ const OAuthCompleteContainer = ({ history }: RouteComponentProps) => {
                     </div>
                 )}
             </div>
-
-            <AuthFooter />
         </div>
     );
 };

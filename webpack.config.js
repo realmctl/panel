@@ -7,6 +7,30 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+const resolveDevCert = (filename) => {
+    const candidates = [
+        path.join('/etc/certs', filename),
+        path.join(__dirname, '../development/docker/certificates', filename),
+        path.join(__dirname, '../../docker/certificates', filename),
+    ];
+
+    for (const candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+            return candidate;
+        }
+    }
+
+    return candidates[0];
+};
+
+const devHttpsOptions = process.env.USE_LOCAL_CERTS
+    ? {
+          ca: resolveDevCert('root_ca.pem'),
+          cert: resolveDevCert('realm.test.pem'),
+          key: resolveDevCert('realm.test-key.pem'),
+      }
+    : undefined;
+
 // Read .env file to get MOCK_SERVERS and other custom vars
 const envPath = path.join(__dirname, '.env');
 if (fs.existsSync(envPath)) {
@@ -187,16 +211,11 @@ module.exports = {
     },
     devServer: {
         compress: true,
+        host: '0.0.0.0',
         port: 5173,
         server: {
             type: 'https',
-            options: process.env.USE_LOCAL_CERTS
-                ? {
-                      ca: path.join(__dirname, '../../docker/certificates/root_ca.pem'),
-                      cert: path.join(__dirname, '../../docker/certificates/realm.test.pem'),
-                      key: path.join(__dirname, '../../docker/certificates/realm.test-key.pem'),
-                  }
-                : undefined,
+            options: devHttpsOptions,
         },
         static: {
             directory: path.join(__dirname, '/public'),

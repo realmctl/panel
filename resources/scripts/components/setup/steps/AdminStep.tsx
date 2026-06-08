@@ -27,7 +27,8 @@ export default () => {
     });
 
     const onChange = (field: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setForm((current) => ({ ...current, [field]: event.target.value }));
+        const { value } = event.target;
+        setForm((current) => ({ ...current, [field]: value }));
         setErrors((current) => ({ ...current, [field]: '' }));
     };
 

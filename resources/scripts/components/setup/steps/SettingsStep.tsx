@@ -19,6 +19,9 @@ export default () => {
         locale: 'en',
         registrationEnabled: false,
     });
+    const updateField = <K extends keyof typeof form>(field: K, value: (typeof form)[K]) => {
+        setForm((current) => ({ ...current, [field]: value }));
+    };
 
     useEffect(() => {
         if (!status) {
@@ -54,7 +57,7 @@ export default () => {
                         id={'panelName'}
                         className={inputClassName}
                         value={form.name}
-                        onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                        onChange={(event) => updateField('name', event.target.value)}
                         disabled={submitting}
                         required
                     />
@@ -65,7 +68,7 @@ export default () => {
                         id={'panelLocale'}
                         className={selectClassName}
                         value={form.locale}
-                        onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))}
+                        onChange={(event) => updateField('locale', event.target.value)}
                         disabled={submitting}
                     >
                         {Object.entries(status?.context.locales || { en: 'English' }).map(([code, label]) => (
@@ -86,10 +89,7 @@ export default () => {
                         className={selectClassName}
                         value={form.registrationEnabled ? 'true' : 'false'}
                         onChange={(event) =>
-                            setForm((current) => ({
-                                ...current,
-                                registrationEnabled: event.target.value === 'true',
-                            }))
+                            updateField('registrationEnabled', event.target.value === 'true')
                         }
                         disabled={submitting}
                     >
