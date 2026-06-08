@@ -1,0 +1,14 @@
+import styled from 'styled-components/macro';
+import tw from 'twin.macro';
+
+export default styled.div<{ $hoverable?: boolean }>`
+    ${tw`flex rounded no-underline text-neutral-200 items-center p-4 border border-transparent transition-colors duration-150 overflow-hidden`};
+    background-color: #192024;
+
+    ${(props) => props.$hoverable !== false && tw`hover:border-neutral-500`};
+
+    & .icon {
+        ${tw`rounded-full w-16 flex items-center justify-center p-3`};
+        background-color: #2d3338;
+    }
+`;

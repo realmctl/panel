@@ -14,7 +14,7 @@ import Can from '@/components/elements/Can';
 import { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import useFlash from '@/plugins/useFlash';
 import tw from 'twin.macro';
-import Button from '@/components/elements/Button';
+import { Button } from '@/components/elements/button/index';
 import Label from '@/components/elements/Label';
 import Input from '@/components/elements/Input';
 import GreyRowBox from '@/components/elements/GreyRowBox';
@@ -86,12 +86,12 @@ export default ({ database, className }: Props) => {
                                 description={'Enter the database name to confirm deletion.'}
                             />
                             <div css={tw`mt-6 text-right`}>
-                                <Button type={'button'} isSecondary css={tw`mr-2`} onClick={() => setVisible(false)}>
+                                <Button.Text type={'button'} css={tw`mr-2`} onClick={() => setVisible(false)}>
                                     Cancel
-                                </Button>
-                                <Button type={'submit'} color={'red'} disabled={!isValid}>
+                                </Button.Text>
+                                <Button.Danger type={'submit'} disabled={!isValid}>
                                     Delete Database
-                                </Button>
+                                </Button.Danger>
                             </div>
                         </Form>
                     </Modal>
@@ -134,9 +134,9 @@ export default ({ database, className }: Props) => {
                     <Can action={'database.update'}>
                         <RotatePasswordButton databaseId={database.id} onUpdate={updateDatabase} />
                     </Can>
-                    <Button isSecondary onClick={() => setConnectionVisible(false)}>
+                    <Button.Text onClick={() => setConnectionVisible(false)}>
                         Close
-                    </Button>
+                    </Button.Text>
                 </div>
             </Modal>
             <div className={className} style={{ backgroundColor: '#192024' }}>

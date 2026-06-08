@@ -8,7 +8,7 @@ import { ServerContext } from '@/state/server';
 import { httpErrorToHuman } from '@/api/http';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import useFlash from '@/plugins/useFlash';
-import Button from '@/components/elements/Button';
+import { Button } from '@/components/elements/button/index';
 import tw from 'twin.macro';
 
 interface Values {
@@ -90,14 +90,13 @@ export default () => {
                                 />
                             </div>
                             <div css={tw`flex flex-wrap justify-end mt-6`}>
-                                <Button
+                                <Button.Text
                                     type={'button'}
-                                    isSecondary
                                     css={tw`w-full sm:w-auto sm:mr-2`}
                                     onClick={() => setVisible(false)}
                                 >
                                     Cancel
-                                </Button>
+                                </Button.Text>
                                 <Button css={tw`w-full mt-4 sm:w-auto sm:mt-0`} type={'submit'}>
                                     Create Database
                                 </Button>

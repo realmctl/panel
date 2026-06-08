@@ -10,7 +10,7 @@ import { ServerContext } from '@/state/server';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Pagination from '@/components/elements/Pagination';
 import { Dialog } from '@/components/elements/dialog';
-import Button from '@/components/elements/Button';
+import { Button } from '@/components/elements/button/index';
 import deleteAllBackups from '@/api/server/backups/deleteAllBackups';
 
 const BackupContainer = () => {
@@ -72,14 +72,13 @@ const BackupContainer = () => {
                     </span>
                     <div className={'flex items-center gap-2'}>
                         <Can action={'backup.delete'}>
-                            <Button
-                                color={'red'}
-                                isSecondary
+                            <Button.Danger
+                                variant={Button.Variants.Secondary}
                                 disabled={deletingAll}
                                 onClick={() => setShowDeleteAllDialog(true)}
                             >
                                 {deletingAll ? 'Deleting…' : 'Delete All'}
-                            </Button>
+                            </Button.Danger>
                         </Can>
                         <Can action={'backup.create'}>
                             {backupLimit > backups.backupCount && <CreateBackupButton />}
