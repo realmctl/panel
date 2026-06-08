@@ -39,7 +39,7 @@ export default ({
         clearFlashes('admin-locations');
 
         createLocation({ short, long })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-locations',
                     type: 'success',

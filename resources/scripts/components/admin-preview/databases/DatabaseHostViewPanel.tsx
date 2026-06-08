@@ -82,7 +82,7 @@ export default () => {
         }
 
         updateDatabaseHost(hostId, payload)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-databases',
                     type: 'success',
@@ -102,7 +102,7 @@ export default () => {
         clearFlashes('admin-databases');
 
         deleteDatabaseHost(hostId)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-databases',
                     type: 'success',

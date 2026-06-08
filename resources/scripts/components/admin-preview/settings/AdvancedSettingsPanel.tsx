@@ -40,7 +40,7 @@ export default () => {
         clearFlashes('admin-settings');
 
         updateAdvancedSettings(form)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-settings',
                     type: 'success',

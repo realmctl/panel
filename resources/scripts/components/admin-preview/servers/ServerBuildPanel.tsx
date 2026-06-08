@@ -131,7 +131,7 @@ export default () => {
             add_allocations: form.add_allocations,
             remove_allocations: form.remove_allocations,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

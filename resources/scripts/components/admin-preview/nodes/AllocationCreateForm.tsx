@@ -48,7 +48,7 @@ export default ({ nodeId, ips, onCreated }: Props) => {
             allocation_alias: form.allocation_alias.trim() || undefined,
             allocation_ports: ports,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-nodes',
                     type: 'success',

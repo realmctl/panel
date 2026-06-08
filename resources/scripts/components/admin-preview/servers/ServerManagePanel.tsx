@@ -80,7 +80,7 @@ export default () => {
         clearFlashes('admin-servers');
 
         action()
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',
@@ -107,7 +107,7 @@ export default () => {
             allocation_id: transferForm.allocation_id,
             allocation_additional: transferForm.allocation_additional,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

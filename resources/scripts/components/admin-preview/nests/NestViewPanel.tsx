@@ -45,7 +45,7 @@ export default () => {
         clearFlashes('admin-nests');
 
         updateNest(nestId, form)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Nest updated', message: response.message });
                 mutate();
             })

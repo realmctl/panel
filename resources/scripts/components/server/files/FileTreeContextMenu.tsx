@@ -268,7 +268,9 @@ export default ({
                             <MenuItem
                                 icon={faFileArchive}
                                 label={'Archive'}
-                                onClick={() => runAction(() => compressFiles(uuid, parentPath, [file.name]))}
+                                onClick={() => runAction(async () => {
+                                    await compressFiles(uuid, parentPath, [file.name]);
+                                })}
                             />
                         </Can>
                     )}

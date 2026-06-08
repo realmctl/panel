@@ -65,7 +65,7 @@ export default () => {
             setSystemInfo((current) => ({ ...current, loading: true }));
 
             getNodeSystemInformation(nodeId)
-                .then((response) => {
+                .then((response: any) => {
                     if (cancelled) return;
                     setSystemInfo({
                         version: response.version,
@@ -101,7 +101,7 @@ export default () => {
         clearFlashes('admin-nodes');
 
         deleteNode(nodeId)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-nodes',
                     type: 'success',

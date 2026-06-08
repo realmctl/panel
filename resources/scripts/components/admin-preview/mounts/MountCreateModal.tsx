@@ -52,7 +52,7 @@ export default ({
             read_only: form.read_only ? 1 : 0,
             user_mountable: form.user_mountable ? 1 : 0,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-mounts',
                     type: 'success',

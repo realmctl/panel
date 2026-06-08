@@ -56,7 +56,7 @@ export default () => {
         clearFlashes('admin-subdomains');
 
         createSubdomainDomain(form)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-subdomains',
                     type: 'success',

@@ -54,7 +54,7 @@ export default () => {
         clearFlashes('admin-api');
 
         createApplicationApiKey(memo, permissions)
-            .then((response) => {
+            .then((response: any) => {
                 setSecretToken(response.secret_token);
                 addFlash({
                     key: 'admin-api',

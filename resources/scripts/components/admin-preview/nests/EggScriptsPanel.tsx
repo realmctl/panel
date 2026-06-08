@@ -55,7 +55,7 @@ export default () => {
             ...form,
             copy_script_from: form.copy_script_from || null,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Script updated', message: response.message });
                 mutate();
             })

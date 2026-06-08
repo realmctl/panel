@@ -101,7 +101,7 @@ export default () => {
         clearFlashes('admin-nodes');
 
         deleteNodeAllocation(nodeId, confirmSingle)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-nodes',
                     type: 'success',
@@ -126,7 +126,7 @@ export default () => {
             nodeId,
             Array.from(selected).map((allocationId) => ({ id: allocationId }))
         )
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-nodes',
                     type: 'success',
@@ -151,7 +151,7 @@ export default () => {
         clearFlashes('admin-nodes');
 
         deleteNodeAllocationBlock(nodeId, blockIp)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-nodes',
                     type: 'success',

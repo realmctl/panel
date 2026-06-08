@@ -85,7 +85,7 @@ export default () => {
         }
 
         updateUser(userId, payload)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-users',
                     type: 'success',

@@ -65,7 +65,7 @@ export default () => {
         clearFlashes('admin-nests');
 
         createEgg(formToEggPayload(form))
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Egg created', message: response.message });
                 history.push(`${adminPreviewBasePath}/nests/eggs/${response.egg!.id}`);
             })

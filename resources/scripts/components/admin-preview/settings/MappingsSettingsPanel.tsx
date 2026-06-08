@@ -57,7 +57,7 @@ export default () => {
         clearFlashes('admin-settings');
 
         updateMappingsSettings(mappings)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-settings',
                     type: 'success',

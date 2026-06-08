@@ -69,7 +69,7 @@ export default () => {
             remote: form.remote.trim(),
             max_connections: form.max_connections ? Number(form.max_connections) : null,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',
@@ -90,7 +90,7 @@ export default () => {
         clearFlashes('admin-servers');
 
         resetServerDatabasePassword(serverId, databaseId)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',
@@ -111,7 +111,7 @@ export default () => {
         clearFlashes('admin-servers');
 
         deleteServerDatabase(serverId, confirmDelete)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

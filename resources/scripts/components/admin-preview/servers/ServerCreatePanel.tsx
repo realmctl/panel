@@ -146,7 +146,7 @@ export default () => {
 
         const timeout = window.setTimeout(() => {
             searchUsers(ownerQuery.trim())
-                .then((response) => setOwnerResults(response.users))
+                .then((response: any) => setOwnerResults(response.users))
                 .catch(() => setOwnerResults([]));
         }, 250);
 
@@ -287,7 +287,7 @@ export default () => {
             skip_scripts: form.skip_scripts,
             environment: form.environment,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

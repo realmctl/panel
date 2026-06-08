@@ -37,7 +37,7 @@ export default () => {
         const action = mounted ? removeServerMount(serverId, mountId) : addServerMount(serverId, mountId);
 
         action
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

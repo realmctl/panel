@@ -120,7 +120,7 @@ export default () => {
             return;
         }
 
-        history.replace(settingsPath(legacyTab === 'details' ? 'general' : legacyTab));
+        history.replace(settingsPath(legacyTab));
     }, [history, location.search, settingsPath, tabParam]);
 
     useEffect(() => {

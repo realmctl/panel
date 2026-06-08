@@ -90,7 +90,7 @@ export default () => {
         clearFlashes('admin-nodes');
 
         createNode(form)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-nodes',
                     type: 'success',

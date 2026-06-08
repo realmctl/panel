@@ -116,7 +116,7 @@ export default ({ config, embedded = false, filePath, initialContent, onSaved }:
                     return;
                 }
 
-                if (error?.response?.status === 404) {
+                if ((error as any)?.response?.status === 404) {
                     setMissing(true);
                     initialContentRef.current = '';
                     setRawContent('');

@@ -44,7 +44,7 @@ export default () => {
         clearFlashes('admin-nodes');
 
         generateNodeDeployToken(nodeId)
-            .then((response) => {
+            .then((response: any) => {
                 const lines = [
                     'cd /etc/realm && sudo wings configure \\',
                     `  --panel-url ${response.panel_url} \\`,

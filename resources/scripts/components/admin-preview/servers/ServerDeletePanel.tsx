@@ -36,7 +36,7 @@ export default () => {
         clearFlashes('admin-servers');
 
         deleteServer(serverId, force)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

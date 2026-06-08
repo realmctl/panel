@@ -65,7 +65,7 @@ export default () => {
         clearFlashes('admin-nests');
 
         updateEgg(eggId, formToEggPayload(form))
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Egg updated', message: response.message });
                 mutate();
             })
@@ -81,7 +81,7 @@ export default () => {
         clearFlashes('admin-nests');
 
         importUpdateEgg(eggId, importFile)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Egg updated', message: response.message });
                 setImportFile(null);
                 mutate();
@@ -93,7 +93,7 @@ export default () => {
     const onDelete = () => {
         setDeleting(true);
         deleteEgg(eggId)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Egg deleted', message: 'Egg removed.' });
                 history.push(`${adminPreviewBasePath}/nests/${response.nest_id}`);
             })

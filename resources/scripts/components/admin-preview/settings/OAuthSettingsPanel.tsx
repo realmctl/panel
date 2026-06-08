@@ -103,7 +103,7 @@ export default () => {
         clearFlashes('admin-settings');
 
         updateOAuthSettings(form)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-settings',
                     type: 'success',

@@ -71,7 +71,7 @@ export default () => {
             ...form,
             domain_id: form.domain_id,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-subdomains',
                     type: 'success',

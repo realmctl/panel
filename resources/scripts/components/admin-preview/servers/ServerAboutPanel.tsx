@@ -48,7 +48,7 @@ export default () => {
         clearFlashes('admin-servers');
 
         duplicateServer(serverId)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

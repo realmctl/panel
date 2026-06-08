@@ -48,7 +48,7 @@ export default () => {
         clearFlashes('admin-locations');
 
         updateLocation(locationId, { short, long })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-locations',
                     type: 'success',
@@ -68,7 +68,7 @@ export default () => {
         clearFlashes('admin-locations');
 
         deleteLocation(locationId)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-locations',
                     type: 'success',

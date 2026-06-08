@@ -75,7 +75,7 @@ export const SettingsSection = ({
     children,
 }: {
     title: string;
-    description: string;
+    description: React.ReactNode;
     children: React.ReactNode;
 }) => (
     <div className="overflow-hidden rounded-md border border-border bg-card">

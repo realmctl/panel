@@ -20,7 +20,7 @@ export default () => {
         clearFlashes('admin-nests');
 
         createNest(form)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Nest created', message: response.message });
                 history.push(`${adminPreviewBasePath}/nests/${response.nest!.id}`);
             })

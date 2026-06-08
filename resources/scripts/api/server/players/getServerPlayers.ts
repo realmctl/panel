@@ -68,7 +68,7 @@ const mapStatus = (attributes: Record<string, unknown>): MinecraftServerStatus =
         players: {
             online: Number(players?.online ?? 0),
             max: Number(players?.max ?? 0),
-            list: Array.isArray(players?.list) ? players.list.map((entry) => mapPlayer(entry as Record<string, unknown>)) : [],
+            list: Array.isArray(players?.list) ? (players?.list ?? []).map((entry) => mapPlayer(entry as Record<string, unknown>)) : [],
         },
     };
 };

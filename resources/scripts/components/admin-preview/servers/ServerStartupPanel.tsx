@@ -122,7 +122,7 @@ export default () => {
             skip_scripts: form.skip_scripts ? 1 : 0,
             environment: form.environment,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-servers',
                     type: 'success',

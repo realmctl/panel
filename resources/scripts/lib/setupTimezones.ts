@@ -24,9 +24,8 @@ export const getSetupTimezones = (): string[] => {
 
     if (typeof Intl !== 'undefined' && 'supportedValuesOf' in Intl) {
         try {
-            cachedTimezones = (Intl as { supportedValuesOf: (key: string) => string[] }).supportedValuesOf(
-                'timeZone'
-            );
+            const result = (Intl as any).supportedValuesOf('timeZone') as string[];
+            cachedTimezones = result;
             return cachedTimezones;
         } catch {
             // Fall through to static list.

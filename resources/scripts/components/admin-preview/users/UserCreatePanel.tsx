@@ -59,7 +59,7 @@ export default () => {
             root_admin: form.root_admin ? 1 : 0,
             password: form.password || undefined,
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-users',
                     type: 'success',

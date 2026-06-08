@@ -95,7 +95,7 @@ export default () => {
         clearFlashes('admin-settings');
 
         updateMailSettings(buildPayload())
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-settings',
                     type: 'success',
@@ -118,7 +118,7 @@ export default () => {
 
         updateMailSettings(buildPayload())
             .then(() => testMailSettings())
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-settings',
                     type: 'success',

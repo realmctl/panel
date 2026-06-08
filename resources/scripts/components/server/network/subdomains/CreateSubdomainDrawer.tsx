@@ -63,7 +63,7 @@ const CreateSubdomainDrawer = ({ visible, templates, onDismissed }: Props) => {
         clearFlashes();
 
         if (!template) {
-            clearAndAddHttpError({ message: 'Template not found.' });
+            clearAndAddHttpError(new Error('Template not found.'));
             setSubmitting(false);
             return;
         }

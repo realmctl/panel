@@ -46,7 +46,7 @@ export default () => {
         clearFlashes('admin-databases');
 
         createDatabaseHost(form)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({
                     key: 'admin-databases',
                     type: 'success',

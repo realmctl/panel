@@ -48,7 +48,7 @@ export default ({
         clearFlashes('admin-nests');
 
         importEgg(file, nestId)
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Egg imported', message: response.message });
                 reset();
                 onClose();

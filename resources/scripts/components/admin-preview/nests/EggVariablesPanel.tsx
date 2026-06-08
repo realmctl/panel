@@ -61,7 +61,7 @@ const VariableCard = ({
                 ...(form.user_editable ? ['user_editable'] : []),
             ],
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Variable updated', message: response.message });
                 onMutate();
             })
@@ -236,7 +236,7 @@ export default () => {
                 ...(createForm.user_editable ? ['user_editable'] : []),
             ],
         })
-            .then((response) => {
+            .then((response: any) => {
                 addFlash({ key: 'admin-nests', type: 'success', title: 'Variable created', message: response.message });
                 setCreateOpen(false);
                 setCreateForm(defaultVariable());
