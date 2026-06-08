@@ -51,6 +51,18 @@
         }
     }
 
+    &.installing_quiet {
+        & #terminal {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+
+    & .install_placeholder {
+        @apply absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-[1];
+        pointer-events: none;
+    }
+
     & .command_icon {
         @apply flex items-center top-0 left-0 absolute z-10 select-none h-full px-3 transition-colors duration-100;
         color: #6b7280;

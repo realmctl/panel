@@ -19,6 +19,13 @@ import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
 
 import 'xterm/css/xterm.css';
 import { formatConsoleLine, formatDaemonErrorLine } from '@/components/server/console/consoleLogFormat';
+import InstallProgressPanel from '@/components/server/console/InstallProgressPanel';
+import {
+    createInitialInstallProgress,
+    InstallProgressState,
+    isNoisyInstallLine,
+    parseInstallLine,
+} from '@/components/server/console/installProgressParser';
 import styles from './style.module.css';
 
 /** Wings (node daemon) console prefix — shown in blue for system messages. */
@@ -105,9 +112,12 @@ export default () => {
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
     const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
+    const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data!.isTransferring);
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
+    const [installProgress, setInstallProgress] = useState<InstallProgressState>(() => createInitialInstallProgress());
+    const [showRawInstallLogs, setShowRawInstallLogs] = useState(false);
     // SearchBarAddon has hardcoded z-index: 999 :(
     const zIndex = `
     .xterm-search-bar__addon {
@@ -147,6 +157,23 @@ export default () => {
             case 'failure':
                 terminal.writeln(TERMINAL_PRELUDE + formatConsoleLine('ERROR: Transfer has failed.'));
                 return;
+        }
+    };
+
+    const handleInstallOutput = (line: string) => {
+        setInstallProgress((current) => parseInstallLine(current, line));
+
+        if (showRawInstallLogs || !isNoisyInstallLine(line)) {
+            handleConsoleOutput(line);
+        }
+    };
+
+    const handleDaemonMessageDuringInstall = (line: string) => {
+        const normalized = normalizeConsoleLine(line);
+        setInstallProgress((current) => parseInstallLine(current, normalized));
+
+        if (showRawInstallLogs) {
+            handleConsoleOutput(line, true);
         }
     };
 
@@ -252,19 +279,36 @@ export default () => {
     }, [connected]);
 
     useEffect(() => {
+        if (!isInstalling) {
+            return;
+        }
+
+        setInstallProgress(createInitialInstallProgress());
+        setShowRawInstallLogs(false);
+
+        if (connected && terminal.element) {
+            terminal.clear();
+        }
+    }, [isInstalling]);
+
+    useEffect(() => {
+        const installOutputHandler = (line: string) => handleInstallOutput(line);
+        const daemonMessageHandler = (line: string) =>
+            isInstalling ? handleDaemonMessageDuringInstall(line) : handleConsoleOutput(line, true);
+
         const listeners: Record<string, (s: string) => void> = {
             [SocketEvent.STATUS]: handlePowerChangeEvent,
             [SocketEvent.CONSOLE_OUTPUT]: handleConsoleOutput,
-            [SocketEvent.INSTALL_OUTPUT]: handleConsoleOutput,
+            [SocketEvent.INSTALL_OUTPUT]: isInstalling ? installOutputHandler : handleConsoleOutput,
             [SocketEvent.TRANSFER_LOGS]: handleConsoleOutput,
             [SocketEvent.TRANSFER_STATUS]: handleTransferStatus,
-            [SocketEvent.DAEMON_MESSAGE]: (line) => handleConsoleOutput(line, true),
+            [SocketEvent.DAEMON_MESSAGE]: daemonMessageHandler,
             [SocketEvent.DAEMON_ERROR]: handleDaemonErrorOutput,
         };
 
         if (connected && instance) {
             // Do not clear the console if the server is being transferred.
-            if (!isTransferring) {
+            if (!isTransferring && !isInstalling) {
                 terminal.clear();
             }
 
@@ -281,17 +325,38 @@ export default () => {
                 });
             }
         };
-    }, [connected, instance]);
+    }, [connected, instance, isInstalling, showRawInstallLogs, isTransferring]);
 
     return (
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
-            <div className={classNames(styles.container, styles.overflows_container)}>
+            <div
+                className={classNames(
+                    styles.container,
+                    styles.overflows_container,
+                    isInstalling && !showRawInstallLogs && styles.installing_quiet
+                )}
+            >
                 <div className={styles.terminal_shell}>
+                    {isInstalling && !showRawInstallLogs && (
+                        <div className={styles.install_placeholder}>
+                            <p className={'text-sm text-neutral-300 font-medium'}>Installing server…</p>
+                            <p className={'text-xs text-neutral-500 mt-1'}>
+                                Progress is shown below. Use &quot;Show logs&quot; for raw installer output.
+                            </p>
+                        </div>
+                    )}
                     <div id={styles.terminal} ref={ref} />
                 </div>
             </div>
-            {canSendCommands && (
+            {isInstalling && (
+                <InstallProgressPanel
+                    progress={installProgress}
+                    showRawLogs={showRawInstallLogs}
+                    onToggleRawLogs={() => setShowRawInstallLogs((current) => !current)}
+                />
+            )}
+            {canSendCommands && !isInstalling && (
                 <div className={classNames('relative', styles.overflows_container)}>
                     <input
                         className={classNames('peer', styles.command_input)}
