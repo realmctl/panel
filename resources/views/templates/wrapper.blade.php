@@ -31,8 +31,6 @@
         @show
 
         @yield('assets')
-
-        @include('layouts.scripts')
     </head>
     <body class="{{ $css['body'] ?? 'bg-neutral-50' }}" @if(isset($css['bodyStyle'])) style="{{ $css['bodyStyle'] }}" @endif>
         @section('content')

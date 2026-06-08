@@ -23,7 +23,9 @@ class LoginController extends AbstractLoginController
      */
     public function index(): View
     {
-        return view('templates/auth.core');
+        return view('templates.spa', [
+            'css' => ['body' => 'bg-neutral-900'],
+        ]);
     }
 
     /**

@@ -47,7 +47,7 @@ class SetupController extends AbstractLoginController
 
     public function index(): View
     {
-        return view('templates/setup.core');
+        return view('templates.spa');
     }
 
     public function status(): JsonResponse

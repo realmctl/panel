@@ -1,1 +1,0 @@
-@extends('tablar::auth.verify')
