@@ -41,7 +41,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     /**
      * Ensure that errors are not thrown back when passing in expected values.
      *
-     * @see https://github.com/realmopensource/panel/issues/2529
+     * @see https://github.com/realmctl/panel/issues/2529
      */
     public function testNoExceptionIsThrownIfStringifiedIntegersArePassedForLocations()
     {

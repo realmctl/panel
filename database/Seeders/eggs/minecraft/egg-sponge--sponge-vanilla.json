@@ -14,11 +14,11 @@
         "pid_limit"
     ],
     "docker_images": {
-        "Java 25": "ghcr.io\/realmopensource\/yolks:java_25",
-        "Java 21": "ghcr.io\/realmopensource\/yolks:java_21",
-        "Java 16": "ghcr.io\/realmopensource\/yolks:java_16",
-        "Java 11": "ghcr.io\/realmopensource\/yolks:java_11",
-        "Java 8": "ghcr.io\/realmopensource\/yolks:java_8"
+        "Java 25": "ghcr.io\/realmctl\/yolks:java_25",
+        "Java 21": "ghcr.io\/realmctl\/yolks:java_21",
+        "Java 16": "ghcr.io\/realmctl\/yolks:java_16",
+        "Java 11": "ghcr.io\/realmctl\/yolks:java_11",
+        "Java 8": "ghcr.io\/realmctl\/yolks:java_8"
     },
     "file_denylist": [],
     "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
@@ -31,7 +31,7 @@
     "scripts": {
         "installation": {
             "script": "#!\/bin\/ash\r\n# Sponge Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n\r\ncd \/mnt\/server\r\n\r\ncurl -sSL \"https:\/\/repo.spongepowered.org\/maven\/org\/spongepowered\/spongevanilla\/${SPONGE_VERSION}\/spongevanilla-${SPONGE_VERSION}.jar\" -o ${SERVER_JARFILE}",
-            "container": "ghcr.io\/realmopensource\/installers:alpine",
+            "container": "ghcr.io\/realmctl\/installers:alpine",
             "entrypoint": "ash"
         }
     },

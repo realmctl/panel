@@ -1,4 +1,4 @@
-const YOLK_BASE = 'ghcr.io/realmopensource/yolks';
+const YOLK_BASE = 'ghcr.io/realmctl/yolks';
 
 const JAVA_ORDER = ['java_8', 'java_11', 'java_16', 'java_17', 'java_21'] as const;
 

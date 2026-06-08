@@ -129,7 +129,7 @@ class ScheduleController extends ClientApiController
         // Toggle the processing state of the scheduled task when it is enabled or disabled so that an
         // invalid state can be reset without manual database intervention.
         //
-        // @see https://github.com/realmopensource/panel/issues/2425
+        // @see https://github.com/realmctl/panel/issues/2425
         if ($schedule->is_active !== $active) {
             $data['is_processing'] = false;
         }

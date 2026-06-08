@@ -46,7 +46,7 @@ the asset URLs used in Realm.
 
 #### Development Environment
 
-If you're using the [`realmopensource/development`](https://github.com/realmopensource/development) environments, which are
+If you're using the [`realmctl/development`](https://github.com/realmctl/development) environments, which are
 highly recommended, you can just run `yarn run serve` to run the HMR server, no additional configuration is necessary.
 
 ### Building for Production

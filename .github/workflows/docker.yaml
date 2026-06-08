@@ -9,7 +9,7 @@ on:
       - published
 
 env:
-  IMAGE: ghcr.io/realmopensource/panel
+  IMAGE: ghcr.io/realmctl/panel
 
 jobs:
   build:

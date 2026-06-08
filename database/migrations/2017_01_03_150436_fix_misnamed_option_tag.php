@@ -13,7 +13,7 @@ class FixMisnamedOptionTag extends Migration
             DB::table('service_options')->where([
                 ['name', 'Sponge (SpongeVanilla)'],
                 ['tag', 'spigot'],
-                ['docker_image', 'ghcr.io/realmopensource/yolks:java_17'],
+                ['docker_image', 'ghcr.io/realmctl/yolks:java_17'],
             ])->update([
                 'tag' => 'sponge',
             ]);
@@ -28,7 +28,7 @@ class FixMisnamedOptionTag extends Migration
         DB::table('service_options')->where([
             ['name', 'Sponge (SpongeVanilla)'],
             ['tag', 'sponge'],
-            ['docker_image', 'ghcr.io/realmopensource/yolks:java_17'],
+            ['docker_image', 'ghcr.io/realmctl/yolks:java_17'],
         ])->update([
             'tag' => 'spigot',
         ]);

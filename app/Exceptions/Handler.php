@@ -136,7 +136,7 @@ class Handler extends ExceptionHandler
         // much as possible at the code level, but there are a lot of spots that do a
         // ton of actions and were written before this bug discovery was made.
         //
-        // @see https://github.com/realmopensource/panel/pull/1468
+        // @see https://github.com/realmctl/panel/pull/1468
         if ($connections->transactionLevel()) {
             $connections->rollBack(0);
         }

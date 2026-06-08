@@ -46,7 +46,7 @@ services:
     image: redis:alpine
     restart: always
   panel:
-    image: ghcr.io/realmopensource/panel:latest
+    image: ghcr.io/realmctl/panel:latest
     restart: always
     ports:
       - "80:80"

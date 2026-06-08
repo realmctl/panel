@@ -59,7 +59,7 @@
         };
 
         packages.development = pkgs.dockerTools.buildImage {
-          name = "realmopensource/development";
+          name = "realmctl/development";
           tag = "panel";
 
           copyToRoot = pkgs.buildEnv (let

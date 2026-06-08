@@ -1,9 +1,9 @@
 [![Logo Image](https://cdn.ordnary.com/readme.png)](https://realmctl.com)
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/realmopensource/panel/ci.yaml?label=Tests&style=for-the-badge&branch=1.0-develop)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/realmctl/panel/ci.yaml?label=Tests&style=for-the-badge&branch=1.0-develop)
 ![Discord](https://img.shields.io/discord/1509949313982267572?label=Discord&logo=Discord&logoColor=white&style=for-the-badge)
-![GitHub Releases](https://img.shields.io/github/downloads/realmopensource/panel/latest/total?style=for-the-badge)
-![GitHub contributors](https://img.shields.io/github/contributors/realmopensource/panel?style=for-the-badge)
+![GitHub Releases](https://img.shields.io/github/downloads/realmctl/panel/latest/total?style=for-the-badge)
+![GitHub contributors](https://img.shields.io/github/contributors/realmctl/panel?style=for-the-badge)
 
 # Realm Panel
 

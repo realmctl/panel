@@ -63,7 +63,7 @@ export default () => {
     const resourceLinks = [
         { label: 'Get help', description: 'Discord', href: version?.discord || 'https://realmctl.com/discord' },
         { label: 'Documentation', description: 'realmctl.com', href: 'https://realmctl.com' },
-        { label: 'GitHub', description: 'Source code', href: 'https://github.com/realmopensource/panel' },
+        { label: 'GitHub', description: 'Source code', href: 'https://github.com/realmctl/panel' },
         {
             label: 'Support the project',
             description: 'Donate',
@@ -147,7 +147,7 @@ export default () => {
                                             </code>
                                             , but a newer release is available:{' '}
                                             <a
-                                                href={`https://github.com/realmopensource/panel/releases/v${latestVersion}`}
+                                                href={`https://github.com/realmctl/panel/releases/v${latestVersion}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-400 hover:text-blue-300"
@@ -192,7 +192,7 @@ export default () => {
                                                 <span className="ml-1.5 text-xs text-emerald-400">· Installed</span>
                                             ) : (
                                                 <a
-                                                    href={`https://github.com/realmopensource/panel/releases/v${latestVersion}`}
+                                                    href={`https://github.com/realmctl/panel/releases/v${latestVersion}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="ml-1.5 inline-flex items-center gap-0.5 text-xs text-blue-400 no-underline hover:text-blue-300"

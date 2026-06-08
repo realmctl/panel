@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
         // this should just work with the proxy logic, but there are a lot of cases where it
         // doesn't, and it triggers a lot of support requests, so lets just head it off here.
         //
-        // @see https://github.com/realmopensource/panel/issues/3623
+        // @see https://github.com/realmctl/panel/issues/3623
         if (Str::startsWith(config('app.url') ?? '', 'https://')) {
             URL::forceScheme('https');
         }

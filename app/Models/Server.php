@@ -304,7 +304,7 @@ class Server extends Model implements Identifiable
                 // would actually return all the variables and their values for _all_ servers using that egg,
                 // rather than only the server for this model.
                 //
-                // @see https://github.com/realmopensource/panel/issues/2250
+                // @see https://github.com/realmctl/panel/issues/2250
                 $join->on('server_variables.variable_id', 'egg_variables.id')
                     ->where('server_variables.server_id', $this->id);
             });
