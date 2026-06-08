@@ -3,6 +3,7 @@
 namespace Realm\Repositories\Wings;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 use Realm\Models\Node;
 use Webmozart\Assert\Assert;
 use Realm\Models\Server;
@@ -13,6 +14,16 @@ abstract class DaemonRepository
     protected ?Server $server;
 
     protected ?Node $node;
+
+    /**
+     * A single, shared Guzzle handler stack reused across every client this
+     * process creates. Sharing the underlying cURL handler keeps its
+     * connection pool alive between calls, so repeated requests to the same
+     * daemon reuse an established TCP + TLS connection instead of paying for a
+     * fresh handshake each time. That handshake is the dominant per-request
+     * cost whenever the panel reaches the daemon through a proxy or tunnel.
+     */
+    private static ?HandlerStack $handlerStack = null;
 
     /**
      * DaemonRepository constructor.
@@ -50,7 +61,12 @@ abstract class DaemonRepository
     {
         Assert::isInstanceOf($this->node, Node::class);
 
+        if (self::$handlerStack === null) {
+            self::$handlerStack = HandlerStack::create();
+        }
+
         return new Client([
+            'handler' => self::$handlerStack,
             'verify' => $this->app->environment('production'),
             'base_uri' => $this->node->getConnectionAddress(),
             'timeout' => config('realm.guzzle.timeout'),
@@ -59,6 +75,7 @@ abstract class DaemonRepository
                 'Authorization' => 'Bearer ' . $this->node->getDecryptedKey(),
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
+                'Connection' => 'keep-alive',
             ]),
         ]);
     }

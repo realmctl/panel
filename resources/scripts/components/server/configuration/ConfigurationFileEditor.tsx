@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import getFileContents from '@/api/server/files/getFileContents';
 import saveFileContents from '@/api/server/files/saveFileContents';
 import { httpErrorToHuman } from '@/api/http';
@@ -17,14 +17,20 @@ import { parsePropertiesFile, serializePropertiesFile, PropertiesLine } from '@/
 import { encodePathSegments } from '@/helpers';
 import styles from './style.module.css';
 
+const saveShortcutLabel =
+    typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? '⌘S' : 'Ctrl+S';
+
 interface Props {
     config: MinecraftConfigDefinition;
+    embedded?: boolean;
+    filePath?: string;
+    onSaved?: (content: string) => void;
 }
 
-export default ({ config }: Props) => {
+export default ({ config, embedded = false, filePath, onSaved }: Props) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
-    const { clearFlashes, addError } = useFlashKey('server:configuration');
+    const { clearFlashes, addError } = useFlashKey(embedded ? 'files:editor' : 'server:configuration');
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -49,7 +55,8 @@ export default ({ config }: Props) => {
             setResolvedPath(null);
             clearFlashes();
 
-            const existingPath = await resolveConfigFilePath(uuid, getConfigPaths(config));
+            const existingPath =
+                filePath ?? (await resolveConfigFilePath(uuid, getConfigPaths(config)));
 
             if (cancelled) {
                 return;
@@ -107,7 +114,7 @@ export default ({ config }: Props) => {
         return () => {
             cancelled = true;
         };
-    }, [uuid, config.id]);
+    }, [uuid, config.id, filePath]);
 
     useEffect(() => {
         if (loading) {
@@ -117,8 +124,8 @@ export default ({ config }: Props) => {
         setDirty(currentContent !== initialContentRef.current);
     }, [currentContent, loading]);
 
-    const save = () => {
-        if (!activePath) {
+    const save = useCallback(() => {
+        if (!activePath || !dirty || loading || missing) {
             return;
         }
 
@@ -129,10 +136,28 @@ export default ({ config }: Props) => {
             .then(() => {
                 initialContentRef.current = currentContent;
                 setDirty(false);
+                onSaved?.(currentContent);
             })
             .catch((error) => addError(httpErrorToHuman(error)))
             .then(() => setSaving(false));
-    };
+    }, [activePath, addError, clearFlashes, currentContent, dirty, loading, missing, onSaved, uuid]);
+
+    useEffect(() => {
+        if (!embedded) {
+            return;
+        }
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+                event.preventDefault();
+                save();
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [embedded, save]);
 
     const reset = () => {
         if (config.format === 'properties') {
@@ -144,81 +169,124 @@ export default ({ config }: Props) => {
         setDirty(false);
     };
 
-    return (
-        <RealmCard
-            header={
-                <div className={styles.toolbar}>
-                    <div className={styles.toolbarMain}>
-                        <h2 className={styles.toolbarTitle}>{config.label}</h2>
-                        <p className={styles.toolbarPath}>{activePath}</p>
-                    </div>
-                    <div className={styles.toolbarActions}>
-                        {!missing && (
-                            <a
-                                href={`/server/${serverId}/files#${encodePathSegments(activePath)}`}
-                                className={styles.toolbarLink}
+    const displayPath = activePath.startsWith('/') ? activePath : `/${activePath}`;
+    const actionsDisabled = !dirty || loading || missing || saving;
+
+    const toolbar = (
+        <div className={styles.toolbar}>
+            <div className={styles.toolbarMain}>
+                <h2 className={styles.toolbarTitle}>
+                    {config.label}
+                    {embedded && <span className={styles.previewBadge}>Preview</span>}
+                </h2>
+                <p className={styles.toolbarPath}>{displayPath}</p>
+            </div>
+            <div className={styles.toolbarActions}>
+                {!embedded && !missing && (
+                    <a
+                        href={`/server/${serverId}/files#${encodePathSegments(activePath)}`}
+                        className={styles.toolbarLink}
+                    >
+                        Open in Files
+                    </a>
+                )}
+                {embedded ? (
+                    <>
+                        <button
+                            type={'button'}
+                            className={styles.toolbarAction}
+                            disabled={actionsDisabled}
+                            onClick={reset}
+                        >
+                            Reset
+                        </button>
+                        <Can action={'file.create'}>
+                            <button
+                                type={'button'}
+                                className={styles.toolbarAction}
+                                disabled={actionsDisabled}
+                                onClick={save}
                             >
-                                Open in Files
-                            </a>
-                        )}
-                        <Button.Text disabled={!dirty || loading || missing} onClick={reset}>
+                                Save
+                                <span className={styles.toolbarKbd}>{saveShortcutLabel}</span>
+                            </button>
+                        </Can>
+                    </>
+                ) : (
+                    <>
+                        <Button.Text disabled={actionsDisabled} onClick={reset}>
                             Reset
                         </Button.Text>
                         <Can action={'file.create'}>
-                            <Button disabled={!dirty || loading || missing} onClick={save}>
+                            <Button disabled={actionsDisabled} onClick={save}>
                                 Save changes
                             </Button>
                         </Can>
-                    </div>
-                </div>
-            }
-        >
-            <SpinnerOverlay visible={saving} />
+                    </>
+                )}
+            </div>
+        </div>
+    );
 
-            {loading ? (
-                <Spinner size={'large'} centered />
-            ) : missing ? (
-                <div className={styles.emptyState}>
-                    <h3 className={styles.emptyTitle}>Configuration file not found</h3>
-                    <p className={'text-sm text-neutral-400 max-w-lg'}>
-                        None of the expected paths exist on this server yet:
-                    </p>
-                    <ul className={styles.pathList}>
-                        {getConfigPaths(config).map((path) => (
-                            <li key={path}>
-                                <code className={styles.pathCode}>{path}</code>
-                            </li>
-                        ))}
-                    </ul>
-                    {config.unavailableHint && (
-                        <p className={'text-sm text-neutral-500 max-w-lg'}>{config.unavailableHint}</p>
-                    )}
-                </div>
-            ) : config.format === 'properties' ? (
-                <PropertiesConfigForm
-                    config={config}
-                    lines={propertyLines}
-                    onChange={(lines) => {
-                        setPropertyLines(lines);
-                    }}
-                />
-            ) : config.format === 'eula' ? (
-                <EulaConfigForm
-                    content={rawContent}
-                    onChange={(content) => {
-                        setRawContent(content);
-                    }}
-                />
-            ) : (
-                <div className={styles.rawEditorWrap}>
-                    <textarea
-                        className={styles.rawEditor}
-                        value={rawContent}
-                        spellCheck={false}
-                        onChange={(event) => setRawContent(event.currentTarget.value)}
-                    />
-                </div>
+    const editorBody = loading ? (
+        <Spinner size={'large'} centered />
+    ) : missing ? (
+        <div className={styles.emptyState}>
+            <h3 className={styles.emptyTitle}>Configuration file not found</h3>
+            <p className={'text-sm text-neutral-400 max-w-lg'}>
+                None of the expected paths exist on this server yet:
+            </p>
+            <ul className={styles.pathList}>
+                {getConfigPaths(config).map((path) => (
+                    <li key={path}>
+                        <code className={styles.pathCode}>{path}</code>
+                    </li>
+                ))}
+            </ul>
+            {config.unavailableHint && (
+                <p className={'text-sm text-neutral-500 max-w-lg'}>{config.unavailableHint}</p>
             )}
+        </div>
+    ) : config.format === 'properties' ? (
+        <PropertiesConfigForm
+            config={config}
+            lines={propertyLines}
+            onChange={(lines) => {
+                setPropertyLines(lines);
+            }}
+        />
+    ) : config.format === 'eula' ? (
+        <EulaConfigForm
+            content={rawContent}
+            onChange={(content) => {
+                setRawContent(content);
+            }}
+        />
+    ) : (
+        <div className={styles.rawEditorWrap}>
+            <textarea
+                className={styles.rawEditor}
+                value={rawContent}
+                spellCheck={false}
+                onChange={(event) => setRawContent(event.currentTarget.value)}
+            />
+        </div>
+    );
+
+    if (embedded) {
+        return (
+            <div className={styles.embeddedWrap}>
+                <SpinnerOverlay visible={saving} />
+                <div className={styles.embeddedToolbar}>{toolbar}</div>
+                <div className={styles.embeddedBody}>{editorBody}</div>
+            </div>
+        );
+    }
+
+    return (
+        <RealmCard header={toolbar}>
+            <SpinnerOverlay visible={saving} />
+            {editorBody}
         </RealmCard>
     );
 };

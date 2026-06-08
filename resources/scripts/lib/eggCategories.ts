@@ -1,9 +1,9 @@
 export type EggCategory = 'minecraft';
 
-export type EggCategoryFeature = 'players' | 'plugins' | 'versions' | 'configuration';
+export type EggCategoryFeature = 'players' | 'plugins' | 'versions';
 
 const CATEGORY_FEATURES: Record<EggCategory, EggCategoryFeature[]> = {
-    minecraft: ['players', 'plugins', 'versions', 'configuration'],
+    minecraft: ['players', 'plugins', 'versions'],
 };
 
 export const serverHasEggFeature = (

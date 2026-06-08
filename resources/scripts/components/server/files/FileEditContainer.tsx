@@ -21,7 +21,7 @@ import { encodePathSegments, hashToPath } from '@/helpers';
 import { dirname } from 'pathe';
 import Spinner from '@/components/elements/Spinner';
 
-const MonacoEditor = lazy(() => import('@/components/elements/MonacoEditor'));
+const MonacoEditor = lazy(() => import(/* webpackPrefetch: true */ '@/components/elements/MonacoEditor'));
 import FileRevisionModal from '@/components/server/files/FileRevisionModal';
 
 export default () => {

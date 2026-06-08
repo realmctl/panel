@@ -238,6 +238,19 @@ export const MINECRAFT_CONFIGS: MinecraftConfigDefinition[] = [
 export const getMinecraftConfigById = (id: string): MinecraftConfigDefinition | undefined =>
     MINECRAFT_CONFIGS.find((config) => config.id === id);
 
+const normalizeConfigPath = (filePath: string): string => filePath.replace(/^\/+/, '');
+
+export const getMinecraftConfigByPath = (filePath: string): MinecraftConfigDefinition | undefined => {
+    const normalized = normalizeConfigPath(filePath);
+
+    return MINECRAFT_CONFIGS.find((config) =>
+        getConfigPaths(config).some((path) => normalizeConfigPath(path) === normalized)
+    );
+};
+
+export const isVisualEditorCompatible = (config: MinecraftConfigDefinition): boolean =>
+    config.format === 'properties' || config.format === 'eula';
+
 export const getConfigPaths = (config: MinecraftConfigDefinition): string[] => {
     const paths = [config.path];
 

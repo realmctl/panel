@@ -17,8 +17,6 @@ import ActivityLogContainer from '@/components/dashboard/activity/ActivityLogCon
 import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer';
 import VersionChangerContainer from '@/components/server/versions/VersionChangerContainer';
 import PluginInstallerContainer from '@/components/server/plugins/PluginInstallerContainer';
-import ConfigurationContainer from '@/components/server/configuration/ConfigurationContainer';
-
 // Each of the router files is already code split out appropriately — so
 // all of the items above will only be loaded in when that router is loaded.
 //
@@ -37,7 +35,7 @@ interface RouteDefinition {
 
 interface ServerRouteDefinition extends RouteDefinition {
     permission: string | string[] | null;
-    feature?: 'players' | 'plugins' | 'versions' | 'configuration';
+    feature?: 'players' | 'plugins' | 'versions';
 }
 
 interface Routes {
@@ -104,14 +102,6 @@ export default {
             feature: 'plugins',
             name: 'Plugins',
             component: PluginInstallerContainer,
-            exact: true,
-        },
-        {
-            path: '/configuration',
-            permission: 'file.*',
-            feature: 'configuration',
-            name: 'Configuration',
-            component: ConfigurationContainer,
             exact: true,
         },
         {
