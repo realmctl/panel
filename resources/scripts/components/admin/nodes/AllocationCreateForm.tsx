@@ -95,7 +95,8 @@ export default ({ nodeId, ips, onCreated }: Props) => {
                         className={fieldClass}
                         value={form.allocation_ip}
                         onChange={(event) => {
-                            setForm((current) => ({ ...current, allocation_ip: event.target.value }));
+                            const value = event.target.value;
+                            setForm((current) => ({ ...current, allocation_ip: value }));
                         }}
                         placeholder="192.168.1.1"
                         required
@@ -114,7 +115,8 @@ export default ({ nodeId, ips, onCreated }: Props) => {
                         className={fieldClass}
                         value={form.allocation_alias}
                         onChange={(event) => {
-                            setForm((current) => ({ ...current, allocation_alias: event.target.value }));
+                            const value = event.target.value;
+                            setForm((current) => ({ ...current, allocation_alias: value }));
                         }}
                         placeholder="alias"
                     />
@@ -130,7 +132,8 @@ export default ({ nodeId, ips, onCreated }: Props) => {
                         className={textareaClass}
                         value={form.allocation_ports}
                         onChange={(event) => {
-                            setForm((current) => ({ ...current, allocation_ports: event.target.value }));
+                            const value = event.target.value;
+                            setForm((current) => ({ ...current, allocation_ports: value }));
                         }}
                         placeholder="25565, 25566, 3000-3100"
                         rows={4}
