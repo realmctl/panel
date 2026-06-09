@@ -14,6 +14,15 @@ UI to end users.
 Stop settling for less. Make game servers a first class citizen on your platform.
 
 
+## Live Demo
+
+Try Realm without installing anything: **[demo.realmctl.com](https://demo.realmctl.com)**
+
+| Email | Password |
+| --- | --- |
+| `demo@realmctl.com` | `demo` |
+
+
 ## Documentation
 
 * [Panel Documentation](https://realmctl.com/panel/1.0/getting_started.html)
