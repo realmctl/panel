@@ -14,12 +14,6 @@ Route::get('/locales/locale.json', Base\LocaleController::class)
     ->withoutMiddleware(['auth', RequireTwoFactorAuthentication::class])
     ->where('namespace', '.*');
 
-Route::get('/admin-preview/{react?}', function (?string $react = null) {
-    $target = '/admin' . ($react !== null && $react !== '' ? '/' . $react : '');
-
-    return redirect($target, 301);
-})->where('react', '.*');
-
 Route::get('/admin/{react?}', [Base\IndexController::class, 'index'])
     ->where('react', '.*')
     ->middleware(AdminAuthenticate::class)

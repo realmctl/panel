@@ -24,8 +24,6 @@ class PanelSetupService
 
     public const KEY_WELCOME_DONE = 'realm:setup:welcome_done';
 
-    public const KEY_ENVIRONMENT_DONE = SetupEnvironmentService::KEY_ENVIRONMENT_DONE;
-
     public const KEY_LOCATION_DONE = 'realm:setup:location_done';
 
     public const KEY_FORCE_REOPEN = 'realm:setup:force_reopen';
@@ -39,7 +37,6 @@ class PanelSetupService
         self::KEY_SERVER_SKIPPED,
         self::KEY_SETTINGS_DONE,
         self::KEY_WELCOME_DONE,
-        self::KEY_ENVIRONMENT_DONE,
         self::KEY_LOCATION_DONE,
         self::KEY_FORCE_REOPEN,
     ];
@@ -51,7 +48,6 @@ class PanelSetupService
 
     public function __construct(
         private SettingsRepositoryInterface $settings,
-        private SetupEnvironmentService $environmentService,
     ) {
     }
 
@@ -109,7 +105,6 @@ class PanelSetupService
         }
 
         return $this->getBooleanSetting(self::KEY_WELCOME_DONE)
-            || $this->getBooleanSetting(self::KEY_ENVIRONMENT_DONE)
             || $this->getBooleanSetting(self::KEY_SETTINGS_DONE)
             || $this->getBooleanSetting(self::KEY_WINGS_VERIFIED)
             || $this->getBooleanSetting(self::KEY_SERVER_SKIPPED);
@@ -122,7 +117,6 @@ class PanelSetupService
     {
         $steps = [
             $this->step('welcome', 'Welcome', 'Get started with your panel', $this->isWelcomeComplete()),
-            $this->step('environment', 'Environment', 'Configure application URL and drivers', $this->isEnvironmentComplete()),
             $this->step('admin', 'Admin account', 'Create your administrator', $this->isAdminComplete(), User::query()->exists()),
             $this->step('settings', 'Panel settings', 'Configure basic panel options', $this->isSettingsComplete()),
             $this->step('location', 'Location', 'Add your first location', $this->isLocationComplete()),
@@ -203,7 +197,6 @@ class PanelSetupService
                 'locales' => $this->getAvailableLanguages(true),
                 'panelName' => config('app.name'),
                 'panelLocale' => config('app.locale'),
-                'environment' => $this->environmentService->getDefaults(request()),
                 'testingMode' => $this->isTestingMode(),
             ],
         ]);
@@ -234,12 +227,6 @@ class PanelSetupService
     public function markWelcomeComplete(): void
     {
         $this->settings->set('settings::' . self::KEY_WELCOME_DONE, true);
-        $this->summaryCache = null;
-    }
-
-    public function markEnvironmentComplete(): void
-    {
-        $this->settings->set('settings::' . self::KEY_ENVIRONMENT_DONE, true);
         $this->summaryCache = null;
     }
 
@@ -281,19 +268,8 @@ class PanelSetupService
         }
 
         return $this->getBooleanSetting(self::KEY_WELCOME_DONE)
-            || $this->isEnvironmentComplete()
             || User::query()->exists()
             || $this->isSettingsComplete();
-    }
-
-    private function isEnvironmentComplete(): bool
-    {
-        if ($this->isTestingMode()) {
-            return $this->getBooleanSetting(self::KEY_ENVIRONMENT_DONE);
-        }
-
-        return $this->getBooleanSetting(self::KEY_ENVIRONMENT_DONE)
-            || $this->environmentService->isConfigured();
     }
 
     private function isAdminComplete(): bool

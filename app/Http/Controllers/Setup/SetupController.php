@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
 use Realm\Exceptions\DisplayException;
 use Realm\Services\Setup\PanelSetupService;
-use Realm\Services\Setup\SetupEnvironmentService;
 use Realm\Services\Users\UserCreationService;
 use Realm\Services\Nodes\NodeCreationService;
 use Realm\Http\Controllers\Auth\AbstractLoginController;
@@ -34,7 +33,6 @@ class SetupController extends AbstractLoginController
 
     public function __construct(
         private PanelSetupService $setupService,
-        private SetupEnvironmentService $environmentService,
         private UserCreationService $userCreationService,
         private LocationCreationService $locationCreationService,
         private NodeCreationService $nodeCreationService,
@@ -58,37 +56,6 @@ class SetupController extends AbstractLoginController
     public function acknowledgeWelcome(): JsonResponse
     {
         $this->setupService->markWelcomeComplete();
-
-        return $this->status();
-    }
-
-    public function configureEnvironment(Request $request): JsonResponse
-    {
-        $request->validate([
-            'author' => 'required|email',
-            'url' => 'required|url',
-            'timezone' => 'required|string',
-            'cache' => 'sometimes|in:redis,memcached,file',
-            'session' => 'sometimes|in:redis,memcached,database,file,cookie',
-            'queue' => 'sometimes|in:redis,database,sync',
-            'redisHost' => 'sometimes|string',
-            'redisPort' => 'sometimes|integer|min:1|max:65535',
-            'redisPassword' => 'sometimes|nullable|string',
-        ]);
-
-        if (!in_array($request->input('timezone'), \DateTimeZone::listIdentifiers(), true)) {
-            throw new DisplayException('The selected timezone is invalid.');
-        }
-
-        try {
-            $this->environmentService->configure($request->only([
-                'author', 'url', 'timezone', 'cache', 'session', 'queue', 'redisHost', 'redisPort', 'redisPassword',
-            ]));
-        } catch (\Realm\Exceptions\RealmException $exception) {
-            throw new DisplayException($exception->getMessage());
-        }
-
-        $this->setupService->markEnvironmentComplete();
 
         return $this->status();
     }

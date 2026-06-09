@@ -17,7 +17,6 @@ Route::get('/status', [SetupController::class, 'status'])->name('setup.status');
 
 Route::middleware(['throttle:authentication'])->group(function () {
     Route::post('/welcome', [SetupController::class, 'acknowledgeWelcome'])->name('setup.welcome');
-    Route::post('/environment', [SetupController::class, 'configureEnvironment'])->name('setup.environment');
     Route::post('/admin', [SetupController::class, 'createAdmin'])->name('setup.admin');
 });
 

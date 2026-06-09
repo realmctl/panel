@@ -1,6 +1,6 @@
 import React, { lazy } from 'react';
 import { hot } from 'react-hot-loader/root';
-import { Redirect, Route, Router, Switch, useLocation } from 'react-router-dom';
+import { Route, Router, Switch } from 'react-router-dom';
 import { StoreProvider } from 'easy-peasy';
 import { store } from '@/state';
 import { SiteSettings } from '@/state/settings';
@@ -22,21 +22,7 @@ const DashboardRouter = lazy(() => import(/* webpackChunkName: "dashboard" */ '@
 const ServerRouter = lazy(() => import(/* webpackChunkName: "server" */ '@/routers/ServerRouter'));
 const AuthenticationRouter = lazy(() => import(/* webpackChunkName: "auth" */ '@/routers/AuthenticationRouter'));
 const SetupRouter = lazy(() => import(/* webpackChunkName: "setup" */ '@/routers/SetupRouter'));
-const AdminPreviewRouter = lazy(() => import(/* webpackChunkName: "admin" */ '@/routers/AdminPreviewRouter'));
-
-const AdminLegacyPathRedirect = () => {
-    const location = useLocation();
-
-    return (
-        <Redirect
-            to={{
-                pathname: location.pathname.replace(/^\/admin-preview/, '/admin'),
-                search: location.search,
-                hash: location.hash,
-            }}
-        />
-    );
-};
+const AdminRouter = lazy(() => import(/* webpackChunkName: "admin" */ '@/routers/AdminRouter'));
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
@@ -113,13 +99,10 @@ const App = () => {
                                         </ServerContext.Provider>
                                     </Spinner.Suspense>
                                 </AuthenticatedRoute>
-                                <AuthenticatedRoute path={'/admin-preview'}>
-                                    <AdminLegacyPathRedirect />
-                                </AuthenticatedRoute>
                                 <AuthenticatedRoute path={'/admin'}>
                                     <RootAdminRoute>
                                         <Spinner.Suspense>
-                                            <AdminPreviewRouter />
+                                            <AdminRouter />
                                         </Spinner.Suspense>
                                     </RootAdminRoute>
                                 </AuthenticatedRoute>

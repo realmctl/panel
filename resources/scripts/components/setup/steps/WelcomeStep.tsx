@@ -32,7 +32,7 @@ export default () => {
             title={'Welcome'}
             description={
                 <>
-                    Configure your panel environment, create your administrator account, and add your first location.
+                    Create your administrator account, configure your panel settings, and add your first location.
                     You can connect Wings later from the admin area.
                 </>
             }

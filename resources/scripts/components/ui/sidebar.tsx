@@ -17,12 +17,12 @@ import { useStoreState } from '@/state/hooks';
 import http from '@/api/http';
 import { REALM_FAVICON } from '@/lib/branding';
 import {
-    AdminPreviewRouteDefinition,
-    adminPreviewRoutesBySection,
+    AdminRouteDefinition,
+    adminRoutesBySection,
     fullPathFor,
-} from '@/routers/adminPreviewRoutes';
+} from '@/routers/adminRoutes';
 
-const isRouteActive = (route: AdminPreviewRouteDefinition, pathname: string): boolean => {
+const isRouteActive = (route: AdminRouteDefinition, pathname: string): boolean => {
     const full = fullPathFor(route);
     return route.exact ? pathname === full : pathname === full || pathname.startsWith(`${full}/`);
 };
@@ -33,7 +33,7 @@ const NavCategory = ({
     pathname,
 }: {
     label: string;
-    items: AdminPreviewRouteDefinition[];
+    items: AdminRouteDefinition[];
     pathname: string;
 }) => {
     const hasActive = items.some((item) => isRouteActive(item, pathname));
@@ -61,7 +61,7 @@ const NavLinkItem = ({
     item,
     pathname,
 }: {
-    item: AdminPreviewRouteDefinition;
+    item: AdminRouteDefinition;
     pathname: string;
 }) => {
     const Icon = item.icon;
@@ -83,7 +83,7 @@ const NavLinkItem = ({
     );
 };
 
-export function AdminPreviewSidebar() {
+export function AdminSidebar() {
     const { pathname } = useLocation();
     const history = useHistory();
     const panelName = useStoreState((state) => state.settings.data?.name || 'Realm');
@@ -91,9 +91,9 @@ export function AdminPreviewSidebar() {
     const email = useStoreState((state) => state.user.data?.email || '');
     const initials = useMemo(() => username.slice(0, 2).toUpperCase(), [username]);
 
-    const topLevelItems = adminPreviewRoutesBySection('top');
-    const managementItems = adminPreviewRoutesBySection('management');
-    const serviceItems = adminPreviewRoutesBySection('services');
+    const topLevelItems = adminRoutesBySection('top');
+    const managementItems = adminRoutesBySection('management');
+    const serviceItems = adminRoutesBySection('services');
 
     const onLogout = () => {
         http.post('/auth/logout').finally(() => {

@@ -7,7 +7,6 @@ import { canAccessStep, getStepPath } from '@/lib/setupSteps';
 import { SetupProvider, useSetup } from '@/components/setup/SetupContext';
 import SetupSidebar from '@/components/setup/SetupSidebar';
 import WelcomeStep from '@/components/setup/steps/WelcomeStep';
-import EnvironmentStep from '@/components/setup/steps/EnvironmentStep';
 import AdminStep from '@/components/setup/steps/AdminStep';
 import SettingsStep from '@/components/setup/steps/SettingsStep';
 import LocationStep from '@/components/setup/steps/LocationStep';
@@ -86,7 +85,6 @@ const SetupRoutes = () => {
                     <div className={styles.content}>
                         <Switch>
                             <Route path={`${path}/welcome`} component={WelcomeStep} exact />
-                            <Route path={`${path}/environment`} component={EnvironmentStep} exact />
                             <Route path={`${path}/admin`} component={AdminStep} exact />
                             <Route path={`${path}/settings`} component={SettingsStep} exact />
                             <Route path={`${path}/location`} component={LocationStep} exact />
