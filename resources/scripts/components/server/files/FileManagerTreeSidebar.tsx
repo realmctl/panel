@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronRight, faCheck } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
 import { dirname } from 'pathe';
 import loadDirectory, { FileObject } from '@/api/server/files/loadDirectory';
@@ -25,6 +25,7 @@ import { hasExternalFiles } from '@/components/server/files/fileUploadUtils';
 import FileTreeContextMenu, { TreeContextTarget } from '@/components/server/files/FileTreeContextMenu';
 import TreeInlineCreate from '@/components/server/files/TreeInlineCreate';
 import TreeInlineRename from '@/components/server/files/TreeInlineRename';
+import { useStoreActions } from '@/state/hooks';
 import styles from './style.module.css';
 
 export interface InlineCreateState {
@@ -120,12 +121,20 @@ const TreeEntry = ({
         handleDrop,
     } = useExplorerDrag();
 
+    const selectedFiles = ServerContext.useStoreState((state) => state.files.selectedFiles);
+    const storeDirectory = ServerContext.useStoreState((state) => state.files.directory);
+    const setDirectory = ServerContext.useStoreActions((actions) => actions.files.setDirectory);
+    const setSelectedFiles = ServerContext.useStoreActions((actions) => actions.files.setSelectedFiles);
+    const appendSelectedFile = ServerContext.useStoreActions((actions) => actions.files.appendSelectedFile);
+    const removeSelectedFile = ServerContext.useStoreActions((actions) => actions.files.removeSelectedFile);
+
     const fullPath = joinTreePath(parentPath, file.name);
     const isBrowsableJar = isBrowsableArchive(file);
     const isFolder = !file.isFile || isBrowsableJar;
     const isExpanded = isFolder && expandedPaths.has(fullPath);
     const isLoading = isFolder && loadingPaths.has(fullPath);
     const isSelected = !isFolder && activeFilePath === fullPath;
+    const isChecked = !isFolder && selectedFiles.includes(file.name) && cleanDirectoryPath(parentPath) === storeDirectory;
     const children = isFolder ? treeCache[fullPath] : undefined;
     const showPresence = !isFolder && activeFilePath === fullPath;
     const dropFolder = getDropFolderForPath(fullPath, isFolder);
@@ -137,7 +146,21 @@ const TreeEntry = ({
         inlineRename?.parentPath === parentPath && inlineRename.fileName === file.name;
     const showAsFile = !isBrowsableJar && file.isFile;
 
-    const handleClick = () => {
+    const handleClick = (event: React.MouseEvent) => {
+        if ((event.ctrlKey || event.metaKey) && !isFolder) {
+            const parentDir = cleanDirectoryPath(parentPath);
+            if (selectedFiles.length > 0 && storeDirectory !== parentDir) {
+                setDirectory(parentDir);
+                setSelectedFiles([file.name]);
+            } else if (isChecked) {
+                removeSelectedFile(file.name);
+            } else {
+                if (selectedFiles.length === 0) setDirectory(parentDir);
+                appendSelectedFile(file.name);
+            }
+            return;
+        }
+
         if (isFolder) {
             onToggleFolder(fullPath);
             return;
@@ -212,6 +235,7 @@ const TreeEntry = ({
                 className={classNames(
                     styles.tree_row,
                     isSelected && styles.tree_row_active,
+                    isChecked && styles.tree_row_checked,
                     isDragging && styles.tree_row_dragging,
                     isDropTarget && styles.tree_row_drop_target
                 )}
@@ -224,6 +248,8 @@ const TreeEntry = ({
                         ) : (
                             <FontAwesomeIcon icon={isExpanded ? faChevronDown : faChevronRight} className={'text-[10px]'} />
                         )
+                    ) : isChecked ? (
+                        <FontAwesomeIcon icon={faCheck} className={'text-[9px] text-blue-400'} />
                     ) : (
                         <span className={'inline-block w-2.5'} />
                     )}

@@ -22,6 +22,7 @@ import { canOpenInEditor, getMediaKindFromPath } from '@/components/server/files
 import useFileEditingPresence from '@/plugins/useFileEditingPresence';
 import { usePermissions } from '@/plugins/usePermissions';
 import { ExplorerDragProvider } from '@/components/server/files/ExplorerDragContext';
+import MassActionsBar from '@/components/server/files/MassActionsBar';
 import style from './style.module.css';
 
 export default () => {
@@ -391,6 +392,7 @@ export default () => {
                 />
             </div>
 
+            <MassActionsBar />
         </ServerContentBlock>
     );
 };
