@@ -15,7 +15,6 @@ import { debounce } from 'debounce';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import classNames from 'classnames';
-import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
 
 import 'xterm/css/xterm.css';
 import { formatConsoleLine, formatDaemonErrorLine } from '@/components/server/console/consoleLogFormat';
@@ -23,9 +22,7 @@ import InstallProgressPanel from '@/components/server/console/InstallProgressPan
 import {
     createInitialInstallProgress,
     InstallProgressState,
-    isNoisyInstallLine,
     parseInstallLine,
-    stripAnsi,
 } from '@/components/server/console/installProgressParser';
 import styles from './style.module.css';
 
@@ -118,8 +115,6 @@ export default () => {
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
     const [installProgress, setInstallProgress] = useState<InstallProgressState>(() => createInitialInstallProgress());
-    const [showRawInstallLogs, setShowRawInstallLogs] = useState(false);
-    const [recentInstallLines, setRecentInstallLines] = useState<string[]>([]);
     // SearchBarAddon has hardcoded z-index: 999 :(
     const zIndex = `
     .xterm-search-bar__addon {
@@ -164,26 +159,13 @@ export default () => {
 
     const handleInstallOutput = (line: string) => {
         setInstallProgress((current) => parseInstallLine(current, line));
-
-        if (!isNoisyInstallLine(line)) {
-            const plain = stripAnsi(line).trim();
-            if (plain) {
-                setRecentInstallLines((prev) => [...prev.slice(-4), plain]);
-            }
-        }
-
-        if (showRawInstallLogs) {
-            handleConsoleOutput(line);
-        }
+        handleConsoleOutput(line);
     };
 
     const handleDaemonMessageDuringInstall = (line: string) => {
         const normalized = normalizeConsoleLine(line);
         setInstallProgress((current) => parseInstallLine(current, normalized));
-
-        if (showRawInstallLogs) {
-            handleConsoleOutput(line, true);
-        }
+        handleConsoleOutput(line, true);
     };
 
     const handleDaemonErrorOutput = (line: string) => {
@@ -293,8 +275,6 @@ export default () => {
         }
 
         setInstallProgress(createInitialInstallProgress());
-        setShowRawInstallLogs(false);
-        setRecentInstallLines([]);
 
         if (connected && terminal.element) {
             terminal.clear();
@@ -335,35 +315,16 @@ export default () => {
                 });
             }
         };
-    }, [connected, instance, isInstalling, showRawInstallLogs, isTransferring]);
+    }, [connected, instance, isInstalling, isTransferring]);
 
     return (
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
             <div className={classNames(styles.container, styles.overflows_container)}>
-                <div
-                    className={styles.terminal_shell}
-                    style={{ display: isInstalling && !showRawInstallLogs ? 'none' : undefined }}
-                >
+                <div className={styles.terminal_shell}>
                     <div id={styles.terminal} ref={ref} />
-                    {isInstalling && showRawInstallLogs && (
-                        <button
-                            type={'button'}
-                            onClick={() => setShowRawInstallLogs(false)}
-                            className={styles.install_log_toggle}
-                        >
-                            <ChevronDoubleRightIcon className={'w-3 h-3 -rotate-90'} />
-                            Hide logs
-                        </button>
-                    )}
                 </div>
-                {isInstalling && !showRawInstallLogs && (
-                    <InstallProgressPanel
-                        progress={installProgress}
-                        recentLines={recentInstallLines}
-                        onToggleRawLogs={() => setShowRawInstallLogs(true)}
-                    />
-                )}
+                {isInstalling && <InstallProgressPanel progress={installProgress} />}
             </div>
             {canSendCommands && !isInstalling && (
                 <div className={classNames('relative', styles.overflows_container)}>

@@ -31,9 +31,11 @@
         background-color: #192024;
         min-height: 16rem;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
 
         & .terminal_shell {
-            height: 100%;
+            flex: 1 1 0;
             min-height: 0;
             position: relative;
         }
