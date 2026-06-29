@@ -165,7 +165,14 @@ export default () => {
     const handleInstallOutput = (line: string) => {
         setInstallProgress((current) => parseInstallLine(current, line));
 
-        if (showRawInstallLogs || !isNoisyInstallLine(line)) {
+        if (!isNoisyInstallLine(line)) {
+            const plain = stripAnsi(line).trim();
+            if (plain) {
+                setRecentInstallLines((prev) => [...prev.slice(-4), plain]);
+            }
+        }
+
+        if (showRawInstallLogs) {
             handleConsoleOutput(line);
         }
     };
@@ -287,6 +294,7 @@ export default () => {
 
         setInstallProgress(createInitialInstallProgress());
         setShowRawInstallLogs(false);
+        setRecentInstallLines([]);
 
         if (connected && terminal.element) {
             terminal.clear();
