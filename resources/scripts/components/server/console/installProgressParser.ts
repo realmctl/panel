@@ -11,6 +11,9 @@ export interface InstallProgressState {
     label: string;
     detail: string | null;
     downloadPercent: number | null;
+    downloadSpeed: string | null;
+    downloadTotal: string | null;
+    downloadReceived: string | null;
     overallPercent: number;
     steps: InstallStep[];
     lineCount: number;
@@ -25,13 +28,16 @@ const STEPS: { id: InstallPhase; label: string }[] = [
     { id: 'configuring', label: 'Finalizing setup' },
 ];
 
-const stripAnsi = (line: string): string => line.replace(/\u001b\[[0-9;]*m/g, '');
+export const stripAnsi = (line: string): string => line.replace(/\[[0-9;]*m/g, '');
 
 export const createInitialInstallProgress = (): InstallProgressState => ({
     phase: 'preparing',
     label: 'Preparing environment',
     detail: 'Starting installation…',
     downloadPercent: null,
+    downloadSpeed: null,
+    downloadTotal: null,
+    downloadReceived: null,
     overallPercent: 5,
     steps: STEPS.map((step, index) => ({
         ...step,
@@ -85,15 +91,32 @@ const computeOverallPercent = (phase: InstallPhase, downloadPercent: number | nu
     }
 };
 
-const parseCurlPercent = (plain: string): number | null => {
-    const totalMatch = plain.match(/^\s*(\d+(?:\.\d+)?)\s+\d+(?:\.\d+)?\s+\d+(?:\.\d+)?\s+\d+(?:\.\d+)?\s+\d+(?:\.\d+)?/);
-    if (totalMatch) {
-        return Math.min(100, Math.max(0, parseFloat(totalMatch[1])));
+interface CurlProgress {
+    percent: number;
+    speed: string | null;
+    total: string | null;
+    received: string | null;
+}
+
+const parseCurlProgress = (plain: string): CurlProgress | null => {
+    // curl progress row: "  45 115M   45 52.6M    0     0  12.4M      0  0:00:09  0:00:04  0:00:05 12.9M"
+    const match = plain.match(
+        /^\s*(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?[KMGkm]?)\s+\d+(?:\.\d+)?\s+(\d+(?:\.\d+)?[KMGkm]?)\s+\S+\s+\S+\s+(\d+(?:\.\d+)?[KMGkm]?)/
+    );
+    if (match) {
+        const percent = Math.min(100, Math.max(0, parseFloat(match[1])));
+        const formatSize = (s: string) => (s.endsWith('M') || s.endsWith('G') || s.endsWith('K') ? `${s}B` : `${s} B`);
+        return {
+            percent,
+            total: formatSize(match[2]),
+            received: formatSize(match[3]),
+            speed: formatSize(match[4]),
+        };
     }
 
     const receivedMatch = plain.match(/(\d+(?:\.\d+)?)\s*%\s*received/i);
     if (receivedMatch) {
-        return Math.min(100, Math.max(0, parseFloat(receivedMatch[1])));
+        return { percent: Math.min(100, Math.max(0, parseFloat(receivedMatch[1]))), speed: null, total: null, received: null };
     }
 
     return null;
@@ -160,25 +183,13 @@ const detectPhase = (plain: string): { phase: InstallPhase; label: string; detai
 export const isNoisyInstallLine = (line: string): boolean => {
     const plain = stripAnsi(line).trim();
 
-    if (!plain) {
-        return true;
-    }
+    if (!plain) return true;
+    if (/^[\#=\-\.\|\s\\\/]+$/.test(plain)) return true;
+    if (plain.length > 60 && (plain.match(/#/g)?.length ?? 0) > 8) return true;
 
-    if (/^[\#=\-\.\|\s\\\/]+$/.test(plain)) {
-        return true;
-    }
-
-    if (plain.length > 60 && (plain.match(/#/g)?.length ?? 0) > 8) {
-        return true;
-    }
-
-    if (/^\s*\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?/.test(plain)) {
-        return true;
-    }
-
-    if (/^[\s\d]+(?:\.\d+)?%/.test(plain) && plain.length < 40) {
-        return true;
-    }
+    // curl progress rows (raw numbers)
+    if (/^\s*\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?[KMG]?\s+\d+(?:\.\d+)?/.test(plain)) return true;
+    if (/^[\s\d]+(?:\.\d+)?%/.test(plain) && plain.length < 40) return true;
 
     return false;
 };
@@ -186,12 +197,10 @@ export const isNoisyInstallLine = (line: string): boolean => {
 export const parseInstallLine = (state: InstallProgressState, line: string): InstallProgressState => {
     const plain = stripAnsi(line).trim();
 
-    if (!plain) {
-        return state;
-    }
+    if (!plain) return state;
 
     const detected = detectPhase(plain);
-    const curlPercent = parseCurlPercent(plain);
+    const curlProgress = parseCurlProgress(plain);
     let next = { ...state, lineCount: state.lineCount + 1 };
 
     if (detected?.phase === 'failed') {
@@ -221,27 +230,34 @@ export const parseInstallLine = (state: InstallProgressState, line: string): Ins
     if (detected) {
         const phase = detected.phase;
         const shouldAdvance = phaseIndex(phase) >= phaseIndex(state.phase);
+        const newDownloadPercent = curlProgress?.percent ?? (phase === 'downloading' ? state.downloadPercent : state.downloadPercent);
 
         next = {
             ...next,
             phase: shouldAdvance ? phase : state.phase,
             label: shouldAdvance ? detected.label : state.label,
             detail: detected.detail,
-            downloadPercent: curlPercent ?? (phase === 'downloading' ? state.downloadPercent : state.downloadPercent),
+            downloadPercent: newDownloadPercent,
+            downloadSpeed: curlProgress?.speed ?? state.downloadSpeed,
+            downloadTotal: curlProgress?.total ?? state.downloadTotal,
+            downloadReceived: curlProgress?.received ?? state.downloadReceived,
             overallPercent: computeOverallPercent(
                 shouldAdvance ? phase : state.phase,
-                curlPercent ?? state.downloadPercent
+                newDownloadPercent
             ),
             steps: buildSteps(shouldAdvance ? phase : state.phase, false),
         };
-    } else if (curlPercent !== null) {
+    } else if (curlProgress !== null) {
         next = {
             ...next,
             phase: 'downloading',
             label: 'Downloading files',
-            detail: `Downloaded ${Math.round(curlPercent)}%`,
-            downloadPercent: curlPercent,
-            overallPercent: computeOverallPercent('downloading', curlPercent),
+            detail: `Downloaded ${Math.round(curlProgress.percent)}%`,
+            downloadPercent: curlProgress.percent,
+            downloadSpeed: curlProgress.speed ?? state.downloadSpeed,
+            downloadTotal: curlProgress.total ?? state.downloadTotal,
+            downloadReceived: curlProgress.received ?? state.downloadReceived,
+            overallPercent: computeOverallPercent('downloading', curlProgress.percent),
             steps: buildSteps('downloading', false),
         };
     } else if (state.phase !== 'complete' && state.phase !== 'failed') {
