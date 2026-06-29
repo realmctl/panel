@@ -330,32 +330,30 @@ export default () => {
     return (
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
-            <div
-                className={classNames(
-                    styles.container,
-                    styles.overflows_container,
-                    isInstalling && !showRawInstallLogs && styles.installing_quiet
-                )}
-            >
-                <div className={styles.terminal_shell}>
-                    {isInstalling && !showRawInstallLogs && (
-                        <div className={styles.install_placeholder}>
-                            <p className={'text-sm text-neutral-300 font-medium'}>Installing server…</p>
-                            <p className={'text-xs text-neutral-500 mt-1'}>
-                                Progress is shown below. Use &quot;Show logs&quot; for raw installer output.
-                            </p>
-                        </div>
-                    )}
+            <div className={classNames(styles.container, styles.overflows_container)}>
+                <div
+                    className={styles.terminal_shell}
+                    style={{ display: isInstalling && !showRawInstallLogs ? 'none' : undefined }}
+                >
                     <div id={styles.terminal} ref={ref} />
+                    {isInstalling && showRawInstallLogs && (
+                        <button
+                            type={'button'}
+                            onClick={() => setShowRawInstallLogs(false)}
+                            className={styles.install_log_toggle}
+                        >
+                            <ChevronDoubleRightIcon className={'w-3 h-3 -rotate-90'} />
+                            Hide logs
+                        </button>
+                    )}
                 </div>
+                {isInstalling && !showRawInstallLogs && (
+                    <InstallProgressPanel
+                        progress={installProgress}
+                        onToggleRawLogs={() => setShowRawInstallLogs(true)}
+                    />
+                )}
             </div>
-            {isInstalling && (
-                <InstallProgressPanel
-                    progress={installProgress}
-                    showRawLogs={showRawInstallLogs}
-                    onToggleRawLogs={() => setShowRawInstallLogs((current) => !current)}
-                />
-            )}
             {canSendCommands && !isInstalling && (
                 <div className={classNames('relative', styles.overflows_container)}>
                     <input
