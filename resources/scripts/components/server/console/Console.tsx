@@ -25,6 +25,7 @@ import {
     InstallProgressState,
     isNoisyInstallLine,
     parseInstallLine,
+    stripAnsi,
 } from '@/components/server/console/installProgressParser';
 import styles from './style.module.css';
 
@@ -118,6 +119,7 @@ export default () => {
     const [historyIndex, setHistoryIndex] = useState(-1);
     const [installProgress, setInstallProgress] = useState<InstallProgressState>(() => createInitialInstallProgress());
     const [showRawInstallLogs, setShowRawInstallLogs] = useState(false);
+    const [recentInstallLines, setRecentInstallLines] = useState<string[]>([]);
     // SearchBarAddon has hardcoded z-index: 999 :(
     const zIndex = `
     .xterm-search-bar__addon {
