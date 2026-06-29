@@ -360,6 +360,7 @@ export default () => {
                 {isInstalling && !showRawInstallLogs && (
                     <InstallProgressPanel
                         progress={installProgress}
+                        recentLines={recentInstallLines}
                         onToggleRawLogs={() => setShowRawInstallLogs(true)}
                     />
                 )}
