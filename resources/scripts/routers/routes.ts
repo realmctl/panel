@@ -13,6 +13,7 @@ import SettingsContainer from '@/components/server/settings/SettingsContainer';
 import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
 import AccountApiContainer from '@/components/dashboard/AccountApiContainer';
 import AccountSSHContainer from '@/components/dashboard/ssh/AccountSSHContainer';
+import AccountPermissionTemplatesContainer from '@/components/dashboard/permissionTemplates/AccountPermissionTemplatesContainer';
 import ActivityLogContainer from '@/components/dashboard/activity/ActivityLogContainer';
 import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer';
 import VersionChangerContainer from '@/components/server/versions/VersionChangerContainer';
@@ -62,6 +63,11 @@ export default {
             path: '/ssh',
             name: 'SSH Keys',
             component: AccountSSHContainer,
+        },
+        {
+            path: '/permission-templates',
+            name: 'Permission Templates',
+            component: AccountPermissionTemplatesContainer,
         },
         {
             path: '/activity',

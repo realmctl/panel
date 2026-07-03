@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormikContext } from 'formik';
 import classNames from 'classnames';
+import { useStoreActions, useStoreState } from 'easy-peasy';
+import { ApplicationStore } from '@/state';
 import { Button } from '@/components/elements/button/index';
 import { PERMISSION_PRESETS, resolvePresetPermissions } from '@/components/server/users/userPermissionPresets';
 
@@ -27,6 +29,13 @@ export default ({ editablePermissions, showPresets = false }: Props) => {
     const allSelected = editablePermissions.every((p) => values.permissions.includes(p));
     const selectedCount = values.permissions.filter((p) => p !== 'websocket.connect').length;
 
+    const templates = useStoreState((state: ApplicationStore) => state.permissionTemplates.data);
+    const fetchTemplates = useStoreActions((actions: Actions<ApplicationStore>) => actions.permissionTemplates.fetchTemplates);
+
+    useEffect(() => {
+        fetchTemplates();
+    }, [fetchTemplates]);
+
     const applyPreset = (presetId: string) => {
         setFieldValue('permissions', resolvePresetPermissions(presetId, editablePermissions));
     };
@@ -35,6 +44,19 @@ export default ({ editablePermissions, showPresets = false }: Props) => {
         const presetPerms = resolvePresetPermissions(presetId, editablePermissions).sort().join(',');
         const currentPerms = [...values.permissions].sort().join(',');
         return presetPerms.length > 0 && presetPerms === currentPerms;
+    };
+
+    const applyTemplate = (permissions: string[]) => {
+        setFieldValue('permissions', permissions.filter((p) => editablePermissions.includes(p)));
+    };
+
+    const isTemplateActive = (permissions: string[]) => {
+        const templatePerms = permissions
+            .filter((p) => editablePermissions.includes(p))
+            .sort()
+            .join(',');
+        const currentPerms = [...values.permissions].sort().join(',');
+        return templatePerms.length > 0 && templatePerms === currentPerms;
     };
 
     return (
@@ -69,6 +91,21 @@ export default ({ editablePermissions, showPresets = false }: Props) => {
                     >
                         Full access
                     </button>
+                </div>
+            )}
+            {templates.length > 0 && (
+                <div className={'flex flex-wrap gap-2 mt-2'}>
+                    {templates.map((template) => (
+                        <button
+                            key={template.uuid}
+                            type={'button'}
+                            title={`Apply "${template.name}" template`}
+                            className={presetButtonClass(isTemplateActive(template.permissions))}
+                            onClick={() => applyTemplate(template.permissions)}
+                        >
+                            {template.name}
+                        </button>
+                    ))}
                 </div>
             )}
         </div>

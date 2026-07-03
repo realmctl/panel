@@ -5,6 +5,7 @@ import permissions, { GloablPermissionsStore } from '@/state/permissions';
 import settings, { SettingsStore } from '@/state/settings';
 import progress, { ProgressStore } from '@/state/progress';
 import serverGroups, { ServerGroupStore } from '@/state/serverGroups';
+import permissionTemplates, { PermissionTemplateStore } from '@/state/permissionTemplates';
 
 export interface ApplicationStore {
     permissions: GloablPermissionsStore;
@@ -13,6 +14,7 @@ export interface ApplicationStore {
     settings: SettingsStore;
     progress: ProgressStore;
     serverGroups: ServerGroupStore;
+    permissionTemplates: PermissionTemplateStore;
 }
 
 const state: ApplicationStore = {
@@ -22,6 +24,7 @@ const state: ApplicationStore = {
     settings,
     progress,
     serverGroups,
+    permissionTemplates,
 };
 
 export const store = createStore(state);

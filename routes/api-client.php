@@ -28,6 +28,13 @@ Route::prefix('/server-groups')->group(function () {
     Route::delete('/{group:uuid}', [Client\ServerGroupController::class, 'destroy']);
 });
 
+Route::prefix('/permission-templates')->group(function () {
+    Route::get('/', [Client\SubuserPermissionTemplateController::class, 'index']);
+    Route::post('/', [Client\SubuserPermissionTemplateController::class, 'store']);
+    Route::patch('/{template:uuid}', [Client\SubuserPermissionTemplateController::class, 'update']);
+    Route::delete('/{template:uuid}', [Client\SubuserPermissionTemplateController::class, 'destroy']);
+});
+
 Route::prefix('/account')->middleware(AccountSubject::class)->group(function () {
     Route::prefix('/')->withoutMiddleware(RequireTwoFactorAuthentication::class)->group(function () {
         Route::get('/', [Client\AccountController::class, 'index'])->name('api:client.account');
