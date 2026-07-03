@@ -1,32 +1,32 @@
-.panel {
-    @apply overflow-hidden bg-realm-card border border-realm-border rounded-lg flex flex-col;
-    min-height: min(38rem, calc(100vh - 12rem));
+.toolbar {
+    @apply flex flex-wrap items-center gap-3 mb-4;
 }
 
-.toolbar {
-    @apply flex items-center gap-3 px-4 py-3 border-b border-realm-border bg-realm-surface flex-shrink-0;
+.search_wrap {
+    @apply relative flex-1 min-w-[14rem];
+}
+
+.search_icon {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 pointer-events-none text-xs;
 }
 
 .search {
-    @apply flex-1 min-w-0;
+    @apply w-full rounded-md text-sm pl-8 pr-3 py-2 focus:outline-none transition-colors;
+    @apply focus:border-neutral-500;
 }
 
 .count {
     @apply text-xs font-mono text-realm-muted flex-shrink-0;
 }
 
-.list {
-    @apply flex-1 overflow-y-auto min-h-0;
-}
-
 .plugin_grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 p-4 content-start;
+    @apply grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 content-start;
 }
 
 .card {
-    @apply flex flex-col gap-3 p-3.5 rounded-lg border border-realm-border bg-realm-surface text-left;
-    @apply border-0 cursor-pointer transition-colors duration-100;
-    @apply hover:bg-realm-surface-raised/50;
+    @apply flex flex-col gap-3 p-4 rounded-md border border-realm-border/50 bg-realm-card text-left;
+    @apply cursor-pointer transition-colors duration-100;
+    @apply hover:border-realm-border hover:bg-realm-card/80;
 }
 
 .card_header {
@@ -34,15 +34,19 @@
 }
 
 .card_icon {
-    @apply w-10 h-10 rounded object-contain flex-shrink-0 bg-realm-surface-raised;
+    @apply w-10 h-10 rounded-md object-contain flex-shrink-0 bg-realm-surface-raised;
 }
 
 .card_name {
-    @apply text-sm font-semibold text-neutral-100 truncate m-0;
+    @apply text-sm font-medium text-neutral-100 truncate m-0;
 }
 
 .card_meta {
-    @apply text-xs font-mono text-realm-muted m-0 mt-0.5;
+    @apply flex items-center gap-1.5 text-xs text-neutral-500 m-0 mt-0.5 min-w-0;
+}
+
+.card_meta_icon {
+    @apply text-[10px] text-neutral-600 flex-shrink-0;
 }
 
 .card_desc {
@@ -50,44 +54,77 @@
 }
 
 .card_footer {
-    @apply flex items-center justify-end gap-2 mt-auto pt-1;
+    @apply flex items-center justify-between gap-2 mt-auto pt-2 border-t border-realm-border/40;
 }
 
-.row_action {
-    @apply flex-shrink-0 px-2.5 py-1 text-xs font-medium rounded transition-colors duration-150 border-0 cursor-pointer;
-    @apply disabled:opacity-50 disabled:cursor-default;
+.card_source {
+    @apply flex items-center gap-1.5 text-[11px] text-neutral-600 min-w-0 truncate;
 }
 
-.row_action_install {
-    @apply bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300;
+.install_badge {
+    @apply flex-shrink-0 px-2.5 py-1 text-xs font-medium rounded-md transition-colors duration-150 border-0 cursor-pointer;
+    @apply bg-blue-500/10 text-blue-400;
 }
 
-.row_action_installed {
+.card:hover .install_badge {
+    @apply bg-blue-500/20 text-blue-300;
+}
+
+.installed_badge {
+    @apply flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md;
     @apply bg-emerald-500/10 text-emerald-400;
 }
 
-.detail {
-    @apply flex flex-col gap-5 p-5 flex-1 overflow-y-auto min-h-0;
+.pagination {
+    @apply flex items-center justify-center gap-4 mt-4;
+}
+
+.pagination_button {
+    @apply flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-realm-border/50 bg-realm-card;
+    @apply text-neutral-400 cursor-pointer transition-colors duration-100;
+    @apply hover:text-neutral-200 hover:border-realm-border;
+    @apply disabled:opacity-40 disabled:cursor-default disabled:hover:text-neutral-400 disabled:hover:border-realm-border/50;
+}
+
+.pagination_label {
+    @apply text-xs font-mono text-realm-muted;
+}
+
+.state_block {
+    @apply flex flex-col items-center justify-center py-20 px-6;
+    @apply rounded-md border border-realm-border/50 bg-realm-card;
+}
+
+.detail_card {
+    @apply rounded-md border border-realm-border/50 bg-realm-card overflow-hidden;
 }
 
 .detail_back {
-    @apply flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-300 transition-colors self-start border-0 bg-transparent p-0 cursor-pointer;
+    @apply flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-300 transition-colors border-0 bg-transparent p-0 cursor-pointer mb-3;
 }
 
 .detail_header {
-    @apply flex items-start gap-4;
+    @apply flex flex-wrap items-center gap-4 px-5 py-5 border-b border-realm-border/50 bg-realm-surface;
 }
 
 .detail_icon {
-    @apply w-14 h-14 rounded object-contain flex-shrink-0 bg-realm-surface-raised;
+    @apply w-14 h-14 rounded-md object-contain flex-shrink-0 bg-realm-surface-raised;
 }
 
 .detail_title {
-    @apply text-lg font-semibold text-neutral-100 m-0 mb-1;
+    @apply text-lg font-semibold text-neutral-100 m-0;
 }
 
 .detail_stats {
-    @apply flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500;
+    @apply flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-xs text-neutral-500;
+}
+
+.detail_stat_dot {
+    @apply text-neutral-700;
+}
+
+.detail_body {
+    @apply flex flex-col gap-5 px-5 py-5;
 }
 
 .detail_desc {
@@ -95,11 +132,11 @@
 }
 
 .detail_install {
-    @apply flex flex-col gap-3 pt-4 border-t border-realm-border;
+    @apply flex flex-col gap-3 p-4 rounded-md border border-realm-border bg-realm-surface;
 }
 
 .detail_install_label {
-    @apply text-xs font-medium uppercase tracking-wide text-neutral-400;
+    @apply text-xs font-medium text-neutral-500;
 }
 
 .detail_install_row {
@@ -110,6 +147,16 @@
     @apply flex flex-wrap gap-4 text-xs;
 }
 
-.empty {
-    @apply flex flex-col items-center justify-center py-16 px-6 flex-1;
+.detail_link {
+    @apply text-blue-400 hover:text-blue-300 no-underline transition-colors duration-150;
+}
+
+.install_button {
+    @apply flex-shrink-0 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150 border-0 cursor-pointer;
+    @apply bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300;
+    @apply disabled:opacity-50 disabled:cursor-default;
+}
+
+.install_button_installed {
+    @apply bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-400;
 }

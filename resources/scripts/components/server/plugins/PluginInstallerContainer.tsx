@@ -10,7 +10,15 @@ import { debounce } from 'debounce';
 import classNames from 'classnames';
 import { realmClasses } from '@/lib/realmTokens';
 import styles from './style.module.css';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import {
+    faArrowLeft,
+    faCheck,
+    faChevronLeft,
+    faChevronRight,
+    faDownload,
+    faSearch,
+    faUser,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type Source = 'hangar' | 'modrinth';
@@ -70,9 +78,13 @@ const formatNumber = (n: number) =>
     n >= 1_000_000 ? (n / 1_000_000).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
 
 const PLUGIN_SEARCH_CACHE_TTL_MS = 5 * 60 * 1000;
-const pluginSearchCache = new Map<string, { data: (HangarPlugin | ModrinthPlugin)[]; cachedAt: number }>();
+const PAGE_SIZE = 20;
+const pluginSearchCache = new Map<
+    string,
+    { data: (HangarPlugin | ModrinthPlugin)[]; total: number; cachedAt: number }
+>();
 
-const getPluginSearchCacheKey = (src: Source, q: string) => `${src}:${q.trim().toLowerCase()}`;
+const getPluginSearchCacheKey = (src: Source, q: string, page: number) => `${src}:${page}:${q.trim().toLowerCase()}`;
 
 const isHangarPlugin = (plugin: HangarPlugin | ModrinthPlugin): plugin is HangarPlugin => 'namespace' in plugin;
 
@@ -87,6 +99,9 @@ const getPluginAvatar = (plugin: HangarPlugin | ModrinthPlugin) =>
 
 const getPluginDownloads = (plugin: HangarPlugin | ModrinthPlugin) =>
     isHangarPlugin(plugin) ? plugin.stats.downloads : plugin.downloads;
+
+const getPluginAuthor = (plugin: HangarPlugin | ModrinthPlugin) =>
+    isHangarPlugin(plugin) ? plugin.namespace.owner : plugin.author;
 
 const mapHangarVersions = (result: any[]): VersionOption[] =>
     result.map((v) => {
@@ -119,6 +134,8 @@ export default () => {
     const [source, setSource] = useState<Source>('hangar');
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<(HangarPlugin | ModrinthPlugin)[]>([]);
+    const [totalResults, setTotalResults] = useState(0);
+    const [page, setPage] = useState(0);
     const [searching, setSearching] = useState(false);
     const [selectedPlugin, setSelectedPlugin] = useState<HangarPlugin | ModrinthPlugin | null>(null);
     const [pluginDetail, setPluginDetail] = useState<PluginDetail | null>(null);
@@ -128,12 +145,13 @@ export default () => {
 
     const activeSource = SOURCES.find((s) => s.id === source)!;
 
-    const loadPlugins = useCallback(async (src: Source, q: string) => {
-        const cacheKey = getPluginSearchCacheKey(src, q);
+    const loadPlugins = useCallback(async (src: Source, q: string, pageIndex: number) => {
+        const cacheKey = getPluginSearchCacheKey(src, q, pageIndex);
         const cached = pluginSearchCache.get(cacheKey);
 
         if (cached && Date.now() - cached.cachedAt < PLUGIN_SEARCH_CACHE_TTL_MS) {
             setResults(cached.data);
+            setTotalResults(cached.total);
             setSearching(false);
             return;
         }
@@ -141,9 +159,11 @@ export default () => {
         setSearching(true);
         try {
             let nextResults: (HangarPlugin | ModrinthPlugin)[] = [];
+            let total = 0;
+            const offset = String(pageIndex * PAGE_SIZE);
 
             if (src === 'hangar') {
-                const params = new URLSearchParams({ limit: '20', offset: '0', platform: 'PAPER' });
+                const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset, platform: 'PAPER' });
                 if (q.trim()) {
                     params.set('query', q.trim());
                 } else {
@@ -152,9 +172,11 @@ export default () => {
                 const res = await fetch(`https://hangar.papermc.io/api/v1/projects?${params}`);
                 const data = await res.json();
                 nextResults = data.result ?? [];
+                total = data.pagination?.count ?? nextResults.length;
             } else {
                 const params = new URLSearchParams({
-                    limit: '20',
+                    limit: String(PAGE_SIZE),
+                    offset,
                     facets: '[["project_type:plugin"]]',
                     index: q.trim() ? 'relevance' : 'downloads',
                 });
@@ -164,38 +186,52 @@ export default () => {
                 const res = await fetch(`https://api.modrinth.com/v2/search?${params}`);
                 const data = await res.json();
                 nextResults = data.hits ?? [];
+                total = data.total_hits ?? nextResults.length;
             }
 
-            pluginSearchCache.set(cacheKey, { data: nextResults, cachedAt: Date.now() });
+            pluginSearchCache.set(cacheKey, { data: nextResults, total, cachedAt: Date.now() });
             setResults(nextResults);
+            setTotalResults(total);
         } catch (e) {
             console.error(e);
             setResults([]);
+            setTotalResults(0);
         } finally {
             setSearching(false);
         }
     }, []);
 
     const debouncedSearch = useCallback(
-        debounce((q: string, src: Source) => loadPlugins(src, q), 500),
+        debounce((q: string, src: Source) => loadPlugins(src, q, 0), 500),
         [loadPlugins]
     );
 
     useEffect(() => {
-        loadPlugins(source, '');
+        loadPlugins(source, '', 0);
     }, [source, loadPlugins]);
 
     const onQueryChange = (value: string) => {
         setQuery(value);
+        setPage(0);
         debouncedSearch(value, source);
     };
 
     const onSourceChange = (src: Source) => {
         setSource(src);
         setQuery('');
+        setPage(0);
         setSelectedPlugin(null);
         setPluginDetail(null);
         setInstalling(null);
+    };
+
+    const totalPages = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
+
+    const goToPage = (pageIndex: number) => {
+        const next = Math.max(0, Math.min(pageIndex, totalPages - 1));
+        if (next === page) return;
+        setPage(next);
+        loadPlugins(source, query, next);
     };
 
     const closeDetail = () => {
@@ -348,8 +384,8 @@ export default () => {
     const listBadge =
         !selectedPlugin && results.length > 0 && !searching
             ? query.trim()
-                ? `${results.length} results`
-                : `${results.length} popular`
+                ? `${formatNumber(totalResults)} results`
+                : `${formatNumber(totalResults)} popular`
             : undefined;
 
     const renderDetail = () => {
@@ -366,187 +402,261 @@ export default () => {
                 ? `https://hangar.papermc.io/${selectedPlugin.namespace.owner}/${selectedPlugin.namespace.slug}`
                 : `https://modrinth.com/plugin/${selectedPlugin.slug}`);
 
+        const stats: React.ReactNode[] = [];
+        if (pluginDetail?.owner) {
+            stats.push(<span key={'owner'}>by {pluginDetail.owner}</span>);
+        }
+        stats.push(<span key={'downloads'}>{formatNumber(downloads)} downloads</span>);
+        if (pluginDetail?.stars != null) {
+            stats.push(<span key={'stars'}>{formatNumber(pluginDetail.stars)} stars</span>);
+        }
+        if (pluginDetail?.lastUpdated) {
+            stats.push(<span key={'updated'}>Updated {new Date(pluginDetail.lastUpdated).toLocaleDateString()}</span>);
+        }
+
         return (
-            <div className={styles.detail}>
+            <>
                 <button type={'button'} onClick={closeDetail} className={styles.detail_back}>
                     <FontAwesomeIcon icon={faArrowLeft} />
                     Back to plugins
                 </button>
 
-                <div className={styles.detail_header}>
-                    {avatar ? (
-                        <img src={avatar} alt={name} className={styles.detail_icon} />
-                    ) : (
-                        <PluginFallbackIcon large />
-                    )}
-                    <div className={'flex-1 min-w-0'}>
-                        <h3 className={styles.detail_title}>{name}</h3>
-                        <div className={styles.detail_stats}>
-                            {pluginDetail?.owner && <span>by {pluginDetail.owner}</span>}
-                            <span>{formatNumber(downloads)} downloads</span>
-                            {pluginDetail?.stars != null && <span>{formatNumber(pluginDetail.stars)} stars</span>}
-                            {pluginDetail?.lastUpdated && (
-                                <span>Updated {new Date(pluginDetail.lastUpdated).toLocaleDateString()}</span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <p className={styles.detail_desc}>{description}</p>
-
-                {detailLoading || installing.loading ? (
-                    <div className={'flex items-center gap-2 text-sm text-neutral-400 py-2'}>
-                        <Spinner size={'small'} />
-                        <span>Loading versions…</span>
-                    </div>
-                ) : installing.versions.length === 0 ? (
-                    <p className={'text-sm text-neutral-500 m-0'}>No versions available for Paper.</p>
-                ) : (
-                    <div className={styles.detail_install}>
-                        <span className={styles.detail_install_label}>Install version</span>
-                        <div className={styles.detail_install_row}>
-                            <select
-                                className={classNames(
-                                    'rounded text-sm px-3 py-2 focus:outline-none min-w-[12rem] max-w-full',
-                                    realmClasses.input
-                                )}
-                                value={installing.selectedVersion}
-                                onChange={(e) => onVersionChange(e.target.value)}
-                            >
-                                {installing.versions.map((v) => (
-                                    <option key={v.name} value={v.name}>
-                                        {v.name}
-                                        {!v.downloadUrl && v.externalUrl ? ' (external)' : ''}
-                                    </option>
+                <div className={styles.detail_card}>
+                    <div className={styles.detail_header}>
+                        {avatar ? (
+                            <img src={avatar} alt={name} className={styles.detail_icon} />
+                        ) : (
+                            <PluginFallbackIcon large />
+                        )}
+                        <div className={'flex-1 min-w-0'}>
+                            <h3 className={styles.detail_title}>{name}</h3>
+                            <div className={styles.detail_stats}>
+                                {stats.map((stat, index) => (
+                                    <React.Fragment key={index}>
+                                        {index > 0 && <span className={styles.detail_stat_dot}>•</span>}
+                                        {stat}
+                                    </React.Fragment>
                                 ))}
-                            </select>
-                            <button
-                                onClick={install}
-                                disabled={!installing.downloadUrl || installing.loading || isInstalled}
-                                className={classNames(
-                                    styles.row_action,
-                                    isInstalled ? styles.row_action_installed : styles.row_action_install,
-                                    'px-3 py-2 text-sm'
-                                )}
-                            >
-                                {installing.loading ? 'Installing…' : isInstalled ? 'Installed ✓' : 'Install to server'}
-                            </button>
+                            </div>
                         </div>
-                        {installing.externalUrl &&
-                            !installing.versions.find((v) => v.name === installing.selectedVersion)?.downloadUrl && (
-                                <p className={'text-xs text-neutral-500 m-0'}>
-                                    This version is hosted externally.{' '}
-                                    <a
-                                        href={installing.externalUrl}
-                                        target={'_blank'}
-                                        rel={'noopener noreferrer'}
-                                        className={'text-blue-400 hover:text-blue-300 no-underline'}
-                                    >
-                                        Download from publisher
-                                    </a>
-                                </p>
-                            )}
+                        <div className={'flex-shrink-0'}>
+                            <img
+                                src={activeSource.icon}
+                                alt={activeSource.label}
+                                title={activeSource.label}
+                                className={'w-5 h-5 object-contain opacity-60'}
+                            />
+                        </div>
                     </div>
-                )}
 
-                <div className={styles.detail_links}>
-                    <a
-                        href={externalPageUrl}
-                        target={'_blank'}
-                        rel={'noopener noreferrer'}
-                        className={'text-blue-400 hover:text-blue-300 no-underline'}
-                    >
-                        View on {activeSource.label} →
-                    </a>
-                    {pluginDetail?.wikiUrl && (
-                        <a
-                            href={pluginDetail.wikiUrl}
-                            target={'_blank'}
-                            rel={'noopener noreferrer'}
-                            className={'text-blue-400 hover:text-blue-300 no-underline'}
-                        >
-                            Wiki →
-                        </a>
-                    )}
+                    <div className={styles.detail_body}>
+                        <p className={styles.detail_desc}>{description}</p>
+
+                        {detailLoading || installing.loading ? (
+                            <div className={'flex items-center gap-2 text-sm text-neutral-400 py-2'}>
+                                <Spinner size={'small'} />
+                                <span>Loading versions…</span>
+                            </div>
+                        ) : installing.versions.length === 0 ? (
+                            <p className={'text-sm text-neutral-500 m-0'}>No versions available for Paper.</p>
+                        ) : (
+                            <div className={styles.detail_install}>
+                                <span className={styles.detail_install_label}>Install version</span>
+                                <div className={styles.detail_install_row}>
+                                    <select
+                                        className={classNames(
+                                            'rounded-md text-sm px-3 py-2 focus:outline-none min-w-[12rem] max-w-full',
+                                            realmClasses.input
+                                        )}
+                                        value={installing.selectedVersion}
+                                        onChange={(e) => onVersionChange(e.target.value)}
+                                    >
+                                        {installing.versions.map((v) => (
+                                            <option key={v.name} value={v.name}>
+                                                {v.name}
+                                                {!v.downloadUrl && v.externalUrl ? ' (external)' : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        onClick={install}
+                                        disabled={!installing.downloadUrl || installing.loading || isInstalled}
+                                        className={classNames(
+                                            styles.install_button,
+                                            isInstalled && styles.install_button_installed
+                                        )}
+                                    >
+                                        {installing.loading ? 'Installing…' : isInstalled ? 'Installed ✓' : 'Install to server'}
+                                    </button>
+                                </div>
+                                {installing.externalUrl &&
+                                    !installing.versions.find((v) => v.name === installing.selectedVersion)
+                                        ?.downloadUrl && (
+                                        <p className={'text-xs text-neutral-500 m-0'}>
+                                            This version is hosted externally.{' '}
+                                            <a
+                                                href={installing.externalUrl}
+                                                target={'_blank'}
+                                                rel={'noopener noreferrer'}
+                                                className={styles.detail_link}
+                                            >
+                                                Download from publisher
+                                            </a>
+                                        </p>
+                                    )}
+                            </div>
+                        )}
+
+                        <div className={styles.detail_links}>
+                            <a
+                                href={externalPageUrl}
+                                target={'_blank'}
+                                rel={'noopener noreferrer'}
+                                className={styles.detail_link}
+                            >
+                                View on {activeSource.label} →
+                            </a>
+                            {pluginDetail?.wikiUrl && (
+                                <a
+                                    href={pluginDetail.wikiUrl}
+                                    target={'_blank'}
+                                    rel={'noopener noreferrer'}
+                                    className={styles.detail_link}
+                                >
+                                    Wiki →
+                                </a>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </>
         );
     };
 
     const renderList = () => (
         <>
             <div className={styles.toolbar}>
-                <input
-                    className={classNames('rounded text-sm px-3 py-2 focus:outline-none transition-colors', realmClasses.input, styles.search)}
-                    placeholder={`Search ${activeSource.label}…`}
-                    value={query}
-                    onChange={(e) => onQueryChange(e.target.value)}
-                    autoFocus
-                />
+                <div className={classNames('flex items-center gap-1 p-1 rounded-md flex-shrink-0', realmClasses.tabBar)}>
+                    {SOURCES.map((s) => {
+                        const active = source === s.id;
+                        return (
+                            <button
+                                key={s.id}
+                                onClick={() => onSourceChange(s.id)}
+                                className={classNames(
+                                    'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150 border-0 cursor-pointer',
+                                    active ? realmClasses.tabActive : realmClasses.tabInactive
+                                )}
+                            >
+                                <img src={s.icon} alt={s.label} className={'w-4 h-4 object-contain flex-shrink-0'} />
+                                {s.label}
+                            </button>
+                        );
+                    })}
+                </div>
+                <div className={styles.search_wrap}>
+                    <FontAwesomeIcon icon={faSearch} className={styles.search_icon} />
+                    <input
+                        className={classNames(realmClasses.input, styles.search)}
+                        placeholder={`Search ${activeSource.label}…`}
+                        value={query}
+                        onChange={(e) => onQueryChange(e.target.value)}
+                        autoFocus
+                    />
+                </div>
                 {listBadge && <span className={styles.count}>{listBadge}</span>}
             </div>
 
-            <div className={styles.list}>
-                {searching ? (
-                    <div className={'py-16'}>
-                        <Spinner centered size={'large'} />
-                    </div>
-                ) : results.length > 0 ? (
-                    <div className={styles.plugin_grid}>
-                        {results.map((plugin) => {
-                            const slug = getPluginSlug(plugin);
-                            const name = getPluginName(plugin);
-                            const desc = plugin.description;
-                            const downloads = getPluginDownloads(plugin);
-                            const avatar = getPluginAvatar(plugin);
-                            const isInstalled = installedSlugs.has(slug);
+            {searching ? (
+                <div className={styles.state_block}>
+                    <Spinner centered size={'large'} />
+                </div>
+            ) : results.length > 0 ? (
+                <div className={styles.plugin_grid}>
+                    {results.map((plugin) => {
+                        const slug = getPluginSlug(plugin);
+                        const name = getPluginName(plugin);
+                        const desc = plugin.description;
+                        const downloads = getPluginDownloads(plugin);
+                        const author = getPluginAuthor(plugin);
+                        const avatar = getPluginAvatar(plugin);
+                        const isInstalled = installedSlugs.has(slug);
 
-                            return (
-                                <button
-                                    key={slug}
-                                    type={'button'}
-                                    onClick={() => openDetail(plugin)}
-                                    className={styles.card}
-                                >
-                                    <div className={styles.card_header}>
-                                        {avatar ? (
-                                            <img src={avatar} alt={name} className={styles.card_icon} />
-                                        ) : (
-                                            <PluginFallbackIcon />
-                                        )}
-                                        <div className={'flex-1 min-w-0'}>
-                                            <p className={styles.card_name}>{name}</p>
-                                            <p className={styles.card_meta}>{formatNumber(downloads)} downloads</p>
-                                        </div>
+                        return (
+                            <button
+                                key={slug}
+                                type={'button'}
+                                onClick={() => openDetail(plugin)}
+                                className={styles.card}
+                            >
+                                <div className={styles.card_header}>
+                                    {avatar ? (
+                                        <img src={avatar} alt={name} className={styles.card_icon} />
+                                    ) : (
+                                        <PluginFallbackIcon />
+                                    )}
+                                    <div className={'flex-1 min-w-0'}>
+                                        <p className={styles.card_name}>{name}</p>
+                                        <p className={styles.card_meta}>
+                                            <FontAwesomeIcon icon={faUser} className={styles.card_meta_icon} />
+                                            <span className={'truncate'}>{author}</span>
+                                        </p>
                                     </div>
+                                </div>
 
-                                    <p className={styles.card_desc}>{desc}</p>
+                                <p className={styles.card_desc}>{desc}</p>
 
-                                    <div className={styles.card_footer}>
-                                        <span
-                                            role={'button'}
-                                            tabIndex={-1}
-                                            aria-disabled={isInstalled}
-                                            className={classNames(
-                                                styles.row_action,
-                                                isInstalled ? styles.row_action_installed : styles.row_action_install
-                                            )}
-                                        >
-                                            {isInstalled ? 'Installed' : 'Install'}
+                                <div className={styles.card_footer}>
+                                    <span className={styles.card_source}>
+                                        <FontAwesomeIcon icon={faDownload} className={styles.card_meta_icon} />
+                                        {formatNumber(downloads)}
+                                    </span>
+                                    {isInstalled ? (
+                                        <span className={styles.installed_badge}>
+                                            <FontAwesomeIcon icon={faCheck} className={'text-[10px]'} />
+                                            Installed
                                         </span>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <div className={styles.empty}>
-                        <img src={activeSource.icon} alt={''} className={'w-8 h-8 object-contain opacity-30 mb-3'} />
-                        <h3 className={'text-base font-semibold text-neutral-100 mb-1 m-0'}>No plugins found</h3>
-                        <p className={'text-sm text-neutral-500 m-0'}>Try a different search term or switch source.</p>
-                    </div>
-                )}
-            </div>
+                                    ) : (
+                                        <span className={styles.install_badge}>Install</span>
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className={styles.state_block}>
+                    <img src={activeSource.icon} alt={''} className={'w-8 h-8 object-contain opacity-30 mb-3'} />
+                    <h3 className={'text-base font-semibold text-neutral-100 mb-1 m-0'}>No plugins found</h3>
+                    <p className={'text-sm text-neutral-500 m-0'}>Try a different search term or switch source.</p>
+                </div>
+            )}
+
+            {!searching && results.length > 0 && totalPages > 1 && (
+                <div className={styles.pagination}>
+                    <button
+                        type={'button'}
+                        className={styles.pagination_button}
+                        onClick={() => goToPage(page - 1)}
+                        disabled={page === 0}
+                    >
+                        <FontAwesomeIcon icon={faChevronLeft} className={'text-[10px]'} />
+                        Previous
+                    </button>
+                    <span className={styles.pagination_label}>
+                        Page {page + 1} of {formatNumber(totalPages)}
+                    </span>
+                    <button
+                        type={'button'}
+                        className={styles.pagination_button}
+                        onClick={() => goToPage(page + 1)}
+                        disabled={page >= totalPages - 1}
+                    >
+                        Next
+                        <FontAwesomeIcon icon={faChevronRight} className={'text-[10px]'} />
+                    </button>
+                </div>
+            )}
         </>
     );
 
@@ -554,28 +664,7 @@ export default () => {
         <ServerContentBlock title={'Plugins'}>
             <FlashMessageRender byKey={'plugins'} className={'mb-4'} />
 
-            <div className={classNames('flex items-center gap-1 p-1 rounded-lg mb-4 flex-wrap', realmClasses.tabBar)}>
-                {SOURCES.map((s) => {
-                    const active = source === s.id;
-                    return (
-                        <button
-                            key={s.id}
-                            onClick={() => onSourceChange(s.id)}
-                            className={classNames(
-                                'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150 border-0 cursor-pointer',
-                                active ? realmClasses.tabActive : realmClasses.tabInactive
-                            )}
-                        >
-                            <img src={s.icon} alt={s.label} className={'w-4 h-4 object-contain flex-shrink-0'} />
-                            {s.label}
-                        </button>
-                    );
-                })}
-            </div>
-
-            <div className={styles.panel}>
-                {selectedPlugin ? renderDetail() : renderList()}
-            </div>
+            {selectedPlugin ? renderDetail() : renderList()}
         </ServerContentBlock>
     );
 };
