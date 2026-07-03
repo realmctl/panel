@@ -4,41 +4,9 @@ import { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { ServerPowerState, ServerStats } from '@/api/server/getServerResourceUsage';
 import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import Spinner from '@/components/elements/Spinner';
+import { getServerBackground } from '@/lib/serverBackground';
 
 type Timer = ReturnType<typeof setInterval>;
-
-// Map egg name to background image
-const getServerBackground = (server: Server): string => {
-    // Use the egg's configured background if set
-    if (server.eggBackground) {
-        return `/assets/backgrounds/${server.eggBackground}`;
-    }
-
-    // Fallback: detect from egg name
-    const egg = server.eggName.toLowerCase();
-
-    if (egg.includes('minecraft')) return '/assets/backgrounds/minecraft.png';
-    if (egg.includes('rust')) return '/assets/backgrounds/rust.jpg';
-    if (egg.includes('valheim')) return '/assets/backgrounds/valheim.jpeg';
-    if (egg.includes('ark')) return '/assets/backgrounds/ark.webp';
-    if (egg.includes('terraria')) return '/assets/backgrounds/terraria.jpg';
-    if (egg.includes('csgo') || egg.includes('cs2') || egg.includes('counter-strike') || egg.includes('counter strike')) return '/assets/backgrounds/csgo.jpg';
-    if (egg.includes('gmod') || egg.includes('garry')) return '/assets/backgrounds/gmod.jpeg';
-    if (egg.includes('fivem')) return '/assets/backgrounds/fivem.jpeg';
-
-    // Fallback: check docker image
-    const image = server.dockerImage.toLowerCase();
-    if (image.includes('minecraft')) return '/assets/backgrounds/minecraft.png';
-    if (image.includes('rust')) return '/assets/backgrounds/rust.jpg';
-    if (image.includes('valheim')) return '/assets/backgrounds/valheim.jpeg';
-    if (image.includes('ark')) return '/assets/backgrounds/ark.webp';
-    if (image.includes('terraria')) return '/assets/backgrounds/terraria.jpg';
-    if (image.includes('csgo') || image.includes('cs2')) return '/assets/backgrounds/csgo.jpg';
-    if (image.includes('gmod')) return '/assets/backgrounds/gmod.jpeg';
-    if (image.includes('fivem')) return '/assets/backgrounds/fivem.jpeg';
-
-    return '/assets/backgrounds/minecraft.png';
-};
 
 const getServerType = (server: Server): string => {
     // Use the egg name directly as the server type

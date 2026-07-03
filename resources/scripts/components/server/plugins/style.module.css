@@ -1,6 +1,6 @@
 .panel {
     @apply overflow-hidden bg-realm-card border border-realm-border rounded-lg flex flex-col;
-    min-height: min(28rem, calc(100vh - 14rem));
+    min-height: min(38rem, calc(100vh - 12rem));
 }
 
 .toolbar {
@@ -19,29 +19,38 @@
     @apply flex-1 overflow-y-auto min-h-0;
 }
 
-.row {
-    @apply flex items-center gap-3 px-4 py-2.5 w-full text-left transition-colors duration-75;
-    @apply hover:bg-neutral-800/50;
+.plugin_grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 p-4 content-start;
 }
 
-.row_icon {
-    @apply w-9 h-9 rounded object-contain flex-shrink-0 bg-realm-surface-raised;
+.card {
+    @apply flex flex-col gap-3 p-3.5 rounded-lg border border-realm-border bg-realm-surface text-left;
+    @apply border-0 cursor-pointer transition-colors duration-100;
+    @apply hover:bg-realm-surface-raised/50;
 }
 
-.row_body {
-    @apply flex-1 min-w-0;
+.card_header {
+    @apply flex items-start gap-3;
 }
 
-.row_name {
-    @apply text-sm font-medium text-neutral-200 truncate m-0;
+.card_icon {
+    @apply w-10 h-10 rounded object-contain flex-shrink-0 bg-realm-surface-raised;
 }
 
-.row_desc {
-    @apply text-xs text-neutral-500 line-clamp-1 m-0 mt-0.5;
+.card_name {
+    @apply text-sm font-semibold text-neutral-100 truncate m-0;
 }
 
-.row_meta {
-    @apply text-xs font-mono text-realm-muted flex-shrink-0 hidden sm:block;
+.card_meta {
+    @apply text-xs font-mono text-realm-muted m-0 mt-0.5;
+}
+
+.card_desc {
+    @apply text-xs text-neutral-500 line-clamp-2 m-0 leading-relaxed flex-1;
+}
+
+.card_footer {
+    @apply flex items-center justify-end gap-2 mt-auto pt-1;
 }
 
 .row_action {

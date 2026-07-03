@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faTimes } from '@fortawesome/free-solid-svg-icons';
 import FileEditorEmptyState from '@/components/server/files/FileEditorEmptyState';
 import getFileContents from '@/api/server/files/getFileContents';
 import saveFileContents from '@/api/server/files/saveFileContents';
@@ -25,6 +25,7 @@ import {
 import FileEditorPresenceAvatars from '@/components/server/files/FileEditorPresenceAvatars';
 import FileEditorTabContextMenu, { TabContextTarget } from '@/components/server/files/FileEditorTabContextMenu';
 import FileMediaViewer from '@/components/server/files/FileMediaViewer';
+import FileTreeIcon from '@/components/server/files/FileTreeIcon';
 import { FileEditorPresence } from '@/api/server/files/fileEditingPresence';
 import styles from './style.module.css';
 import tw from 'twin.macro';
@@ -248,6 +249,24 @@ export default ({
                 </div>
             ) : (
                 <>
+                    <div className={styles.editor_breadcrumbs} aria-label={'File path'}>
+                        {activeTab.path
+                            .split('/')
+                            .filter(Boolean)
+                            .map((segment, index, segments) =>
+                                index === segments.length - 1 ? (
+                                    <span key={index} className={styles.editor_breadcrumb_current}>
+                                        <FileTreeIcon name={segment} isFile size={12} className={'!w-3 !h-3'} />
+                                        <span className={'truncate'}>{segment}</span>
+                                    </span>
+                                ) : (
+                                    <React.Fragment key={index}>
+                                        <span className={styles.editor_breadcrumb_segment}>{segment}</span>
+                                        <FontAwesomeIcon icon={faChevronRight} className={styles.editor_breadcrumb_sep} />
+                                    </React.Fragment>
+                                )
+                            )}
+                    </div>
                     <div className={styles.editor_body}>
                         {activeTab.path.endsWith('.realmignore') && (
                             <div className={styles.editor_notice}>

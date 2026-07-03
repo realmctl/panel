@@ -3,6 +3,9 @@ import * as monaco from 'monaco-editor';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 import { findModeByFilename, getMonacoLanguage } from '@/lib/monacoLanguages';
+import { patchMonacoWorkerEnvironment } from '@/lib/monacoWorkerShim';
+
+patchMonacoWorkerEnvironment();
 
 const EditorContainer = styled.div`
     ${tw`relative h-full w-full min-h-0`};

@@ -104,7 +104,7 @@ const PluginFallbackIcon = ({ large = false }: { large?: boolean }) => (
     <div
         className={classNames(
             'rounded flex items-center justify-center flex-shrink-0 font-bold bg-realm-surface-raised text-realm-muted',
-            large ? 'w-14 h-14 text-lg' : 'w-9 h-9 text-xs'
+            large ? 'w-14 h-14 text-lg' : 'w-10 h-10 text-xs'
         )}
     >
         ?
@@ -492,7 +492,7 @@ export default () => {
                         <Spinner centered size={'large'} />
                     </div>
                 ) : results.length > 0 ? (
-                    <div className={'divide-y divide-realm-border/60'}>
+                    <div className={styles.plugin_grid}>
                         {results.map((plugin) => {
                             const slug = getPluginSlug(plugin);
                             const name = getPluginName(plugin);
@@ -502,36 +502,40 @@ export default () => {
                             const isInstalled = installedSlugs.has(slug);
 
                             return (
-                                <div key={slug} className={styles.row}>
-                                    {avatar ? (
-                                        <img src={avatar} alt={name} className={styles.row_icon} />
-                                    ) : (
-                                        <PluginFallbackIcon />
-                                    )}
-
-                                    <button
-                                        type={'button'}
-                                        onClick={() => openDetail(plugin)}
-                                        className={classNames(styles.row_body, 'border-0 bg-transparent p-0 cursor-pointer text-left')}
-                                    >
-                                        <p className={styles.row_name}>{name}</p>
-                                        <p className={styles.row_desc}>{desc}</p>
-                                    </button>
-
-                                    <span className={styles.row_meta}>{formatNumber(downloads)} dl</span>
-
-                                    <button
-                                        type={'button'}
-                                        onClick={() => openDetail(plugin)}
-                                        disabled={isInstalled}
-                                        className={classNames(
-                                            styles.row_action,
-                                            isInstalled ? styles.row_action_installed : styles.row_action_install
+                                <button
+                                    key={slug}
+                                    type={'button'}
+                                    onClick={() => openDetail(plugin)}
+                                    className={styles.card}
+                                >
+                                    <div className={styles.card_header}>
+                                        {avatar ? (
+                                            <img src={avatar} alt={name} className={styles.card_icon} />
+                                        ) : (
+                                            <PluginFallbackIcon />
                                         )}
-                                    >
-                                        {isInstalled ? 'Installed' : 'Install'}
-                                    </button>
-                                </div>
+                                        <div className={'flex-1 min-w-0'}>
+                                            <p className={styles.card_name}>{name}</p>
+                                            <p className={styles.card_meta}>{formatNumber(downloads)} downloads</p>
+                                        </div>
+                                    </div>
+
+                                    <p className={styles.card_desc}>{desc}</p>
+
+                                    <div className={styles.card_footer}>
+                                        <span
+                                            role={'button'}
+                                            tabIndex={-1}
+                                            aria-disabled={isInstalled}
+                                            className={classNames(
+                                                styles.row_action,
+                                                isInstalled ? styles.row_action_installed : styles.row_action_install
+                                            )}
+                                        >
+                                            {isInstalled ? 'Installed' : 'Install'}
+                                        </span>
+                                    </div>
+                                </button>
                             );
                         })}
                     </div>

@@ -71,13 +71,13 @@ const BUCKET_LABELS: Record<LogBucket, string> = {
     other: 'Other',
 };
 
-/** Active/inactive chip colours per bucket (tailwind classes). */
-const BUCKET_COLORS: Record<LogBucket, string> = {
-    error: 'bg-red-500/20 text-red-300 border-red-500/40',
-    warn: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
-    info: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
-    debug: 'bg-slate-500/20 text-slate-300 border-slate-500/40',
-    other: 'bg-neutral-500/20 text-neutral-300 border-neutral-500/40',
+/** Indicator dot colour per bucket when the filter is active (tailwind classes). */
+const BUCKET_DOT_COLORS: Record<LogBucket, string> = {
+    error: 'bg-red-400',
+    warn: 'bg-amber-400',
+    info: 'bg-sky-400',
+    debug: 'bg-slate-400',
+    other: 'bg-neutral-500',
 };
 
 const bucketForLevel = (level: LogLevel): LogBucket => {
@@ -448,8 +448,7 @@ export default () => {
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
             {!isInstalling && (
-                <div className={'flex flex-wrap items-center gap-2 px-2 pb-2'}>
-                    <span className={'text-xs uppercase tracking-wide text-neutral-500 mr-1'}>Filter</span>
+                <div className={'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-realm-border/50'}>
                     {BUCKET_ORDER.map((bucket) => {
                         const active = filters[bucket];
                         return (
@@ -459,14 +458,22 @@ export default () => {
                                 onClick={() => toggleBucket(bucket)}
                                 aria-pressed={active}
                                 className={classNames(
-                                    'px-2 py-0.5 rounded-full border text-xs font-medium transition-colors duration-100',
+                                    'flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium border-0 bg-transparent cursor-pointer transition-colors duration-100',
                                     active
-                                        ? BUCKET_COLORS[bucket]
-                                        : 'bg-transparent text-neutral-500 border-neutral-700 line-through opacity-70'
+                                        ? 'text-neutral-300 hover:text-neutral-100'
+                                        : 'text-neutral-600 hover:text-neutral-400'
                                 )}
                             >
+                                <span
+                                    className={classNames(
+                                        'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                                        active ? BUCKET_DOT_COLORS[bucket] : 'bg-neutral-700'
+                                    )}
+                                />
                                 {BUCKET_LABELS[bucket]}
-                                <span className={'ml-1 opacity-70'}>{counts[bucket]}</span>
+                                <span className={classNames('tabular-nums', active ? 'text-neutral-500' : 'text-neutral-700')}>
+                                    {counts[bucket]}
+                                </span>
                             </button>
                         );
                     })}
