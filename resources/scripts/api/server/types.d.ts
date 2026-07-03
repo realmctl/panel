@@ -8,6 +8,7 @@ export type ServerStatus =
 
 export interface ServerBackup {
     uuid: string;
+    disk: string;
     isSuccessful: boolean;
     isLocked: boolean;
     name: string;

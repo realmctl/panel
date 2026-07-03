@@ -65,6 +65,7 @@ export interface NodeFormData {
     daemonSFTP: number | string;
     maintenance_mode?: boolean | number;
     upload_size?: number | string;
+    backup_adapter?: string;
     reset_secret?: boolean;
 }
 
@@ -104,6 +105,7 @@ export interface NodeSettingsDetail {
     scheme: 'https' | 'http';
     behind_proxy: boolean;
     maintenance_mode: boolean;
+    backup_adapter: string | null;
     memory: number;
     memory_overallocate: number;
     disk: number;

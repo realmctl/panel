@@ -109,7 +109,12 @@ class InitiateBackupService
 
         return $this->connection->transaction(function () use ($server, $name) {
             $destination = $this->backupManager->resolveDestinationForServer($server);
-            $disk = $destination?->adapter ?? $this->backupManager->getDefaultAdapter();
+            // Adapter precedence: an explicit location backup destination wins,
+            // then a per-node adapter override (e.g. "rustic"), then the
+            // Panel-wide default configured in config/backups.php.
+            $disk = $destination?->adapter
+                ?? $server->node?->backup_adapter
+                ?? $this->backupManager->getDefaultAdapter();
 
             /** @var Backup $backup */
             $backup = $this->repository->create([

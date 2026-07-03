@@ -447,6 +447,7 @@ class NodeController extends Controller
             'scheme' => $node->scheme,
             'behind_proxy' => $node->behind_proxy,
             'maintenance_mode' => $node->maintenance_mode,
+            'backup_adapter' => $node->backup_adapter,
             'memory' => $node->memory,
             'memory_overallocate' => $node->memory_overallocate,
             'disk' => $node->disk,

@@ -38,6 +38,15 @@ return [
             'adapter' => Backup::ADAPTER_WINGS,
         ],
 
+        // Deduplicated, encrypted backups stored in a rustic repository owned by
+        // the node's Wings daemon. Like the wings disk the Panel does not store
+        // or access the backup data itself; all storage is handled by Wings, so
+        // the repository, encryption password, and compression are configured in
+        // the node's Wings config.yml under `system.backups.rustic`.
+        'rustic' => [
+            'adapter' => Backup::ADAPTER_RUSTIC,
+        ],
+
         // Configuration for storing backups in Amazon S3. This uses the same credentials
         // specified in filesystems.php but does include some more specific settings for
         // backups, notably bucket, location, and use_accelerate_endpoint.

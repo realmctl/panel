@@ -89,7 +89,11 @@ class DaemonBackupRepository extends DaemonRepository
 
         try {
             return $this->getHttpClient()->delete(
-                sprintf('/api/servers/%s/backup/%s', $this->server->uuid, $backup->uuid)
+                sprintf('/api/servers/%s/backup/%s', $this->server->uuid, $backup->uuid),
+                // Wings needs to know the adapter for repository-backed backups
+                // (e.g. rustic) so it can forget the snapshot rather than looking
+                // for a standalone archive on disk.
+                ['query' => ['adapter' => $backup->disk]]
             );
         } catch (TransferException $exception) {
             throw new DaemonConnectionException($exception);

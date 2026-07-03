@@ -174,12 +174,16 @@ export default ({ backup }: Props) => {
                     )}
                 >
                     <div css={tw`text-sm`}>
-                        <Can action={'backup.download'}>
-                            <DropdownButtonRow onClick={doDownload}>
-                                <FontAwesomeIcon fixedWidth icon={faCloudDownloadAlt} css={tw`text-xs`} />
-                                <span css={tw`ml-2`}>Download</span>
-                            </DropdownButtonRow>
-                        </Can>
+                        {/* Rustic backups live in a deduplicated repository and cannot be
+                            downloaded as a single archive, so hide the download action. */}
+                        {backup.disk !== 'rustic' && (
+                            <Can action={'backup.download'}>
+                                <DropdownButtonRow onClick={doDownload}>
+                                    <FontAwesomeIcon fixedWidth icon={faCloudDownloadAlt} css={tw`text-xs`} />
+                                    <span css={tw`ml-2`}>Download</span>
+                                </DropdownButtonRow>
+                            </Can>
+                        )}
                         <Can action={'backup.restore'}>
                             <DropdownButtonRow onClick={() => setModal('restore')}>
                                 <FontAwesomeIcon fixedWidth icon={faBoxOpen} css={tw`text-xs`} />

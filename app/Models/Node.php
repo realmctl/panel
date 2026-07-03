@@ -96,6 +96,7 @@ class Node extends Model implements Identifiable
         'disk_overallocate', 'upload_size', 'daemonBase',
         'daemonSFTP', 'daemonListen',
         'description', 'maintenance_mode',
+        'backup_adapter',
     ];
 
     public static array $validationRules = [
@@ -115,6 +116,7 @@ class Node extends Model implements Identifiable
         'daemonListen' => 'required|numeric|between:1,65535',
         'maintenance_mode' => 'boolean',
         'upload_size' => 'int|min:1',
+        'backup_adapter' => 'nullable|string|in:wings,s3,rustic',
     ];
 
     /**

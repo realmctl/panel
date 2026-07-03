@@ -58,6 +58,7 @@ export default () => {
         scheme: 'https' as 'https' | 'http',
         behind_proxy: 0,
         maintenance_mode: 0,
+        backup_adapter: '',
         memory: '',
         memory_overallocate: '',
         disk: '',
@@ -82,6 +83,7 @@ export default () => {
                 scheme: node.scheme,
                 behind_proxy: node.behind_proxy ? 1 : 0,
                 maintenance_mode: node.maintenance_mode ? 1 : 0,
+                backup_adapter: node.backup_adapter ?? '',
                 memory: String(node.memory),
                 memory_overallocate: String(node.memory_overallocate),
                 disk: String(node.disk),
@@ -238,6 +240,24 @@ export default () => {
                             { value: 1, label: 'On' },
                         ]}
                     />
+                </SettingRow>
+                <SettingRow
+                    label="Backup adapter"
+                    description="Override the backup driver for servers on this node. Rustic requires the repository to be configured in this node's Wings config.yml."
+                    htmlFor="settings-backup-adapter"
+                    wide
+                >
+                    <select
+                        id="settings-backup-adapter"
+                        className={selectClass}
+                        value={form.backup_adapter}
+                        onChange={(e) => updateField('backup_adapter', e.target.value)}
+                    >
+                        <option value="">Panel default</option>
+                        <option value="wings">Wings (local)</option>
+                        <option value="s3">S3</option>
+                        <option value="rustic">Rustic (deduplicated + encrypted)</option>
+                    </select>
                 </SettingRow>
             </SettingsSection>
 

@@ -165,6 +165,16 @@ class BackupManager
     }
 
     /**
+     * Creates a new rustic adapter. Rustic backups are stored in a repository
+     * owned entirely by the node's Wings daemon, so the Panel keeps no local
+     * representation of the data (mirroring the wings adapter).
+     */
+    public function createRusticAdapter(array $config): FilesystemAdapter
+    {
+        return new InMemoryFilesystemAdapter();
+    }
+
+    /**
      * Creates a new S3 adapter.
      */
     public function createS3Adapter(array $config): FilesystemAdapter
