@@ -7,7 +7,8 @@ import Spinner from '@/components/elements/Spinner';
 import { Dialog } from '@/components/elements/dialog';
 import useFlash from '@/plugins/useFlash';
 import { deleteLocation, getLocation, updateLocation } from '@/api/admin/locations';
-import { fieldClass, textareaClass } from '@/components/admin/settings/fieldClass';
+import { getBackupDestinations } from '@/api/admin/backupDestinations';
+import { fieldClass, selectClass, textareaClass } from '@/components/admin/settings/fieldClass';
 import { SettingRow, SettingsFooter, SettingsSection } from '@/components/admin/settings/settingsLayout';
 import { adminBasePath } from '@/routers/adminRoutes';
 
@@ -20,8 +21,10 @@ export default () => {
         Number.isFinite(locationId) ? `admin-location-${locationId}` : null,
         () => getLocation(locationId)
     );
+    const { data: destinationsData } = useSWR('admin-backup-destinations', getBackupDestinations);
     const [short, setShort] = useState('');
     const [long, setLong] = useState('');
+    const [backupDestinationId, setBackupDestinationId] = useState<number | null>(null);
     const [saving, setSaving] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -30,6 +33,7 @@ export default () => {
         if (data?.location) {
             setShort(data.location.short);
             setLong(data.location.long ?? '');
+            setBackupDestinationId(data.location.backup_destination_id);
         }
     }, [data]);
 
@@ -47,7 +51,7 @@ export default () => {
         setSaving(true);
         clearFlashes('admin-locations');
 
-        updateLocation(locationId, { short, long })
+        updateLocation(locationId, { short, long, backup_destination_id: backupDestinationId })
             .then((response: any) => {
                 addFlash({
                     key: 'admin-locations',
@@ -136,6 +140,25 @@ export default () => {
                             onChange={(e) => setLong(e.target.value)}
                             rows={3}
                         />
+                    </SettingRow>
+                    <SettingRow
+                        label="Backup destination"
+                        htmlFor="location-backup-destination-edit"
+                        description="Servers in this location will store backups here instead of the global default."
+                    >
+                        <select
+                            id="location-backup-destination-edit"
+                            className={selectClass}
+                            value={backupDestinationId ?? ''}
+                            onChange={(e) => setBackupDestinationId(e.target.value ? Number(e.target.value) : null)}
+                        >
+                            <option value="">Use global default</option>
+                            {(destinationsData?.backup_destinations ?? []).map((destination) => (
+                                <option key={destination.id} value={destination.id}>
+                                    {destination.name}
+                                </option>
+                            ))}
+                        </select>
                     </SettingRow>
                 </SettingsSection>
 

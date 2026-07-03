@@ -19,6 +19,7 @@ export interface LocationDetail {
     id: number;
     short: string;
     long: string | null;
+    backup_destination_id: number | null;
 }
 
 export interface LocationListResponse {
@@ -33,6 +34,7 @@ export interface LocationShowResponse {
 export interface LocationFormData {
     short: string;
     long: string;
+    backup_destination_id?: number | null;
 }
 
 export interface LocationMutationResponse {

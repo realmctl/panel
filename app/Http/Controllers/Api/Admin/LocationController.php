@@ -53,6 +53,7 @@ class LocationController extends Controller
                 'id' => $location->id,
                 'short' => $location->short,
                 'long' => $location->long,
+                'backup_destination_id' => $location->backup_destination_id,
             ],
             'nodes' => $location->nodes->map(fn ($node) => [
                 'id' => $node->id,
@@ -78,6 +79,7 @@ class LocationController extends Controller
                 'id' => $location->id,
                 'short' => $location->short,
                 'long' => $location->long,
+                'backup_destination_id' => $location->backup_destination_id,
             ],
         ]);
     }
@@ -89,14 +91,16 @@ class LocationController extends Controller
     public function update(LocationFormRequest $request, Location $location): JsonResponse
     {
         $this->updateService->handle($location->id, $request->normalize());
+        $location->refresh();
 
         return response()->json([
             'success' => true,
             'message' => 'Location was updated successfully.',
             'location' => [
                 'id' => $location->id,
-                'short' => $request->input('short', $location->short),
-                'long' => $request->input('long', $location->long),
+                'short' => $location->short,
+                'long' => $location->long,
+                'backup_destination_id' => $location->backup_destination_id,
             ],
         ]);
     }

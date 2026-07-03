@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 import {
     Blocks,
+    CloudUpload,
     Database,
     Egg,
     Folder,
@@ -28,6 +29,9 @@ const AdminDatabasesContainer = lazy(
 );
 const AdminLocationsContainer = lazy(
     () => import('@/components/admin/AdminLocationsContainer')
+);
+const AdminBackupDestinationsContainer = lazy(
+    () => import('@/components/admin/AdminBackupDestinationsContainer')
 );
 const AdminNodesContainer = lazy(
     () => import('@/components/admin/AdminNodesContainer')
@@ -96,6 +100,13 @@ export const adminRoutes: AdminRouteDefinition[] = [
         name: 'Locations',
         component: AdminLocationsContainer,
         icon: Globe,
+        section: 'management',
+    },
+    {
+        path: '/backup-destinations',
+        name: 'Backup Destinations',
+        component: AdminBackupDestinationsContainer,
+        icon: CloudUpload,
         section: 'management',
     },
     {

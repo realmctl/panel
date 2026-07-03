@@ -49,7 +49,7 @@ class DownloadLinkService
     protected function getS3BackupUrl(Backup $backup): string
     {
         /** @var S3Filesystem $adapter */
-        $adapter = $this->backupManager->adapter(Backup::ADAPTER_AWS_S3);
+        $adapter = $this->backupManager->adapterForBackup($backup);
 
         $request = $adapter->getClient()->createPresignedRequest(
             $adapter->getClient()->getCommand('GetObject', [

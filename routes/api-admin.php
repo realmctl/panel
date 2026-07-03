@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Realm\Http\Controllers\Api\Admin\ApplicationApiController;
 use Realm\Http\Controllers\Api\Admin\OverviewController;
+use Realm\Http\Controllers\Api\Admin\BackupDestinationController;
 use Realm\Http\Controllers\Api\Admin\DatabaseHostController;
 use Realm\Http\Controllers\Api\Admin\LocationController;
 use Realm\Http\Controllers\Api\Admin\NodeController;
@@ -48,6 +49,12 @@ Route::post('/locations', [LocationController::class, 'store']);
 Route::get('/locations/{location}', [LocationController::class, 'show']);
 Route::patch('/locations/{location}', [LocationController::class, 'update']);
 Route::delete('/locations/{location}', [LocationController::class, 'destroy']);
+
+Route::get('/backup-destinations', [BackupDestinationController::class, 'index']);
+Route::post('/backup-destinations', [BackupDestinationController::class, 'store']);
+Route::get('/backup-destinations/{backup_destination}', [BackupDestinationController::class, 'show']);
+Route::patch('/backup-destinations/{backup_destination}', [BackupDestinationController::class, 'update']);
+Route::delete('/backup-destinations/{backup_destination}', [BackupDestinationController::class, 'destroy']);
 
 Route::get('/database-hosts', [DatabaseHostController::class, 'index']);
 Route::get('/database-hosts/create', [DatabaseHostController::class, 'create']);

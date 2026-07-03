@@ -63,7 +63,7 @@ class BackupRemoteUploadController extends Controller
         }
 
         // Ensure we are using the S3 adapter.
-        $adapter = $this->backupManager->adapter();
+        $adapter = $this->backupManager->adapterForBackup($model);
         if (!$adapter instanceof S3Filesystem) {
             throw new BadRequestHttpException('The configured backup adapter is not an S3 compatible adapter.');
         }
@@ -82,7 +82,7 @@ class BackupRemoteUploadController extends Controller
             'ContentType' => 'application/x-gzip',
         ];
 
-        $storageClass = config('backups.disks.s3.storage_class');
+        $storageClass = $model->backupDestination?->storage_class ?? config('backups.disks.s3.storage_class');
         if (!is_null($storageClass)) {
             $params['StorageClass'] = $storageClass;
         }

@@ -108,18 +108,22 @@ class InitiateBackupService
         }
 
         return $this->connection->transaction(function () use ($server, $name) {
+            $destination = $this->backupManager->resolveDestinationForServer($server);
+            $disk = $destination?->adapter ?? $this->backupManager->getDefaultAdapter();
+
             /** @var Backup $backup */
             $backup = $this->repository->create([
                 'server_id' => $server->id,
                 'uuid' => Uuid::uuid4()->toString(),
                 'name' => trim($name) ?: sprintf('Backup at %s', CarbonImmutable::now()->toDateTimeString()),
                 'ignored_files' => array_values($this->ignoredFiles),
-                'disk' => $this->backupManager->getDefaultAdapter(),
+                'disk' => $disk,
+                'backup_destination_id' => $destination?->id,
                 'is_locked' => $this->isLocked,
             ], true, true);
 
             $this->daemonBackupRepository->setServer($server)
-                ->setBackupAdapter($this->backupManager->getDefaultAdapter())
+                ->setBackupAdapter($disk)
                 ->backup($backup);
 
             return $backup;

@@ -73,7 +73,7 @@ class DeleteBackupService
             $backup->delete();
 
             /** @var S3Filesystem $adapter */
-            $adapter = $this->manager->adapter(Backup::ADAPTER_AWS_S3);
+            $adapter = $this->manager->adapterForBackup($backup);
 
             // @phpstan-ignore-next-line method.notFound
             $adapter->getClient()->deleteObject([

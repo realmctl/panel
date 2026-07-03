@@ -13,6 +13,9 @@ use League\Flysystem\FilesystemAdapter;
 use Realm\Extensions\Filesystem\S3Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Realm\Models\Backup;
+use Realm\Models\BackupDestination;
+use Realm\Models\Server;
 
 class BackupManager
 {
@@ -42,6 +45,60 @@ class BackupManager
     public function adapter(?string $name = null): FilesystemAdapter
     {
         return $this->get($name ?: $this->getDefaultAdapter());
+    }
+
+    /**
+     * Returns the backup adapter that should be used for a given backup, honoring
+     * a per-location backup destination if one was recorded on the backup at
+     * creation time, and falling back to the globally configured adapter otherwise.
+     */
+    public function adapterForBackup(Backup $backup): FilesystemAdapter
+    {
+        if ($backup->backup_destination_id && $backup->backupDestination) {
+            return $this->adapterForDestination($backup->backupDestination);
+        }
+
+        return $this->adapter($backup->disk);
+    }
+
+    /**
+     * Returns the backup adapter configured for a specific backup destination.
+     */
+    public function adapterForDestination(BackupDestination $destination): FilesystemAdapter
+    {
+        $cacheKey = 'destination:' . $destination->uuid;
+        if (isset($this->adapters[$cacheKey])) {
+            return $this->adapters[$cacheKey];
+        }
+
+        $config = [
+            'adapter' => $destination->adapter,
+            'key' => $destination->access_key,
+            'secret' => $destination->secret_key,
+            'region' => $destination->region,
+            'bucket' => $destination->bucket,
+            'prefix' => '',
+            'endpoint' => $destination->endpoint,
+            'use_path_style_endpoint' => $destination->use_path_style_endpoint,
+            'storage_class' => $destination->storage_class,
+        ];
+
+        $adapterMethod = 'create' . Str::studly($config['adapter']) . 'Adapter';
+        if (!method_exists($this, $adapterMethod)) {
+            throw new InvalidArgumentException("Adapter [{$config['adapter']}] is not supported.");
+        }
+
+        return $this->adapters[$cacheKey] = $this->{$adapterMethod}($config);
+    }
+
+    /**
+     * Resolves the backup destination that should be used for a server, based on
+     * the location its node belongs to. Returns null if the location has no
+     * destination assigned, in which case the globally configured adapter applies.
+     */
+    public function resolveDestinationForServer(Server $server): ?BackupDestination
+    {
+        return $server->node?->location?->backupDestination;
     }
 
     /**

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
@@ -14,8 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property string $long
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property int|null $backup_destination_id
  * @property Node[] $nodes
  * @property Server[] $servers
+ * @property BackupDestination|null $backupDestination
  */
 class Location extends Model
 {
@@ -44,6 +47,7 @@ class Location extends Model
     public static array $validationRules = [
         'short' => 'required|string|between:1,60|unique:locations,short',
         'long' => 'string|nullable|between:1,191',
+        'backup_destination_id' => 'nullable|integer|exists:backup_destinations,id',
     ];
 
     public function getRouteKeyName(): string
@@ -69,5 +73,13 @@ class Location extends Model
     public function servers(): HasManyThrough
     {
         return $this->hasManyThrough(Server::class, Node::class);
+    }
+
+    /**
+     * @return BelongsTo<BackupDestination, $this>
+     */
+    public function backupDestination(): BelongsTo
+    {
+        return $this->belongsTo(BackupDestination::class);
     }
 }

@@ -75,7 +75,7 @@ class BackupStatusController extends Controller
 
             // Check if we are using the s3 backup adapter. If so, make sure we mark the backup as
             // being completed in S3 correctly.
-            $adapter = $this->backupManager->adapter();
+            $adapter = $this->backupManager->adapterForBackup($model);
             if ($adapter instanceof S3Filesystem) {
                 $this->completeMultipartUpload($model, $adapter, $successful, $request->input('parts'));
             }

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $name
  * @property string[] $ignored_files
  * @property string $disk
+ * @property int|null $backup_destination_id
  * @property string|null $checksum
  * @property int $bytes
  * @property string|null $upload_id
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property CarbonImmutable $updated_at
  * @property CarbonImmutable|null $deleted_at
  * @property Server $server
+ * @property BackupDestination|null $backupDestination
  * @property AuditLog[] $audits
  */
 #[Attributes\Identifiable('bkup')]
@@ -73,6 +75,7 @@ class Backup extends Model implements Identifiable
         'name' => 'required|string',
         'ignored_files' => 'array',
         'disk' => 'required|string',
+        'backup_destination_id' => 'nullable|integer|exists:backup_destinations,id',
         'checksum' => 'nullable|string',
         'bytes' => 'numeric',
         'upload_id' => 'nullable|string',
@@ -84,5 +87,13 @@ class Backup extends Model implements Identifiable
     public function server(): BelongsTo
     {
         return $this->belongsTo(Server::class);
+    }
+
+    /**
+     * @return BelongsTo<BackupDestination, $this>
+     */
+    public function backupDestination(): BelongsTo
+    {
+        return $this->belongsTo(BackupDestination::class);
     }
 }
