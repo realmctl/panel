@@ -8,6 +8,9 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Realm\Enum\JwtScope;
 use Realm\Models\Server;
+use Realm\Models\Permission;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Http\JsonResponse;
 use Realm\Facades\Activity;
 use Realm\Models\FileRevision;
@@ -18,6 +21,8 @@ use Realm\Transformers\Api\Client\FileObjectTransformer;
 use Realm\Http\Controllers\Api\Client\ClientApiController;
 use Realm\Http\Requests\Api\Client\Servers\Files\CopyFileRequest;
 use Realm\Http\Requests\Api\Client\Servers\Files\PullFileRequest;
+use Realm\Http\Requests\Api\Client\Servers\Files\TransferFilesRequest;
+use Realm\Services\Files\FileTransferService;
 use Realm\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
 use Realm\Http\Requests\Api\Client\Servers\Files\ListArchiveDirectoryRequest;
 use Realm\Http\Requests\Api\Client\Servers\Files\ChmodFilesRequest;
@@ -38,6 +43,7 @@ class FileController extends ClientApiController
         private NodeJWTService $jwtService,
         private DaemonFileRepository $fileRepository,
         private FileRevisionService $revisionService,
+        private FileTransferService $transferService,
     ) {
         parent::__construct();
     }
@@ -299,6 +305,61 @@ class FileController extends ClientApiController
         Activity::event('server:file.pull')
             ->property('directory', $request->input('directory'))
             ->property('url', $request->input('url'))
+            ->log();
+
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Copies or moves the given files from this server to another server the user has
+     * access to. Works across nodes.
+     *
+     * @throws DaemonConnectionException
+     * @throws \Realm\Exceptions\DisplayException
+     */
+    public function transfer(TransferFilesRequest $request, Server $server): JsonResponse
+    {
+        set_time_limit(900);
+
+        $user = $request->user();
+
+        /** @var Server $destination */
+        $destination = Server::query()->where('uuid', $request->input('destination'))->firstOrFail();
+
+        // The user must be able to create files on the destination server, and must have
+        // access to it at all (owner, subuser, or admin) — mirror the standard access rules.
+        if ($user->id !== $destination->owner_id && !$user->root_admin && !$destination->subusers->contains('user_id', $user->id)) {
+            throw new NotFoundHttpException(trans('exceptions.api.resource_not_found'));
+        }
+
+        if (!$user->can(Permission::ACTION_FILE_CREATE, $destination)) {
+            throw new AccessDeniedHttpException('You do not have permission to create files on the destination server.');
+        }
+
+        $move = (bool) $request->input('move', false);
+        if ($move && !$user->can(Permission::ACTION_FILE_DELETE, $server)) {
+            throw new AccessDeniedHttpException('You do not have permission to delete files on the source server.');
+        }
+
+        $sourceDirectory = rawurldecode($request->input('root') ?? '/');
+        $destinationDirectory = rawurldecode($request->input('destination_directory') ?? '/');
+        $files = $request->input('files');
+
+        $this->transferService->handle(
+            $user,
+            $server,
+            $destination,
+            $sourceDirectory,
+            $files,
+            $destinationDirectory,
+            $move,
+        );
+
+        Activity::event($move ? 'server:file.transfer-move' : 'server:file.transfer-copy')
+            ->property('directory', $sourceDirectory)
+            ->property('files', $files)
+            ->property('destination', $destination->uuid)
+            ->property('destination_directory', $destinationDirectory)
             ->log();
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);

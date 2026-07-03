@@ -8,6 +8,7 @@ import compressFiles from '@/api/server/files/compressFiles';
 import { ServerContext } from '@/state/server';
 import deleteFiles from '@/api/server/files/deleteFiles';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
+import FileTransferModal from '@/components/server/files/FileTransferModal';
 import Portal from '@/components/elements/Portal';
 import { Dialog } from '@/components/elements/dialog';
 import { XIcon } from '@heroicons/react/solid';
@@ -21,6 +22,7 @@ const MassActionsBar = () => {
     const [loadingMessage, setLoadingMessage] = useState('');
     const [showConfirm, setShowConfirm] = useState(false);
     const [showMove, setShowMove] = useState(false);
+    const [transferMode, setTransferMode] = useState<'copy' | 'move' | null>(null);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
     const selectedFiles = ServerContext.useStoreState((state) => state.files.selectedFiles);
@@ -91,6 +93,15 @@ const MassActionsBar = () => {
                     onDismissed={() => setShowMove(false)}
                 />
             )}
+            {transferMode !== null && (
+                <FileTransferModal
+                    files={selectedFiles}
+                    visible
+                    appear
+                    move={transferMode === 'move'}
+                    onDismissed={() => setTransferMode(null)}
+                />
+            )}
             <Portal>
                 <div className={'pointer-events-none fixed bottom-0 mb-6 flex justify-center w-full z-50'}>
                     <Fade timeout={100} in={selectedFiles.length > 0} unmountOnExit>
@@ -103,6 +114,12 @@ const MassActionsBar = () => {
                             </Button>
                             <Button size={Button.Sizes.Small} onClick={onClickCompress}>
                                 Archive
+                            </Button>
+                            <Button size={Button.Sizes.Small} onClick={() => setTransferMode('copy')}>
+                                Copy to Server
+                            </Button>
+                            <Button size={Button.Sizes.Small} onClick={() => setTransferMode('move')}>
+                                Move to Server
                             </Button>
                             <Button.Danger size={Button.Sizes.Small} variant={Button.Variants.Secondary} onClick={() => setShowConfirm(true)}>
                                 Delete

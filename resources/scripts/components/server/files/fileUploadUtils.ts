@@ -73,7 +73,8 @@ export async function uploadFilesToDirectory(
     uuid: string,
     directory: string,
     filesWithPaths: FileWithPath[],
-    handlers: UploadProgressHandlers
+    handlers: UploadProgressHandlers,
+    batchSignal?: AbortSignal
 ): Promise<void> {
     if (filesWithPaths.length === 0) {
         return;
@@ -104,7 +105,16 @@ export async function uploadFilesToDirectory(
     }
 
     for (const { file, relativePath } of filesWithPaths) {
+        // Stop queueing new files once the whole batch has been cancelled.
+        if (batchSignal?.aborted) {
+            break;
+        }
+
         const controller = new AbortController();
+        // Cancelling the entire batch should also abort the request that is in flight.
+        const onBatchAbort = () => controller.abort();
+        batchSignal?.addEventListener('abort', onBatchAbort);
+
         const lastSlash = relativePath.lastIndexOf('/');
         const subDir = lastSlash > 0 ? relativePath.substring(0, lastSlash) : '';
         const uploadDirectory = subDir ? cleanDirectoryPath(`${base}/${subDir}`) : targetDirectory;
@@ -114,20 +124,37 @@ export async function uploadFilesToDirectory(
             data: { abort: controller, loaded: 0, total: file.size },
         });
 
-        const url = await getFileUploadUrl(uuid);
-        await axios.post(
-            url,
-            { files: file },
-            {
-                signal: controller.signal,
-                headers: { 'Content-Type': 'multipart/form-data' },
-                params: { directory: uploadDirectory },
-                onUploadProgress: (data: AxiosProgressEvent) => {
-                    handlers.setUploadProgress({ name: relativePath, loaded: data.loaded ?? 0 });
-                },
-            }
-        );
+        try {
+            const url = await getFileUploadUrl(uuid);
+            await axios.post(
+                url,
+                { files: file },
+                {
+                    signal: controller.signal,
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    params: { directory: uploadDirectory },
+                    onUploadProgress: (data: AxiosProgressEvent) => {
+                        handlers.setUploadProgress({ name: relativePath, loaded: data.loaded ?? 0 });
+                    },
+                }
+            );
 
-        handlers.removeFileUpload(relativePath);
+            handlers.removeFileUpload(relativePath);
+        } catch (error) {
+            handlers.removeFileUpload(relativePath);
+
+            // A cancelled upload (single file or whole batch) is not an error. Skip the
+            // file and keep going with the rest unless the entire batch was cancelled.
+            if (axios.isCancel(error)) {
+                if (batchSignal?.aborted) {
+                    break;
+                }
+                continue;
+            }
+
+            throw error;
+        } finally {
+            batchSignal?.removeEventListener('abort', onBatchAbort);
+        }
     }
 }

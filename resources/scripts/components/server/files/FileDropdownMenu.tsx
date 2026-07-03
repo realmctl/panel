@@ -10,10 +10,12 @@ import {
     faHistory,
     faLevelUpAlt,
     faPencilAlt,
+    faShareSquare,
     faTrashAlt,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
+import FileTransferModal from '@/components/server/files/FileTransferModal';
 import { ServerContext } from '@/state/server';
 import { join } from 'pathe';
 import deleteFiles from '@/api/server/files/deleteFiles';
@@ -62,6 +64,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     const [modal, setModal] = useState<ModalType | null>(null);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showRevisions, setShowRevisions] = useState(false);
+    const [transferMode, setTransferMode] = useState<'copy' | 'move' | null>(null);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
@@ -142,6 +145,15 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                 You will not be able to recover the contents of&nbsp;
                 <span className={'font-semibold text-gray-50'}>{file.name}</span> once deleted.
             </Dialog.Confirm>
+            {transferMode !== null && (
+                <FileTransferModal
+                    visible
+                    appear
+                    files={[file.name]}
+                    move={transferMode === 'move'}
+                    onDismissed={() => setTransferMode(null)}
+                />
+            )}
             {file.isFile && (
                 <FileRevisionModal
                     visible={showRevisions}
@@ -186,6 +198,20 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         <Row onClick={doCopy} icon={faCopy} title={'Copy'} />
                     </Can>
                 )}
+                <Can action={'file.create'}>
+                    <Row
+                        onClick={() => setTransferMode('copy')}
+                        icon={faShareSquare}
+                        title={'Copy to Server'}
+                    />
+                </Can>
+                <Can action={'file.delete'}>
+                    <Row
+                        onClick={() => setTransferMode('move')}
+                        icon={faShareSquare}
+                        title={'Move to Server'}
+                    />
+                </Can>
                 {file.isArchiveType() ? (
                     <Can action={'file.create'}>
                         <Row onClick={doUnarchive} icon={faBoxOpen} title={'Unarchive'} />

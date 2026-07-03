@@ -103,6 +103,7 @@ Route::group([
         Route::get('/download', [Client\Servers\FileController::class, 'download']);
         Route::put('/rename', [Client\Servers\FileController::class, 'rename']);
         Route::post('/copy', [Client\Servers\FileController::class, 'copy']);
+        Route::post('/transfer', [Client\Servers\FileController::class, 'transfer']);
         Route::post('/write', [Client\Servers\FileController::class, 'write']);
         Route::post('/compress', [Client\Servers\FileController::class, 'compress']);
         Route::post('/decompress', [Client\Servers\FileController::class, 'decompress']);

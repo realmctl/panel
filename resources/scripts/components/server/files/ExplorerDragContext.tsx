@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import axios from 'axios';
 import renameFiles from '@/api/server/files/renameFiles';
 import { httpErrorToHuman } from '@/api/http';
 import { cleanDirectoryPath } from '@/helpers';
@@ -61,7 +62,7 @@ interface ProviderProps {
 
 export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onItemMoved, children }: ProviderProps) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
-    const { clearFileUploads, removeFileUpload, pushFileUpload, setUploadProgress } = ServerContext.useStoreActions(
+    const { clearFileUploads, removeFileUpload, pushFileUpload, setUploadProgress, setUploadBatchAbort } = ServerContext.useStoreActions(
         (actions) => actions.files
     );
     const { clearAndAddHttpError, clearFlashes } = useFlash();
@@ -164,15 +165,23 @@ export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onIte
             }
 
             clearFlashes('files');
-            await uploadFilesToDirectory(uuid, targetFolder, files, {
-                pushFileUpload,
-                removeFileUpload,
-                setUploadProgress,
-                clearFileUploads,
-            });
+
+            const batch = new AbortController();
+            setUploadBatchAbort(batch);
+            try {
+                await uploadFilesToDirectory(
+                    uuid,
+                    targetFolder,
+                    files,
+                    { pushFileUpload, removeFileUpload, setUploadProgress, clearFileUploads },
+                    batch.signal
+                );
+            } finally {
+                setUploadBatchAbort(null);
+            }
             onTreeChange();
         },
-        [canCreate, clearFileUploads, clearFlashes, onTreeChange, pushFileUpload, removeFileUpload, setUploadProgress, uuid]
+        [canCreate, clearFileUploads, clearFlashes, onTreeChange, pushFileUpload, removeFileUpload, setUploadProgress, setUploadBatchAbort, uuid]
     );
 
     const handleDrop = useCallback(
@@ -190,8 +199,11 @@ export const ExplorerDragProvider = ({ canUpdate, canCreate, onTreeChange, onIte
                     await uploadToFolder(targetFolder, dataTransfer);
                 }
             } catch (error) {
-                console.error(error);
-                clearAndAddHttpError({ key: 'files', error: httpErrorToHuman(error) });
+                // Ignore user-initiated upload cancellations.
+                if (!axios.isCancel(error)) {
+                    console.error(error);
+                    clearAndAddHttpError({ key: 'files', error: httpErrorToHuman(error) });
+                }
             } finally {
                 endDrag();
             }

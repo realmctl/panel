@@ -16,7 +16,7 @@ use Realm\Exceptions\Http\Connection\DaemonConnectionException;
  */
 class DaemonBackupRepository extends DaemonRepository
 {
-    protected ?string $adapter;
+    protected ?string $adapter = null;
 
     /**
      * Sets the backup adapter for this execution instance.

@@ -11,12 +11,14 @@ export interface ServerFileStore {
     directory: string;
     selectedFiles: string[];
     uploads: Record<string, FileUploadData>;
+    uploadBatchAbort: AbortController | null;
 
     setDirectory: Action<ServerFileStore, string>;
     setSelectedFiles: Action<ServerFileStore, string[]>;
     appendSelectedFile: Action<ServerFileStore, string>;
     removeSelectedFile: Action<ServerFileStore, string>;
 
+    setUploadBatchAbort: Action<ServerFileStore, AbortController | null>;
     pushFileUpload: Action<ServerFileStore, { name: string; data: FileUploadData }>;
     setUploadProgress: Action<ServerFileStore, { name: string; loaded: number }>;
     clearFileUploads: Action<ServerFileStore>;
@@ -28,6 +30,11 @@ const files: ServerFileStore = {
     directory: '/',
     selectedFiles: [],
     uploads: {},
+    uploadBatchAbort: null,
+
+    setUploadBatchAbort: action((state, payload) => {
+        state.uploadBatchAbort = payload;
+    }),
 
     setDirectory: action((state, payload) => {
         state.directory = cleanDirectoryPath(payload);
@@ -46,6 +53,11 @@ const files: ServerFileStore = {
     }),
 
     clearFileUploads: action((state) => {
+        // Signal the batch first so the sequential upload loop stops queueing new files,
+        // then abort any request currently in flight.
+        state.uploadBatchAbort?.abort();
+        state.uploadBatchAbort = null;
+
         Object.values(state.uploads).forEach((upload) => upload.abort.abort());
 
         state.uploads = {};

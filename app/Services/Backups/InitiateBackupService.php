@@ -108,13 +108,20 @@ class InitiateBackupService
         }
 
         return $this->connection->transaction(function () use ($server, $name) {
-            $destination = $this->backupManager->resolveDestinationForServer($server);
-            // Adapter precedence: an explicit location backup destination wins,
-            // then a per-node adapter override (e.g. "rustic"), then the
-            // Panel-wide default configured in config/backups.php.
-            $disk = $destination?->adapter
-                ?? $server->node?->backup_adapter
-                ?? $this->backupManager->getDefaultAdapter();
+            // Adapter precedence:
+            //   1. A per-node adapter override (e.g. "rustic") is authoritative.
+            //      It selects a node-local driver whose storage lives on the node
+            //      itself, so it does not use a shared backup destination.
+            //   2. Otherwise a resolved backup destination (e.g. an S3 bucket).
+            //   3. Otherwise the Panel-wide default from config/backups.php.
+            $nodeAdapter = $server->node?->backup_adapter;
+            if ($nodeAdapter) {
+                $destination = null;
+                $disk = $nodeAdapter;
+            } else {
+                $destination = $this->backupManager->resolveDestinationForServer($server);
+                $disk = $destination?->adapter ?? $this->backupManager->getDefaultAdapter();
+            }
 
             /** @var Backup $backup */
             $backup = $this->repository->create([

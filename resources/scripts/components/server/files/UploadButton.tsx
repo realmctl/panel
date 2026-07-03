@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import axios from 'axios';
 import tw from 'twin.macro';
 import { Button } from '@/components/elements/button/index';
 import { useFlashKey } from '@/plugins/useFlash';
@@ -28,9 +29,8 @@ export default ({ className, iconOnly = false, onUploaded }: Props) => {
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
-    const { clearFileUploads, removeFileUpload, pushFileUpload, setUploadProgress } = ServerContext.useStoreActions(
-        (actions) => actions.files
-    );
+    const { clearFileUploads, removeFileUpload, pushFileUpload, setUploadProgress, setUploadBatchAbort } =
+        ServerContext.useStoreActions((actions) => actions.files);
 
     useEffect(() => {
         folderUploadInput.current?.setAttribute('webkitdirectory', '');
@@ -49,18 +49,28 @@ export default ({ className, iconOnly = false, onUploaded }: Props) => {
     const uploadFilesWithPaths = async (filesWithPaths: { file: File; relativePath: string }[]) => {
         clearAndAddHttpError();
 
+        const batch = new AbortController();
+        setUploadBatchAbort(batch);
+
         try {
-            await uploadFilesToDirectory(uuid, directory, filesWithPaths, {
-                pushFileUpload,
-                removeFileUpload,
-                setUploadProgress,
-                clearFileUploads,
-            });
-            await mutate();
+            await uploadFilesToDirectory(
+                uuid,
+                directory,
+                filesWithPaths,
+                { pushFileUpload, removeFileUpload, setUploadProgress, clearFileUploads },
+                batch.signal
+            );
             onUploaded?.();
         } catch (error: unknown) {
-            clearFileUploads();
-            clearAndAddHttpError(error instanceof Error ? error : String(error));
+            // A user-initiated cancellation is not an error worth surfacing.
+            if (!axios.isCancel(error)) {
+                clearFileUploads();
+                clearAndAddHttpError(error instanceof Error ? error : String(error));
+            }
+        } finally {
+            setUploadBatchAbort(null);
+            // Refresh the listing so any files that finished before a cancel are shown.
+            await mutate();
         }
     };
 
