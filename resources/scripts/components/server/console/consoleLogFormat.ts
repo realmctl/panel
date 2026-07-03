@@ -8,11 +8,11 @@ const LEVEL_COLORS = {
     default: '\u001b[38;2;203;213;225m', // slate-300
 } as const;
 
-type LogLevel = keyof typeof LEVEL_COLORS;
+export type LogLevel = keyof typeof LEVEL_COLORS;
 
 const hasAnsiColor = (line: string): boolean => ANSI_ESCAPE.test(line);
 
-const detectLogLevel = (line: string): LogLevel => {
+export const detectLogLevel = (line: string): LogLevel => {
     const upper = line.toUpperCase();
 
     if (
@@ -53,6 +53,26 @@ export const formatConsoleLine = (line: string): string => {
     const color = LEVEL_COLORS[level];
 
     return `${color}${trimmed}\u001b[0m`;
+};
+
+/**
+ * Classifies a console line by log level and returns both the detected level and the
+ * ANSI-formatted string ready to write to the terminal. Lines that already carry their own
+ * ANSI colouring keep it, but are still classified by keyword so they can be filtered.
+ *
+ * Returns null for empty lines.
+ */
+export const classifyAndFormat = (line: string): { level: LogLevel; formatted: string } | null => {
+    const trimmed = line.replace(/(?:\r\n|\r|\n)$/i, '');
+
+    if (!trimmed) {
+        return null;
+    }
+
+    const level = detectLogLevel(trimmed);
+    const formatted = hasAnsiColor(trimmed) ? `${trimmed}\u001b[0m` : `${LEVEL_COLORS[level]}${trimmed}\u001b[0m`;
+
+    return { level, formatted };
 };
 
 export const formatDaemonErrorLine = (line: string): string => {

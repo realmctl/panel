@@ -17,7 +17,12 @@ import { SocketEvent, SocketRequest } from '@/components/server/events';
 import classNames from 'classnames';
 
 import 'xterm/css/xterm.css';
-import { formatConsoleLine, formatDaemonErrorLine } from '@/components/server/console/consoleLogFormat';
+import {
+    classifyAndFormat,
+    formatConsoleLine,
+    formatDaemonErrorLine,
+    LogLevel,
+} from '@/components/server/console/consoleLogFormat';
 import InstallProgressPanel from '@/components/server/console/InstallProgressPanel';
 import {
     createInitialInstallProgress,
@@ -48,6 +53,62 @@ const WINGS_MESSAGE_REWRITES: Record<string, string> = {
     'Aborting automatic restart, crash detection is disabled for this instance.':
         'Automatic restart skipped — crash recovery is disabled for this instance.',
 };
+
+/**
+ * Buckets that console lines are grouped into for the category filter. Detected log levels
+ * map onto these; anything without a recognisable level (plain game output) and internal
+ * system/daemon notices fall into "other".
+ */
+type LogBucket = 'error' | 'warn' | 'info' | 'debug' | 'other';
+
+const BUCKET_ORDER: LogBucket[] = ['error', 'warn', 'info', 'debug', 'other'];
+
+const BUCKET_LABELS: Record<LogBucket, string> = {
+    error: 'Errors',
+    warn: 'Warnings',
+    info: 'Info',
+    debug: 'Debug',
+    other: 'Other',
+};
+
+/** Active/inactive chip colours per bucket (tailwind classes). */
+const BUCKET_COLORS: Record<LogBucket, string> = {
+    error: 'bg-red-500/20 text-red-300 border-red-500/40',
+    warn: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+    info: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
+    debug: 'bg-slate-500/20 text-slate-300 border-slate-500/40',
+    other: 'bg-neutral-500/20 text-neutral-300 border-neutral-500/40',
+};
+
+const bucketForLevel = (level: LogLevel): LogBucket => {
+    switch (level) {
+        case 'error':
+        case 'warn':
+        case 'info':
+        case 'debug':
+            return level;
+        default:
+            return 'other';
+    }
+};
+
+const emptyBucketRecord = (value: number): Record<LogBucket, number> => ({
+    error: value,
+    warn: value,
+    info: value,
+    debug: value,
+    other: value,
+});
+
+const allVisible = (): Record<LogBucket, boolean> => ({
+    error: true,
+    warn: true,
+    info: true,
+    debug: true,
+    other: true,
+});
+
+const MAX_BUFFERED_LINES = 5000;
 
 const powersettings = {
     starting: 'Server marked as starting',
@@ -115,6 +176,67 @@ export default () => {
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
     const [installProgress, setInstallProgress] = useState<InstallProgressState>(() => createInitialInstallProgress());
+
+    // Every line ever written is retained (capped) with its category so the terminal can be
+    // re-rendered when the user toggles category filters. xterm has no per-line filtering.
+    const lineBuffer = useRef<{ bucket: LogBucket; text: string }[]>([]);
+    const [filters, setFilters] = useState<Record<LogBucket, boolean>>(allVisible);
+    const [counts, setCounts] = useState<Record<LogBucket, number>>(() => emptyBucketRecord(0));
+    // Refs mirror the above so the socket handlers (registered once) always read current values.
+    const filtersRef = useRef(filters);
+    const countsRef = useRef(counts);
+    const countsFlushScheduled = useRef(false);
+    filtersRef.current = filters;
+
+    const scheduleCountsFlush = () => {
+        if (countsFlushScheduled.current) {
+            return;
+        }
+        countsFlushScheduled.current = true;
+        window.requestAnimationFrame(() => {
+            countsFlushScheduled.current = false;
+            setCounts({ ...countsRef.current });
+        });
+    };
+
+    const resetConsoleBuffer = () => {
+        lineBuffer.current = [];
+        countsRef.current = emptyBucketRecord(0);
+        setCounts(emptyBucketRecord(0));
+    };
+
+    // Records a line in the buffer and writes it to the terminal only if its category is
+    // currently visible.
+    const writeBuffered = (bucket: LogBucket, text: string) => {
+        lineBuffer.current.push({ bucket, text });
+        if (lineBuffer.current.length > MAX_BUFFERED_LINES) {
+            lineBuffer.current.shift();
+        }
+
+        countsRef.current[bucket] += 1;
+        scheduleCountsFlush();
+
+        if (filtersRef.current[bucket]) {
+            terminal.writeln(text);
+        }
+    };
+
+    // Re-renders the whole terminal from the buffer according to the given visibility map.
+    const rerenderFromBuffer = (visible: Record<LogBucket, boolean>) => {
+        terminal.clear();
+        for (const entry of lineBuffer.current) {
+            if (visible[entry.bucket]) {
+                terminal.writeln(entry.text);
+            }
+        }
+    };
+
+    const toggleBucket = (bucket: LogBucket) => {
+        const next = { ...filtersRef.current, [bucket]: !filtersRef.current[bucket] };
+        filtersRef.current = next;
+        setFilters(next);
+        rerenderFromBuffer(next);
+    };
     // SearchBarAddon has hardcoded z-index: 999 :(
     const zIndex = `
     .xterm-search-bar__addon {
@@ -139,20 +261,23 @@ export default () => {
     };
 
     const handleConsoleOutput = (line: string, prelude = false) => {
-        const formatted = formatConsoleLine(normalizeConsoleLine(line));
+        const result = classifyAndFormat(normalizeConsoleLine(line));
 
-        if (!formatted) {
+        if (!result) {
             return;
         }
 
-        terminal.writeln((prelude ? TERMINAL_PRELUDE : '') + formatted);
+        // Daemon-prefixed (prelude) notices are internal system messages regardless of any
+        // level keyword they happen to contain.
+        const bucket = prelude ? 'other' : bucketForLevel(result.level);
+        writeBuffered(bucket, (prelude ? TERMINAL_PRELUDE : '') + result.formatted);
     };
 
     const handleTransferStatus = (status: string) => {
         switch (status) {
             // Sent by either the source or target node if a failure occurs.
             case 'failure':
-                terminal.writeln(TERMINAL_PRELUDE + formatConsoleLine('ERROR: Transfer has failed.'));
+                writeBuffered('error', TERMINAL_PRELUDE + formatConsoleLine('ERROR: Transfer has failed.'));
                 return;
         }
     };
@@ -172,17 +297,17 @@ export default () => {
         const formatted = formatDaemonErrorLine(line);
 
         if (formatted) {
-            terminal.writeln(formatted);
+            writeBuffered('error', formatted);
         }
     };
 
     const handlePowerChangeEvent = (state: string) => {
         if (state === 'starting') {
-            terminal.writeln(TERMINAL_PRELUDE + powersettings.starting);
+            writeBuffered('other', TERMINAL_PRELUDE + powersettings.starting);
         } else if (state === 'started') {
-            terminal.writeln(TERMINAL_PRELUDE + powersettings.started);
+            writeBuffered('other', TERMINAL_PRELUDE + powersettings.started);
         } else if (state === 'offline') {
-            terminal.writeln(TERMINAL_PRELUDE + powersettings.offline);
+            writeBuffered('other', TERMINAL_PRELUDE + powersettings.offline);
         }
     };
 
@@ -278,6 +403,7 @@ export default () => {
 
         if (connected && terminal.element) {
             terminal.clear();
+            resetConsoleBuffer();
         }
     }, [isInstalling]);
 
@@ -300,6 +426,7 @@ export default () => {
             // Do not clear the console if the server is being transferred.
             if (!isTransferring && !isInstalling) {
                 terminal.clear();
+                resetConsoleBuffer();
             }
 
             Object.keys(listeners).forEach((key: string) => {
@@ -320,6 +447,31 @@ export default () => {
     return (
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
+            {!isInstalling && (
+                <div className={'flex flex-wrap items-center gap-2 px-2 pb-2'}>
+                    <span className={'text-xs uppercase tracking-wide text-neutral-500 mr-1'}>Filter</span>
+                    {BUCKET_ORDER.map((bucket) => {
+                        const active = filters[bucket];
+                        return (
+                            <button
+                                key={bucket}
+                                type={'button'}
+                                onClick={() => toggleBucket(bucket)}
+                                aria-pressed={active}
+                                className={classNames(
+                                    'px-2 py-0.5 rounded-full border text-xs font-medium transition-colors duration-100',
+                                    active
+                                        ? BUCKET_COLORS[bucket]
+                                        : 'bg-transparent text-neutral-500 border-neutral-700 line-through opacity-70'
+                                )}
+                            >
+                                {BUCKET_LABELS[bucket]}
+                                <span className={'ml-1 opacity-70'}>{counts[bucket]}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
             <div className={classNames(styles.container, styles.overflows_container)}>
                 <div className={styles.terminal_shell}>
                     <div id={styles.terminal} ref={ref} />
