@@ -84,6 +84,8 @@ Route::group([
     Route::get('/resources', Client\Servers\ResourceUtilizationController::class)->name('api:client:server.resources');
     Route::get('/players', [Client\Servers\PlayerController::class, 'index'])->name('api:client:server.players');
     Route::get('/activity', Client\Servers\ActivityLogController::class)->name('api:client:server.activity');
+    Route::post('/console/upload-logs', [Client\Servers\ConsoleLogController::class, 'upload']);
+    Route::post('/console/summarize', [Client\Servers\ConsoleLogController::class, 'summarize']);
 
     Route::post('/command', [Client\Servers\CommandController::class, 'index']);
     Route::post('/power', [Client\Servers\PowerController::class, 'index']);
@@ -194,6 +196,7 @@ Route::group([
         Route::get('/', [Client\Servers\VersionChangerController::class, 'listVersions']);
         Route::get('/download', [Client\Servers\VersionChangerController::class, 'getDownloadUrl']);
         Route::post('/install', [Client\Servers\VersionChangerController::class, 'install']);
+        Route::post('/custom', [Client\Servers\VersionChangerController::class, 'markCustom']);
     });
 
     Route::group(['prefix' => '/settings'], function () {

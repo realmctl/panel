@@ -15,6 +15,7 @@ use Realm\Http\Controllers\Api\Admin\EggVariableController;
 use Realm\Http\Controllers\Api\Admin\MountController;
 use Realm\Http\Controllers\Api\Admin\NestController;
 use Realm\Http\Controllers\Api\Admin\SubdomainDomainController;
+use Realm\Http\Controllers\Api\Admin\AiProviderController;
 use Realm\Http\Controllers\Api\Admin\SubdomainRecordController;
 use Realm\Http\Controllers\Api\Admin\UserController;
 
@@ -124,6 +125,7 @@ Route::delete('/users/{user:id}', [UserController::class, 'destroy']);
 Route::get('/subdomains/domains', [SubdomainDomainController::class, 'index']);
 Route::get('/subdomains/domains/create', [SubdomainDomainController::class, 'create']);
 Route::post('/subdomains/domains', [SubdomainDomainController::class, 'store']);
+Route::post('/subdomains/domains/cloudflare/zones', [SubdomainDomainController::class, 'cloudflareZones']);
 Route::get('/subdomains/domains/{domain:id}', [SubdomainDomainController::class, 'show']);
 Route::patch('/subdomains/domains/{domain:id}', [SubdomainDomainController::class, 'update']);
 Route::delete('/subdomains/domains/{domain:id}', [SubdomainDomainController::class, 'destroy']);
@@ -134,6 +136,11 @@ Route::post('/subdomains/records', [SubdomainRecordController::class, 'store']);
 Route::get('/subdomains/records/{record:id}', [SubdomainRecordController::class, 'show']);
 Route::patch('/subdomains/records/{record:id}', [SubdomainRecordController::class, 'update']);
 Route::delete('/subdomains/records/{record:id}', [SubdomainRecordController::class, 'destroy']);
+
+Route::get('/ai-provider', [AiProviderController::class, 'current']);
+Route::patch('/ai-provider', [AiProviderController::class, 'save']);
+Route::delete('/ai-provider', [AiProviderController::class, 'destroy']);
+Route::post('/ai-provider/test', [AiProviderController::class, 'test']);
 
 Route::get('/mounts', [MountController::class, 'index']);
 Route::post('/mounts', [MountController::class, 'store']);
