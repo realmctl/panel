@@ -6,6 +6,7 @@ import Spinner from '@/components/elements/Spinner';
 import Features from '@feature/Features';
 import Console from '@/components/server/console/Console';
 import OverviewStats from '@/components/server/console/OverviewStats';
+import ServerInfoCard from '@/components/server/console/ServerInfoCard';
 import { Alert } from '@/components/elements/alert';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { SocketEvent } from '@/components/server/events';
@@ -34,34 +35,40 @@ const ServerConsoleContainer = () => {
                 </Alert>
             )}
 
-            <OverviewStats className={'mb-4'} />
+            <div className={'grid grid-cols-1 lg:grid-cols-4 gap-4'}>
+                <ServerInfoCard className={'lg:col-span-1 self-start'} />
 
-            <RealmCard
-                rounded={'md'}
-                border={'soft'}
-                header={
-                    <div className={'flex items-center justify-between gap-3'}>
-                        <h2 className={'text-base font-semibold text-neutral-100 m-0'}>Console</h2>
-                        {errorCount > 0 && (
-                            <span
-                                className={
-                                    'flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30'
-                                }
-                            >
-                                ⚠ {errorCount} {errorCount === 1 ? 'Error' : 'Errors'}
-                            </span>
-                        )}
-                    </div>
-                }
-                headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
-                bodyClassName={'!p-0'}
-            >
-                <div className={'flex flex-col h-[30rem] lg:h-[34rem]'}>
-                    <Spinner.Suspense>
-                        <Console />
-                    </Spinner.Suspense>
+                <div className={'lg:col-span-3 flex flex-col gap-4'}>
+                    <OverviewStats />
+
+                    <RealmCard
+                        rounded={'md'}
+                        border={'soft'}
+                        header={
+                            <div className={'flex items-center justify-between gap-3'}>
+                                <h2 className={'text-base font-semibold text-neutral-100 m-0'}>Console</h2>
+                                {errorCount > 0 && (
+                                    <span
+                                        className={
+                                            'flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30'
+                                        }
+                                    >
+                                        ⚠ {errorCount} {errorCount === 1 ? 'Error' : 'Errors'}
+                                    </span>
+                                )}
+                            </div>
+                        }
+                        headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
+                        bodyClassName={'!p-0'}
+                    >
+                        <div className={'flex flex-col h-[30rem] lg:h-[34rem]'}>
+                            <Spinner.Suspense>
+                                <Console />
+                            </Spinner.Suspense>
+                        </div>
+                    </RealmCard>
                 </div>
-            </RealmCard>
+            </div>
 
             <Features enabled={eggFeatures} />
         </ServerContentBlock>

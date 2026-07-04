@@ -46,6 +46,13 @@ class ServerTransformer extends BaseClientTransformer
             $geo = $geolocation->lookup($this->request->ip());
         }
 
+        // Both of the above are still private when the whole stack runs behind Docker/NAT
+        // locally, so as a last resort ask what public IP this box is actually reaching the
+        // internet as and geolocate that instead.
+        if (!$geo) {
+            $geo = $geolocation->lookupOutboundPublicIp();
+        }
+
         if (!$geo) {
             return [
                 'ip' => $allocation->ip,

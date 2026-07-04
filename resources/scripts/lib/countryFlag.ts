@@ -31,7 +31,5 @@ export const formatGeoLocationLabel = (
         return null;
     }
 
-    const parts = [location.city, location.region, location.country].filter(Boolean);
-
-    return parts.length > 0 ? parts.join(', ') : null;
+    return location.city || location.country || null;
 };

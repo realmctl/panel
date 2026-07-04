@@ -82,4 +82,40 @@ class IpGeolocationService
     {
         return (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     }
+
+    /**
+     * Used as a last-resort fallback when neither the node's own IP nor the requesting
+     * client's IP are public (e.g. local development behind NAT/Docker), by asking an
+     * external service what IP this box is actually reaching the internet as.
+     *
+     * @return array{country_code: string, country: string, city: string|null, region: string|null}|null
+     */
+    public function lookupOutboundPublicIp(): ?array
+    {
+        $cacheKey = 'geolocation:outbound-ip';
+        $cacheTtl = (int) config('geolocation.cache_ttl', 604800);
+
+        if (Cache::has($cacheKey)) {
+            /** @var array{country_code: string, country: string, city: string|null, region: string|null}|null $cached */
+            $cached = Cache::get($cacheKey);
+
+            return $cached;
+        }
+
+        try {
+            $response = Http::timeout(5)->get('https://api.ipify.org', ['format' => 'json']);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (!$response->successful() || !filled($ip = $response->json('ip'))) {
+            return null;
+        }
+
+        $result = $this->fetch($ip);
+
+        Cache::put($cacheKey, $result, Carbon::now()->addSeconds($cacheTtl));
+
+        return $result;
+    }
 }
