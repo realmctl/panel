@@ -36,7 +36,15 @@ class ServerTransformer extends BaseClientTransformer
             return null;
         }
 
-        $geo = app(IpGeolocationService::class)->lookup($allocation->ip);
+        $geolocation = app(IpGeolocationService::class);
+        $geo = $geolocation->lookup($allocation->ip);
+
+        // The node's own IP is often private/unroutable in local or NAT'd deployments, which
+        // means it can never be geolocated. Fall back to the requesting user's IP so the UI
+        // still has a sensible location to display rather than "Unknown location".
+        if (!$geo && $this->request->ip()) {
+            $geo = $geolocation->lookup($this->request->ip());
+        }
 
         if (!$geo) {
             return [

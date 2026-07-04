@@ -1,7 +1,7 @@
 import React from 'react';
 import { Server } from '@/api/server/getServer';
 import ServerCard from '@/components/dashboard/ServerCard';
-import ServerRow from '@/components/dashboard/ServerRow';
+import ServerTable from '@/components/dashboard/ServerTable';
 import GroupColorDot, { resolveColor } from '@/components/dashboard/groups/GroupColorDot';
 
 interface Props {
@@ -49,11 +49,7 @@ export default ({ name, color, servers, layout, collapsed, onToggle }: Props) =>
                     ))}
                 </div>
             ) : (
-                <div className={'flex flex-col gap-2'}>
-                    {servers.map((s) => (
-                        <ServerRow key={s.uuid} server={s} groupColor={color} />
-                    ))}
-                </div>
+                <ServerTable servers={servers} groupColor={color} />
             )
         )}
     </div>

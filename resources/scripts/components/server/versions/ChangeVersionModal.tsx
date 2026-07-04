@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import tw from 'twin.macro';
-import Drawer from '@/components/elements/Drawer';
+import Modal from '@/components/elements/Modal';
 import Select from '@/components/elements/Select';
 import Button from '@/components/elements/Button';
 import InputSpinner from '@/components/elements/InputSpinner';
@@ -176,18 +176,20 @@ export default ({ visible, onDismissed }: Props) => {
     const javaLabel = selectedVersion ? getRequiredJavaLabel(selectedVersion) : null;
 
     return (
-        <Drawer
+        <Modal
             visible={visible}
             onDismissed={handleDismiss}
-            title={'Change Version'}
-            subtitle={'Select a server distribution and version to install.'}
-            width={'28rem'}
             dismissable={!installing}
             closeOnBackground={!installing}
             closeOnEscape={!installing}
         >
-            <div className={'relative flex flex-col min-h-full'}>
+            <div className={'relative flex flex-col'}>
                 <SpinnerOverlay visible={installing} />
+
+                <h2 css={tw`text-2xl mb-1`}>Change Version</h2>
+                <p css={tw`text-sm text-neutral-400 mb-6`}>
+                    Select a server distribution and version to install.
+                </p>
 
                 {success && (
                     <div
@@ -308,6 +310,6 @@ export default ({ visible, onDismissed }: Props) => {
                     )}
                 </div>
             </div>
-        </Drawer>
+        </Modal>
     );
 };

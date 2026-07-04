@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconDefinition, faClock, faHdd, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
+import {
+    IconDefinition,
+    faClock,
+    faHdd,
+    faMapMarkerAlt,
+    faMemory,
+    faMicrochip,
+} from '@fortawesome/free-solid-svg-icons';
 import { ServerContext } from '@/state/server';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
@@ -21,26 +28,55 @@ interface TileProps {
     children: React.ReactNode;
 }
 
+const RING_SIZE = 28;
+const RING_STROKE = 3;
+const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
+const CircularProgress = ({ percent, color }: { percent: number; color: string }) => {
+    const offset = RING_CIRCUMFERENCE - (Math.min(percent, 100) / 100) * RING_CIRCUMFERENCE;
+
+    return (
+        <svg width={RING_SIZE} height={RING_SIZE} className={'-rotate-90 flex-shrink-0'}>
+            <circle
+                cx={RING_SIZE / 2}
+                cy={RING_SIZE / 2}
+                r={RING_RADIUS}
+                strokeWidth={RING_STROKE}
+                fill={'none'}
+                className={'stroke-realm-border/40'}
+            />
+            <circle
+                cx={RING_SIZE / 2}
+                cy={RING_SIZE / 2}
+                r={RING_RADIUS}
+                strokeWidth={RING_STROKE}
+                fill={'none'}
+                strokeLinecap={'round'}
+                strokeDasharray={RING_CIRCUMFERENCE}
+                strokeDashoffset={offset}
+                stroke={color}
+                className={'transition-all duration-500'}
+            />
+        </svg>
+    );
+};
+
 const Tile = ({ icon, label, sub, barUsed, barLimit, children }: TileProps) => {
     const delta = barLimit ? barUsed! / barLimit : 0;
-    const barColor = delta > 0.9 ? 'bg-red-400' : delta > 0.8 ? 'bg-amber-400' : 'bg-neutral-400';
+    const ringColor = delta > 0.9 ? '#f87171' : delta > 0.8 ? '#fbbf24' : '#9ca3af';
 
     return (
         <div className={'bg-realm-card border border-realm-border/50 rounded-md px-4 py-3 min-w-0 flex flex-col'}>
-            <div className={'flex items-center gap-2 mb-1.5'}>
-                <FontAwesomeIcon icon={icon} className={'w-3.5 h-3.5 text-neutral-500'} fixedWidth />
-                <span className={'text-xs font-medium text-neutral-500'}>{label}</span>
+            <div className={'flex items-center justify-between gap-2 mb-1.5 min-h-[28px]'}>
+                <div className={'flex items-center gap-2 min-w-0'}>
+                    <FontAwesomeIcon icon={icon} className={'w-3.5 h-3.5 text-neutral-500 flex-shrink-0'} fixedWidth />
+                    <span className={'text-xs font-medium text-neutral-500 truncate'}>{label}</span>
+                </div>
+                {!!barLimit && <CircularProgress percent={delta * 100} color={ringColor} />}
             </div>
             <div className={'text-sm font-medium text-neutral-100 truncate'}>{children}</div>
-            <div className={'h-1 rounded-full bg-realm-border/40 mt-2 overflow-hidden'}>
-                {!!barLimit && (
-                    <div
-                        className={classNames('h-full rounded-full transition-all duration-500', barColor)}
-                        style={{ width: `${Math.min(delta * 100, 100)}%` }}
-                    />
-                )}
-            </div>
-            <div className={'text-xs text-neutral-500 mt-0.5 truncate'}>{sub}</div>
+            <div className={'text-xs text-neutral-500 truncate mt-0.5'}>{sub}</div>
         </div>
     );
 };
@@ -83,10 +119,10 @@ const OverviewStats = ({ className }: { className?: string }) => {
     });
 
     const isOffline = status === 'offline' || status === null;
-    const offlineValue = <span className={'text-neutral-600'}>—</span>;
+    const offlineValue = <span className={'text-neutral-600'}>Offline</span>;
 
     return (
-        <div className={classNames('grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3 content-start', className)}>
+        <div className={classNames('grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3', className)}>
             <Tile icon={faClock} label={'Uptime'} sub={'Since last start'}>
                 {status === 'running' && stats.uptime > 0 ? (
                     <UptimeDuration uptime={stats.uptime / 1000} />
@@ -127,11 +163,7 @@ const OverviewStats = ({ className }: { className?: string }) => {
                 {bytesToString(stats.disk)}
             </Tile>
 
-            <Tile
-                icon={faServer}
-                label={'Node'}
-                sub={nodeLocationLabel || 'Unknown location'}
-            >
+            <Tile icon={faMapMarkerAlt} label={'Location'} sub={nodeName}>
                 <span className={'flex items-center gap-1.5'}>
                     {nodeFlagUrl && (
                         <img
@@ -145,7 +177,7 @@ const OverviewStats = ({ className }: { className?: string }) => {
                             decoding={'async'}
                         />
                     )}
-                    <span className={'truncate'}>{nodeName}</span>
+                    <span className={'truncate'}>{nodeLocationLabel || 'Unknown location'}</span>
                 </span>
             </Tile>
         </div>

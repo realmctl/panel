@@ -77,9 +77,6 @@ export default () => {
         .filter((r) => !!r.name)
         .find((r) => isNavRouteActive(r.path, location.pathname, match.url, r.exact));
 
-    // The overview page renders its own hero with power controls, so hide the header ones there.
-    const isOverviewPage = activeRoute?.path === '/';
-
     const serverBreadcrumbs = [
         { label: 'Home', to: '/' },
         ...(serverName ? [{ label: serverName }] : []),
@@ -100,7 +97,7 @@ export default () => {
                     <PageHeader
                         title={serverName || 'Server'}
                         belowTitle={<ServerOnlinePlayers />}
-                        rightActions={isOverviewPage ? undefined : <ServerPowerControls />}
+                        rightActions={<ServerPowerControls />}
                         breadcrumbs={serverBreadcrumbs}
                     >
                         <CSSTransition timeout={150} classNames={'fade'} appear in>
