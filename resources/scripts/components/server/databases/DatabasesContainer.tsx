@@ -44,27 +44,51 @@ export default () => {
             ) : (
                 <Fade timeout={150}>
                     <>
-                        {/* Top bar */}
-                        {databaseLimit > 0 && databases.length > 0 && (
-                            <div className={'flex items-center justify-between mb-6'}>
-                                <span className={'text-sm text-neutral-400'}>
-                                    <span className={'text-neutral-100 font-semibold'}>{databases.length}</span>
-                                    <span className={'text-neutral-600'}> / </span>
-                                    {databaseLimit} databases used
-                                </span>
-                                <Can action={'database.create'}>
-                                    {databases.length < databaseLimit && <CreateDatabaseButton />}
-                                </Can>
+                        {databases.length > 0 ? (
+                            <div className={'rounded-md border border-realm-border/50 bg-realm-card overflow-hidden'}>
+                                <div className={'hidden sm:grid grid-cols-12 gap-4 px-4 py-2 border-b border-realm-border/50'}>
+                                    <div className={'col-span-4 text-xs font-medium uppercase tracking-wide text-neutral-500'}>
+                                        Name
+                                    </div>
+                                    <div className={'col-span-3 text-xs font-medium uppercase tracking-wide text-neutral-500'}>
+                                        Username
+                                    </div>
+                                    <div className={'col-span-3 text-xs font-medium uppercase tracking-wide text-neutral-500'}>
+                                        Endpoint
+                                    </div>
+                                    <div className={'col-span-2'} />
+                                </div>
+                                <div className={'divide-y divide-realm-border/50'}>
+                                    {databases.map((database) => (
+                                        <DatabaseRow key={database.id} database={database} />
+                                    ))}
+                                </div>
                             </div>
+                        ) : null}
+
+                        {databaseLimit > 0 && databases.length > 0 && databases.length < databaseLimit && (
+                            <Can action={'database.create'}>
+                                <p className={'text-sm text-neutral-500 mt-4 m-0'}>
+                                    {databases.length} of {databaseLimit} databases allocated to this server.{' '}
+                                    <CreateDatabaseButton
+                                        trigger={(open) => (
+                                            <button
+                                                type={'button'}
+                                                onClick={open}
+                                                className={
+                                                    'bg-transparent border-0 p-0 text-blue-600 hover:text-blue-500 cursor-pointer'
+                                                }
+                                            >
+                                                Create a new database
+                                            </button>
+                                        )}
+                                    />
+                                    .
+                                </p>
+                            </Can>
                         )}
 
-                        {databases.length > 0 ? (
-                            <div className={'grid grid-cols-1 md:grid-cols-2 gap-3'}>
-                                {databases.map((database) => (
-                                    <DatabaseRow key={database.id} database={database} />
-                                ))}
-                            </div>
-                        ) : (
+                        {!databases.length && (
                             <div className={'flex flex-col items-center justify-center py-16'}>
                                 <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>
                                     {databaseLimit > 0 ? 'No databases yet' : 'Databases unavailable'}

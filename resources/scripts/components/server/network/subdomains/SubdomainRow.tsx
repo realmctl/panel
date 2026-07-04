@@ -16,44 +16,33 @@ const SubdomainRow = ({ subdomain }: Props) => {
     const fqdn = `${subdomain.name}.${domain}`;
 
     return (
-        <div
-            className={'rounded-lg overflow-hidden flex flex-col transition-shadow duration-150'}
-            style={{
-                backgroundColor: '#192024',
-                border: '1px solid #2d3338',
-            }}
-        >
-            <div
-                className={'flex items-center justify-between px-4 py-3'}
-                style={{ backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' }}
-            >
-                <div className={'flex items-center gap-2'}>
+        <div className={'grid grid-cols-12 gap-4 items-center px-4 py-3 transition-colors duration-150 hover:bg-white/[0.02]'}>
+            <div className={'col-span-12 sm:col-span-7 min-w-0'}>
+                <CopyOnClick text={fqdn}>
                     <span
-                        className={'flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide'}
-                        style={{ backgroundColor: '#252a30', color: '#cbd5e1', border: '1px solid #3d454d' }}
+                        className={'font-mono text-sm text-neutral-200 hover:text-neutral-100 cursor-pointer truncate block'}
                     >
-                        <FontAwesomeIcon icon={faSitemap} className={'text-xs'} />
-                        {subdomain.type}
+                        {subdomain.name}
+                        <span className={'text-neutral-600'}>.</span>
+                        <span className={'text-neutral-400'}>{domain}</span>
                     </span>
-                </div>
+                </CopyOnClick>
+            </div>
 
+            <div className={'col-span-6 sm:col-span-2'}>
+                <span
+                    className={'inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide'}
+                    style={{ backgroundColor: '#252a30', color: '#cbd5e1', border: '1px solid #3d454d' }}
+                >
+                    <FontAwesomeIcon icon={faSitemap} className={'text-xs'} />
+                    {subdomain.type}
+                </span>
+            </div>
+
+            <div className={'col-span-6 sm:col-span-3 flex items-center justify-end'}>
                 <Can action={'subdomain.delete'}>
                     <DeleteSubdomainButton subdomainId={subdomain.id} fqdn={fqdn} />
                 </Can>
-            </div>
-
-            <div className={'px-4 py-4'}>
-                <p className={'text-xs uppercase tracking-wide text-neutral-500 mb-2'}>Hostname</p>
-                <CopyOnClick text={fqdn}>
-                    <div
-                        className={'inline-flex items-center rounded-md px-3 py-2 font-mono text-sm cursor-pointer transition-colors duration-150 hover:border-neutral-600'}
-                        style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
-                    >
-                        <span className={'text-neutral-200'}>{subdomain.name}</span>
-                        <span className={'text-neutral-600 mx-1'}>.</span>
-                        <span className={'text-neutral-400'}>{domain}</span>
-                    </div>
-                </CopyOnClick>
             </div>
         </div>
     );

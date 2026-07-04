@@ -50,11 +50,7 @@ export default ({ allocation, onCreateAllocation, canCreateAllocation }: Props) 
                         </Can>
                     )}
                     <Can action={'allocation.update'}>
-                        <Button
-                            type={'button'}
-                            variant={Button.Variants.Secondary}
-                            onClick={() => setShowFirewall(true)}
-                        >
+                        <Button type={'button'} onClick={() => setShowFirewall(true)}>
                             Firewall
                         </Button>
                     </Can>

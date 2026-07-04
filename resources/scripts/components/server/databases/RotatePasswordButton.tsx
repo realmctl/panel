@@ -6,7 +6,6 @@ import { ServerContext } from '@/state/server';
 import { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import { httpErrorToHuman } from '@/api/http';
 import { Button } from '@/components/elements/button/index';
-import tw from 'twin.macro';
 
 export default ({ databaseId, onUpdate }: { databaseId: string; onUpdate: (database: ServerDatabase) => void }) => {
     const [loading, setLoading] = useState(false);
@@ -36,8 +35,8 @@ export default ({ databaseId, onUpdate }: { databaseId: string; onUpdate: (datab
     };
 
     return (
-        <Button.Text css={tw`mr-2`} onClick={rotate} disabled={loading}>
-            Rotate Password
+        <Button.Text size={Button.Sizes.Small} onClick={rotate} disabled={loading}>
+            {loading ? 'Rotating…' : 'Rotate Password'}
         </Button.Text>
     );
 };

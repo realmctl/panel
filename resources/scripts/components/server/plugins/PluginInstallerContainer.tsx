@@ -382,10 +382,8 @@ export default () => {
     };
 
     const listBadge =
-        !selectedPlugin && results.length > 0 && !searching
-            ? query.trim()
-                ? `${formatNumber(totalResults)} results`
-                : `${formatNumber(totalResults)} popular`
+        !selectedPlugin && results.length > 0 && !searching && query.trim()
+            ? `${formatNumber(totalResults)} results`
             : undefined;
 
     const renderDetail = () => {

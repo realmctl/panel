@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDatabase, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Modal from '@/components/elements/Modal';
-import { Form, Formik, FormikHelpers } from 'formik';
-import Field from '@/components/elements/Field';
-import { object, string } from 'yup';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { ServerContext } from '@/state/server';
 import deleteServerDatabase from '@/api/server/databases/deleteServerDatabase';
@@ -13,11 +11,9 @@ import RotatePasswordButton from '@/components/server/databases/RotatePasswordBu
 import Can from '@/components/elements/Can';
 import { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import useFlash from '@/plugins/useFlash';
-import tw from 'twin.macro';
 import { Button } from '@/components/elements/button/index';
 import Label from '@/components/elements/Label';
 import Input from '@/components/elements/Input';
-import GreyRowBox from '@/components/elements/GreyRowBox';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 
 interface Props {
@@ -30,6 +26,8 @@ export default ({ database, className }: Props) => {
     const { addError, clearFlashes } = useFlash();
     const [visible, setVisible] = useState(false);
     const [connectionVisible, setConnectionVisible] = useState(false);
+    const [confirmName, setConfirmName] = useState('');
+    const [deleting, setDeleting] = useState(false);
 
     const updateDatabase = ServerContext.useStoreActions((actions) => actions.databases.updateDatabase);
     const removeDatabase = ServerContext.useStoreActions((actions) => actions.databases.removeDatabase);
@@ -38,14 +36,20 @@ export default ({ database, className }: Props) => {
         database.password ? `:${encodeURIComponent(database.password)}` : ''
     }@${database.connectionString}/${database.name}`;
 
-    const schema = object().shape({
-        confirm: string()
-            .required('The database name must be provided.')
-            .oneOf([database.name.split('_', 2)[1], database.name], 'The database name must be provided.'),
-    });
+    const expectedNames = [database.name.split('_', 2)[1], database.name];
+    const isConfirmValid = expectedNames.includes(confirmName);
 
-    const submit = (values: { confirm: string }, { setSubmitting }: FormikHelpers<{ confirm: string }>) => {
+    useEffect(() => {
+        if (!visible) return;
+        setConfirmName('');
+        setDeleting(false);
+    }, [visible]);
+
+    const submit = () => {
+        if (!isConfirmValid || deleting) return;
+
         clearFlashes();
+        setDeleting(true);
         deleteServerDatabase(uuid, database.id)
             .then(() => {
                 setVisible(false);
@@ -53,142 +57,132 @@ export default ({ database, className }: Props) => {
             })
             .catch((error) => {
                 console.error(error);
-                setSubmitting(false);
+                setDeleting(false);
                 addError({ key: 'database:delete', message: httpErrorToHuman(error) });
             });
     };
 
     return (
         <>
-            <Formik onSubmit={submit} initialValues={{ confirm: '' }} validationSchema={schema} isInitialValid={false}>
-                {({ isSubmitting, isValid, resetForm }) => (
-                    <Modal
-                        visible={visible}
-                        dismissable={!isSubmitting}
-                        showSpinnerOverlay={isSubmitting}
-                        onDismissed={() => {
-                            setVisible(false);
-                            resetForm();
+            <Modal
+                visible={visible}
+                dismissable={!deleting}
+                showSpinnerOverlay={deleting}
+                onDismissed={() => setVisible(false)}
+                title={'Confirm database deletion'}
+                footer={
+                    <>
+                        <Button.Text size={Button.Sizes.Small} onClick={() => setVisible(false)} disabled={deleting}>
+                            Cancel
+                        </Button.Text>
+                        <Button.Danger size={Button.Sizes.Small} onClick={submit} disabled={!isConfirmValid || deleting}>
+                            {deleting ? 'Deleting…' : 'Delete Database'}
+                        </Button.Danger>
+                    </>
+                }
+            >
+                <FlashMessageRender byKey={'database:delete'} className={'mb-4'} />
+                <p className={'text-sm text-neutral-400'}>
+                    Deleting a database is a permanent action, it cannot be undone. This will permanently delete the{' '}
+                    <strong className={'text-neutral-200'}>{database.name}</strong> database and remove all associated
+                    data.
+                </p>
+                <div className={'mt-5'}>
+                    <Label>Confirm Database Name</Label>
+                    <Input
+                        type={'text'}
+                        value={confirmName}
+                        onChange={(e) => setConfirmName(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                submit();
+                            }
                         }}
-                    >
-                        <FlashMessageRender byKey={'database:delete'} css={tw`mb-6`} />
-                        <h2 css={tw`text-2xl mb-6`}>Confirm database deletion</h2>
-                        <p css={tw`text-sm`}>
-                            Deleting a database is a permanent action, it cannot be undone. This will permanently delete
-                            the <strong>{database.name}</strong> database and remove all associated data.
-                        </p>
-                        <Form css={tw`m-0 mt-6`}>
-                            <Field
-                                type={'text'}
-                                id={'confirm_name'}
-                                name={'confirm'}
-                                label={'Confirm Database Name'}
-                                description={'Enter the database name to confirm deletion.'}
-                            />
-                            <div css={tw`mt-6 text-right`}>
-                                <Button.Text type={'button'} css={tw`mr-2`} onClick={() => setVisible(false)}>
-                                    Cancel
-                                </Button.Text>
-                                <Button.Danger type={'submit'} disabled={!isValid}>
-                                    Delete Database
-                                </Button.Danger>
-                            </div>
-                        </Form>
-                    </Modal>
-                )}
-            </Formik>
-            <Modal visible={connectionVisible} onDismissed={() => setConnectionVisible(false)}>
-                <FlashMessageRender byKey={'database-connection-modal'} css={tw`mb-6`} />
-                <h3 css={tw`mb-6 text-2xl`}>Database connection details</h3>
+                    />
+                    <p className={'text-xs text-neutral-500 mt-1.5 mb-0'}>Enter the database name to confirm deletion.</p>
+                </div>
+            </Modal>
+            <Modal
+                visible={connectionVisible}
+                onDismissed={() => setConnectionVisible(false)}
+                title={'Database connection details'}
+                footer={
+                    <>
+                        <Can action={'database.update'}>
+                            <RotatePasswordButton databaseId={database.id} onUpdate={updateDatabase} />
+                        </Can>
+                        <Button.Text size={Button.Sizes.Small} onClick={() => setConnectionVisible(false)}>
+                            Close
+                        </Button.Text>
+                    </>
+                }
+            >
+                <FlashMessageRender byKey={'database-connection-modal'} className={'mb-4'} />
                 <div>
                     <Label>Endpoint</Label>
                     <CopyOnClick text={database.connectionString}>
                         <Input type={'text'} readOnly value={database.connectionString} />
                     </CopyOnClick>
                 </div>
-                <div css={tw`mt-6`}>
+                <div className={'mt-5'}>
                     <Label>Connections from</Label>
                     <Input type={'text'} readOnly value={database.allowConnectionsFrom} />
                 </div>
-                <div css={tw`mt-6`}>
+                <div className={'mt-5'}>
                     <Label>Username</Label>
                     <CopyOnClick text={database.username}>
                         <Input type={'text'} readOnly value={database.username} />
                     </CopyOnClick>
                 </div>
                 <Can action={'database.view_password'}>
-                    <div css={tw`mt-6`}>
+                    <div className={'mt-5'}>
                         <Label>Password</Label>
                         <CopyOnClick text={database.password} showInNotification={false}>
                             <Input type={'text'} readOnly value={database.password} />
                         </CopyOnClick>
                     </div>
                 </Can>
-                <div css={tw`mt-6`}>
+                <div className={'mt-5'}>
                     <Label>JDBC Connection String</Label>
                     <CopyOnClick text={jdbcConnectionString} showInNotification={false}>
                         <Input type={'text'} readOnly value={jdbcConnectionString} />
                     </CopyOnClick>
                 </div>
-                <div css={tw`mt-6 text-right`}>
-                    <Can action={'database.update'}>
-                        <RotatePasswordButton databaseId={database.id} onUpdate={updateDatabase} />
-                    </Can>
-                    <Button.Text onClick={() => setConnectionVisible(false)}>
-                        Close
-                    </Button.Text>
-                </div>
             </Modal>
-            <div className={className} style={{ backgroundColor: '#192024' }}>
-                <div className={'rounded-md border border-[#2d3338]/50 p-5'}>
-                    <div className={'flex items-center gap-3 mb-4'}>
-                        <div className={'flex items-center justify-center w-9 h-9 rounded-lg bg-blue-500/20'}>
-                            <FontAwesomeIcon icon={faDatabase} className={'text-blue-400'} />
-                        </div>
-                        <div>
-                            <CopyOnClick text={database.name}>
-                                <p className={'text-sm font-semibold text-neutral-100 m-0'}>{database.name}</p>
-                            </CopyOnClick>
-                        </div>
-                    </div>
-                    <div className={'space-y-2.5 mb-4'}>
-                        <div className={'flex items-center'}>
-                            <span className={'text-xs text-neutral-500 uppercase w-28'}>Username</span>
-                            <CopyOnClick text={database.username}>
-                                <span className={'text-xs text-neutral-200 font-mono'}>{database.username}</span>
-                            </CopyOnClick>
-                        </div>
-                        <div className={'flex items-center'}>
-                            <span className={'text-xs text-neutral-500 uppercase w-28'}>Endpoint</span>
-                            <CopyOnClick text={database.connectionString}>
-                                <span className={'text-xs text-neutral-200 font-mono'}>{database.connectionString}</span>
-                            </CopyOnClick>
-                        </div>
-                        <div className={'flex items-center'}>
-                            <span className={'text-xs text-neutral-500 uppercase w-28'}>Connections</span>
-                            <span className={'text-xs text-neutral-200'}>{database.allowConnectionsFrom}</span>
-                        </div>
-                    </div>
-                    <div className={'flex items-center justify-between pt-3 border-t border-[#2d3338]/50'}>
-                        <div className={'flex items-center gap-1'}>
-                            <button
-                                onClick={() => setConnectionVisible(true)}
-                                className={'flex items-center justify-center w-8 h-8 rounded-md text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50 bg-transparent border-0 cursor-pointer transition-colors duration-150'}
-                                title={'View details'}
-                            >
-                                <FontAwesomeIcon icon={faEye} size={'sm'} />
-                            </button>
-                        </div>
-                        <Can action={'database.delete'}>
-                            <button
-                                onClick={() => setVisible(true)}
-                                className={'flex items-center gap-2 px-3 py-1.5 rounded-md text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-transparent border-0 cursor-pointer transition-colors duration-150'}
-                            >
-                                <FontAwesomeIcon icon={faTrashAlt} size={'sm'} />
-                                Delete
-                            </button>
-                        </Can>
-                    </div>
+            <div className={classNames('grid grid-cols-12 gap-4 items-center px-4 py-3', className)}>
+                <div className={'col-span-4'}>
+                    <CopyOnClick text={database.name}>
+                        <p className={'text-sm font-mono text-neutral-200 m-0 truncate'}>{database.name}</p>
+                    </CopyOnClick>
+                </div>
+                <div className={'col-span-3'}>
+                    <CopyOnClick text={database.username}>
+                        <span className={'text-xs text-neutral-400 font-mono truncate'}>{database.username}</span>
+                    </CopyOnClick>
+                </div>
+                <div className={'col-span-3'}>
+                    <CopyOnClick text={database.connectionString}>
+                        <span className={'text-xs text-neutral-400 font-mono truncate'}>{database.connectionString}</span>
+                    </CopyOnClick>
+                </div>
+                <div className={'col-span-2 flex items-center justify-end gap-1'}>
+                    <button
+                        onClick={() => setConnectionVisible(true)}
+                        className={'flex items-center justify-center w-8 h-8 rounded-md text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50 bg-transparent border-0 cursor-pointer transition-colors duration-150'}
+                        title={'View details'}
+                    >
+                        <FontAwesomeIcon icon={faEye} size={'sm'} />
+                    </button>
+                    <Can action={'database.delete'}>
+                        <button
+                            onClick={() => setVisible(true)}
+                            className={'flex items-center justify-center w-8 h-8 rounded-md text-neutral-400 hover:text-red-400 hover:bg-red-500/10 bg-transparent border-0 cursor-pointer transition-colors duration-150'}
+                            title={'Delete database'}
+                        >
+                            <FontAwesomeIcon icon={faTrashAlt} size={'sm'} />
+                        </button>
+                    </Can>
                 </div>
             </div>
         </>
