@@ -14,6 +14,7 @@ import { useStoreState } from 'easy-peasy';
 import SubNavigation from '@/components/elements/SubNavigation';
 import ServerInsightsNav from '@/components/server/ServerInsightsNav';
 import ServerVersionNav from '@/components/server/ServerVersionNav';
+import InviteUserNav from '@/components/server/InviteUserNav';
 import ServerOnlinePlayers from '@/components/server/players/ServerOnlinePlayers';
 import PageHeader from '@/components/elements/PageHeader';
 import InstallListener from '@/components/server/InstallListener';
@@ -138,8 +139,9 @@ export default () => {
                                             <FontAwesomeIcon icon={faExternalLinkAlt} />
                                         </a>
                                     )}
-                                    <div className={'nav-trailing-actions'}>
+                                    <div className={'nav-trailing-actions flex items-center gap-4'}>
                                         <ServerVersionNav />
+                                        <InviteUserNav />
                                     </div>
                                 </div>
                             </SubNavigation>

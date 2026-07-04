@@ -26,16 +26,7 @@ import Spinner from '@/components/elements/Spinner';
 import RealmCard from '@/components/elements/realm/RealmCard';
 import RealmCardSourceHeader from '@/components/elements/realm/RealmCardSourceHeader';
 import { realmClasses } from '@/lib/realmTokens';
-
-const SERVER_TYPES = [
-    { id: 'paper',    name: 'Paper',    description: 'High performance Minecraft server', icon: '/assets/icons/papermc.webp' },
-    { id: 'purpur',   name: 'Purpur',   description: 'Paper fork with extra features',    icon: '/assets/icons/purpur.svg' },
-    { id: 'vanilla',  name: 'Vanilla',  description: 'Official Mojang server',            icon: '/assets/icons/Grass_Block.png' },
-    { id: 'spigot',   name: 'Spigot',   description: 'Modified Minecraft server',         icon: '/assets/icons/spigotmc.svg' },
-    { id: 'fabric',   name: 'Fabric',   description: 'Lightweight modding platform',      icon: '/assets/icons/fabricmc.png' },
-    { id: 'velocity', name: 'Velocity', description: 'Modern proxy server',               icon: '/assets/icons/velocity.webp' },
-    { id: 'snapshot', name: 'Snapshot', description: 'Vanilla development versions',      icon: '/assets/icons/Grass_Block.png' },
-];
+import { SERVER_SOFTWARE as SERVER_TYPES } from '@/lib/serverSoftware';
 
 const DownloadProgress = () => {
     const [progress, setProgress] = useState(0);

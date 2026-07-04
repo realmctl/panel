@@ -17,14 +17,16 @@ import { ip } from '@/lib/formatters';
 import { Button } from '@/components/elements/button/index';
 import RealmCard from '@/components/elements/realm/RealmCard';
 import RealmTabBar from '@/components/elements/realm/RealmTabBar';
+import AccessSettingsPanel from '@/components/server/settings/AccessSettingsPanel';
 const TAB_SWITCH_DELAY_MS = 200;
 
-type Tab = 'general' | 'danger' | 'startup' | 'variables';
+type Tab = 'general' | 'access' | 'danger' | 'startup' | 'variables';
 
-const TAB_IDS: Tab[] = ['general', 'danger', 'startup', 'variables'];
+const TAB_IDS: Tab[] = ['general', 'access', 'danger', 'startup', 'variables'];
 
 const ALL_TABS: { id: Tab; label: string; permission: string | string[] | null }[] = [
     { id: 'general', label: 'General', permission: null },
+    { id: 'access', label: 'Access', permission: 'user.*' },
     { id: 'startup', label: 'Startup & Docker', permission: 'startup.*' },
     { id: 'variables', label: 'Variables', permission: 'startup.*' },
     { id: 'danger', label: 'Danger Zone', permission: 'settings.reinstall' },
@@ -279,6 +281,12 @@ export default () => {
                                     </RealmCard>
                                 </Can>
                             </div>
+                        )}
+
+                        {renderedTab === 'access' && (
+                            <Can action={'user.*'}>
+                                <AccessSettingsPanel />
+                            </Can>
                         )}
 
                         {renderedTab === 'startup' && <StartupSettingsPanel section={'startup'} />}

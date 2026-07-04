@@ -11,7 +11,7 @@
 }
 
 .search {
-    @apply w-full rounded-md text-sm pl-8 pr-3 py-2 focus:outline-none transition-colors;
+    @apply w-full rounded-md text-sm pl-8 pr-3 py-2.5 focus:outline-none transition-colors;
     @apply focus:border-neutral-500;
 }
 
