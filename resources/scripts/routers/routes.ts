@@ -165,11 +165,11 @@ export default {
         {
             path: '/users',
             permission: 'user.*',
-            name: 'Users',
+            name: undefined,
             component: UsersContainer,
         },
         {
-            path: '/settings/:tab(general|details|danger|startup|variables)?',
+            path: '/settings/:tab(general|details|access|danger|startup|variables)?',
             permission: ['settings.*', 'file.sftp', 'startup.*'],
             name: 'Settings',
             component: SettingsContainer,

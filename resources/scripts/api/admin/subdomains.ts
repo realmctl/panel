@@ -111,8 +111,22 @@ export interface RecordStorePayload {
     service?: string;
 }
 
+export interface CloudflareZone {
+    id: string;
+    name: string;
+}
+
+export interface CloudflareZonesResponse {
+    zones: CloudflareZone[];
+}
+
 export const getSubdomainDomains = (): Promise<DomainListResponse> =>
     adminHttp.get<DomainListResponse>('/api/admin/subdomains/domains').then((response) => response.data);
+
+export const getCloudflareZones = (apiToken: string): Promise<CloudflareZonesResponse> =>
+    adminHttp
+        .post<CloudflareZonesResponse>('/api/admin/subdomains/domains/cloudflare/zones', { api_token: apiToken })
+        .then((response) => response.data);
 
 export const getSubdomainDomainCreateMeta = (): Promise<DomainCreateMetaResponse> =>
     adminHttp.get<DomainCreateMetaResponse>('/api/admin/subdomains/domains/create').then((response) => response.data);

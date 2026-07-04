@@ -50,6 +50,10 @@ export default () => {
         setForm((current) => (current ? { ...current, [key]: value } : current));
     };
 
+    const applyPreset = (values: Partial<RecordFormState>) => {
+        setForm((current) => (current ? { ...current, ...values } : current));
+    };
+
     const onToggleEgg = (eggId: number) => {
         setForm((current) => {
             if (!current) return current;
@@ -111,6 +115,7 @@ export default () => {
                     eggs={data.eggs}
                     onChange={updateField}
                     onToggleEgg={onToggleEgg}
+                    onApplyPreset={applyPreset}
                 />
             </SettingsSection>
 

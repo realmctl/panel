@@ -31,6 +31,7 @@ export interface PanelVersionInfo {
     isLatest: boolean;
     discord: string;
     donations: string;
+    commit: string | null;
 }
 
 export interface SiteSettings {

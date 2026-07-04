@@ -73,12 +73,19 @@ export default () => {
                             DNS provider credentials for customer subdomain creation.
                         </p>
                     </div>
-                    <Link to={`${adminBasePath}/subdomains/new`} className="shrink-0 no-underline">
-                        <Button disabled={deleting}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Create domain
-                        </Button>
-                    </Link>
+                    <div className="flex shrink-0 items-center gap-2">
+                        <Link to={`${adminBasePath}/subdomains/connect-cloudflare`} className="no-underline">
+                            <Button variant="outline" disabled={deleting}>
+                                Connect Cloudflare
+                            </Button>
+                        </Link>
+                        <Link to={`${adminBasePath}/subdomains/new`} className="no-underline">
+                            <Button disabled={deleting}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create domain
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 {domains.length === 0 ? (

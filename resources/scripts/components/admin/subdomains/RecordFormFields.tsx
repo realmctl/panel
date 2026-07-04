@@ -21,13 +21,73 @@ interface Props {
     eggs: SubdomainOption[];
     onChange: <K extends keyof RecordFormState>(key: K, value: RecordFormState[K]) => void;
     onToggleEgg: (eggId: number) => void;
+    onApplyPreset: (values: Partial<RecordFormState>) => void;
 }
 
-export default ({ form, domains, eggs, onChange, onToggleEgg }: Props) => {
+interface RecordPreset {
+    key: string;
+    label: string;
+    description: string;
+    values: Partial<RecordFormState>;
+}
+
+export const RECORD_PRESETS: RecordPreset[] = [
+    {
+        key: 'minecraft-java',
+        label: 'Minecraft (Java)',
+        description: 'SRV record — lets players connect without a port in the address.',
+        values: { type: 'SRV', ttl: '3600', protocol: 'tcp', priority: '0', weight: '5', service: '_minecraft' },
+    },
+    {
+        key: 'minecraft-bedrock',
+        label: 'Minecraft (Bedrock)',
+        description: "CNAME record — Bedrock clients don't support SRV, server must run on the default port.",
+        values: { type: 'CNAME', ttl: '3600' },
+    },
+    {
+        key: 'teamspeak',
+        label: 'TeamSpeak 3',
+        description: 'SRV record for TS3 voice servers.',
+        values: { type: 'SRV', ttl: '3600', protocol: 'udp', priority: '0', weight: '5', service: '_ts3' },
+    },
+    {
+        key: 'mumble',
+        label: 'Mumble',
+        description: 'SRV record for Mumble voice servers.',
+        values: { type: 'SRV', ttl: '3600', protocol: 'tcp', priority: '0', weight: '5', service: '_mumble' },
+    },
+    {
+        key: 'generic',
+        label: 'Generic (CNAME)',
+        description: 'Plain CNAME pointing at the node — no SRV fields.',
+        values: { type: 'CNAME', ttl: '3600' },
+    },
+];
+
+export default ({ form, domains, eggs, onChange, onToggleEgg, onApplyPreset }: Props) => {
     const isSrv = form.type === 'SRV';
 
     return (
         <>
+            <SettingRow
+                label="Quick template"
+                description="Fill in common protocol defaults, then adjust anything below before saving."
+            >
+                <div className="flex flex-wrap gap-2">
+                    {RECORD_PRESETS.map((preset) => (
+                        <button
+                            key={preset.key}
+                            type="button"
+                            title={preset.description}
+                            onClick={() => onApplyPreset(preset.values)}
+                            className="rounded-md border border-border bg-muted/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+                        >
+                            {preset.label}
+                        </button>
+                    ))}
+                </div>
+            </SettingRow>
+
             <SettingRow
                 label="Name"
                 htmlFor="record-name"

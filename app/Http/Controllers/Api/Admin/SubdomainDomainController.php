@@ -5,6 +5,7 @@ namespace Realm\Http\Controllers\Api\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 use Realm\Http\Controllers\Controller;
 use Realm\Models\Subdomain\Domain;
 use Realm\Services\Subdomains\Dns\DnsProviderRegistry;
@@ -59,6 +60,35 @@ class SubdomainDomainController extends Controller
                 'display_type' => $domain->display_type,
             ],
         ], 201);
+    }
+
+    public function cloudflareZones(Request $request): JsonResponse
+    {
+        $request->validate([
+            'api_token' => 'required|string',
+        ]);
+
+        $response = Http::withToken($request->input('api_token'))
+            ->timeout(10)
+            ->get('https://api.cloudflare.com/client/v4/zones', ['per_page' => 50]);
+
+        if (!$response->successful() || !$response->json('success')) {
+            return response()->json([
+                'message' => 'Cloudflare rejected this token. Make sure it has "Zone / DNS / Edit" permissions.',
+            ], 422);
+        }
+
+        $zones = collect($response->json('result', []))
+            ->map(fn (array $zone) => ['id' => $zone['id'], 'name' => $zone['name']])
+            ->values();
+
+        if ($zones->isEmpty()) {
+            return response()->json([
+                'message' => 'This token is valid but has no zones assigned to it.',
+            ], 422);
+        }
+
+        return response()->json(['zones' => $zones]);
     }
 
     public function show(Domain $domain): JsonResponse

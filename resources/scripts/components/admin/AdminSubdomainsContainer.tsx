@@ -5,6 +5,7 @@ import SubdomainTabNav from '@/components/admin/subdomains/SubdomainTabNav';
 import DomainListPanel from '@/components/admin/subdomains/DomainListPanel';
 import DomainCreatePanel from '@/components/admin/subdomains/DomainCreatePanel';
 import DomainEditPanel from '@/components/admin/subdomains/DomainEditPanel';
+import CloudflareConnectPanel from '@/components/admin/subdomains/CloudflareConnectPanel';
 import RecordListPanel from '@/components/admin/subdomains/RecordListPanel';
 import RecordCreatePanel from '@/components/admin/subdomains/RecordCreatePanel';
 import RecordEditPanel from '@/components/admin/subdomains/RecordEditPanel';
@@ -31,6 +32,9 @@ export default () => {
                 </Route>
                 <Route path={`${match.path}/records`} exact>
                     <RecordListPanel />
+                </Route>
+                <Route path={`${match.path}/connect-cloudflare`}>
+                    <CloudflareConnectPanel />
                 </Route>
                 <Route path={`${match.path}/new`}>
                     <DomainCreatePanel />
