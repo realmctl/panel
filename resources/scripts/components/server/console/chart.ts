@@ -7,6 +7,7 @@ import {
     LinearScale,
     LineElement,
     PointElement,
+    Tooltip,
 } from 'chart.js';
 import { DeepPartial } from 'ts-essentials';
 import { useState } from 'react';
@@ -14,7 +15,7 @@ import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
 import { theme } from 'twin.macro';
 import { hexToRgba } from '@/lib/helpers';
 
-ChartJS.register(LineElement, PointElement, Filler, LinearScale);
+ChartJS.register(LineElement, PointElement, Filler, LinearScale, Tooltip);
 
 const options: ChartOptions<'line'> = {
     responsive: true,
@@ -139,10 +140,18 @@ function useChart(label: string, opts?: UseChartOptions) {
     return { props: { data, options }, push, clear };
 }
 
-function useChartTickLabel(label: string, max: number, tickLabel: string, roundTo?: number) {
+interface ChartTickLabelOpts {
+    borderColor?: string;
+    backgroundColor?: string;
+    hoverable?: boolean;
+}
+
+function useChartTickLabel(label: string, max: number, tickLabel: string, roundTo?: number, opts?: ChartTickLabelOpts) {
     return useChart(label, {
         sets: 1,
         options: {
+            interaction: opts?.hoverable ? { mode: 'index', intersect: false } : undefined,
+            elements: opts?.hoverable ? { point: { hoverRadius: 4, hitRadius: 8 } } : undefined,
             scales: {
                 y: {
                     suggestedMax: max,
@@ -153,7 +162,33 @@ function useChartTickLabel(label: string, max: number, tickLabel: string, roundT
                     },
                 },
             },
+            plugins: opts?.hoverable
+                ? {
+                      tooltip: {
+                          enabled: true,
+                          intersect: false,
+                          mode: 'index',
+                          backgroundColor: theme('colors.realm.card') ?? '#192024',
+                          borderColor: theme('colors.realm.border') ?? '#2d3338',
+                          borderWidth: 1,
+                          padding: 8,
+                          titleColor: theme('colors.neutral.400'),
+                          bodyColor: theme('colors.neutral.100'),
+                          callbacks: {
+                              title: () => '',
+                              label: (context) => `${label}: ${context.formattedValue}${tickLabel}`,
+                          },
+                      },
+                  }
+                : undefined,
         },
+        callback: opts?.borderColor
+            ? (value) => ({
+                  ...value,
+                  borderColor: opts.borderColor,
+                  backgroundColor: opts.backgroundColor,
+              })
+            : undefined,
     });
 }
 

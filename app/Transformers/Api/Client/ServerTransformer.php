@@ -119,6 +119,9 @@ class ServerTransformer extends BaseClientTransformer
             'egg_name' => $server->egg->name,
             'egg_background' => $server->egg->background,
             'egg_category' => app(EggCategoryMappingService::class)->getCategoryForEgg($server->egg_id),
+            'installed_software' => $server->installed_software,
+            'installed_version' => $server->installed_version,
+            'installed_build' => $server->installed_build,
             'feature_limits' => [
                 'databases' => $server->database_limit,
                 'allocations' => $server->allocation_limit,

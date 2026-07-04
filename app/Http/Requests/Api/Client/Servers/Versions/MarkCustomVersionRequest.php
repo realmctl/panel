@@ -5,7 +5,7 @@ namespace Realm\Http\Requests\Api\Client\Servers\Versions;
 use Realm\Models\Permission;
 use Realm\Http\Requests\Api\Client\ClientApiRequest;
 
-class InstallVersionRequest extends ClientApiRequest
+class MarkCustomVersionRequest extends ClientApiRequest
 {
     public function permission(): string
     {
@@ -15,8 +15,7 @@ class InstallVersionRequest extends ClientApiRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|string|in:paper,purpur,velocity,vanilla,snapshot,fabric,forge,folia,waterfall,neoforge',
-            'version' => 'required|string',
+            'filename' => 'required|string|max:255',
         ];
     }
 }

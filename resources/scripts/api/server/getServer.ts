@@ -69,6 +69,9 @@ export interface Server {
     eggName: string;
     eggBackground: string | null;
     eggCategory: string | null;
+    installedSoftware: string | null;
+    installedVersion: string | null;
+    installedBuild: string | null;
     featureLimits: {
         databases: number;
         allocations: number;
@@ -111,6 +114,9 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     eggName: data.egg_name || '',
     eggBackground: data.egg_background || null,
     eggCategory: data.egg_category || null,
+    installedSoftware: data.installed_software || null,
+    installedVersion: data.installed_version || null,
+    installedBuild: data.installed_build || null,
     featureLimits: {
         databases: data.feature_limits?.databases ?? 0,
         allocations: data.feature_limits?.allocations ?? 0,

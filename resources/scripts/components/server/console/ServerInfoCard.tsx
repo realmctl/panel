@@ -62,6 +62,8 @@ export default ({ className }: { className?: string }) => {
 
     const activeSubdomain = subdomains?.domains.data[0];
     const domain = activeSubdomain ? `${activeSubdomain.name}.${subdomainDomainName(activeSubdomain)}` : null;
+    const subdomainFeatureAvailable = server.featureLimits.subdomains > 0 && (subdomains?.templates.length ?? 0) > 0;
+    const showDomainRow = subdomainFeatureAvailable || !!domain;
 
     useEffect(() => {
         if (!showPlayers || powerStatus !== 'running') {
@@ -187,6 +189,7 @@ export default ({ className }: { className?: string }) => {
                         )
                     }
                 />
+                {showDomainRow && (
                 <InfoRow
                     label={'Domain'}
                     value={domain ?? 'No domain attached'}
@@ -209,6 +212,7 @@ export default ({ className }: { className?: string }) => {
                         )
                     }
                 />
+                )}
             </div>
         </RealmCard>
     );

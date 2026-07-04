@@ -58,15 +58,11 @@
     }
 
     & .command_input {
-        @apply relative px-2 text-gray-100 pl-10 pr-4 py-3 w-full font-mono text-sm;
+        @apply relative px-2 text-gray-100 pl-10 pr-4 py-3 w-full font-sans text-sm;
         @apply focus:ring-0 outline-none focus-visible:outline-none;
         @apply border-0 border-t transition-colors duration-100;
         border-color: #2d3338;
         background-color: #192024;
-
-        &:focus {
-            border-color: #3b82f6;
-        }
 
         &::placeholder {
             color: #4b5563;

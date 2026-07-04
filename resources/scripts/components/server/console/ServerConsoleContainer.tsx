@@ -4,15 +4,20 @@ import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import isEqual from 'react-fast-compare';
 import Spinner from '@/components/elements/Spinner';
 import Features from '@feature/Features';
+import { Link, useRouteMatch } from 'react-router-dom';
 import Console from '@/components/server/console/Console';
 import OverviewStats from '@/components/server/console/OverviewStats';
+import StatGraphs from '@/components/server/console/StatGraphs';
 import ServerInfoCard from '@/components/server/console/ServerInfoCard';
+import InstalledVersionCard from '@/components/server/console/InstalledVersionCard';
+import QuickActionsCard from '@/components/server/console/QuickActionsCard';
 import { Alert } from '@/components/elements/alert';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { SocketEvent } from '@/components/server/events';
 import RealmCard from '@/components/elements/realm/RealmCard';
 
 const ServerConsoleContainer = () => {
+    const { url } = useRouteMatch();
     const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data!.isTransferring);
     const eggFeatures = ServerContext.useStoreState((state) => state.server.data!.eggFeatures, isEqual);
@@ -36,7 +41,11 @@ const ServerConsoleContainer = () => {
             )}
 
             <div className={'grid grid-cols-1 lg:grid-cols-4 gap-4'}>
-                <ServerInfoCard className={'lg:col-span-1 self-start'} />
+                <div className={'lg:col-span-1 flex flex-col gap-4 self-start'}>
+                    <ServerInfoCard />
+                    <InstalledVersionCard />
+                    <QuickActionsCard />
+                </div>
 
                 <div className={'lg:col-span-3 flex flex-col gap-4'}>
                     <OverviewStats />
@@ -61,11 +70,27 @@ const ServerConsoleContainer = () => {
                         headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
                         bodyClassName={'!p-0'}
                     >
-                        <div className={'flex flex-col h-[30rem] lg:h-[34rem]'}>
+                        <div className={'flex flex-col h-[24rem] lg:h-[26rem]'}>
                             <Spinner.Suspense>
                                 <Console />
                             </Spinner.Suspense>
                         </div>
+                    </RealmCard>
+
+                    <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
+                        <Spinner.Suspense>
+                            <StatGraphs compact />
+                        </Spinner.Suspense>
+                    </div>
+
+                    <RealmCard rounded={'md'} border={'soft'} bodyClassName={'text-left'}>
+                        <p className={'text-sm text-neutral-400 m-0'}>
+                            Want a closer look at CPU, memory, and network usage over time?{' '}
+                            <Link to={`${url}/metrics`} className={'text-blue-600 hover:text-blue-500'}>
+                                Click here
+                            </Link>{' '}
+                            for full statistics.
+                        </p>
                     </RealmCard>
                 </div>
             </div>

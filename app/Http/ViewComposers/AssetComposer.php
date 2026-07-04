@@ -3,6 +3,7 @@
 namespace Realm\Http\ViewComposers;
 
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Cache;
 use Realm\Services\Helpers\AssetHashService;
 use Realm\Services\Helpers\SoftwareVersionService;
 use Realm\Services\Setup\PanelSetupService;
@@ -55,7 +56,30 @@ class AssetComposer
                 'isLatest' => $this->versionService->isLatestPanel(),
                 'discord' => $this->versionService->getDiscord(),
                 'donations' => $this->versionService->getDonations(),
+                'commit' => $this->gitCommitHash(),
             ],
         ]);
+    }
+
+    /**
+     * Short (8 char) git commit hash for the running checkout, if this is a git clone.
+     */
+    private function gitCommitHash(): ?string
+    {
+        return Cache::remember('asset-composer-git-commit', 5, function () {
+            if (file_exists(base_path('.git/HEAD'))) {
+                $head = explode(' ', file_get_contents(base_path('.git/HEAD')));
+
+                if (array_key_exists(1, $head)) {
+                    $path = base_path('.git/' . trim($head[1]));
+                }
+            }
+
+            if (isset($path) && file_exists($path)) {
+                return substr(file_get_contents($path), 0, 8);
+            }
+
+            return null;
+        });
     }
 }

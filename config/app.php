@@ -200,6 +200,7 @@ return [
         Realm\Providers\RouteServiceProvider::class,
         Realm\Providers\RepositoryServiceProvider::class,
         Realm\Providers\ScheduleServiceProvider::class,
+        Realm\Providers\SettingsServiceProvider::class,
         Realm\Providers\ViewComposerServiceProvider::class,
 
         /*

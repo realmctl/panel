@@ -22,7 +22,7 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, className, c
                     {children}
                 </ContentContainer>
                 <ContentContainer css={tw`mb-4`}>
-                    <p css={tw`text-left text-neutral-500 text-xs`}>
+                    <p css={tw`text-center text-neutral-500 text-xs`}>
                         <a
                             rel={'noopener nofollow noreferrer'}
                             href={'https://realmctl.com'}

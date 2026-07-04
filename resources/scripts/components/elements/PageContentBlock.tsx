@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
+import { useStoreState } from 'easy-peasy';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCodeBranch } from '@fortawesome/free-solid-svg-icons';
 import ContentContainer from '@/components/elements/ContentContainer';
 import { CSSTransition } from 'react-transition-group';
 import tw from 'twin.macro';
+import { ApplicationStore } from '@/state';
 export interface PageContentBlockProps {
     title?: string;
     className?: string;
@@ -9,6 +13,8 @@ export interface PageContentBlockProps {
 }
 
 const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, className, children }) => {
+    const version = useStoreState((state: ApplicationStore) => state.settings.data?.version);
+
     useEffect(() => {
         if (title) {
             document.title = title;
@@ -22,16 +28,15 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, className, c
                     {children}
                 </ContentContainer>
                 <ContentContainer css={tw`mb-4`}>
-                    <p css={tw`text-left text-neutral-500 text-xs`}>
-                        <a
-                            rel={'noopener nofollow noreferrer'}
-                            href={'https://realmctl.com'}
-                            target={'_blank'}
-                            css={tw`no-underline text-neutral-500 hover:text-neutral-300`}
-                        >
-                            Realm&reg;
-                        </a>
-                        &nbsp;&copy; 2026 - {new Date().getFullYear()}
+                    <p css={tw`flex items-center justify-center gap-1.5 text-center text-neutral-500 text-xs`}>
+                        <FontAwesomeIcon icon={faCodeBranch} className={'text-xs'} />
+                        v{version?.current ?? 'unknown'}
+                        {version?.commit && (
+                            <>
+                                <span css={tw`text-neutral-700`}>&middot;</span>
+                                <span css={tw`font-mono`}>{version.commit}</span>
+                            </>
+                        )}
                     </p>
                 </ContentContainer>
             </>

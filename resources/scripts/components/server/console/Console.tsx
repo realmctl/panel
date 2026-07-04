@@ -7,6 +7,8 @@ import { WebLinksAddon } from 'xterm-addon-web-links';
 import { Unicode11Addon } from 'xterm-addon-unicode11';
 import { ScrollDownHelperAddon } from '@/plugins/XtermScrollDownHelperAddon';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import Spinner from '@/components/elements/Spinner';
+import Modal from '@/components/elements/Modal';
 import { ServerContext } from '@/state/server';
 import { usePermissions } from '@/plugins/usePermissions';
 import { theme as th } from 'twin.macro';
@@ -15,6 +17,9 @@ import { debounce } from 'debounce';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import classNames from 'classnames';
+import copy from 'copy-to-clipboard';
+import { TerminalIcon, UploadIcon, SparklesIcon } from '@heroicons/react/outline';
+import http, { httpErrorToHuman } from '@/api/http';
 
 import 'xterm/css/xterm.css';
 import {
@@ -171,6 +176,15 @@ export default () => {
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
     const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
+    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
+    const [logUploadState, setLogUploadState] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+    const [logUploadMessage, setLogUploadMessage] = useState<string | null>(null);
+    const [summarizing, setSummarizing] = useState(false);
+    const [summaryModal, setSummaryModal] = useState<{ open: boolean; text: string; error: string | null }>({
+        open: false,
+        text: '',
+        error: null,
+    });
     const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data!.isTransferring);
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
@@ -444,8 +458,90 @@ export default () => {
         };
     }, [connected, instance, isInstalling, isTransferring]);
 
+    const handleUploadLogs = () => {
+        if (logUploadState === 'uploading') return;
+
+        setLogUploadState('uploading');
+        setLogUploadMessage(null);
+
+        const content = lineBuffer.current
+            .map((entry) => entry.text.replace(/\x1B\[[0-9;]*m/g, ''))
+            .join('\n');
+
+        http.post(`/api/client/servers/${uuid}/console/upload-logs`, { content })
+            .then(({ data }) => {
+                if (!data.success) {
+                    setLogUploadState('error');
+                    setLogUploadMessage(data.error || 'Failed to upload logs.');
+                    return;
+                }
+
+                copy(data.url);
+                setLogUploadState('success');
+                setLogUploadMessage('Link copied to clipboard!');
+                window.open(data.url, '_blank', 'noopener');
+            })
+            .catch((error) => {
+                setLogUploadState('error');
+                setLogUploadMessage(httpErrorToHuman(error));
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    setLogUploadState('idle');
+                    setLogUploadMessage(null);
+                }, 4000);
+            });
+    };
+
+    const handleSummarize = () => {
+        if (summarizing) return;
+
+        setSummarizing(true);
+        setSummaryModal({ open: true, text: '', error: null });
+
+        const content = lineBuffer.current
+            .map((entry) => entry.text.replace(/\x1B\[[0-9;]*m/g, ''))
+            .join('\n');
+
+        http.post(`/api/client/servers/${uuid}/console/summarize`, { content })
+            .then(({ data }) => {
+                if (!data.success) {
+                    setSummaryModal({ open: true, text: '', error: data.error || 'Failed to summarize console.' });
+                    return;
+                }
+
+                setSummaryModal({ open: true, text: data.summary, error: null });
+            })
+            .catch((error) => {
+                setSummaryModal({ open: true, text: '', error: httpErrorToHuman(error) });
+            })
+            .finally(() => setSummarizing(false));
+    };
+
     return (
         <div className={classNames(styles.terminal, 'relative')}>
+            <Modal
+                visible={summaryModal.open}
+                onDismissed={() => setSummaryModal((current) => ({ ...current, open: false }))}
+            >
+                <h2 className={'text-xl font-semibold text-neutral-100 m-0 mb-1'}>Console Summary</h2>
+                <p className={'text-sm text-neutral-400 mb-5'}>AI-generated summary of the recent console output.</p>
+
+                {summarizing ? (
+                    <div className={'py-8'}>
+                        <Spinner centered />
+                    </div>
+                ) : summaryModal.error ? (
+                    <div
+                        className={'p-3 rounded-md text-sm'}
+                        style={{ backgroundColor: '#1c0a0a', border: '1px solid rgba(239,68,68,0.2)', color: '#fca5a5' }}
+                    >
+                        {summaryModal.error}
+                    </div>
+                ) : (
+                    <p className={'text-sm text-neutral-200 whitespace-pre-wrap m-0'}>{summaryModal.text}</p>
+                )}
+            </Modal>
             <SpinnerOverlay visible={!connected} size={'large'} />
             {!isInstalling && (
                 <div className={'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-realm-border/50'}>
@@ -477,6 +573,41 @@ export default () => {
                             </button>
                         );
                     })}
+
+                    <button
+                        type={'button'}
+                        onClick={handleSummarize}
+                        disabled={summarizing}
+                        className={
+                            'flex items-center gap-1.5 ml-auto px-2 py-1 rounded text-xs font-medium border-0 bg-transparent cursor-pointer transition-colors duration-100 text-neutral-500 hover:text-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed'
+                        }
+                    >
+                        <SparklesIcon className={'w-3.5 h-3.5'} />
+                        {summarizing ? 'Summarizing…' : 'Summarize'}
+                    </button>
+
+                    <button
+                        type={'button'}
+                        onClick={handleUploadLogs}
+                        disabled={logUploadState === 'uploading'}
+                        className={
+                            'flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium border-0 bg-transparent cursor-pointer transition-colors duration-100 text-neutral-500 hover:text-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed'
+                        }
+                    >
+                        <UploadIcon className={'w-3.5 h-3.5'} />
+                        {logUploadState === 'uploading' ? 'Uploading…' : 'Upload logs'}
+                    </button>
+
+                    {logUploadMessage && (
+                        <span
+                            className={classNames(
+                                'text-xs',
+                                logUploadState === 'error' ? 'text-red-400' : 'text-emerald-400'
+                            )}
+                        >
+                            {logUploadMessage}
+                        </span>
+                    )}
                 </div>
             )}
             <div className={classNames(styles.container, styles.overflows_container)}>
@@ -499,11 +630,11 @@ export default () => {
                     />
                     <div
                         className={classNames(
-                            'text-gray-100 peer-focus:text-gray-50 peer-focus:animate-pulse',
+                            'text-gray-100 peer-focus:text-white',
                             styles.command_icon
                         )}
                     >
-                        <span className={'font-mono text-sm font-bold'}>$</span>
+                        <TerminalIcon className={'w-4 h-4'} />
                     </div>
                 </div>
             )}

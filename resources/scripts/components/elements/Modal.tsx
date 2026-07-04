@@ -19,6 +19,8 @@ export interface ModalProps extends RequiredModalProps {
     closeOnBackground?: boolean;
     showSpinnerOverlay?: boolean;
     wide?: boolean;
+    title?: string;
+    footer?: React.ReactNode;
 }
 
 export const ModalMask = styled.div<{ center?: boolean }>`
@@ -50,19 +52,6 @@ const ModalContainer = styled.div<{ alignTop?: boolean; wide?: boolean }>`
         `};
 
     margin-bottom: auto;
-
-    & > .close-icon {
-        ${tw`absolute right-0 p-2 text-white cursor-pointer opacity-50 transition-all duration-150 ease-linear hover:opacity-100`};
-        top: -2.5rem;
-
-        &:hover {
-            ${tw`transform rotate-90`}
-        }
-
-        & > svg {
-            ${tw`w-6 h-6`};
-        }
-    }
 `;
 
 const Modal: React.FC<ModalProps> = ({
@@ -75,6 +64,8 @@ const Modal: React.FC<ModalProps> = ({
     closeOnBackground = true,
     closeOnEscape = true,
     onDismissed,
+    title,
+    footer,
     children,
 }) => {
     const [render, setRender] = useState(visible);
@@ -114,23 +105,6 @@ const Modal: React.FC<ModalProps> = ({
                 }}
             >
                 <ModalContainer alignTop={top} wide={wide}>
-                    {isDismissable && (
-                        <div className={'close-icon'} onClick={() => setRender(false)}>
-                            <svg
-                                xmlns={'http://www.w3.org/2000/svg'}
-                                fill={'none'}
-                                viewBox={'0 0 24 24'}
-                                stroke={'currentColor'}
-                            >
-                                <path
-                                    strokeLinecap={'round'}
-                                    strokeLinejoin={'round'}
-                                    strokeWidth={'2'}
-                                    d={'M6 18L18 6M6 6l12 12'}
-                                />
-                            </svg>
-                        </div>
-                    )}
                     {showSpinnerOverlay && (
                         <Fade timeout={150} appear in>
                             <div
@@ -143,14 +117,32 @@ const Modal: React.FC<ModalProps> = ({
                     )}
                     <div
                         css={[
-                            tw`rounded shadow-md transition-all duration-150`,
-                            wide
+                            tw`relative rounded-lg border border-realm-border/50 shadow-md transition-all duration-150`,
+                            wide || footer
                                 ? tw`flex flex-col flex-1 min-h-0 overflow-hidden`
-                                : tw`p-3 sm:p-4 md:p-6 overflow-y-scroll`,
+                                : tw`p-5 sm:p-6 overflow-y-auto`,
                         ]}
                         style={{ backgroundColor: '#192024' }}
                     >
-                        {children}
+                        {footer ? (
+                            <>
+                                <div className={'flex-1 min-h-0 overflow-y-auto p-6'}>
+                                    {title && (
+                                        <h2 className={'text-xl font-semibold text-neutral-100 m-0 mb-5'}>{title}</h2>
+                                    )}
+                                    {children}
+                                </div>
+                                <div
+                                    className={
+                                        'flex items-center justify-end gap-3 px-6 py-4 border-t border-realm-border/50 flex-shrink-0'
+                                    }
+                                >
+                                    {footer}
+                                </div>
+                            </>
+                        ) : (
+                            children
+                        )}
                     </div>
                 </ModalContainer>
             </ModalMask>
