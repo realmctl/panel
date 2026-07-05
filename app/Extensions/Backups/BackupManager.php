@@ -13,6 +13,7 @@ use League\Flysystem\FilesystemAdapter;
 use Realm\Extensions\Filesystem\S3Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Realm\Exceptions\Service\Backup\BackupAdapterNotConfiguredException;
 use Realm\Models\Backup;
 use Realm\Models\BackupDestination;
 use Realm\Models\Server;
@@ -176,14 +177,22 @@ class BackupManager
 
     /**
      * Creates a new S3 adapter.
+     *
+     * @throws BackupAdapterNotConfiguredException
      */
     public function createS3Adapter(array $config): FilesystemAdapter
     {
-        $config['version'] = 'latest';
+        $missing = array_filter(
+            ['key', 'secret', 'bucket', 'region'],
+            fn (string $field) => empty($config[$field])
+        );
 
-        if (!empty($config['key']) && !empty($config['secret'])) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
+        if (!empty($missing)) {
+            throw new BackupAdapterNotConfiguredException(Backup::ADAPTER_AWS_S3, $missing);
         }
+
+        $config['version'] = 'latest';
+        $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
 
         $client = new S3Client($config);
 
