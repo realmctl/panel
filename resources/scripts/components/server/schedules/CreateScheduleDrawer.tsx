@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Formik, FormikHelpers, useFormikContext } from 'formik';
 import classNames from 'classnames';
 import { ChevronDownIcon } from '@heroicons/react/outline';
-import tw from 'twin.macro';
-import Drawer from '@/components/elements/Drawer';
+import Modal from '@/components/elements/Modal';
+import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import Can from '@/components/elements/Can';
 import { Button } from '@/components/elements/button/index';
-import Field from '@/components/elements/Field';
-import FormikSwitch from '@/components/elements/FormikSwitch';
+import Switch from '@/components/elements/Switch';
 import ScheduleCheatsheetCards from '@/components/server/schedules/ScheduleCheatsheetCards';
 import {
     CRON_PRESETS,
@@ -20,17 +18,14 @@ import createOrUpdateSchedule from '@/api/server/schedules/createOrUpdateSchedul
 import { ServerContext } from '@/state/server';
 import { httpErrorToHuman } from '@/api/http';
 import useFlash from '@/plugins/useFlash';
-
-interface Values extends CronFieldValues {
-    name: string;
-    enabled: boolean;
-    onlyWhenOnline: boolean;
-}
+import { realmClasses } from '@/lib/realmTokens';
 
 interface Props {
     visible: boolean;
     onDismissed: () => void;
 }
+
+const STEPS = ['Details', 'Schedule', 'Behavior', 'Review'] as const;
 
 const CRON_FIELDS: { name: keyof CronFieldValues; label: string; hint: string }[] = [
     { name: 'minute', label: 'Minute', hint: '0–59' },
@@ -40,252 +35,374 @@ const CRON_FIELDS: { name: keyof CronFieldValues; label: string; hint: string }[
     { name: 'dayOfWeek', label: 'Weekday', hint: 'MON–SUN' },
 ];
 
-const Section = ({
-    title,
-    description,
-    children,
-}: {
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-}) => (
-    <section className={'space-y-3'}>
-        <div>
-            <h3 className={'text-sm font-semibold text-neutral-100 m-0'}>{title}</h3>
-            {description && <p className={'text-xs text-neutral-500 mt-1 mb-0'}>{description}</p>}
-        </div>
-        {children}
-    </section>
-);
-
-const CronPreview = () => {
-    const { values } = useFormikContext<Values>();
-    const expression = `${values.minute} ${values.hour} ${values.dayOfMonth} ${values.month} ${values.dayOfWeek}`;
-
-    return (
-        <div className={'rounded-lg border border-realm-border bg-[#0b1014] px-4 py-3'}>
-            <p className={'text-2xs uppercase tracking-wide text-neutral-500 m-0 mb-1.5'}>Cron expression</p>
-            <code className={'block font-mono text-sm text-blue-200 break-all'}>{expression}</code>
-            <p className={'text-xs text-neutral-500 mt-2 mb-0'}>{describeCronExpression(values)}</p>
-        </div>
-    );
+const DEFAULT_CRON: CronFieldValues = {
+    minute: '*/5',
+    hour: '*',
+    dayOfMonth: '*',
+    month: '*',
+    dayOfWeek: '*',
 };
-
-const CronPresetPicker = () => {
-    const { values, setValues } = useFormikContext<Values>();
-
-    return (
-        <div className={'flex flex-wrap gap-2'}>
-            {CRON_PRESETS.map((preset) => {
-                const active = matchesCronPreset(values, preset);
-
-                return (
-                    <button
-                        key={preset.id}
-                        type={'button'}
-                        title={preset.description}
-                        className={classNames(
-                            'px-3 py-1.5 text-xs font-medium rounded-md border transition-colors duration-150 cursor-pointer',
-                            active
-                                ? 'border-blue-500/50 bg-blue-500/15 text-blue-200'
-                                : 'border-realm-border/70 bg-realm-surface/40 text-neutral-300 hover:border-neutral-500 hover:bg-neutral-800/40'
-                        )}
-                        onClick={() =>
-                            setValues({
-                                ...values,
-                                ...preset.values,
-                            })
-                        }
-                    >
-                        {preset.label}
-                    </button>
-                );
-            })}
-        </div>
-    );
-};
-
-const CronFieldGrid = () => (
-    <div className={'grid grid-cols-2 sm:grid-cols-5 gap-3'}>
-        {CRON_FIELDS.map((field) => (
-            <div key={field.name} className={'min-w-0'}>
-                <Field
-                    name={field.name}
-                    label={field.label}
-                    description={field.hint}
-                    className={'font-mono text-sm'}
-                    spellCheck={false}
-                />
-            </div>
-        ))}
-    </div>
-);
-
-const CreateScheduleForm = ({
-    isSubmitting,
-    showCheatsheet,
-    onToggleCheatsheet,
-    onCancel,
-}: {
-    isSubmitting: boolean;
-    showCheatsheet: boolean;
-    onToggleCheatsheet: () => void;
-    onCancel: () => void;
-}) => (
-    <Form css={tw`flex flex-col min-h-full m-0`}>
-        <div css={tw`space-y-6 flex-1`}>
-            <FlashMessageRender byKey={'automation:edit'} />
-
-            <Section title={'Details'} description={'Give this automation a clear name so you can find it later.'}>
-                <Field
-                    name={'name'}
-                    label={'Name'}
-                    description={'Shown in the automation list and activity log.'}
-                    placeholder={'Daily restart'}
-                    autoFocus
-                />
-            </Section>
-
-            <Section
-                title={'Schedule'}
-                description={'Choose a preset or fine-tune the cron fields. Tasks run when this schedule triggers.'}
-            >
-                <CronPreview />
-                <CronPresetPicker />
-                <CronFieldGrid />
-                <button
-                    type={'button'}
-                    className={
-                        'flex items-center gap-2 text-xs text-neutral-400 hover:text-neutral-200 transition-colors bg-transparent border-0 p-0 cursor-pointer'
-                    }
-                    onClick={onToggleCheatsheet}
-                >
-                    <ChevronDownIcon
-                        className={classNames('w-4 h-4 transition-transform duration-150', showCheatsheet && 'rotate-180')}
-                    />
-                    {showCheatsheet ? 'Hide cron reference' : 'Show cron reference'}
-                </button>
-                {showCheatsheet && <ScheduleCheatsheetCards compact />}
-            </Section>
-
-            <Section title={'Behavior'} description={'Control when this automation is allowed to run.'}>
-                <div className={'rounded-lg border border-realm-border divide-y divide-realm-border/60 overflow-hidden'}>
-                    <div className={'px-4 py-3 bg-realm-surface/30'}>
-                        <FormikSwitch
-                            name={'onlyWhenOnline'}
-                            description={'Skip the run if the server is stopped or still starting.'}
-                            label={'Only when server is online'}
-                        />
-                    </div>
-                    <div className={'px-4 py-3 bg-realm-surface/30'}>
-                        <FormikSwitch
-                            name={'enabled'}
-                            description={'Disabled automations stay saved but will not execute.'}
-                            label={'Enabled'}
-                        />
-                    </div>
-                </div>
-            </Section>
-        </div>
-
-        <Can action={'schedule.create'}>
-            <div css={tw`mt-6 pt-4 border-t border-realm-border flex justify-end gap-3`}>
-                <Button.Text size={Button.Sizes.Small} type={'button'} onClick={onCancel} disabled={isSubmitting}>
-                    Cancel
-                </Button.Text>
-                <Button size={Button.Sizes.Small} type={'submit'} disabled={isSubmitting}>
-                    {isSubmitting ? 'Creating…' : 'Create automation'}
-                </Button>
-            </div>
-        </Can>
-    </Form>
-);
 
 const CreateScheduleDrawer = ({ visible, onDismissed }: Props) => {
     const { addError, clearFlashes } = useFlash();
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const appendSchedule = ServerContext.useStoreActions((actions) => actions.schedules.appendSchedule);
-    const [showCheatsheet, setShowCheatsheet] = useState(false);
 
-    useEffect(
-        () => () => {
-            clearFlashes('automation:edit');
-        },
-        [clearFlashes]
-    );
+    const [step, setStep] = useState(0);
+    const [saving, setSaving] = useState(false);
+    const [showCheatsheet, setShowCheatsheet] = useState(false);
+    const [name, setName] = useState('');
+    const [nameError, setNameError] = useState('');
+    const [cron, setCron] = useState<CronFieldValues>(DEFAULT_CRON);
+    const [onlyWhenOnline, setOnlyWhenOnline] = useState(true);
+    const [enabled, setEnabled] = useState(true);
+
+    useEffect(() => {
+        if (!visible) return;
+
+        clearFlashes('automation:edit');
+        setStep(0);
+        setSaving(false);
+        setShowCheatsheet(false);
+        setName('');
+        setNameError('');
+        setCron(DEFAULT_CRON);
+        setOnlyWhenOnline(true);
+        setEnabled(true);
+    }, [visible]);
 
     const handleDismiss = () => {
-        clearFlashes('automation:edit');
-        setShowCheatsheet(false);
+        if (saving) return;
         onDismissed();
     };
 
-    const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
+    const goNext = () => {
+        if (step === 0 && !name.trim()) {
+            setNameError('A name must be provided.');
+            return;
+        }
+        setStep((current) => Math.min(current + 1, STEPS.length - 1));
+    };
+
+    const goBack = () => setStep((current) => Math.max(current - 1, 0));
+
+    const setCronField = (field: keyof CronFieldValues, value: string) => setCron((prev) => ({ ...prev, [field]: value }));
+
+    const save = () => {
+        if (!name.trim()) {
+            setNameError('A name must be provided.');
+            setStep(0);
+            return;
+        }
+
         clearFlashes('automation:edit');
+        setSaving(true);
         createOrUpdateSchedule(uuid, {
-            name: values.name,
+            name,
             cron: {
-                minute: values.minute,
-                hour: values.hour,
-                dayOfWeek: values.dayOfWeek,
-                month: values.month,
-                dayOfMonth: values.dayOfMonth,
+                minute: cron.minute,
+                hour: cron.hour,
+                dayOfWeek: cron.dayOfWeek,
+                month: cron.month,
+                dayOfMonth: cron.dayOfMonth,
             },
-            onlyWhenOnline: values.onlyWhenOnline,
-            isActive: values.enabled,
+            onlyWhenOnline,
+            isActive: enabled,
         })
             .then((schedule) => {
                 appendSchedule(schedule);
-                setSubmitting(false);
-                handleDismiss();
+                onDismissed();
             })
             .catch((error) => {
                 console.error(error);
-                setSubmitting(false);
                 addError({ key: 'automation:edit', message: httpErrorToHuman(error) });
-            });
+            })
+            .finally(() => setSaving(false));
     };
 
+    const cronExpression = `${cron.minute} ${cron.hour} ${cron.dayOfMonth} ${cron.month} ${cron.dayOfWeek}`;
+
     return (
-        <Formik
-            onSubmit={submit}
-            initialValues={
-                {
-                    name: '',
-                    minute: '*/5',
-                    hour: '*',
-                    dayOfMonth: '*',
-                    month: '*',
-                    dayOfWeek: '*',
-                    enabled: true,
-                    onlyWhenOnline: true,
-                } as Values
-            }
-            enableReinitialize
+        <Modal
+            visible={visible}
+            onDismissed={handleDismiss}
+            dismissable={!saving}
+            closeOnBackground={!saving}
+            closeOnEscape={!saving}
+            wide
         >
-            {({ isSubmitting, resetForm }) => (
-                <Drawer
-                    visible={visible}
-                    onDismissed={() => {
-                        resetForm();
-                        handleDismiss();
-                    }}
-                    title={'Create automation'}
-                    subtitle={'Set a schedule first — you can add tasks after creating it.'}
-                    width={'42rem'}
-                    dismissable={!isSubmitting}
-                    closeOnBackground={!isSubmitting}
-                    closeOnEscape={!isSubmitting}
-                >
-                    <CreateScheduleForm
-                        isSubmitting={isSubmitting}
-                        showCheatsheet={showCheatsheet}
-                        onToggleCheatsheet={() => setShowCheatsheet((value) => !value)}
-                        onCancel={handleDismiss}
-                    />
-                </Drawer>
-            )}
-        </Formik>
+            <div className={'relative flex h-[34rem] max-h-[80vh]'}>
+                <SpinnerOverlay visible={saving} />
+
+                <div className={'w-44 sm:w-52 flex-shrink-0 border-r border-realm-border/50 p-5'}>
+                    <h2 className={'text-base font-semibold text-neutral-100 m-0 mb-1'}>Create Automation</h2>
+                    <p className={'text-xs text-neutral-500 mb-4 font-mono truncate'}>{name || ' '}</p>
+                    <div>
+                        {STEPS.map((label, index) => {
+                            const active = index === step;
+                            const done = index < step;
+
+                            return (
+                                <div key={label} className={'flex items-start gap-3'}>
+                                    <div className={'flex flex-col items-center flex-shrink-0'}>
+                                        <div
+                                            className={classNames(
+                                                'w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0',
+                                                active || done
+                                                    ? 'bg-blue-500 text-white'
+                                                    : 'bg-transparent border border-realm-border text-neutral-500'
+                                            )}
+                                        >
+                                            {index + 1}
+                                        </div>
+                                        {index < STEPS.length - 1 && (
+                                            <div
+                                                className={classNames(
+                                                    'w-px flex-1 my-1',
+                                                    done ? 'bg-blue-500' : 'bg-realm-border'
+                                                )}
+                                                style={{ minHeight: '1.25rem' }}
+                                            />
+                                        )}
+                                    </div>
+                                    <span
+                                        className={classNames(
+                                            'text-sm mt-0.5 pb-6',
+                                            active ? 'text-neutral-100 font-semibold' : 'text-neutral-500'
+                                        )}
+                                    >
+                                        {label}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className={'flex-1 flex flex-col min-h-0'}>
+                    <div className={'flex-1 overflow-y-auto p-6'}>
+                        <p className={'text-xs font-semibold text-blue-400 uppercase tracking-wide mb-1'}>
+                            Step {step + 1} of {STEPS.length}
+                        </p>
+
+                        <FlashMessageRender byKey={'automation:edit'} className={'mb-4'} />
+
+                        {step === 0 && (
+                            <>
+                                <h3 className={'text-xl font-semibold text-neutral-100 m-0 mb-1'}>Name this automation</h3>
+                                <p className={'text-sm text-neutral-400 mb-5'}>
+                                    Shown in the automation list and activity log.
+                                </p>
+
+                                <label className={'block text-xs uppercase tracking-wide text-neutral-400 mb-1.5'}>
+                                    Name
+                                </label>
+                                <input
+                                    className={classNames(
+                                        'w-full rounded text-sm px-3 py-2 focus:outline-none transition-colors duration-150',
+                                        realmClasses.input
+                                    )}
+                                    placeholder={'Daily restart'}
+                                    value={name}
+                                    autoFocus
+                                    onChange={(e) => {
+                                        setName(e.target.value);
+                                        setNameError('');
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            goNext();
+                                        }
+                                    }}
+                                />
+                                {nameError && <p className={'text-red-400 text-xs mt-1.5 mb-0'}>{nameError}</p>}
+                            </>
+                        )}
+
+                        {step === 1 && (
+                            <>
+                                <h3 className={'text-xl font-semibold text-neutral-100 m-0 mb-1'}>Schedule</h3>
+                                <p className={'text-sm text-neutral-400 mb-5'}>
+                                    Choose a preset or fine-tune the cron fields. Tasks run when this schedule triggers.
+                                </p>
+
+                                <div className={'rounded-lg border border-realm-border bg-[#0b1014] px-4 py-3 mb-4'}>
+                                    <p className={'text-2xs uppercase tracking-wide text-neutral-500 m-0 mb-1.5'}>
+                                        Cron expression
+                                    </p>
+                                    <code className={'block font-mono text-sm text-blue-200 break-all'}>
+                                        {cronExpression}
+                                    </code>
+                                    <p className={'text-xs text-neutral-500 mt-2 mb-0'}>{describeCronExpression(cron)}</p>
+                                </div>
+
+                                <div className={'flex flex-wrap gap-2 mb-4'}>
+                                    {CRON_PRESETS.map((preset) => {
+                                        const active = matchesCronPreset(cron, preset);
+
+                                        return (
+                                            <button
+                                                key={preset.id}
+                                                type={'button'}
+                                                title={preset.description}
+                                                className={classNames(
+                                                    'px-3 py-1.5 text-xs font-medium rounded-md border transition-colors duration-150 cursor-pointer',
+                                                    active
+                                                        ? 'border-blue-500/50 bg-blue-500/15 text-blue-200'
+                                                        : 'border-realm-border/70 bg-realm-surface/40 text-neutral-300 hover:border-neutral-500 hover:bg-neutral-800/40'
+                                                )}
+                                                onClick={() => setCron({ ...cron, ...preset.values })}
+                                            >
+                                                {preset.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className={'grid grid-cols-2 sm:grid-cols-5 gap-3'}>
+                                    {CRON_FIELDS.map((field) => (
+                                        <div key={field.name} className={'min-w-0'}>
+                                            <label
+                                                className={'block text-xs uppercase tracking-wide text-neutral-400 mb-1.5'}
+                                            >
+                                                {field.label}
+                                            </label>
+                                            <input
+                                                className={classNames(
+                                                    'w-full rounded text-sm px-3 py-2 focus:outline-none transition-colors duration-150 font-mono',
+                                                    realmClasses.input
+                                                )}
+                                                spellCheck={false}
+                                                value={cron[field.name]}
+                                                onChange={(e) => setCronField(field.name, e.target.value)}
+                                            />
+                                            <p className={'text-xs text-neutral-500 mt-1 mb-0'}>{field.hint}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <button
+                                    type={'button'}
+                                    className={
+                                        'flex items-center gap-2 text-xs text-neutral-400 hover:text-neutral-200 transition-colors bg-transparent border-0 p-0 cursor-pointer mt-4'
+                                    }
+                                    onClick={() => setShowCheatsheet((value) => !value)}
+                                >
+                                    <ChevronDownIcon
+                                        className={classNames(
+                                            'w-4 h-4 transition-transform duration-150',
+                                            showCheatsheet && 'rotate-180'
+                                        )}
+                                    />
+                                    {showCheatsheet ? 'Hide cron reference' : 'Show cron reference'}
+                                </button>
+                                {showCheatsheet && <ScheduleCheatsheetCards compact />}
+                            </>
+                        )}
+
+                        {step === 2 && (
+                            <>
+                                <h3 className={'text-xl font-semibold text-neutral-100 m-0 mb-1'}>Behavior</h3>
+                                <p className={'text-sm text-neutral-400 mb-5'}>
+                                    Control when this automation is allowed to run.
+                                </p>
+
+                                <div
+                                    className={classNames(
+                                        'flex items-center justify-between p-4 rounded-lg mb-4',
+                                        realmClasses.insetPanel
+                                    )}
+                                >
+                                    <div>
+                                        <p className={'text-sm font-medium text-neutral-200 m-0'}>
+                                            Only when server is online
+                                        </p>
+                                        <p className={'text-xs text-neutral-500 mt-0.5 mb-0'}>
+                                            Skip the run if the server is stopped or still starting.
+                                        </p>
+                                    </div>
+                                    <Switch
+                                        name={'only_when_online'}
+                                        defaultChecked={onlyWhenOnline}
+                                        onChange={(e) => setOnlyWhenOnline(e.target.checked)}
+                                    />
+                                </div>
+
+                                <div
+                                    className={classNames(
+                                        'flex items-center justify-between p-4 rounded-lg',
+                                        realmClasses.insetPanel
+                                    )}
+                                >
+                                    <div>
+                                        <p className={'text-sm font-medium text-neutral-200 m-0'}>Enabled</p>
+                                        <p className={'text-xs text-neutral-500 mt-0.5 mb-0'}>
+                                            Disabled automations stay saved but will not execute.
+                                        </p>
+                                    </div>
+                                    <Switch
+                                        name={'enabled'}
+                                        defaultChecked={enabled}
+                                        onChange={(e) => setEnabled(e.target.checked)}
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        {step === 3 && (
+                            <>
+                                <h3 className={'text-xl font-semibold text-neutral-100 m-0 mb-1'}>Review Information</h3>
+                                <p className={'text-sm text-neutral-400 mb-5'}>Make sure everything looks good!</p>
+
+                                <div className={'rounded-md border border-realm-border/60 divide-y divide-realm-border/50'}>
+                                    <div className={'flex items-center justify-between px-4 py-3'}>
+                                        <span className={'text-sm text-neutral-500'}>Name</span>
+                                        <span className={'text-sm text-neutral-200'}>{name}</span>
+                                    </div>
+                                    <div className={'flex items-center justify-between px-4 py-3'}>
+                                        <span className={'text-sm text-neutral-500'}>Cron</span>
+                                        <span className={'text-sm text-neutral-200 font-mono'}>{cronExpression}</span>
+                                    </div>
+                                    <div className={'flex items-center justify-between px-4 py-3'}>
+                                        <span className={'text-sm text-neutral-500'}>Only when online</span>
+                                        <span className={'text-sm text-neutral-200'}>
+                                            {onlyWhenOnline ? 'Yes' : 'No'}
+                                        </span>
+                                    </div>
+                                    <div className={'flex items-center justify-between px-4 py-3'}>
+                                        <span className={'text-sm text-neutral-500'}>Enabled</span>
+                                        <span className={'text-sm text-neutral-200'}>{enabled ? 'Yes' : 'No'}</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <Can action={'schedule.create'}>
+                        <div className={'flex items-center justify-between gap-3 px-6 py-4 border-t border-realm-border/50'}>
+                            <Button.Text
+                                size={Button.Sizes.Small}
+                                onClick={step === 0 ? handleDismiss : goBack}
+                                disabled={saving}
+                            >
+                                {step === 0 ? 'Cancel' : 'Back'}
+                            </Button.Text>
+
+                            {step < STEPS.length - 1 ? (
+                                <Button key={'nav-next'} size={Button.Sizes.Small} onClick={goNext}>
+                                    Next Step
+                                </Button>
+                            ) : (
+                                <Button key={'nav-save'} size={Button.Sizes.Small} disabled={saving} onClick={save}>
+                                    {saving ? 'Creating…' : 'Create automation'}
+                                </Button>
+                            )}
+                        </div>
+                    </Can>
+                </div>
+            </div>
+        </Modal>
     );
 };
 

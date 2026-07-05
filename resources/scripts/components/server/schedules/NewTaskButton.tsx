@@ -5,15 +5,16 @@ import { Button } from '@/components/elements/button/index';
 
 interface Props {
     schedule: Schedule;
+    size?: typeof Button.Sizes.Small;
 }
 
-export default ({ schedule }: Props) => {
+export default ({ schedule, size = Button.Sizes.Small }: Props) => {
     const [visible, setVisible] = useState(false);
 
     return (
         <>
             <CreateTaskDrawer schedule={schedule} visible={visible} onDismissed={() => setVisible(false)} />
-            <Button onClick={() => setVisible(true)} className={'flex-1'}>
+            <Button size={size} onClick={() => setVisible(true)}>
                 New Task
             </Button>
         </>

@@ -6,7 +6,13 @@ import { ServerContext } from '@/state/server';
 import useFlash from '@/plugins/useFlash';
 import { Schedule } from '@/api/server/schedules/getServerSchedules';
 
-const RunScheduleButton = ({ schedule }: { schedule: Schedule }) => {
+const RunScheduleButton = ({
+    schedule,
+    size = Button.Sizes.Small,
+}: {
+    schedule: Schedule;
+    size?: typeof Button.Sizes.Small;
+}) => {
     const [loading, setLoading] = useState(false);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
 
@@ -33,7 +39,7 @@ const RunScheduleButton = ({ schedule }: { schedule: Schedule }) => {
             <SpinnerOverlay visible={loading} size={'large'} />
             <Button
                 variant={Button.Variants.Secondary}
-                className={'flex-1 sm:flex-none'}
+                size={size}
                 disabled={schedule.isProcessing}
                 onClick={onTriggerExecute}
             >

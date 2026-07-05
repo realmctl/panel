@@ -11,9 +11,10 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 interface Props {
     scheduleId: number;
     onDeleted: () => void;
+    size?: typeof Button.Sizes.Small;
 }
 
-export default ({ scheduleId, onDeleted }: Props) => {
+export default ({ scheduleId, onDeleted, size = Button.Sizes.Small }: Props) => {
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -48,11 +49,7 @@ export default ({ scheduleId, onDeleted }: Props) => {
                 <SpinnerOverlay visible={isLoading} />
                 All tasks will be removed and any running processes will be terminated.
             </Dialog.Confirm>
-            <Button.Danger
-                variant={Button.Variants.Secondary}
-                className={'flex-1 sm:flex-none mr-4 border-transparent'}
-                onClick={() => setVisible(true)}
-            >
+            <Button.Danger size={size} onClick={() => setVisible(true)}>
                 Delete
             </Button.Danger>
         </>

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import classNames from 'classnames';
 import { Schedule, Task } from '@/api/server/schedules/getServerSchedules';
 import { Field as FormikField, Form, Formik, FormikHelpers, useField, useFormikContext } from 'formik';
 import { ServerContext } from '@/state/server';
@@ -14,6 +15,7 @@ import Label from '@/components/elements/Label';
 import { Textarea } from '@/components/elements/Input';
 import Select from '@/components/elements/Select';
 import FormikSwitch from '@/components/elements/FormikSwitch';
+import { realmClasses } from '@/lib/realmTokens';
 
 interface Values {
     action: string;
@@ -267,15 +269,17 @@ export default ({ schedule, task, onSuccess, footer, onSubmittingChange }: Props
                             </FormikFieldWrapper>
                         </div>
                         <div>{renderPayload(values.action)}</div>
-                        <div css={tw`bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
-                            <FormikSwitch
-                                name={'continueOnFailure'}
-                                description={'Future tasks will be run when this task fails.'}
-                                label={'Continue on Failure'}
-                            />
+                        <div className={classNames('flex items-center justify-between p-4 rounded-lg', realmClasses.insetPanel)}>
+                            <div>
+                                <p className={'text-sm font-medium text-neutral-200 m-0'}>Continue on Failure</p>
+                                <p className={'text-xs text-neutral-500 mt-0.5 mb-0'}>
+                                    Future tasks will be run when this task fails.
+                                </p>
+                            </div>
+                            <FormikSwitch name={'continueOnFailure'} />
                         </div>
                     </div>
-                    <div css={tw`mt-6 pt-4 border-t border-realm-border`}>{footer(isSubmitting)}</div>
+                    <div css={tw`mt-6`}>{footer(isSubmitting)}</div>
                 </Form>
             )}
         </Formik>

@@ -1,8 +1,9 @@
 import React from 'react';
-import tw from 'twin.macro';
-import Drawer from '@/components/elements/Drawer';
+import classNames from 'classnames';
+import Modal from '@/components/elements/Modal';
 import { Button } from '@/components/elements/button/index';
 import { AUTOMATION_TEMPLATES } from '@/components/server/schedules/automationTemplates';
+import { realmClasses } from '@/lib/realmTokens';
 
 interface Props {
     visible: boolean;
@@ -12,35 +13,38 @@ interface Props {
 
 const AutomationTemplatesDrawer = ({ visible, onDismissed, onSelect }: Props) => {
     return (
-        <Drawer
+        <Modal
             visible={visible}
             onDismissed={onDismissed}
             title={'Automation templates'}
-            subtitle={'Start from a preset and customize it after creation.'}
-            width={'32rem'}
+            footer={
+                <Button.Text size={Button.Sizes.Small} onClick={onDismissed}>
+                    Cancel
+                </Button.Text>
+            }
         >
-            <div css={tw`space-y-3`}>
+            <p className={'text-sm text-neutral-400 mb-4 -mt-3'}>Start from a preset and customize it after creation.</p>
+            <div className={'space-y-3'}>
                 {AUTOMATION_TEMPLATES.map((item, index) => (
                     <button
                         key={item.label}
                         type={'button'}
-                        css={tw`w-full text-left p-4 rounded bg-neutral-700 hover:bg-neutral-600 transition-colors duration-150 border-0 cursor-pointer`}
+                        className={classNames(
+                            'w-full text-left p-4 rounded-lg border transition-colors duration-150 cursor-pointer',
+                            realmClasses.insetPanel,
+                            'hover:border-neutral-500'
+                        )}
                         onClick={() => {
                             onSelect(index);
                             onDismissed();
                         }}
                     >
-                        <p css={tw`text-neutral-100 font-medium`}>{item.label}</p>
-                        <p css={tw`text-neutral-400 text-sm mt-1`}>{item.description}</p>
+                        <p className={'text-neutral-100 font-medium m-0'}>{item.label}</p>
+                        <p className={'text-neutral-400 text-sm mt-1 mb-0'}>{item.description}</p>
                     </button>
                 ))}
             </div>
-            <div css={tw`mt-6 pt-4 border-t border-realm-border flex justify-end`}>
-                <Button.Text size={Button.Sizes.Small} type={'button'} onClick={onDismissed}>
-                    Cancel
-                </Button.Text>
-            </div>
-        </Drawer>
+        </Modal>
     );
 };
 

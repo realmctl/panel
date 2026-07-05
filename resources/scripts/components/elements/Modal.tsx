@@ -59,7 +59,7 @@ const Modal: React.FC<ModalProps> = ({
     appear,
     dismissable,
     showSpinnerOverlay,
-    top = true,
+    top = false,
     wide = false,
     closeOnBackground = true,
     closeOnEscape = true,
@@ -118,13 +118,13 @@ const Modal: React.FC<ModalProps> = ({
                     <div
                         css={[
                             tw`relative rounded-lg border border-realm-border/50 shadow-md transition-all duration-150`,
-                            wide || footer
+                            wide || footer || title
                                 ? tw`flex flex-col flex-1 min-h-0 overflow-hidden`
                                 : tw`p-5 sm:p-6 overflow-y-auto`,
                         ]}
                         style={{ backgroundColor: '#192024' }}
                     >
-                        {footer ? (
+                        {footer || title ? (
                             <>
                                 <div className={'flex-1 min-h-0 overflow-y-auto p-6'}>
                                     {title && (
@@ -132,13 +132,15 @@ const Modal: React.FC<ModalProps> = ({
                                     )}
                                     {children}
                                 </div>
-                                <div
-                                    className={
-                                        'flex items-center justify-end gap-3 px-6 py-4 border-t border-realm-border/50 flex-shrink-0'
-                                    }
-                                >
-                                    {footer}
-                                </div>
+                                {footer && (
+                                    <div
+                                        className={
+                                            'flex items-center justify-end gap-3 px-6 py-4 border-t border-realm-border/50 flex-shrink-0'
+                                        }
+                                    >
+                                        {footer}
+                                    </div>
+                                )}
                             </>
                         ) : (
                             children

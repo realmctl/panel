@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import getServerSchedules from '@/api/server/schedules/getServerSchedules';
 import { ServerContext } from '@/state/server';
 import Spinner from '@/components/elements/Spinner';
@@ -10,14 +11,12 @@ import CreateScheduleDrawer from '@/components/server/schedules/CreateScheduleDr
 import AutomationTemplatesDrawer from '@/components/server/schedules/AutomationTemplatesDrawer';
 import Can from '@/components/elements/Can';
 import useFlash from '@/plugins/useFlash';
-import tw from 'twin.macro';
-import GreyRowBox from '@/components/elements/GreyRowBox';
 import { Button } from '@/components/elements/button/index';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import bulkUpdateSchedules from '@/api/server/schedules/bulkUpdateSchedules';
 import importSchedule from '@/api/server/schedules/importSchedule';
 import { AUTOMATION_TEMPLATES } from '@/components/server/schedules/automationTemplates';
-import Switch from '@/components/elements/Switch';
+import BulkModeSelect from '@/components/server/schedules/BulkModeSelect';
 
 export default () => {
     const match = useRouteMatch();
@@ -107,68 +106,66 @@ export default () => {
 
     return (
         <ServerContentBlock title={'Automation'}>
-            <FlashMessageRender byKey={'automation'} css={tw`mb-4`} />
+            <FlashMessageRender byKey={'automation'} className={'mb-4'} />
+
+            <CreateScheduleDrawer visible={visible} onDismissed={() => setVisible(false)} />
+            <AutomationTemplatesDrawer
+                visible={templatesVisible}
+                onDismissed={() => setTemplatesVisible(false)}
+                onSelect={onTemplateSelect}
+            />
+            <input ref={fileInputRef} type={'file'} accept={'.json'} className={'hidden'} onChange={onImportFile} />
+
             {!schedules.length && loading ? (
                 <Spinner size={'large'} centered />
+            ) : schedules.length === 0 ? (
+                <div className={'flex flex-col items-center justify-center py-16'}>
+                    <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No automations yet</h3>
+                    <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                        Automations let you run restarts, backups, webhooks, and commands at specific times.
+                    </p>
+                    <Can action={'schedule.create'}>
+                        <div className={'mt-6 flex gap-3'}>
+                            <Button type={'button'} onClick={() => setVisible(true)}>
+                                Create automation
+                            </Button>
+                            <Button
+                                type={'button'}
+                                variant={Button.Variants.Secondary}
+                                onClick={() => setTemplatesVisible(true)}
+                            >
+                                Use template
+                            </Button>
+                        </div>
+                    </Can>
+                </div>
             ) : (
                 <>
-                    {schedules.length === 0 ? (
-                        <div className={'flex flex-col items-center justify-center py-16'}>
-                            <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>No automations yet</h3>
-                            <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
-                                Automations let you run restarts, backups, webhooks, and commands at specific times.
-                            </p>
-                            <Can action={'schedule.create'}>
-                                <div className={'mt-6 flex gap-3'}>
-                                    <CreateScheduleDrawer visible={visible} onDismissed={() => setVisible(false)} />
-                                    <AutomationTemplatesDrawer
-                                        visible={templatesVisible}
-                                        onDismissed={() => setTemplatesVisible(false)}
-                                        onSelect={onTemplateSelect}
-                                    />
-                                    <Button type={'button'} onClick={() => setVisible(true)}>
-                                        Create automation
-                                    </Button>
-                                    <Button type={'button'} variant={Button.Variants.Secondary} onClick={() => setTemplatesVisible(true)}>
-                                        Use template
-                                    </Button>
-                                </div>
-                            </Can>
+                    <div className={'rounded-md border border-realm-border/50 bg-realm-card overflow-hidden'}>
+                        <div className={'hidden sm:grid grid-cols-12 gap-4 px-4 py-2 border-b border-realm-border/50'}>
+                            <div className={'col-span-5 text-xs font-medium uppercase tracking-wide text-neutral-500'}>
+                                Name
+                            </div>
+                            <div className={'col-span-4 text-xs font-medium uppercase tracking-wide text-neutral-500'}>
+                                Cron
+                            </div>
+                            <div className={'col-span-3 text-xs font-medium uppercase tracking-wide text-neutral-500 text-right'}>
+                                Status
+                            </div>
                         </div>
-                    ) : (
-                        <>
-                            <Can action={'schedule.update'}>
-                                <div css={tw`flex items-center justify-between mb-4`}>
-                                    <Switch
-                                        name={'bulk_mode'}
-                                        label={'Bulk select'}
-                                        defaultChecked={bulkMode}
-                                        onChange={() => {
-                                            setBulkMode((v) => !v);
-                                            setSelected(new Set());
-                                        }}
-                                    />
-                                    {bulkMode && selected.size > 0 && (
-                                        <div css={tw`flex gap-2`}>
-                                            <Button.Text onClick={() => bulkSetActive(true)}>Enable selected</Button.Text>
-                                            <Button.Text onClick={() => bulkSetActive(false)}>Disable selected</Button.Text>
-                                        </div>
-                                    )}
-                                </div>
-                            </Can>
+                        <div className={'divide-y divide-realm-border/50'}>
                             {schedules.map((schedule) => (
-                                <GreyRowBox
-                                    as={'a'}
+                                <div
                                     key={schedule.id}
-                                    href={`${match.url}/${schedule.id}`}
-                                    css={tw`cursor-pointer mb-2 flex-wrap`}
-                                    onClick={(e: any) => {
+                                    className={classNames(
+                                        'flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-realm-surface/40 transition-colors duration-150',
+                                        bulkMode && selected.has(schedule.id) && 'bg-blue-500/5'
+                                    )}
+                                    onClick={() => {
                                         if (bulkMode) {
-                                            e.preventDefault();
                                             toggleSelected(schedule.id);
                                             return;
                                         }
-                                        e.preventDefault();
                                         history.push(`${match.url}/${schedule.id}`);
                                     }}
                                 >
@@ -177,36 +174,70 @@ export default () => {
                                             type={'checkbox'}
                                             checked={selected.has(schedule.id)}
                                             readOnly
-                                            css={tw`mr-3`}
+                                            className={'flex-shrink-0'}
                                         />
                                     )}
-                                    <ScheduleRow schedule={schedule} />
-                                </GreyRowBox>
+                                    <div className={'grid grid-cols-12 gap-4 items-center flex-1 min-w-0'}>
+                                        <ScheduleRow schedule={schedule} />
+                                    </div>
+                                </div>
                             ))}
-                        </>
-                    )}
-                    <Can action={'schedule.create'}>
-                        {schedules.length > 0 && (
-                            <div css={tw`mt-8 flex justify-end gap-3 flex-wrap`}>
-                                <input ref={fileInputRef} type={'file'} accept={'.json'} css={tw`hidden`} onChange={onImportFile} />
-                                <CreateScheduleDrawer visible={visible} onDismissed={() => setVisible(false)} />
-                                <AutomationTemplatesDrawer
-                                    visible={templatesVisible}
-                                    onDismissed={() => setTemplatesVisible(false)}
-                                    onSelect={onTemplateSelect}
+                        </div>
+                    </div>
+
+                    <div className={'flex items-center justify-between gap-4 mt-4'}>
+                        <Can action={'schedule.create'}>
+                            <p className={'text-sm text-neutral-500 m-0'}>
+                                {schedules.length} automation{schedules.length === 1 ? '' : 's'} configured.{' '}
+                                <button
+                                    type={'button'}
+                                    onClick={() => setVisible(true)}
+                                    className={'bg-transparent border-0 p-0 text-blue-600 hover:text-blue-500 cursor-pointer'}
+                                >
+                                    Create a new automation
+                                </button>
+                                {', '}
+                                <button
+                                    type={'button'}
+                                    onClick={() => setTemplatesVisible(true)}
+                                    className={'bg-transparent border-0 p-0 text-blue-600 hover:text-blue-500 cursor-pointer'}
+                                >
+                                    use a template
+                                </button>
+                                {', or '}
+                                <button
+                                    type={'button'}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={'bg-transparent border-0 p-0 text-blue-600 hover:text-blue-500 cursor-pointer'}
+                                >
+                                    import one from JSON
+                                </button>
+                                .
+                            </p>
+                        </Can>
+
+                        <Can action={'schedule.update'}>
+                            <div className={'flex items-center gap-3 flex-shrink-0'}>
+                                {bulkMode && selected.size > 0 && (
+                                    <div className={'flex gap-2'}>
+                                        <Button.Text size={Button.Sizes.Small} onClick={() => bulkSetActive(true)}>
+                                            Enable selected
+                                        </Button.Text>
+                                        <Button.Text size={Button.Sizes.Small} onClick={() => bulkSetActive(false)}>
+                                            Disable selected
+                                        </Button.Text>
+                                    </div>
+                                )}
+                                <BulkModeSelect
+                                    value={bulkMode}
+                                    onChange={(value) => {
+                                        setBulkMode(value);
+                                        setSelected(new Set());
+                                    }}
                                 />
-                                <Button type={'button'} variant={Button.Variants.Secondary} onClick={() => fileInputRef.current?.click()}>
-                                    Import JSON
-                                </Button>
-                                <Button type={'button'} variant={Button.Variants.Secondary} onClick={() => setTemplatesVisible(true)}>
-                                    Use template
-                                </Button>
-                                <Button type={'button'} onClick={() => setVisible(true)}>
-                                    Create automation
-                                </Button>
                             </div>
-                        )}
-                    </Can>
+                        </Can>
+                    </div>
                 </>
             )}
         </ServerContentBlock>
