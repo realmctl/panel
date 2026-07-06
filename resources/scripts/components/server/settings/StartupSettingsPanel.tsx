@@ -126,7 +126,7 @@ export default ({ section }: Props) => {
                     className={'px-4 py-3'}
                     style={{ backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' }}
                 >
-                    <span className={'text-xs uppercase tracking-wide text-neutral-400'}>Startup Command</span>
+                    <span className={'text-xs tracking-wide text-neutral-400'}>Startup Command</span>
                 </div>
                 <div className={'px-4 py-4'}>
                     <CopyOnClick text={data.invocation} showInNotification={false}>
@@ -159,7 +159,7 @@ export default ({ section }: Props) => {
                     className={'px-4 py-3'}
                     style={{ backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' }}
                 >
-                    <span className={'text-xs uppercase tracking-wide text-neutral-400'}>Docker Image</span>
+                    <span className={'text-xs tracking-wide text-neutral-400'}>Docker Image</span>
                 </div>
                 <div className={'px-4 py-4'}>
                     {Object.keys(data.dockerImages).length > 1 && !isCustomImage ? (

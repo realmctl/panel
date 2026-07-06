@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
 import getServerSchedules from '@/api/server/schedules/getServerSchedules';
 import { ServerContext } from '@/state/server';
 import Spinner from '@/components/elements/Spinner';
@@ -155,32 +154,13 @@ export default () => {
                         </div>
                         <div className={'divide-y divide-realm-border/50'}>
                             {schedules.map((schedule) => (
-                                <div
+                                <ScheduleRow
                                     key={schedule.id}
-                                    className={classNames(
-                                        'flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-realm-surface/40 transition-colors duration-150',
-                                        bulkMode && selected.has(schedule.id) && 'bg-blue-500/5'
-                                    )}
-                                    onClick={() => {
-                                        if (bulkMode) {
-                                            toggleSelected(schedule.id);
-                                            return;
-                                        }
-                                        history.push(`${match.url}/${schedule.id}`);
-                                    }}
-                                >
-                                    {bulkMode && (
-                                        <input
-                                            type={'checkbox'}
-                                            checked={selected.has(schedule.id)}
-                                            readOnly
-                                            className={'flex-shrink-0'}
-                                        />
-                                    )}
-                                    <div className={'grid grid-cols-12 gap-4 items-center flex-1 min-w-0'}>
-                                        <ScheduleRow schedule={schedule} />
-                                    </div>
-                                </div>
+                                    schedule={schedule}
+                                    bulkMode={bulkMode}
+                                    selected={selected.has(schedule.id)}
+                                    onToggleSelected={toggleSelected}
+                                />
                             ))}
                         </div>
                     </div>

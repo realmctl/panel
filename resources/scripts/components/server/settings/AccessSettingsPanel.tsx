@@ -49,7 +49,7 @@ export default () => {
             <RealmCard
                 header={
                     <div className={'flex items-center justify-between gap-3'}>
-                        <span className={'text-xs uppercase tracking-wide text-neutral-400'}>Server Access</span>
+                        <span className={'text-xs tracking-wide text-neutral-400'}>Server Access</span>
                         <Can action={'user.create'}>
                             <AddSubuserButton />
                         </Can>

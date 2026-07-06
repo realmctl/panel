@@ -1,23 +1,23 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useHistory, useLocation, useParams, useRouteMatch } from 'react-router-dom';
 import { ServerContext } from '@/state/server';
-import { useStoreState } from 'easy-peasy';
 import RenameServerBox from '@/components/server/settings/RenameServerBox';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import Can from '@/components/elements/Can';
 import ReinstallServerBox from '@/components/server/settings/ReinstallServerBox';
 import StartupSettingsPanel from '@/components/server/settings/StartupSettingsPanel';
-import Input from '@/components/elements/Input';
-import Label from '@/components/elements/Label';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import isEqual from 'react-fast-compare';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import { ip } from '@/lib/formatters';
-import { Button } from '@/components/elements/button/index';
 import RealmCard from '@/components/elements/realm/RealmCard';
-import RealmTabBar from '@/components/elements/realm/RealmTabBar';
 import AccessSettingsPanel from '@/components/server/settings/AccessSettingsPanel';
+import { realmClasses } from '@/lib/realmTokens';
+import { DetailGroup, DetailRow } from '@/components/server/settings/DetailRow';
+import { ArchiveIcon, ChipIcon, CogIcon, DatabaseIcon, GlobeAltIcon, SaveIcon } from '@heroicons/react/outline';
+
 const TAB_SWITCH_DELAY_MS = 200;
 
 type Tab = 'general' | 'access' | 'danger' | 'startup' | 'variables';
@@ -157,11 +157,15 @@ export default () => {
         return () => window.clearTimeout(timer);
     }, [activeTab]);
 
-    const username = useStoreState((state) => state.user.data!.username);
-    const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const node = ServerContext.useStoreState((state) => state.server.data!.node);
-    const sftp = ServerContext.useStoreState((state) => state.server.data!.sftpDetails, isEqual);
+    const dockerImage = ServerContext.useStoreState((state) => state.server.data!.dockerImage);
+    const status = ServerContext.useStoreState((state) => state.server.data!.status);
+    const nodeLocation = ServerContext.useStoreState((state) => state.server.data!.nodeLocation);
+    const allocations = ServerContext.useStoreState((state) => state.server.data!.allocations, isEqual);
+    const defaultAllocation = allocations.find((allocation) => allocation.isDefault) ?? allocations[0];
+    const limits = ServerContext.useStoreState((state) => state.server.data!.limits, isEqual);
+    const featureLimits = ServerContext.useStoreState((state) => state.server.data!.featureLimits, isEqual);
 
     const showStartupFlash = renderedTab === 'startup' || renderedTab === 'variables';
 
@@ -170,129 +174,208 @@ export default () => {
             <FlashMessageRender byKey={'settings'} className={'mb-4'} />
             {showStartupFlash && <FlashMessageRender byKey={'startup:image'} className={'mb-4'} />}
 
-            <RealmTabBar
-                className={'mb-6'}
-                tabs={visibleTabs}
-                activeTab={activeTab}
-                onTabChange={switchTab}
-            />
+            <div className={'grid grid-cols-1 lg:grid-cols-[13rem_1fr] gap-6'}>
+                <div
+                    className={classNames(
+                        'flex lg:flex-col gap-1 p-1 rounded-md flex-shrink-0 lg:self-start overflow-x-auto',
+                        realmClasses.tabBar
+                    )}
+                >
+                    {visibleTabs.map((tab) => {
+                        const active = activeTab === tab.id;
 
-            <div className={'relative min-h-[12rem]'}>
-                {isTabLoading ? (
-                    <Spinner centered size={Spinner.Size.LARGE} />
-                ) : (
-                    <>
-                        {renderedTab === 'general' && (
-                            <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
-                                <Can action={'settings.rename'}>
-                                    <RealmCard
-                                        header={
-                                            <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
-                                                Server Details
-                                            </span>
-                                        }
-                                    >
+                        return (
+                            <button
+                                key={tab.id}
+                                type={'button'}
+                                onClick={() => switchTab(tab.id)}
+                                className={classNames(
+                                    'flex-1 lg:flex-none text-left px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 whitespace-nowrap border-0 cursor-pointer',
+                                    active ? realmClasses.tabActive : realmClasses.tabInactive
+                                )}
+                            >
+                                {tab.label}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                <div className={'min-w-0 relative min-h-[12rem]'}>
+                    {isTabLoading ? (
+                        <Spinner centered size={Spinner.Size.LARGE} />
+                    ) : (
+                        <>
+                            {renderedTab === 'general' && (
+                                <div className={'space-y-4'}>
+                                    <Can action={'settings.rename'}>
                                         <RenameServerBox />
-                                    </RealmCard>
-                                </Can>
+                                    </Can>
 
-                                <Can action={'file.sftp'}>
-                                    <RealmCard
-                                        header={
-                                            <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
-                                                SFTP Details
-                                            </span>
-                                        }
-                                        bodyClassName={'space-y-4'}
-                                    >
-                                            <div>
-                                                <Label>Server Address</Label>
-                                                <CopyOnClick text={`sftp://${ip(sftp.ip)}:${sftp.port}`}>
-                                                    <Input
-                                                        type={'text'}
-                                                        value={`sftp://${ip(sftp.ip)}:${sftp.port}`}
-                                                        readOnly
-                                                    />
-                                                </CopyOnClick>
+                                    <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
+                                        <RealmCard
+                                            rounded={'md'}
+                                            border={'soft'}
+                                            header={
+                                                <h2 className={'text-base font-semibold text-neutral-100 m-0'}>
+                                                    Resources
+                                                </h2>
+                                            }
+                                            headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
+                                            bodyClassName={'space-y-4'}
+                                        >
+                                            <div className={'space-y-2.5'}>
+                                                <DetailGroup label={'Limits'} />
+                                                <DetailRow
+                                                    icon={ChipIcon}
+                                                    label={'Memory'}
+                                                    value={limits.memory ? `${limits.memory} MiB` : 'Unlimited'}
+                                                />
+                                                <DetailRow
+                                                    icon={SaveIcon}
+                                                    label={'Disk'}
+                                                    value={limits.disk ? `${limits.disk} MiB` : 'Unlimited'}
+                                                />
+                                                <DetailRow
+                                                    icon={CogIcon}
+                                                    label={'CPU'}
+                                                    value={limits.cpu ? `${limits.cpu}%` : 'Unlimited'}
+                                                />
                                             </div>
-                                            <div>
-                                                <Label>Username</Label>
-                                                <CopyOnClick text={`${username}.${id}`}>
-                                                    <Input type={'text'} value={`${username}.${id}`} readOnly />
-                                                </CopyOnClick>
-                                            </div>
-                                            <div
-                                                className={
-                                                    'flex items-center justify-between gap-4 p-3 rounded-md bg-realm-surface border border-realm-border'
-                                                }
-                                            >
-                                                <p className={'text-xs text-neutral-400 flex-1'}>
-                                                    Your SFTP password is the same as your panel password.
-                                                </p>
-                                                <a href={`sftp://${username}.${id}@${ip(sftp.ip)}:${sftp.port}`}>
-                                                    <Button.Text
-                                                        variant={Button.Variants.Secondary}
-                                                        size={Button.Sizes.Small}
-                                                    >
-                                                        Launch SFTP
-                                                    </Button.Text>
-                                                </a>
-                                            </div>
-                                    </RealmCard>
-                                </Can>
 
-                                <RealmCard
-                                    header={
-                                        <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
-                                            Debug Information
-                                        </span>
-                                    }
-                                    bodyClassName={'space-y-3'}
-                                >
-                                        <div className={'flex items-center justify-between text-sm'}>
-                                            <span className={'text-neutral-400'}>Node</span>
-                                            <code className={'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'}>
-                                                {node}
-                                            </code>
-                                        </div>
-                                        <CopyOnClick text={uuid}>
-                                            <div className={'flex items-center justify-between text-sm cursor-pointer'}>
-                                                <span className={'text-neutral-400'}>Server ID</span>
-                                                <code className={'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'}>
-                                                    {uuid}
+                                            <div className={'border-t border-realm-border/50 pt-3.5 space-y-2.5'}>
+                                                <DetailGroup label={'Allowances'} />
+                                                <DetailRow
+                                                    icon={DatabaseIcon}
+                                                    label={'Databases'}
+                                                    value={featureLimits.databases}
+                                                />
+                                                <DetailRow
+                                                    icon={ArchiveIcon}
+                                                    label={'Backups'}
+                                                    value={featureLimits.backups}
+                                                />
+                                                <DetailRow
+                                                    icon={GlobeAltIcon}
+                                                    label={'Allocations'}
+                                                    value={featureLimits.allocations}
+                                                />
+                                            </div>
+                                        </RealmCard>
+
+                                        <RealmCard
+                                            rounded={'md'}
+                                            border={'soft'}
+                                            header={
+                                                <h2 className={'text-base font-semibold text-neutral-100 m-0'}>
+                                                    Debug Information
+                                                </h2>
+                                            }
+                                            headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
+                                            bodyClassName={'space-y-3'}
+                                        >
+                                            <div className={'flex items-center justify-between text-sm'}>
+                                                <span className={'text-neutral-400'}>Node</span>
+                                                <code
+                                                    className={
+                                                        'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'
+                                                    }
+                                                >
+                                                    {node}
                                                 </code>
                                             </div>
-                                        </CopyOnClick>
-                                </RealmCard>
-                            </div>
-                        )}
+                                            <CopyOnClick text={uuid}>
+                                                <div className={'flex items-center justify-between text-sm cursor-pointer'}>
+                                                    <span className={'text-neutral-400'}>Server ID</span>
+                                                    <code
+                                                        className={
+                                                            'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'
+                                                        }
+                                                    >
+                                                        {uuid}
+                                                    </code>
+                                                </div>
+                                            </CopyOnClick>
+                                            <div className={'flex items-center justify-between text-sm'}>
+                                                <span className={'text-neutral-400'}>Status</span>
+                                                <code
+                                                    className={
+                                                        'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'
+                                                    }
+                                                >
+                                                    {status ?? 'unknown'}
+                                                </code>
+                                            </div>
+                                            <div className={'flex items-center justify-between text-sm'}>
+                                                <span className={'text-neutral-400'}>Docker Image</span>
+                                                <code
+                                                    className={
+                                                        'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code truncate max-w-[60%]'
+                                                    }
+                                                >
+                                                    {dockerImage}
+                                                </code>
+                                            </div>
+                                            {defaultAllocation && (
+                                                <CopyOnClick text={`${ip(defaultAllocation.ip)}:${defaultAllocation.port}`}>
+                                                    <div className={'flex items-center justify-between text-sm cursor-pointer'}>
+                                                        <span className={'text-neutral-400'}>Allocation</span>
+                                                        <code
+                                                            className={
+                                                                'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'
+                                                            }
+                                                        >
+                                                            {ip(defaultAllocation.ip)}:{defaultAllocation.port}
+                                                        </code>
+                                                    </div>
+                                                </CopyOnClick>
+                                            )}
+                                            {nodeLocation && (
+                                                <div className={'flex items-center justify-between text-sm'}>
+                                                    <span className={'text-neutral-400'}>Location</span>
+                                                    <code
+                                                        className={
+                                                            'font-mono text-xs px-2 py-1 rounded bg-realm-surface text-realm-code'
+                                                        }
+                                                    >
+                                                        {nodeLocation.city ?? nodeLocation.region ?? nodeLocation.country ?? '-'}
+                                                    </code>
+                                                </div>
+                                            )}
+                                        </RealmCard>
+                                    </div>
+                                </div>
+                            )}
 
-                        {renderedTab === 'danger' && (
-                            <div className={'max-w-xl'}>
-                                <Can action={'settings.reinstall'}>
-                                    <RealmCard
-                                        header={
-                                            <span className={'text-xs uppercase tracking-wide text-neutral-400'}>
-                                                Reinstall Server
-                                            </span>
-                                        }
-                                    >
-                                        <ReinstallServerBox />
-                                    </RealmCard>
+                            {renderedTab === 'danger' && (
+                                <div className={'max-w-xl'}>
+                                    <Can action={'settings.reinstall'}>
+                                        <RealmCard
+                                            rounded={'md'}
+                                            border={'soft'}
+                                            header={
+                                                <h2 className={'text-base font-semibold text-neutral-100 m-0'}>
+                                                    Reinstall Server
+                                                </h2>
+                                            }
+                                            headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
+                                        >
+                                            <ReinstallServerBox />
+                                        </RealmCard>
+                                    </Can>
+                                </div>
+                            )}
+
+                            {renderedTab === 'access' && (
+                                <Can action={'user.*'}>
+                                    <AccessSettingsPanel />
                                 </Can>
-                            </div>
-                        )}
+                            )}
 
-                        {renderedTab === 'access' && (
-                            <Can action={'user.*'}>
-                                <AccessSettingsPanel />
-                            </Can>
-                        )}
-
-                        {renderedTab === 'startup' && <StartupSettingsPanel section={'startup'} />}
-                        {renderedTab === 'variables' && <StartupSettingsPanel section={'variables'} />}
-                    </>
-                )}
+                            {renderedTab === 'startup' && <StartupSettingsPanel section={'startup'} />}
+                            {renderedTab === 'variables' && <StartupSettingsPanel section={'variables'} />}
+                        </>
+                    )}
+                </div>
             </div>
         </ServerContentBlock>
     );
