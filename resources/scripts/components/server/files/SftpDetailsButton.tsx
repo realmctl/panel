@@ -5,12 +5,12 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ServerContext } from '@/state/server';
 import { ip } from '@/lib/formatters';
-import { Button } from '@/components/elements/button/index';
-import { Dialog } from '@/components/elements/dialog';
+import Button from '@/components/elements/Button';
 import Label from '@/components/elements/Label';
 import Input from '@/components/elements/Input';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import DropdownMenu from '@/components/elements/DropdownMenu';
+import Modal from '@/components/elements/Modal';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 
@@ -27,7 +27,21 @@ export default () => {
 
     return (
         <>
-            <Dialog open={visible} onClose={() => setVisible(false)} title={'SFTP Details'}>
+            <Modal
+                visible={visible}
+                onDismissed={() => setVisible(false)}
+                title={'SFTP Details'}
+                footer={
+                    <>
+                        <Button isSecondary onClick={() => setVisible(false)}>
+                            Close
+                        </Button>
+                        <a href={`sftp://${username}.${id}@${ip(sftp.ip)}:${sftp.port}`} className={'inline-flex'}>
+                            <Button>Launch SFTP</Button>
+                        </a>
+                    </>
+                }
+            >
                 <div>
                     <Label>Address</Label>
                     <CopyOnClick text={`sftp://${ip(sftp.ip)}:${sftp.port}`}>
@@ -40,16 +54,7 @@ export default () => {
                         <Input type={'text'} readOnly value={`${username}.${id}`} />
                     </CopyOnClick>
                 </div>
-                <Dialog.Footer>
-                    <Button.Text onClick={() => setVisible(false)}>Close</Button.Text>
-                    <a
-                        href={`sftp://${username}.${id}@${ip(sftp.ip)}:${sftp.port}`}
-                        className={'inline-flex'}
-                    >
-                        <Button>Launch SFTP</Button>
-                    </a>
-                </Dialog.Footer>
-            </Dialog>
+            </Modal>
             <DropdownMenu
                 renderToggle={(onClick) => (
                     <div
