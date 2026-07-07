@@ -1,137 +1,110 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
-import getFileContents from '@/api/server/files/getFileContents';
+import { useHistory, useLocation } from 'react-router-dom';
 import { httpErrorToHuman } from '@/api/http';
+import { CSSTransition } from 'react-transition-group';
+import Spinner from '@/components/elements/Spinner';
+import FileObjectRow from '@/components/server/files/FileObjectRow';
+import FileManagerBreadcrumbs from '@/components/server/files/FileManagerBreadcrumbs';
 import { FileObject } from '@/api/server/files/loadDirectory';
-import FileManagerTreeSidebar, { InlineCreateState, InlineRenameState } from '@/components/server/files/FileManagerTreeSidebar';
-import FileManagerExplorerToolbar from '@/components/server/files/FileManagerExplorerToolbar';
-import FileEditorWorkspace from '@/components/server/files/FileEditorWorkspace';
-import createDirectory from '@/api/server/files/createDirectory';
-import renameFiles from '@/api/server/files/renameFiles';
-import useFlash from '@/plugins/useFlash';
-import ServerContentBlock from '@/components/elements/ServerContentBlock';
-import RealmCard from '@/components/elements/realm/RealmCard';
-import { useStoreActions } from '@/state/hooks';
-import ErrorBoundary from '@/components/elements/ErrorBoundary';
-import { cleanDirectoryPath, encodePathSegments, hashToPath } from '@/helpers';
-import { dirname, join } from 'pathe';
+import NewDirectoryButton from '@/components/server/files/NewDirectoryButton';
+import Can from '@/components/elements/Can';
+import { ServerError } from '@/components/elements/ScreenBlock';
+import { Button } from '@/components/elements/button/index';
 import { ServerContext } from '@/state/server';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
-import { detectModeFromFilename, getFileName, OpenFileTab } from '@/components/server/files/fileEditorUtils';
-import { canOpenInEditor, getMediaKindFromPath } from '@/components/server/files/fileMediaUtils';
-import useFileEditingPresence from '@/plugins/useFileEditingPresence';
-import { usePermissions } from '@/plugins/usePermissions';
-import { ExplorerDragProvider } from '@/components/server/files/ExplorerDragContext';
+import FileManagerStatus from '@/components/server/files/FileManagerStatus';
 import MassActionsBar from '@/components/server/files/MassActionsBar';
+import UploadButton from '@/components/server/files/UploadButton';
+import SftpDetailsButton from '@/components/server/files/SftpDetailsButton';
+import ServerContentBlock from '@/components/elements/ServerContentBlock';
+import { useStoreActions } from '@/state/hooks';
+import ErrorBoundary from '@/components/elements/ErrorBoundary';
+import { FileActionCheckbox } from '@/components/server/files/SelectFileCheckbox';
+import { encodePathSegments, hashToPath } from '@/helpers';
+import { dirname } from 'pathe';
+import getFileContents from '@/api/server/files/getFileContents';
+import saveFileContents from '@/api/server/files/saveFileContents';
+import useFlash from '@/plugins/useFlash';
+import FileNameModal from '@/components/server/files/FileNameModal';
+import FileEditorWorkspace from '@/components/server/files/FileEditorWorkspace';
+import { detectModeFromFilename, getFileName, isTabDirty, OpenFileTab } from '@/components/server/files/fileEditorUtils';
+import { ChevronDoubleUpIcon } from '@heroicons/react/solid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import style from './style.module.css';
 
+const sortFiles = (files: FileObject[]): FileObject[] => {
+    const sortedFiles: FileObject[] = files
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
+    return sortedFiles.filter((file, index) => index === 0 || file.name !== sortedFiles[index - 1].name);
+};
+
 export default () => {
-    const { action } = useParams<{ action?: 'edit' | 'new' }>();
     const history = useHistory();
-    const { hash } = useLocation();
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
+    const { hash } = useLocation();
+    const { data: files, error, mutate } = useFileManagerSwr();
     const directory = ServerContext.useStoreState((state) => state.files.directory);
-    const { data: files, mutate } = useFileManagerSwr();
     const clearFlashes = useStoreActions((actions) => actions.flashes.clearFlashes);
+    const { clearAndAddHttpError } = useFlash();
     const setDirectory = ServerContext.useStoreActions((actions) => actions.files.setDirectory);
+    const setSelectedFiles = ServerContext.useStoreActions((actions) => actions.files.setSelectedFiles);
+    const selectedFilesLength = ServerContext.useStoreState((state) => state.files.selectedFiles.length);
 
+    const [view, setView] = useState<'browse' | 'edit'>('browse');
     const [tabs, setTabs] = useState<OpenFileTab[]>([]);
     const [activePath, setActivePath] = useState<string | null>(null);
-    const [cursorLine, setCursorLine] = useState(1);
-    const [inlineCreate, setInlineCreate] = useState<InlineCreateState | null>(null);
-    const [inlineRename, setInlineRename] = useState<InlineRenameState | null>(null);
-    const [treeRefreshToken, setTreeRefreshToken] = useState(0);
-    const { clearAndAddHttpError } = useFlash();
-    const { activeEditors, currentUserUuid } = useFileEditingPresence(uuid, activePath, cursorLine);
-    const [canUpdate] = usePermissions(['file.update']);
-    const [canCreate] = usePermissions(['file.create']);
+    const [saving, setSaving] = useState(false);
+    const [newFileModalVisible, setNewFileModalVisible] = useState(false);
     const skipHashSync = useRef(false);
     const tabsRef = useRef(tabs);
-
     tabsRef.current = tabs;
 
-    const bumpTree = useCallback(() => {
-        void mutate();
-        setTreeRefreshToken((value) => value + 1);
-    }, [mutate]);
-
-    const syncEditorUrl = useCallback(
+    const syncEditUrl = useCallback(
         (path: string) => {
             skipHashSync.current = true;
-            history.replace(`/server/${id}/files#${encodePathSegments(cleanDirectoryPath(path))}`);
+            history.replace(`/server/${id}/files#${encodePathSegments(path)}`);
         },
         [history, id]
     );
 
     const openFile = useCallback(
-        async (path: string) => {
-            const normalized = cleanDirectoryPath(path);
-            const mediaKind = getMediaKindFromPath(normalized);
-            let shouldFetch = false;
+        (path: string) => {
+            const existing = tabsRef.current.find((tab) => tab.path === path);
 
-            setTabs((current) => {
-                if (current.some((tab) => tab.path === normalized)) {
-                    return current;
-                }
+            setActivePath(path);
+            setView('edit');
+            setDirectory(dirname(path));
 
-                shouldFetch = true;
-                return [
-                    ...current,
-                    {
-                        path: normalized,
-                        content: '',
-                        savedContent: '',
-                        mode: detectModeFromFilename(getFileName(normalized)),
-                        loading: !mediaKind,
-                        error: null,
-                        mediaKind,
-                    },
-                ];
-            });
-            setActivePath(normalized);
-            setDirectory(dirname(normalized));
-            syncEditorUrl(normalized);
-
-            if (!shouldFetch) {
+            if (existing) {
                 return;
             }
 
-            if (mediaKind) {
-                return;
-            }
+            const mode = detectModeFromFilename(path);
+            setTabs((current) => [
+                ...current,
+                { path, content: '', savedContent: '', mode, loading: true, error: null },
+            ]);
 
-            try {
-                const content = await getFileContents(uuid, normalized);
-                setTabs((current) =>
-                    current.map((tab) =>
-                        tab.path === normalized
-                            ? {
-                                  ...tab,
-                                  content,
-                                  savedContent: content,
-                                  loading: false,
-                                  error: null,
-                                  mode: detectModeFromFilename(getFileName(normalized)),
-                              }
-                            : tab
-                    )
-                );
-            } catch (error) {
-                setTabs((current) =>
-                    current.map((tab) =>
-                        tab.path === normalized
-                            ? {
-                                  ...tab,
-                                  loading: false,
-                                  error: httpErrorToHuman(error),
-                              }
-                            : tab
-                    )
-                );
-            }
+            getFileContents(uuid, path)
+                .then((content) => {
+                    setTabs((current) =>
+                        current.map((tab) =>
+                            tab.path === path ? { ...tab, content, savedContent: content, loading: false } : tab
+                        )
+                    );
+                })
+                .catch((err) => {
+                    setTabs((current) =>
+                        current.map((tab) =>
+                            tab.path === path ? { ...tab, loading: false, error: httpErrorToHuman(err) } : tab
+                        )
+                    );
+                });
         },
-        [syncEditorUrl, uuid]
+        [uuid, setDirectory]
     );
 
     useEffect(() => {
@@ -142,257 +115,257 @@ export default () => {
             return;
         }
 
-        const path = cleanDirectoryPath(hashToPath(hash));
-        const matchingTab = tabsRef.current.find((tab) => tab.path === path);
-
-        if (matchingTab) {
-            setDirectory(dirname(path));
-            setActivePath(path);
-            return;
-        }
+        const path = hashToPath(hash);
 
         if (path !== '/' && getFileName(path).includes('.')) {
-            void openFile(path);
-        }
-    }, [hash, openFile]);
-
-    const beginInlineCreate = useCallback(
-        (type: 'file' | 'folder', parentPath?: string) => {
-            const target = cleanDirectoryPath(parentPath ?? directory);
-
-            if (target.includes('::')) {
-                return;
-            }
-
-            setInlineRename(null);
-            setInlineCreate({ type, parentPath: target });
-        },
-        [directory]
-    );
-
-    const beginInlineRename = useCallback((parentPath: string, fileName: string, isFile: boolean) => {
-        const target = cleanDirectoryPath(parentPath);
-
-        if (target.includes('::')) {
+            openFile(path);
             return;
         }
 
-        setInlineCreate(null);
-        setInlineRename({ parentPath: target, fileName, isFile });
-    }, []);
-
-    const openNewFileTab = useCallback((fullPath: string) => {
-        const normalized = cleanDirectoryPath(fullPath);
-
-        setTabs((current) => {
-            if (current.some((tab) => tab.path === normalized)) {
-                return current;
-            }
-
-            return [
-                ...current,
-                {
-                    path: normalized,
-                    content: '',
-                    savedContent: '',
-                    mode: detectModeFromFilename(getFileName(normalized)),
-                    loading: false,
-                    error: null,
-                    isNew: true,
-                },
-            ];
-        });
-        setActivePath(normalized);
-        setDirectory(dirname(normalized));
-        syncEditorUrl(normalized);
-    }, [setDirectory, syncEditorUrl]);
-
-    const handleOpenFileFromTree = useCallback(
-        (path: string, file: FileObject) => {
-            if (!canOpenInEditor(file)) {
-                return;
-            }
-
-            void openFile(path);
-        },
-        [openFile]
-    );
-
-    const routeHandled = useRef(false);
+        setView('browse');
+        setSelectedFiles([]);
+        setDirectory(path);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hash]);
 
     useEffect(() => {
-        if (routeHandled.current) {
-            return;
-        }
+        mutate();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [directory]);
 
-        if (action === 'edit' && hash) {
-            routeHandled.current = true;
-            const path = hashToPath(hash);
-            void openFile(path);
-            return;
-        }
-
-        if (action === 'new') {
-            routeHandled.current = true;
-            beginInlineCreate('file');
-            history.replace(`/server/${id}/files${hash}`);
-        }
-    }, [action, beginInlineCreate, hash, history, id, openFile]);
-
-    const handleCreateFile = useCallback(
-        (parentPath: string, name: string) => {
-            setInlineCreate(null);
-            openNewFileTab(join(parentPath, name));
-        },
-        [openNewFileTab]
-    );
-
-    const handleCreateFolder = useCallback(
-        (parentPath: string, name: string) => {
-            setInlineCreate(null);
-            clearFlashes('files');
-
-            createDirectory(uuid, parentPath, name)
-                .then(() => bumpTree())
-                .catch((error) => clearAndAddHttpError({ key: 'files', error }));
-        },
-        [bumpTree, clearAndAddHttpError, clearFlashes, uuid]
-    );
+    const handleTabsChange = useCallback((next: OpenFileTab[]) => setTabs(next), []);
 
     const handleActivePathChange = useCallback(
-        (path: string | null) => {
+        (path: string) => {
             setActivePath(path);
-            setCursorLine(1);
+            setDirectory(dirname(path));
+            syncEditUrl(path);
+        },
+        [setDirectory, syncEditUrl]
+    );
 
-            if (path) {
-                setDirectory(dirname(path));
-                syncEditorUrl(path);
+    const handleCloseTab = useCallback(
+        (path: string) => {
+            const tab = tabsRef.current.find((t) => t.path === path);
+
+            if (tab && isTabDirty(tab)) {
+                const confirmed = window.confirm(`Discard unsaved changes to ${path}?`);
+                if (!confirmed) {
+                    return;
+                }
+            }
+
+            const remaining = tabsRef.current.filter((t) => t.path !== path);
+            setTabs(remaining);
+
+            if (activePath !== path) {
                 return;
             }
 
-            setDirectory('/');
-            history.replace(`/server/${id}/files`);
-        },
-        [history, id, syncEditorUrl]
-    );
+            const next = remaining[remaining.length - 1] ?? null;
+            setActivePath(next?.path ?? null);
 
-    const handleFileSaved = useCallback(
-        (path: string) => {
-            bumpTree();
-            syncEditorUrl(path);
-        },
-        [bumpTree, syncEditorUrl]
-    );
-
-    const handleItemMoved = useCallback(
-        (from: string, to: string) => {
-            setTabs((current) =>
-                current.map((tab) =>
-                    tab.path === from
-                        ? {
-                              ...tab,
-                              path: to,
-                              mode: detectModeFromFilename(getFileName(to)),
-                          }
-                        : tab
-                )
-            );
-
-            if (activePath === from) {
-                setActivePath(to);
-                syncEditorUrl(to);
+            if (next) {
+                syncEditUrl(next.path);
+            } else {
+                skipHashSync.current = true;
+                history.replace(`/server/${id}/files`);
+                setView('browse');
             }
         },
-        [activePath, syncEditorUrl]
+        [activePath, history, id, syncEditUrl]
     );
 
-    const handleRenameFile = useCallback(
-        (parentPath: string, oldName: string, newName: string) => {
-            setInlineRename(null);
+    const handleSave = useCallback(
+        (path: string) => {
+            const tab = tabsRef.current.find((t) => t.path === path);
+            if (!tab) {
+                return;
+            }
+
+            setSaving(true);
             clearFlashes('files');
 
-            renameFiles(uuid, parentPath, [{ from: oldName, to: newName }])
+            saveFileContents(uuid, path, tab.content)
                 .then(() => {
-                    handleItemMoved(join(parentPath, oldName), join(parentPath, newName));
-                    bumpTree();
+                    setTabs((current) =>
+                        current.map((t) => (t.path === path ? { ...t, savedContent: t.content } : t))
+                    );
+                    void mutate();
                 })
-                .catch((error) => clearAndAddHttpError({ key: 'files', error }));
+                .catch((err) => clearAndAddHttpError({ key: 'files', error: err }))
+                .then(() => setSaving(false));
         },
-        [bumpTree, clearAndAddHttpError, clearFlashes, handleItemMoved, uuid]
+        [uuid, clearFlashes, clearAndAddHttpError, mutate]
     );
 
-    const handleItemDeleted = useCallback(
-        (path: string) => {
-            const normalized = cleanDirectoryPath(path);
+    const handleMinimize = useCallback(() => {
+        skipHashSync.current = true;
+        history.replace(`/server/${id}/files#${encodePathSegments(directory)}`);
+        setView('browse');
+    }, [history, id, directory]);
 
-            setTabs((current) =>
-                current.filter((tab) => tab.path !== normalized && !tab.path.startsWith(`${normalized}/`))
-            );
+    const handleRestoreSession = useCallback(() => {
+        if (activePath) {
+            syncEditUrl(activePath);
+        }
+        setView('edit');
+    }, [activePath, syncEditUrl]);
 
-            if (activePath === normalized || activePath?.startsWith(`${normalized}/`)) {
-                setActivePath(null);
-                setDirectory('/');
-                history.replace(`/server/${id}/files`);
-            }
+    const handleCreateFile = useCallback(
+        (fullPath: string) => {
+            setNewFileModalVisible(false);
+            const mode = detectModeFromFilename(fullPath);
+            setTabs((current) => {
+                if (current.some((tab) => tab.path === fullPath)) {
+                    return current;
+                }
+                return [...current, { path: fullPath, content: '', savedContent: '', mode, loading: false, error: null, isNew: true }];
+            });
+            setActivePath(fullPath);
+            setView('edit');
+            syncEditUrl(fullPath);
         },
-        [activePath, history, id]
+        [syncEditUrl]
     );
+
+    const onSelectAllClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedFiles(e.currentTarget.checked ? files?.map((file) => file.name) || [] : []);
+    };
+
+    if (error) {
+        return <ServerError message={httpErrorToHuman(error)} onRetry={() => mutate()} />;
+    }
 
     return (
         <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
-            <div className={style.ide_layout}>
-                <RealmCard className={style.explorer_card} bodyClassName={style.explorer_card_body}>
-                    <ExplorerDragProvider
-                        canUpdate={canUpdate}
-                        canCreate={canCreate}
-                        onTreeChange={bumpTree}
-                        onItemMoved={handleItemMoved}
-                    >
-                        <div className={style.explorer_inner}>
-                            <FileManagerExplorerToolbar
-                                onNewFile={() => beginInlineCreate('file')}
-                                onNewFolder={() => beginInlineCreate('folder')}
-                                onTreeChange={bumpTree}
-                            />
-                            <ErrorBoundary>
-                                <FileManagerTreeSidebar
-                                    refreshToken={treeRefreshToken}
-                                    activeFilePath={activePath}
-                                    activeEditors={activeEditors}
-                                    currentUserUuid={currentUserUuid}
-                                    onOpenFile={handleOpenFileFromTree}
-                                    onTreeChange={bumpTree}
-                                    onNewFile={(parentPath) => beginInlineCreate('file', parentPath)}
-                                    onNewFolder={(parentPath) => beginInlineCreate('folder', parentPath)}
-                                    inlineCreate={inlineCreate}
-                                    onInlineCreateDismiss={() => setInlineCreate(null)}
-                                    onCreateFile={handleCreateFile}
-                                    onCreateFolder={handleCreateFolder}
-                                    inlineRename={inlineRename}
-                                    onInlineRenameDismiss={() => setInlineRename(null)}
-                                    onRenameFile={handleRenameFile}
-                                    onBeginRename={beginInlineRename}
-                                    onItemMoved={handleItemMoved}
-                                    onItemDeleted={handleItemDeleted}
-                                />
-                            </ErrorBoundary>
-                        </div>
-                    </ExplorerDragProvider>
-                </RealmCard>
+            <FileNameModal
+                visible={newFileModalVisible}
+                onDismissed={() => setNewFileModalVisible(false)}
+                onFileNamed={handleCreateFile}
+            />
 
+            {view === 'edit' ? (
                 <FileEditorWorkspace
                     tabs={tabs}
                     activePath={activePath}
-                    onTabsChange={setTabs}
+                    saving={saving}
+                    onTabsChange={handleTabsChange}
                     onActivePathChange={handleActivePathChange}
-                    onFileSaved={handleFileSaved}
-                    activeEditors={activeEditors}
-                    currentUserUuid={currentUserUuid}
-                    onCursorLineChange={setCursorLine}
+                    onCloseTab={handleCloseTab}
+                    onSave={handleSave}
+                    onMinimize={handleMinimize}
                 />
-            </div>
-
-            <MassActionsBar />
+            ) : (
+                <>
+                    <ErrorBoundary>
+                        <div className={'flex items-center justify-between gap-3 flex-wrap mb-4'}>
+                            <div className={style.breadcrumb_card}>
+                                <FileManagerBreadcrumbs />
+                            </div>
+                            <div className={'flex items-center gap-2 flex-wrap'}>
+                                <Can action={'file.create'}>
+                                    <>
+                                        <FileManagerStatus />
+                                        <NewDirectoryButton />
+                                        <UploadButton />
+                                        <Button
+                                            className={'flex items-center gap-1.5'}
+                                            onClick={() => setNewFileModalVisible(true)}
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} className={'text-xs'} />
+                                            New File
+                                        </Button>
+                                    </>
+                                </Can>
+                                <SftpDetailsButton />
+                            </div>
+                        </div>
+                    </ErrorBoundary>
+                    {!files ? (
+                        <Spinner size={'large'} centered />
+                    ) : (
+                        <>
+                            {!files.length ? (
+                                <div className={'flex flex-col items-center justify-center py-16'}>
+                                    <h3 className={'text-lg font-semibold text-neutral-100 mb-1'}>
+                                        This directory is empty
+                                    </h3>
+                                    <p className={'text-sm text-neutral-400 text-center max-w-sm'}>
+                                        Upload files or create a new directory to get started.
+                                    </p>
+                                </div>
+                            ) : (
+                                <CSSTransition classNames={'fade'} timeout={150} appear in>
+                                    <div>
+                                        {files.length > 250 && (
+                                            <div className={'rounded-md bg-yellow-400 mb-3 p-3'}>
+                                                <p className={'text-yellow-900 text-sm text-center m-0'}>
+                                                    This directory is too large to display in the browser, limiting
+                                                    the output to the first 250 files.
+                                                </p>
+                                            </div>
+                                        )}
+                                        <div
+                                            className={
+                                                'rounded-md border border-realm-border/50 bg-realm-card overflow-hidden'
+                                            }
+                                        >
+                                            <div
+                                                className={
+                                                    'grid grid-cols-12 gap-4 px-4 py-2 border-b border-realm-border/50'
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        'col-span-6 flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-neutral-500'
+                                                    }
+                                                >
+                                                    <FileActionCheckbox
+                                                        checked={
+                                                            selectedFilesLength ===
+                                                            (files?.length === 0 ? -1 : files?.length)
+                                                        }
+                                                        onChange={onSelectAllClick}
+                                                    />
+                                                    Name
+                                                </div>
+                                                <div
+                                                    className={
+                                                        'col-span-2 text-xs font-medium uppercase tracking-wide text-neutral-500 text-right'
+                                                    }
+                                                >
+                                                    Size
+                                                </div>
+                                                <div
+                                                    className={
+                                                        'col-span-3 text-xs font-medium uppercase tracking-wide text-neutral-500'
+                                                    }
+                                                >
+                                                    Modified
+                                                </div>
+                                                <div className={'col-span-1'} />
+                                            </div>
+                                            <div className={'divide-y divide-realm-border/50'}>
+                                                {sortFiles(files.slice(0, 250)).map((file) => (
+                                                    <FileObjectRow key={file.key} file={file} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <MassActionsBar />
+                                    </div>
+                                </CSSTransition>
+                            )}
+                        </>
+                    )}
+                    {tabs.length > 0 && (
+                        <button type={'button'} onClick={handleRestoreSession} className={style.restore_session_btn}>
+                            <ChevronDoubleUpIcon className={'w-4 h-4'} />
+                            Back to editor ({tabs.length})
+                        </button>
+                    )}
+                </>
+            )}
         </ServerContentBlock>
     );
 };

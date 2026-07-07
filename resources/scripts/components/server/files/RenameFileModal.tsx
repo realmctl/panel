@@ -14,19 +14,13 @@ interface FormikValues {
     name: string;
 }
 
-type OwnProps = RequiredModalProps & {
-    files: string[];
-    useMoveTerminology?: boolean;
-    directory?: string;
-    onCompleted?: (from: string, to: string) => void;
-};
+type OwnProps = RequiredModalProps & { files: string[]; useMoveTerminology?: boolean };
 
-const RenameFileModal = ({ files, useMoveTerminology, directory: directoryProp, onCompleted, ...props }: OwnProps) => {
+const RenameFileModal = ({ files, useMoveTerminology, ...props }: OwnProps) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
     const { clearFlashes, clearAndAddHttpError } = useFlash();
-    const contextDirectory = ServerContext.useStoreState((state) => state.files.directory);
-    const directory = directoryProp ?? contextDirectory;
+    const directory = ServerContext.useStoreState((state) => state.files.directory);
     const setSelectedFiles = ServerContext.useStoreActions((actions) => actions.files.setSelectedFiles);
 
     const submit = ({ name }: FormikValues, { setSubmitting }: FormikHelpers<FormikValues>) => {
@@ -53,11 +47,6 @@ const RenameFileModal = ({ files, useMoveTerminology, directory: directoryProp, 
         renameFiles(uuid, directory, data)
             .then((): Promise<any> => (files.length > 0 ? mutate() : Promise.resolve()))
             .then(() => setSelectedFiles([]))
-            .then(() => {
-                if (files.length === 1) {
-                    onCompleted?.(files[0], name);
-                }
-            })
             .catch((error) => {
                 mutate();
                 setSubmitting(false);

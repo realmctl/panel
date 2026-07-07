@@ -1,191 +1,18 @@
-.ide_layout {
-    @apply flex gap-3 items-stretch;
-    height: calc(100vh - 9rem);
-    min-height: 24rem;
+.breadcrumb_card {
+    @apply inline-flex items-center min-w-0 max-w-full overflow-x-auto rounded-md border border-realm-border/50 bg-realm-card px-3 py-2.5;
 }
 
-.explorer_card {
-    @apply hidden lg:flex flex-col w-72 flex-shrink-0 h-full min-h-0 self-stretch;
-}
-
-.explorer_card_body {
-    @apply !p-0 flex-1 flex flex-col min-h-0 h-full overflow-hidden;
-}
-
-.explorer_inner {
-    @apply flex flex-1 min-h-0 h-full;
-}
-
-.explorer_toolbar {
-    @apply flex flex-col items-center gap-1 py-2 px-1.5 border-r border-realm-border bg-realm-surface flex-shrink-0 self-stretch h-full;
-}
-
-.explorer_icon_btn {
-    @apply flex items-center justify-center w-9 h-9 rounded-md border-0 cursor-pointer;
-    @apply text-neutral-400 bg-transparent hover:text-neutral-100 hover:bg-realm-surface-raised transition-colors duration-75;
-}
-
-.explorer_tree {
-    @apply flex-1 min-w-0 flex flex-col min-h-0 bg-realm-card;
-}
-
-.tree_body {
-    @apply flex-1 overflow-y-auto py-2 min-h-0;
-}
-
-.tree_row_wrap {
-    @apply px-2 py-px;
-}
-
-.tree_row {
-    @apply flex items-center gap-1.5 w-full border-0 bg-transparent text-left cursor-pointer rounded-md;
-    @apply text-xs text-neutral-300 py-1 px-1.5 min-h-[26px];
-    @apply hover:bg-neutral-800/80 hover:text-neutral-100 transition-colors duration-75;
-}
-
-.tree_row_active {
-    @apply bg-neutral-800/90 text-neutral-100;
-}
-
-.tree_chevron {
-    @apply w-4 flex-shrink-0 flex items-center justify-center text-neutral-500;
-}
-
-.tree_label {
-    @apply truncate flex-1 min-w-0;
-}
-
-.tree_inline_input {
-    @apply flex-1 min-w-0 border-0 bg-transparent text-xs text-neutral-100 outline-none p-0 m-0;
-    @apply placeholder:text-neutral-600;
-}
-
-.tree_file_icon {
-    @apply flex-shrink-0 object-contain;
-    width: 16px;
-    height: 16px;
-}
-
-.tree_row_checked {
-    @apply bg-blue-500/10 text-blue-200;
-    outline: 1px solid theme('colors.blue.500 / 20%');
-    outline-offset: -1px;
-}
-
-.tree_row_dragging {
-    @apply opacity-40;
-}
-
-.tree_row_drop_target {
-    @apply bg-blue-500/15 outline outline-1 outline-blue-400/40;
-}
-
-.tree_body_external_drag {
-    @apply bg-blue-500/5;
-}
-
-.tree_drop_hint {
-    @apply px-3 py-2 text-[10px] text-blue-300/90 border-t border-realm-border bg-black;
-}
-
-.context_menu {
-    @apply fixed z-[120] min-w-[11rem] py-1 rounded-lg border border-realm-border bg-realm-popover shadow-xl;
-}
-
-.context_menu_item {
-    @apply flex items-center gap-2 w-full px-3 py-1.5 text-xs text-neutral-300 border-0 bg-transparent cursor-pointer text-left;
-    @apply hover:bg-white/5 hover:text-neutral-100 transition-colors duration-75;
-
-    &:disabled {
-        @apply opacity-40 cursor-not-allowed hover:bg-transparent hover:text-neutral-300;
-    }
-}
-
-.context_menu_item_danger {
-    @apply flex items-center gap-2 w-full px-3 py-1.5 text-xs text-neutral-300 border-0 bg-transparent cursor-pointer text-left;
-    @apply hover:bg-red-500/10 hover:text-red-400 transition-colors duration-75;
-}
-
-.context_menu_divider {
-    @apply my-1 border-t border-realm-border;
-}
-
-.context_menu_overlay {
-    @apply fixed inset-0 z-[110] cursor-wait;
-}
-
-.revision_drawer_content {
-    @apply relative min-h-[12rem];
-}
-
-.revision_list {
-    @apply flex flex-col gap-2;
-}
-
-.revision_item {
-    @apply rounded-lg border border-realm-border bg-realm-surface p-3;
-}
-
-.revision_item_header {
-    @apply flex items-start justify-between gap-3;
-}
-
-.revision_badge {
-    @apply px-2 py-0.5 rounded text-[10px] font-medium bg-realm-surface-raised text-neutral-400 flex-shrink-0;
-}
-
-.revision_actions {
-    @apply flex flex-wrap gap-x-3 gap-y-1 mt-3 pt-3 border-t border-realm-border;
-
-    button {
-        @apply text-xs text-blue-400 hover:text-blue-300 border-0 bg-transparent cursor-pointer p-0 transition-colors duration-150;
-    }
-}
-
-.revision_action_restore {
-    @apply !text-green-400 hover:!text-green-300;
-}
-
-.revision_action_delete {
-    @apply !text-red-400 hover:!text-red-300;
-}
-
-.revision_preview {
-    @apply bg-[#0b0f10] rounded-lg border border-realm-border p-3 text-xs text-neutral-300 overflow-auto max-h-[calc(100vh-12rem)] whitespace-pre-wrap break-all m-0;
-}
-
-.presence_stack {
-    @apply inline-flex items-center flex-shrink-0;
-}
-
-.presence_avatar {
-    @apply inline-flex items-center justify-center rounded-full overflow-hidden border border-realm-card flex-shrink-0;
-    margin-left: -6px;
-}
-
-.presence_avatar:first-child {
-    margin-left: 0;
-}
-
-.presence_avatar_self {
-    @apply border-blue-400/80;
-}
-
-.presence_overflow {
-    @apply inline-flex items-center justify-center rounded-full border border-realm-card bg-neutral-800 text-[10px] font-medium text-neutral-300 flex-shrink-0;
-    margin-left: -6px;
-}
-
-.tab_presence {
-    @apply flex-shrink-0;
+.restore_session_btn {
+    @apply fixed bottom-6 right-6 z-30 flex items-center gap-2 px-4 py-2.5 rounded-full border-0 cursor-pointer;
+    @apply bg-blue-500 text-white text-sm font-medium shadow-lg hover:bg-blue-400 transition-colors;
 }
 
 .editor_workspace {
-    @apply flex-1 min-w-0 min-h-0 h-full flex flex-col border border-realm-border rounded-lg overflow-hidden bg-[#0f1419];
+    @apply flex flex-col min-h-[32rem] h-[calc(100vh-16rem)] border border-realm-border rounded-lg overflow-hidden bg-[#0f1419];
 }
 
 .editor_top_bar {
-    @apply flex items-stretch border-b border-realm-border bg-black min-h-[34px] flex-shrink-0;
+    @apply flex items-stretch border-b border-realm-border bg-black min-h-[38px] flex-shrink-0;
 }
 
 .tab_bar {
@@ -222,107 +49,33 @@
 
 .tab_close {
     @apply flex items-center justify-center w-4 h-4 rounded text-neutral-600 hover:text-neutral-200 hover:bg-neutral-800 transition-colors;
-    @apply opacity-0;
 }
 
-.tab_item:hover .tab_close,
-.tab_item_active .tab_close {
-    @apply opacity-100;
+.minimize_btn {
+    @apply flex items-center gap-1.5 px-3 text-xs text-neutral-400 border-0 border-l border-realm-border bg-black cursor-pointer flex-shrink-0;
+    @apply hover:text-neutral-100 hover:bg-neutral-900 transition-colors;
 }
 
 .editor_breadcrumbs {
-    @apply flex items-center gap-1 px-3 py-1 min-h-[24px] flex-shrink-0 overflow-hidden whitespace-nowrap;
-    @apply text-[11px] leading-none text-neutral-500 border-b border-realm-border bg-[#0f1419];
-}
-
-.editor_breadcrumb_segment {
-    @apply text-neutral-500 flex-shrink-0;
-}
-
-.editor_breadcrumb_current {
-    @apply inline-flex items-center gap-1.5 text-neutral-300 truncate min-w-0;
-}
-
-.editor_breadcrumb_sep {
-    @apply text-neutral-700 flex-shrink-0 text-[9px];
-}
-
-.editor_body {
-    @apply flex-1 min-h-0 flex flex-col bg-[#0f1419];
-}
-
-.editor_notice {
-    @apply mx-3 mt-2 p-2.5 border-l-4 border-cyan-400 bg-neutral-900/80 rounded-r flex-shrink-0;
+    @apply px-3 py-1 min-h-[24px] flex-shrink-0 overflow-hidden whitespace-nowrap text-ellipsis;
+    @apply text-[11px] leading-none text-neutral-500 border-b border-realm-border bg-[#0f1419] font-mono;
 }
 
 .editor_surface {
-    @apply relative flex-1 min-h-0 h-full;
+    @apply relative flex-1 min-h-0;
 }
 
 .editor_status_bar {
-    @apply flex items-center justify-between gap-3 px-3 py-1 flex-shrink-0 border-t border-realm-border bg-black min-h-[28px];
-}
-
-.editor_status_start,
-.editor_status_end {
-    @apply flex items-center gap-2 min-w-0;
-}
-
-.editor_status_end {
-    @apply flex-shrink-0;
-}
-
-.editor_status_divider {
-    @apply w-px h-3.5 bg-neutral-700/80 flex-shrink-0 mx-0.5;
+    @apply flex items-center justify-between gap-3 px-3 py-1.5 flex-shrink-0 border-t border-realm-border bg-black min-h-[32px];
 }
 
 .editor_status_select {
-    @apply h-5 max-w-[9rem] pl-1.5 pr-5 text-[11px] leading-none rounded border-0 bg-transparent text-neutral-500 cursor-pointer;
-    @apply hover:text-neutral-300 transition-colors duration-75;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='%2364748b' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3e%3c/svg%3e");
-    background-size: 0.6rem;
-    background-repeat: no-repeat;
-    background-position: right 0.25rem center;
-}
-
-.editor_status_select:focus {
-    @apply outline-none text-neutral-300;
-}
-
-.editor_status_link {
-    @apply inline-flex items-center gap-1.5 h-5 px-0 text-[11px] leading-none text-neutral-500 border-0 bg-transparent cursor-pointer whitespace-nowrap;
-    @apply hover:text-neutral-200 transition-colors duration-75;
-}
-
-.editor_status_link:disabled {
-    @apply opacity-50 cursor-default hover:text-neutral-500;
-}
-
-.editor_status_kbd {
-    @apply text-[10px] leading-none font-mono text-neutral-600;
-}
-
-.preview_badge {
-    @apply inline-flex items-center h-4 rounded px-1 text-[9px] font-semibold uppercase tracking-wide leading-none;
-    @apply bg-blue-500/15 text-blue-300/90 border border-blue-500/20;
-}
-
-.editor_surface_empty {
-    @apply relative flex-1 min-h-0 w-full overflow-hidden;
+    @apply h-6 max-w-[10rem] text-xs rounded border-0 bg-transparent text-neutral-400 cursor-pointer;
+    @apply hover:text-neutral-200 transition-colors;
 }
 
 .editor_empty {
-    @apply relative h-full w-full flex items-center justify-center bg-[#0f1419];
-}
-
-.editor_empty_center {
-    @apply text-center px-6;
-}
-
-.editor_empty_icon {
-    @apply flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-xl;
-    @apply bg-realm-surface-raised/40 text-neutral-500 border border-realm-border;
+    @apply flex-1 flex flex-col items-center justify-center text-center px-6;
 }
 
 .editor_empty_title {
@@ -333,39 +86,7 @@
     @apply text-xs text-neutral-500 m-0;
 }
 
-.editor_empty_hints {
-    @apply mt-6 flex flex-col gap-2 items-center;
+.editor_error {
+    @apply text-sm text-red-300 text-center p-6 m-0;
 }
 
-.editor_empty_hint {
-    @apply flex items-center gap-3 text-xs text-neutral-500;
-}
-
-.editor_empty_kbd {
-    @apply inline-flex items-center justify-center min-w-[1.5rem] h-5 px-1.5 rounded border border-realm-border;
-    @apply bg-realm-surface text-[10px] font-mono text-neutral-400 leading-none;
-}
-
-.media_viewer {
-    @apply relative h-full w-full flex items-center justify-center bg-[#0f1419] p-6;
-}
-
-.media_viewer_inner {
-    @apply w-full max-w-3xl flex flex-col items-center gap-4;
-}
-
-.media_filename {
-    @apply text-sm text-neutral-400 m-0 truncate max-w-full;
-}
-
-.media_video {
-    @apply w-full max-h-[calc(100vh-16rem)] rounded-lg bg-black;
-}
-
-.media_audio {
-    @apply w-full;
-}
-
-.media_error {
-    @apply text-sm text-red-300 m-0 mb-3 text-center;
-}

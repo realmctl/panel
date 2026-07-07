@@ -97,12 +97,6 @@ export default {
             component: FileManagerContainer,
         },
         {
-            path: '/files/:action(edit|new)',
-            permission: 'file.*',
-            name: undefined,
-            component: FileManagerContainer,
-        },
-        {
             path: '/plugins',
             permission: 'file.*',
             feature: 'plugins',

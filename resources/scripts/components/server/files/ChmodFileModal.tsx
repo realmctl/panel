@@ -19,14 +19,13 @@ interface File {
     mode: string;
 }
 
-type OwnProps = RequiredModalProps & { files: File[]; directory?: string; onCompleted?: () => void };
+type OwnProps = RequiredModalProps & { files: File[] };
 
-const ChmodFileModal = ({ files, directory: directoryProp, onCompleted, ...props }: OwnProps) => {
+const ChmodFileModal = ({ files, ...props }: OwnProps) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
     const { clearFlashes, clearAndAddHttpError } = useFlash();
-    const contextDirectory = ServerContext.useStoreState((state) => state.files.directory);
-    const directory = directoryProp ?? contextDirectory;
+    const directory = ServerContext.useStoreState((state) => state.files.directory);
     const setSelectedFiles = ServerContext.useStoreActions((actions) => actions.files.setSelectedFiles);
 
     const submit = ({ mode }: FormikValues, { setSubmitting }: FormikHelpers<FormikValues>) => {
@@ -45,7 +44,6 @@ const ChmodFileModal = ({ files, directory: directoryProp, onCompleted, ...props
         chmodFiles(uuid, directory, data)
             .then((): Promise<any> => (files.length > 0 ? mutate() : Promise.resolve()))
             .then(() => setSelectedFiles([]))
-            .then(() => onCompleted?.())
             .catch((error) => {
                 mutate();
                 setSubmitting(false);

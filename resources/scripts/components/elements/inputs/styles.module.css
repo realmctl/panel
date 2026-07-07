@@ -1,7 +1,16 @@
 .checkbox_input {
-    @apply w-4 h-4 rounded-sm border-neutral-500 bg-neutral-600 text-primary-500;
+    @apply block flex-none w-5 h-5 rounded border-2 border-neutral-500 bg-neutral-600 text-primary-500 cursor-pointer transition-colors duration-75;
+    aspect-ratio: 1 / 1;
 
-    &:focus, &:active {
+    &:hover {
+        @apply border-primary-400;
+    }
+
+    &:checked {
+        @apply border-primary-500 bg-primary-500;
+    }
+
+    &:focus-visible {
         @apply ring-2 ring-primary-500 ring-offset-2 ring-offset-neutral-700;
     }
 
