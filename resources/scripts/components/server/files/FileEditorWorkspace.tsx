@@ -1,7 +1,6 @@
 import React, { useCallback, useRef } from 'react';
-import { ChevronDoubleDownIcon, XIcon } from '@heroicons/react/solid';
+import { ChevronDoubleDownIcon, ChevronDownIcon, XIcon } from '@heroicons/react/solid';
 import MonacoEditor from '@/components/elements/MonacoEditor';
-import Select from '@/components/elements/Select';
 import modes from '@/modes';
 import Can from '@/components/elements/Can';
 import { Button } from '@/components/elements/button/index';
@@ -100,7 +99,6 @@ export default ({ tabs, activePath, saving, onTabsChange, onActivePathChange, on
                                 filename={activeTab.path}
                                 mode={activeTab.mode}
                                 initialContent={activeTab.content}
-                                onModeChanged={(mode) => updateActiveTab({ mode })}
                                 onContentChanged={(content) => updateActiveTab({ content })}
                                 fetchContent={(callback) => {
                                     fetchContentRef.current = callback;
@@ -110,17 +108,20 @@ export default ({ tabs, activePath, saving, onTabsChange, onActivePathChange, on
                         )}
                     </div>
                     <div className={style.editor_status_bar}>
-                        <Select
-                            className={style.editor_status_select}
-                            value={activeTab.mode}
-                            onChange={(e) => updateActiveTab({ mode: e.currentTarget.value })}
-                        >
-                            {modes.map((mode) => (
-                                <option key={`${mode.name}_${mode.mime}`} value={mode.mime}>
-                                    {mode.name}
-                                </option>
-                            ))}
-                        </Select>
+                        <div className={style.editor_status_select_wrap}>
+                            <select
+                                className={style.editor_status_select}
+                                value={activeTab.mode}
+                                onChange={(e) => updateActiveTab({ mode: e.currentTarget.value })}
+                            >
+                                {modes.map((mode) => (
+                                    <option key={`${mode.name}_${mode.mime}`} value={mode.mime}>
+                                        {mode.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDownIcon className={style.editor_status_select_icon} />
+                        </div>
                         <Can action={'file.update'}>
                             <Button.Text
                                 size={Button.Sizes.Small}

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolderPlus } from '@fortawesome/free-solid-svg-icons';
+import { FolderAddIcon } from '@heroicons/react/outline';
 import classNames from 'classnames';
 import { ServerContext } from '@/state/server';
 import { Form, Formik, FormikHelpers } from 'formik';
@@ -109,8 +108,8 @@ export default ({ className }: WithClassname) => {
                 onClick={() => setOpen(true)}
                 className={classNames('flex items-center gap-1.5', className)}
             >
-                <FontAwesomeIcon icon={faFolderPlus} className={'text-xs'} />
-                Create Directory
+                <FolderAddIcon className={'w-4 h-4'} />
+                Directory
             </ToolbarButton.Text>
         </>
     );

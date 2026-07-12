@@ -69,9 +69,17 @@
     @apply flex items-center justify-between gap-3 px-3 py-1.5 flex-shrink-0 border-t border-realm-border bg-black min-h-[32px];
 }
 
+.editor_status_select_wrap {
+    @apply relative inline-flex items-center flex-shrink-0;
+}
+
 .editor_status_select {
-    @apply h-6 max-w-[10rem] text-xs rounded border-0 bg-transparent text-neutral-400 cursor-pointer;
-    @apply hover:text-neutral-200 transition-colors;
+    @apply h-7 max-w-[10rem] pl-2 pr-6 text-xs rounded-md border-0 bg-neutral-800/60 text-neutral-300 cursor-pointer;
+    @apply appearance-none outline-none hover:bg-neutral-800 hover:text-neutral-100 transition-colors;
+}
+
+.editor_status_select_icon {
+    @apply w-3 h-3 absolute right-2 text-neutral-500 pointer-events-none;
 }
 
 .editor_empty {

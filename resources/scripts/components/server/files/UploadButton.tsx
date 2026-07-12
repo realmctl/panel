@@ -147,13 +147,13 @@ export default ({ className }: WithClassname) => {
                 }}
                 multiple
             />
-            <Button
+            <Button.Text
                 className={classNames('flex items-center gap-1.5', className)}
                 onClick={() => fileUploadInput.current && fileUploadInput.current.click()}
             >
-                <CloudUploadIcon className={'w-3.5 h-3.5'} />
+                <CloudUploadIcon className={'w-4 h-4'} />
                 Upload
-            </Button>
+            </Button.Text>
         </>
     );
 };

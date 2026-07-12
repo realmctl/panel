@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { KeyIcon } from '@heroicons/react/outline';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { DotsHorizontalIcon, KeyIcon } from '@heroicons/react/outline';
 import { useStoreState } from 'easy-peasy';
 import { ServerContext } from '@/state/server';
 import { ip } from '@/lib/formatters';
@@ -15,7 +13,7 @@ import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 
 const StyledRow = styled.div`
-    ${tw`p-2 flex items-center rounded hover:bg-neutral-100 hover:text-neutral-700`};
+    ${tw`p-2 flex items-center rounded-md text-neutral-300 hover:bg-neutral-700/50 hover:text-neutral-100 cursor-pointer transition-colors duration-150`};
 `;
 
 export default () => {
@@ -59,11 +57,11 @@ export default () => {
                 renderToggle={(onClick) => (
                     <div
                         className={
-                            'flex items-center justify-center w-8 h-8 rounded-md text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50 cursor-pointer transition-colors duration-150'
+                            'flex items-center justify-center w-10 h-10 rounded-md text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50 cursor-pointer transition-colors duration-150'
                         }
                         onClick={onClick}
                     >
-                        <FontAwesomeIcon icon={faEllipsisH} size={'sm'} />
+                        <DotsHorizontalIcon className={'w-5 h-5'} />
                     </div>
                 )}
             >

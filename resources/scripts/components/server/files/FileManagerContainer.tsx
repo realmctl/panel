@@ -27,10 +27,14 @@ import saveFileContents from '@/api/server/files/saveFileContents';
 import useFlash from '@/plugins/useFlash';
 import FileNameModal from '@/components/server/files/FileNameModal';
 import FileEditorWorkspace from '@/components/server/files/FileEditorWorkspace';
-import { detectModeFromFilename, getFileName, isTabDirty, OpenFileTab } from '@/components/server/files/fileEditorUtils';
+import {
+    detectModeFromFilename,
+    getFileName,
+    isTabDirty,
+    OpenFileTab,
+} from '@/components/server/files/fileEditorUtils';
 import { ChevronDoubleUpIcon } from '@heroicons/react/solid';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { PlusIcon } from '@heroicons/react/outline';
 import style from './style.module.css';
 
 const sortFiles = (files: FileObject[]): FileObject[] => {
@@ -188,9 +192,7 @@ export default () => {
 
             saveFileContents(uuid, path, tab.content)
                 .then(() => {
-                    setTabs((current) =>
-                        current.map((t) => (t.path === path ? { ...t, savedContent: t.content } : t))
-                    );
+                    setTabs((current) => current.map((t) => (t.path === path ? { ...t, savedContent: t.content } : t)));
                     void mutate();
                 })
                 .catch((err) => clearAndAddHttpError({ key: 'files', error: err }))
@@ -220,7 +222,10 @@ export default () => {
                 if (current.some((tab) => tab.path === fullPath)) {
                     return current;
                 }
-                return [...current, { path: fullPath, content: '', savedContent: '', mode, loading: false, error: null, isNew: true }];
+                return [
+                    ...current,
+                    { path: fullPath, content: '', savedContent: '', mode, loading: false, error: null, isNew: true },
+                ];
             });
             setActivePath(fullPath);
             setView('edit');
@@ -273,7 +278,7 @@ export default () => {
                                             className={'flex items-center gap-1.5'}
                                             onClick={() => setNewFileModalVisible(true)}
                                         >
-                                            <FontAwesomeIcon icon={faPlus} className={'text-xs'} />
+                                            <PlusIcon className={'w-4 h-4'} />
                                             New File
                                         </Button>
                                     </>
@@ -301,8 +306,8 @@ export default () => {
                                         {files.length > 250 && (
                                             <div className={'rounded-md bg-yellow-400 mb-3 p-3'}>
                                                 <p className={'text-yellow-900 text-sm text-center m-0'}>
-                                                    This directory is too large to display in the browser, limiting
-                                                    the output to the first 250 files.
+                                                    This directory is too large to display in the browser, limiting the
+                                                    output to the first 250 files.
                                                 </p>
                                             </div>
                                         )}

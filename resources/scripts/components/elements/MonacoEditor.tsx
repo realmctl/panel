@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as monaco from 'monaco-editor';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
-import { findModeByFilename, getMonacoLanguage } from '@/lib/monacoLanguages';
+import { getMonacoLanguage } from '@/lib/monacoLanguages';
 import { patchMonacoWorkerEnvironment } from '@/lib/monacoWorkerShim';
 
 patchMonacoWorkerEnvironment();
@@ -25,7 +25,6 @@ export interface Props {
     initialContent?: string;
     mode: string;
     filename?: string;
-    onModeChanged: (mode: string) => void;
     fetchContent: (callback: () => Promise<string>) => void;
     onContentSaved: () => void;
     onContentChanged?: (content: string) => void;
@@ -66,25 +65,20 @@ export default ({
     mode,
     fetchContent,
     onContentSaved,
-    onModeChanged,
     onContentChanged,
     onCursorLineChange,
 }: Props) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const onModeChangedRef = useRef(onModeChanged);
     const onContentSavedRef = useRef(onContentSaved);
     const onContentChangedRef = useRef(onContentChanged);
     const onCursorLineChangeRef = useRef(onCursorLineChange);
     const fetchContentRef = useRef(fetchContent);
-    const modeRef = useRef(mode);
 
-    onModeChangedRef.current = onModeChanged;
     onContentSavedRef.current = onContentSaved;
     onContentChangedRef.current = onContentChanged;
     onCursorLineChangeRef.current = onCursorLineChange;
     fetchContentRef.current = fetchContent;
-    modeRef.current = mode;
 
     useEffect(() => {
         if (!containerRef.current) {
@@ -136,17 +130,6 @@ export default ({
             editorRef.current = null;
         };
     }, []);
-
-    useEffect(() => {
-        if (filename === undefined) {
-            return;
-        }
-
-        const detected = findModeByFilename(filename)?.mime || 'text/plain';
-        if (detected !== modeRef.current) {
-            onModeChangedRef.current(detected);
-        }
-    }, [filename]);
 
     useEffect(() => {
         const editor = editorRef.current;

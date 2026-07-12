@@ -1,17 +1,14 @@
 import React, { memo, useRef, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faBoxOpen,
-    faCopy,
-    faEllipsisH,
-    faFileArchive,
-    faFileCode,
-    faFileDownload,
-    faLevelUpAlt,
-    faPencilAlt,
-    faTrashAlt,
-    IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
+    ArchiveIcon,
+    ArrowUpIcon,
+    CodeIcon,
+    DocumentDownloadIcon,
+    DocumentDuplicateIcon,
+    DotsHorizontalIcon,
+    PencilIcon,
+    TrashIcon,
+} from '@heroicons/react/outline';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
 import { ServerContext } from '@/state/server';
 import { join } from 'pathe';
@@ -36,20 +33,22 @@ import { Dialog } from '@/components/elements/dialog';
 type ModalType = 'rename' | 'move' | 'chmod';
 
 const StyledRow = styled.div<{ $danger?: boolean }>`
-    ${tw`p-2 flex items-center rounded`};
+    ${tw`p-2 flex items-center rounded-md text-neutral-300 cursor-pointer transition-colors duration-150`};
     ${(props) =>
-        props.$danger ? tw`hover:bg-red-100 hover:text-red-700` : tw`hover:bg-neutral-100 hover:text-neutral-700`};
+        props.$danger
+            ? tw`hover:bg-red-500/10 hover:text-red-400`
+            : tw`hover:bg-neutral-700/50 hover:text-neutral-100`};
 `;
 
 interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
-    icon: IconDefinition;
+    icon: React.ComponentType<{ className?: string }>;
     title: string;
     $danger?: boolean;
 }
 
-const Row = ({ icon, title, ...props }: RowProps) => (
+const Row = ({ icon: Icon, title, ...props }: RowProps) => (
     <StyledRow {...props}>
-        <FontAwesomeIcon icon={icon} css={tw`text-xs`} fixedWidth />
+        <Icon className={'w-3.5 h-3.5 flex-shrink-0'} />
         <span css={tw`ml-2`}>{title}</span>
     </StyledRow>
 );
@@ -144,11 +143,11 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                 renderToggle={(onClick) => (
                     <div
                         className={
-                            'flex items-center justify-center w-8 h-8 rounded-md text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50 cursor-pointer transition-colors duration-150'
+                            'flex items-center justify-center w-10 h-10 rounded-md text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50 cursor-pointer transition-colors duration-150'
                         }
                         onClick={onClick}
                     >
-                        <FontAwesomeIcon icon={faEllipsisH} size={'sm'} />
+                        <DotsHorizontalIcon className={'w-5 h-5'} />
                         {modal ? (
                             modal === 'chmod' ? (
                                 <ChmodFileModal
@@ -172,27 +171,27 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                 )}
             >
                 <Can action={'file.update'}>
-                    <Row onClick={() => setModal('rename')} icon={faPencilAlt} title={'Rename'} />
-                    <Row onClick={() => setModal('move')} icon={faLevelUpAlt} title={'Move'} />
-                    <Row onClick={() => setModal('chmod')} icon={faFileCode} title={'Permissions'} />
+                    <Row onClick={() => setModal('rename')} icon={PencilIcon} title={'Rename'} />
+                    <Row onClick={() => setModal('move')} icon={ArrowUpIcon} title={'Move'} />
+                    <Row onClick={() => setModal('chmod')} icon={CodeIcon} title={'Permissions'} />
                 </Can>
                 {file.isFile && (
                     <Can action={'file.create'}>
-                        <Row onClick={doCopy} icon={faCopy} title={'Copy'} />
+                        <Row onClick={doCopy} icon={DocumentDuplicateIcon} title={'Copy'} />
                     </Can>
                 )}
                 {file.isArchiveType() ? (
                     <Can action={'file.create'}>
-                        <Row onClick={doUnarchive} icon={faBoxOpen} title={'Unarchive'} />
+                        <Row onClick={doUnarchive} icon={ArchiveIcon} title={'Unarchive'} />
                     </Can>
                 ) : (
                     <Can action={'file.archive'}>
-                        <Row onClick={doArchive} icon={faFileArchive} title={'Archive'} />
+                        <Row onClick={doArchive} icon={ArchiveIcon} title={'Archive'} />
                     </Can>
                 )}
-                {file.isFile && <Row onClick={doDownload} icon={faFileDownload} title={'Download'} />}
+                {file.isFile && <Row onClick={doDownload} icon={DocumentDownloadIcon} title={'Download'} />}
                 <Can action={'file.delete'}>
-                    <Row onClick={() => setShowConfirmation(true)} icon={faTrashAlt} title={'Delete'} $danger />
+                    <Row onClick={() => setShowConfirmation(true)} icon={TrashIcon} title={'Delete'} $danger />
                 </Can>
             </DropdownMenu>
         </>
