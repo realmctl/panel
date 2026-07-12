@@ -19,7 +19,16 @@ interface Props {
     onMinimize: () => void;
 }
 
-export default ({ tabs, activePath, saving, onTabsChange, onActivePathChange, onCloseTab, onSave, onMinimize }: Props) => {
+export default ({
+    tabs,
+    activePath,
+    saving,
+    onTabsChange,
+    onActivePathChange,
+    onCloseTab,
+    onSave,
+    onMinimize,
+}: Props) => {
     const fetchContentRef = useRef<(() => Promise<string>) | null>(null);
     const activeTab = tabs.find((tab) => tab.path === activePath) ?? null;
 
