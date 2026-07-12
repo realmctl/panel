@@ -119,16 +119,16 @@ export default ({ match, location }: RouteComponentProps<{ id: string; hash: str
                     <h1 className={'text-xl font-semibold text-white'}>Verify your email</h1>
                 </div>
 
-                {status === 'verifying' && (
-                    <p className={'text-sm text-gray-400'}>Verifying your email address...</p>
-                )}
+                {status === 'verifying' && <p className={'text-sm text-gray-400'}>Verifying your email address...</p>}
 
                 {status === 'success' && (
                     <div>
                         <p className={'text-sm text-green-400 mb-6'}>{message}</p>
                         <Link
                             to={'/auth/login'}
-                            className={'inline-flex h-10 items-center justify-center w-full rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 no-underline transition-colors'}
+                            className={
+                                'inline-flex h-10 items-center justify-center w-full rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 no-underline transition-colors'
+                            }
                         >
                             Go to Login
                         </Link>
@@ -154,14 +154,18 @@ export default ({ match, location }: RouteComponentProps<{ id: string; hash: str
                                         placeholder={'you@example.com'}
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className={'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}
+                                        className={
+                                            'w-full h-10 px-3 rounded-lg border border-gray-700/50 bg-[#192024] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                        }
                                     />
                                     {resendError && <p className={'mt-1 text-xs text-red-400'}>{resendError}</p>}
                                 </div>
                                 <button
                                     type={'button'}
                                     onClick={submitResend}
-                                    className={'w-full h-10 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors'}
+                                    className={
+                                        'w-full h-10 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors'
+                                    }
                                 >
                                     Resend verification email
                                 </button>
@@ -186,7 +190,10 @@ export default ({ match, location }: RouteComponentProps<{ id: string; hash: str
                         )}
 
                         <p className={'mt-6 text-sm text-center text-gray-400'}>
-                            <Link to={'/auth/login'} className={'font-medium text-blue-400 hover:text-blue-300 no-underline'}>
+                            <Link
+                                to={'/auth/login'}
+                                className={'font-medium text-blue-400 hover:text-blue-300 no-underline'}
+                            >
                                 Return to Login
                             </Link>
                         </p>
