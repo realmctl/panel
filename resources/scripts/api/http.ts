@@ -102,9 +102,21 @@ export function httpErrorToHuman(error: any): string {
             return data.errors[0].detail;
         }
 
+        // Laravel's default validation error response: { message, errors: { field: [msg] } }.
+        if (data.errors && typeof data.errors === 'object' && !Array.isArray(data.errors)) {
+            const firstError = Object.values<string[]>(data.errors)[0];
+            if (Array.isArray(firstError) && firstError[0]) {
+                return firstError[0];
+            }
+        }
+
         // Errors from wings directory, mostly just for file uploads.
         if (data.error && typeof data.error === 'string') {
             return data.error;
+        }
+
+        if (data.message && typeof data.message === 'string') {
+            return data.message;
         }
     }
 

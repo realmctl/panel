@@ -176,8 +176,12 @@ const RegisterContainer = ({ history }: RouteComponentProps) => {
             'cf-turnstile-response': captchaProvider === 'turnstile' ? token : undefined,
         })
             .then(() => {
-                addFlash({ type: 'success', title: 'Success', message: 'Account created! Redirecting to login...' });
-                setTimeout(() => history.push('/auth/login'), 2000);
+                addFlash({
+                    type: 'success',
+                    title: 'Check your email',
+                    message: 'Account created! Please check your email to verify your account before logging in.',
+                });
+                setTimeout(() => history.push('/auth/login'), 3000);
             })
             .catch((error) => {
                 console.error(error);

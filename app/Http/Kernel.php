@@ -5,6 +5,7 @@ namespace Realm\Http;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Http\Middleware\TrustProxies;
 use Realm\Http\Middleware\TrimStrings;
 use Illuminate\Session\Middleware\StartSession;
@@ -103,5 +104,6 @@ class Kernel extends HttpKernel
         'bindings' => SubstituteBindings::class,
         'recaptcha' => VerifyReCaptcha::class,
         'node.maintenance' => MaintenanceMiddleware::class,
+        'signed' => ValidateSignature::class,
     ];
 }

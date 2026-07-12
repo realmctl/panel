@@ -88,6 +88,12 @@ class ResetPasswordController extends Controller
         $this->dispatcher->dispatch(new PasswordReset($user));
         PasswordChanged::dispatch($user);
 
+        // Successfully completing a reset proves the user controls the mailbox the
+        // link was sent to, which satisfies the email verification requirement.
+        if (!$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
+
         // If the user is not using 2FA log them in, otherwise skip this step and force a
         // fresh login where they'll be prompted to enter a token.
         if (!$user->use_totp) {

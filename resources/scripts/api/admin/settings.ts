@@ -9,6 +9,7 @@ export interface GeneralSettings {
 
 export interface AdminSettingsResponse {
     general: GeneralSettings;
+    mailConfigured: boolean;
     languages: Record<string, string>;
 }
 

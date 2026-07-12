@@ -58,6 +58,10 @@ class LoginController extends AbstractLoginController
             $this->sendFailedLoginResponse($request, $user);
         }
 
+        if (!$user->hasVerifiedEmail()) {
+            throw new DisplayException(trans('auth.email_not_verified'));
+        }
+
         if ($link = $request->session()->pull('oauth_link_pending')) {
             if ($link['email'] === $user->email) {
                 UserOAuthLink::firstOrCreate(

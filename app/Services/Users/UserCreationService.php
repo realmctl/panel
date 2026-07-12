@@ -31,7 +31,7 @@ class UserCreationService
      * @throws Exception
      * @throws DataValidationException
      */
-    public function handle(array $data): User
+    public function handle(array $data, bool $requireEmailVerification = false): User
     {
         if (array_key_exists('password', $data) && !empty($data['password'])) {
             $data['password'] = $this->hasher->make($data['password']);
@@ -43,6 +43,8 @@ class UserCreationService
             $data['password'] = $this->hasher->make(str_random(30));
         }
 
+        $data['email_verified_at'] = $requireEmailVerification ? null : now();
+
         /** @var User $user */
         $user = $this->repository->create(array_merge($data, [
             'uuid' => Uuid::uuid4()->toString(),
@@ -53,7 +55,12 @@ class UserCreationService
         }
 
         $this->connection->commit();
-        $user->notify(new AccountCreated($user, $token ?? null));
+
+        if ($requireEmailVerification) {
+            $user->sendEmailVerificationNotification();
+        } else {
+            $user->notify(new AccountCreated($user, $token ?? null));
+        }
 
         return $user;
     }

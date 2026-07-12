@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
+import { Link } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
@@ -7,6 +8,7 @@ import useFlash from '@/plugins/useFlash';
 import { getAdminSettings, GeneralSettings, updateGeneralSettings } from '@/api/admin/settings';
 import { fieldClass, selectClass } from '@/components/admin/settings/fieldClass';
 import { SettingRow, SettingsFooter, SettingsSection } from '@/components/admin/settings/settingsLayout';
+import { adminBasePath } from '@/routers/adminRoutes';
 
 export default () => {
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
@@ -129,12 +131,26 @@ export default () => {
                 <SettingRow
                     label="User registration"
                     htmlFor="registration"
-                    description="Allow new accounts to be created from the login page."
+                    description={
+                        data?.mailConfigured === false ? (
+                            <>
+                                Requires a working email provider, since new accounts must verify
+                                their email address.{' '}
+                                <Link to={`${adminBasePath}/settings/mail`} className="underline">
+                                    Configure mail settings
+                                </Link>
+                                .
+                            </>
+                        ) : (
+                            'Allow new accounts to be created from the login page. New accounts must verify their email address before they can log in.'
+                        )
+                    }
                 >
                     <select
                         id="registration"
                         className={selectClass}
-                        value={form['realm:auth:registration_enabled']}
+                        disabled={data?.mailConfigured === false}
+                        value={data?.mailConfigured === false ? 'false' : form['realm:auth:registration_enabled']}
                         onChange={(e) =>
                             updateField(
                                 'realm:auth:registration_enabled',

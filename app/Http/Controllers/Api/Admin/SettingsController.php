@@ -49,6 +49,7 @@ class SettingsController extends Controller
                 'app:locale' => config('app.locale'),
                 'realm:auth:registration_enabled' => config('realm.auth.registration_enabled') ? 'true' : 'false',
             ],
+            'mailConfigured' => SupportedMailDrivers::isConfigured(),
             'languages' => $this->getAvailableLanguages(true),
         ]);
     }

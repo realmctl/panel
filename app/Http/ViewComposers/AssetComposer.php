@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Realm\Services\Helpers\AssetHashService;
 use Realm\Services\Helpers\SoftwareVersionService;
 use Realm\Services\Setup\PanelSetupService;
+use Realm\Support\Mail\SupportedMailDrivers;
 
 class AssetComposer
 {
@@ -48,7 +49,9 @@ class AssetComposer
                 'discord' => (bool) config('oauth.discord.enabled', false),
                 'github' => (bool) config('oauth.github.enabled', false),
             ],
-            'registration' => (bool) config('realm.auth.registration_enabled', false),
+            // Registration also requires a working mail provider, since new accounts
+            // must verify their email address before they can log in.
+            'registration' => (bool) config('realm.auth.registration_enabled', false) && SupportedMailDrivers::isConfigured(),
             'setup' => $this->setupService->toSiteConfiguration(),
             'version' => [
                 'current' => config('app.version'),

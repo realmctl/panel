@@ -25,6 +25,9 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+use Realm\Notifications\VerifyEmail as VerifyEmailNotification;
 use Realm\Notifications\SendPasswordReset as ResetPasswordNotification;
 
 /**
@@ -90,6 +93,7 @@ class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract,
+    MustVerifyEmailContract,
     Identifiable
 {
     use Authenticatable;
@@ -98,6 +102,7 @@ class User extends Model implements
     use CanResetPassword;
     /** @use HasAccessTokens<ApiKey> */
     use HasAccessTokens;
+    use MustVerifyEmailTrait;
     use Notifiable;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
@@ -148,6 +153,7 @@ class User extends Model implements
         'use_totp' => 'boolean',
         'gravatar' => 'boolean',
         'totp_authenticated_at' => 'datetime',
+        'email_verified_at' => 'datetime',
     ];
 
     /**
@@ -220,6 +226,20 @@ class User extends Model implements
             ->log('sending password reset email');
 
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Send the email verification notification, using our own Realm-branded
+     * notification instead of Laravel's default.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        Activity::event('auth:send-verification-email')
+            ->withRequestMetadata()
+            ->subject($this)
+            ->log('sending email verification link');
+
+        $this->notify(new VerifyEmailNotification());
     }
 
     /**

@@ -19,6 +19,10 @@ Route::get('/register', [Auth\LoginController::class, 'index'])->name('auth.regi
 Route::get('/password', [Auth\LoginController::class, 'index'])->name('auth.forgot-password');
 Route::get('/password/reset/{token}', [Auth\LoginController::class, 'index'])->name('auth.reset');
 
+// Email verification link. This is also the URL used to generate the signed
+// link included in the verification email — see Realm\Notifications\VerifyEmail.
+Route::get('/verify-email/{id}/{hash}', [Auth\LoginController::class, 'index'])->name('auth.verify-email');
+
 // Apply a throttle to authentication action endpoints, in addition to the
 // recaptcha endpoints to slow down manual attack spammers even more. 🤷‍
 //
@@ -36,6 +40,15 @@ Route::middleware(['throttle:authentication'])->group(function () {
     Route::post('/password', [Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
         ->name('auth.post.forgot-password')
         ->middleware('recaptcha');
+
+    // Confirms a signed email verification link and resends the verification
+    // email for accounts that have not yet verified their address.
+    Route::post('/verify-email/{id}/{hash}', [Auth\VerifyEmailController::class, 'verify'])
+        ->middleware('signed')
+        ->name('auth.verify-email.confirm');
+    Route::post('/verify-email/resend', [Auth\VerifyEmailController::class, 'resend'])
+        ->middleware('recaptcha')
+        ->name('auth.verify-email.resend');
 });
 
 // Password reset routes. This endpoint is hit after going through

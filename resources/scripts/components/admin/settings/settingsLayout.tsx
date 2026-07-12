@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 type SettingRowProps = {
     label: string;
-    description: string;
+    description: React.ReactNode;
     htmlFor?: string;
     children: React.ReactNode;
     wide?: boolean;

@@ -4,6 +4,7 @@ return [
     'sign_in' => 'Sign In',
     'go_to_login' => 'Go to Login',
     'failed' => 'No account matching those credentials could be found.',
+    'email_not_verified' => 'You must verify your email address before you can log in. Please check your inbox for the verification link.',
 
     'forgot_password' => [
         'label' => 'Forgot Password?',

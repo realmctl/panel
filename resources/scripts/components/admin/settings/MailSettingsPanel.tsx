@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate as mutateGlobal } from 'swr';
 import { Save, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Spinner from '@/components/elements/Spinner';
@@ -103,6 +103,9 @@ export default () => {
                     message: response.message,
                 });
                 mutate();
+                // The general settings panel's "registration requires mail" state
+                // depends on this, so make sure it picks up the new value too.
+                mutateGlobal('admin-settings');
             })
             .catch((submitError) => {
                 clearAndAddHttpError({ key: 'admin-settings', error: submitError });

@@ -5,6 +5,7 @@ import ForgotPasswordContainer from '@/components/auth/ForgotPasswordContainer';
 import ResetPasswordContainer from '@/components/auth/ResetPasswordContainer';
 import LoginCheckpointContainer from '@/components/auth/LoginCheckpointContainer';
 import RegisterContainer from '@/components/auth/RegisterContainer';
+import VerifyEmailContainer from '@/components/auth/VerifyEmailContainer';
 import OAuthCompleteContainer from '@/components/auth/OAuthCompleteContainer';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import { useHistory, useLocation } from 'react-router';
@@ -22,6 +23,7 @@ export default () => {
             <Route path={`${path}/oauth/complete`} component={OAuthCompleteContainer} exact />
             <Route path={`${path}/password`} component={ForgotPasswordContainer} exact />
             <Route path={`${path}/password/reset/:token`} component={ResetPasswordContainer} />
+            <Route path={`${path}/verify-email/:id/:hash`} component={VerifyEmailContainer} />
             <Route path={`${path}/checkpoint`} />
             <Route path={'*'}>
                 <NotFound onBack={() => history.push('/auth/login')} />
