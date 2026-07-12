@@ -294,7 +294,7 @@ export default () => {
 
                     {/* Help & Support */}
                     <a
-                        href={'#'}
+                        href={'https://discord.gg/TAWz2MNqtA'}
                         className={'flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-100 transition-colors duration-150 no-underline'}
                     >
                         <FontAwesomeIcon icon={faQuestionCircle} />

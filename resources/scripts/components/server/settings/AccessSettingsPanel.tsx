@@ -45,17 +45,13 @@ export default () => {
     }, []);
 
     return (
-        <div className={'max-w-3xl'}>
+        <div className={'space-y-4'}>
             <RealmCard
-                header={
-                    <div className={'flex items-center justify-between gap-3'}>
-                        <span className={'text-xs tracking-wide text-neutral-400'}>Server Access</span>
-                        <Can action={'user.create'}>
-                            <AddSubuserButton />
-                        </Can>
-                    </div>
-                }
-                bodyClassName={'space-y-2'}
+                rounded={'md'}
+                border={'soft'}
+                header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Server Access</h2>}
+                headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
+                bodyClassName={'space-y-2.5'}
             >
                 <FlashMessageRender byKey={'users'} className={'mb-2'} />
 
@@ -74,7 +70,11 @@ export default () => {
                         </Can>
                     </div>
                 ) : (
-                    subusers.map((subuser) => <UserRow key={subuser.uuid} subuser={subuser} />)
+                    <div className={'divide-y divide-realm-border/50'}>
+                        {subusers.map((subuser) => (
+                            <UserRow key={subuser.uuid} subuser={subuser} />
+                        ))}
+                    </div>
                 )}
             </RealmCard>
         </div>

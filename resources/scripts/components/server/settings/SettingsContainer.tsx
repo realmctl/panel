@@ -347,7 +347,7 @@ export default () => {
                             )}
 
                             {renderedTab === 'danger' && (
-                                <div className={'max-w-xl'}>
+                                <div className={'space-y-4'}>
                                     <Can action={'settings.reinstall'}>
                                         <RealmCard
                                             rounded={'md'}

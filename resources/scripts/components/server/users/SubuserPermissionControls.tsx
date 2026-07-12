@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useFormikContext } from 'formik';
 import classNames from 'classnames';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import { Actions, useStoreActions, useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { Button } from '@/components/elements/button/index';
 import { PERMISSION_PRESETS, resolvePresetPermissions } from '@/components/server/users/userPermissionPresets';
@@ -30,7 +30,9 @@ export default ({ editablePermissions, showPresets = false }: Props) => {
     const selectedCount = values.permissions.filter((p) => p !== 'websocket.connect').length;
 
     const templates = useStoreState((state: ApplicationStore) => state.permissionTemplates.data);
-    const fetchTemplates = useStoreActions((actions: Actions<ApplicationStore>) => actions.permissionTemplates.fetchTemplates);
+    const fetchTemplates = useStoreActions(
+        (actions: Actions<ApplicationStore>) => actions.permissionTemplates.fetchTemplates
+    );
 
     useEffect(() => {
         fetchTemplates();
@@ -47,7 +49,10 @@ export default ({ editablePermissions, showPresets = false }: Props) => {
     };
 
     const applyTemplate = (permissions: string[]) => {
-        setFieldValue('permissions', permissions.filter((p) => editablePermissions.includes(p)));
+        setFieldValue(
+            'permissions',
+            permissions.filter((p) => editablePermissions.includes(p))
+        );
     };
 
     const isTemplateActive = (permissions: string[]) => {
@@ -66,7 +71,10 @@ export default ({ editablePermissions, showPresets = false }: Props) => {
                     <p className={'text-sm font-medium text-neutral-100 m-0'}>Permission presets</p>
                     <p className={'text-xs text-neutral-500 mt-1 m-0'}>{selectedCount} selected</p>
                 </div>
-                <Button.Text type={'button'} onClick={() => setFieldValue('permissions', allSelected ? [] : editablePermissions)}>
+                <Button.Text
+                    type={'button'}
+                    onClick={() => setFieldValue('permissions', allSelected ? [] : editablePermissions)}
+                >
                     {allSelected ? 'Clear all' : 'Select all'}
                 </Button.Text>
             </div>

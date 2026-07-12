@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { DuplicateIcon } from '@heroicons/react/outline';
 import VariableBox from '@/components/server/startup/VariableBox';
 import getServerStartup from '@/api/swr/getServerStartup';
 import Spinner from '@/components/elements/Spinner';
@@ -13,8 +14,7 @@ import setSelectedDockerImage from '@/api/server/setSelectedDockerImage';
 import InputSpinner from '@/components/elements/InputSpinner';
 import useFlash from '@/plugins/useFlash';
 import CopyOnClick from '@/components/elements/CopyOnClick';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import RealmCard from '@/components/elements/realm/RealmCard';
 
 const INVOCATION_TOKEN = /(\{\{[^}]+\}\})/g;
 
@@ -118,81 +118,68 @@ export default ({ section }: Props) => {
 
     return (
         <div className={'grid grid-cols-1 md:grid-cols-3 gap-4'}>
-            <div
-                className={'md:col-span-2 rounded-lg overflow-hidden'}
-                style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
+            <RealmCard
+                rounded={'md'}
+                border={'soft'}
+                header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Startup Command</h2>}
+                headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
+                className={'md:col-span-2'}
             >
-                <div
-                    className={'px-4 py-3'}
-                    style={{ backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' }}
-                >
-                    <span className={'text-xs tracking-wide text-neutral-400'}>Startup Command</span>
-                </div>
-                <div className={'px-4 py-4'}>
-                    <CopyOnClick text={data.invocation} showInNotification={false}>
-                        <div
-                            className={
-                                'group flex w-full items-start justify-between gap-3 rounded-md px-3 py-2.5 font-mono text-sm leading-relaxed cursor-pointer transition-colors duration-150 hover:border-neutral-500'
-                            }
-                            style={{ backgroundColor: '#0e1417', border: '1px solid #2d3338' }}
-                        >
-                            <div className={'flex min-w-0 flex-1 flex-wrap items-center gap-x-1 gap-y-1.5'}>
-                                <InvocationText invocation={data.invocation} />
-                            </div>
-                            <FontAwesomeIcon
-                                icon={faCopy}
-                                className={
-                                    'mt-0.5 flex-shrink-0 text-xs text-neutral-600 transition-colors duration-150 group-hover:text-neutral-400'
-                                }
-                            />
+                <CopyOnClick text={data.invocation} showInNotification={false}>
+                    <div
+                        className={
+                            'group flex w-full items-start justify-between gap-3 rounded-md border border-realm-border bg-realm-surface px-3 py-2.5 font-mono text-sm leading-relaxed cursor-pointer transition-colors duration-150 hover:border-neutral-500'
+                        }
+                    >
+                        <div className={'flex min-w-0 flex-1 flex-wrap items-center gap-x-1 gap-y-1.5'}>
+                            <InvocationText invocation={data.invocation} />
                         </div>
-                    </CopyOnClick>
-                    <p className={'text-xs text-neutral-500 mt-2'}>Click to copy the full startup command.</p>
-                </div>
-            </div>
+                        <DuplicateIcon
+                            className={
+                                'mt-0.5 w-4 h-4 flex-shrink-0 text-neutral-600 transition-colors duration-150 group-hover:text-neutral-400'
+                            }
+                        />
+                    </div>
+                </CopyOnClick>
+                <p className={'text-xs text-neutral-500 mt-2'}>Click to copy the full startup command.</p>
+            </RealmCard>
 
-            <div
-                className={'rounded-lg overflow-hidden'}
-                style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
+            <RealmCard
+                rounded={'md'}
+                border={'soft'}
+                header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Docker Image</h2>}
+                headerClassName={'!py-2.5 !bg-realm-card !border-realm-border/50'}
             >
-                <div
-                    className={'px-4 py-3'}
-                    style={{ backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' }}
-                >
-                    <span className={'text-xs tracking-wide text-neutral-400'}>Docker Image</span>
-                </div>
-                <div className={'px-4 py-4'}>
-                    {Object.keys(data.dockerImages).length > 1 && !isCustomImage ? (
-                        <>
-                            <InputSpinner visible={loading}>
-                                <Select
-                                    disabled={Object.keys(data.dockerImages).length < 2}
-                                    onChange={updateSelectedDockerImage}
-                                    defaultValue={variables.dockerImage}
-                                >
-                                    {Object.keys(data.dockerImages).map((key) => (
-                                        <option key={data.dockerImages[key]} value={data.dockerImages[key]}>
-                                            {key}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </InputSpinner>
+                {Object.keys(data.dockerImages).length > 1 && !isCustomImage ? (
+                    <>
+                        <InputSpinner visible={loading}>
+                            <Select
+                                disabled={Object.keys(data.dockerImages).length < 2}
+                                onChange={updateSelectedDockerImage}
+                                defaultValue={variables.dockerImage}
+                            >
+                                {Object.keys(data.dockerImages).map((key) => (
+                                    <option key={data.dockerImages[key]} value={data.dockerImages[key]}>
+                                        {key}
+                                    </option>
+                                ))}
+                            </Select>
+                        </InputSpinner>
+                        <p className={'text-xs text-neutral-500 mt-2'}>
+                            Select a Docker image to use when running this server.
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <Input disabled readOnly value={variables.dockerImage} />
+                        {isCustomImage && (
                             <p className={'text-xs text-neutral-500 mt-2'}>
-                                Select a Docker image to use when running this server.
+                                This image was manually set by an administrator and cannot be changed here.
                             </p>
-                        </>
-                    ) : (
-                        <>
-                            <Input disabled readOnly value={variables.dockerImage} />
-                            {isCustomImage && (
-                                <p className={'text-xs text-neutral-500 mt-2'}>
-                                    This image was manually set by an administrator and cannot be changed here.
-                                </p>
-                            )}
-                        </>
-                    )}
-                </div>
-            </div>
+                        )}
+                    </>
+                )}
+            </RealmCard>
         </div>
     );
 };

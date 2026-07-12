@@ -5,40 +5,67 @@ import { Actions, useStoreActions } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { httpErrorToHuman } from '@/api/http';
 import { Button } from '@/components/elements/button/index';
-import { Dialog } from '@/components/elements/dialog';
+import Modal from '@/components/elements/Modal';
 
 export default () => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const [modalVisible, setModalVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
     const { addFlash, clearFlashes } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 
     const reinstall = () => {
+        setLoading(true);
         clearFlashes('settings');
         reinstallServer(uuid)
             .then(() => {
-                addFlash({ key: 'settings', type: 'success', message: 'Your server has begun the reinstallation process.' });
+                addFlash({
+                    key: 'settings',
+                    type: 'success',
+                    message: 'Your server has begun the reinstallation process.',
+                });
             })
             .catch((error) => {
                 console.error(error);
                 addFlash({ key: 'settings', type: 'error', message: httpErrorToHuman(error) });
             })
-            .then(() => setModalVisible(false));
+            .then(() => {
+                setLoading(false);
+                setModalVisible(false);
+            });
     };
 
-    useEffect(() => { clearFlashes(); }, []);
+    useEffect(() => {
+        clearFlashes();
+    }, []);
 
     return (
         <>
-            <Dialog.Confirm
-                open={modalVisible}
+            <Modal
+                visible={modalVisible}
+                onDismissed={() => setModalVisible(false)}
+                dismissable={!loading}
+                closeOnBackground={!loading}
+                closeOnEscape={!loading}
+                showSpinnerOverlay={loading}
                 title={'Confirm server reinstallation'}
-                confirm={'Yes, reinstall server'}
-                onClose={() => setModalVisible(false)}
-                onConfirmed={reinstall}
+                footer={
+                    <>
+                        <Button.Text
+                            size={Button.Sizes.Small}
+                            onClick={() => setModalVisible(false)}
+                            disabled={loading}
+                        >
+                            Cancel
+                        </Button.Text>
+                        <Button.Danger size={Button.Sizes.Small} onClick={reinstall} disabled={loading}>
+                            Yes, reinstall server
+                        </Button.Danger>
+                    </>
+                }
             >
                 Your server will be stopped and some files may be deleted or modified during this process, are you sure
                 you wish to continue?
-            </Dialog.Confirm>
+            </Modal>
 
             <p className={'text-sm text-neutral-300 mb-6'}>
                 Reinstalling your server will stop it, and then re-run the installation script that initially set it
@@ -49,9 +76,7 @@ export default () => {
                 </strong>
             </p>
             <div className={'flex justify-end'}>
-                <Button.Danger variant={Button.Variants.Secondary} onClick={() => setModalVisible(true)}>
-                    Reinstall Server
-                </Button.Danger>
+                <Button.Danger onClick={() => setModalVisible(true)}>Reinstall Server</Button.Danger>
             </div>
         </>
     );
