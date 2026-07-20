@@ -13,7 +13,7 @@ import SettingsContainer from '@/components/server/settings/SettingsContainer';
 import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
 import AccountApiContainer from '@/components/dashboard/AccountApiContainer';
 import AccountSSHContainer from '@/components/dashboard/ssh/AccountSSHContainer';
-import AccountPermissionTemplatesContainer from '@/components/dashboard/permissionTemplates/AccountPermissionTemplatesContainer';
+import AccountEnvironmentContainer from '@/components/dashboard/environment/AccountEnvironmentContainer';
 import ActivityLogContainer from '@/components/dashboard/activity/ActivityLogContainer';
 import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer';
 import VersionChangerContainer from '@/components/server/versions/VersionChangerContainer';
@@ -65,9 +65,9 @@ export default {
             component: AccountSSHContainer,
         },
         {
-            path: '/permission-templates',
-            name: 'Permission Templates',
-            component: AccountPermissionTemplatesContainer,
+            path: '/environment',
+            name: 'Environment',
+            component: AccountEnvironmentContainer,
         },
         {
             path: '/activity',
