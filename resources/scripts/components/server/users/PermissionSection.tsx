@@ -1,6 +1,5 @@
 import React, { memo, useCallback } from 'react';
 import { useField } from 'formik';
-import Input from '@/components/elements/Input';
 import isEqual from 'react-fast-compare';
 
 interface Props {
@@ -14,9 +13,9 @@ interface Props {
 const PermissionSection: React.FC<Props> = memo(({ isEditable, title, permissions, description, children }) => {
     const [{ value }, , { setValue }] = useField<string[]>('permissions');
 
-    const onCheckboxClicked = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (e.currentTarget.checked) {
+    const setAllSelected = useCallback(
+        (checked: boolean) => {
+            if (checked) {
                 setValue([...value, ...permissions.filter((p) => !value.includes(p))]);
             } else {
                 setValue(value.filter((p) => !permissions.includes(p)));
@@ -28,17 +27,20 @@ const PermissionSection: React.FC<Props> = memo(({ isEditable, title, permission
     const allSelected = permissions.every((p) => value.includes(p));
 
     return (
-        <section className={'border-t border-realm-border/60 pt-4 first:border-t-0 first:pt-0'}>
-            <div className={'flex items-center gap-3 mb-2'}>
+        <section className={'border-t border-realm-border/50 pt-3 first:border-t-0 first:pt-0'}>
+            <div className={'flex items-center gap-3 mb-1.5 px-1'}>
                 <div className={'flex-1 min-w-0'}>
-                    <h3 className={'text-xs font-semibold uppercase tracking-wide text-neutral-400 m-0'}>{title}</h3>
-                    {description && <p className={'text-xs text-neutral-500 mt-1 mb-0'}>{description}</p>}
+                    <h3 className={'text-sm font-semibold text-neutral-200 m-0 capitalize'}>{title}</h3>
+                    {description && <p className={'text-xs text-neutral-500 mt-0.5 mb-0'}>{description}</p>}
                 </div>
                 {isEditable && (
-                    <label className={'flex items-center gap-2 text-xs text-neutral-500 cursor-pointer shrink-0'}>
-                        <Input type={'checkbox'} checked={allSelected} onChange={onCheckboxClicked} />
-                        All
-                    </label>
+                    <button
+                        type={'button'}
+                        onClick={() => setAllSelected(!allSelected)}
+                        className={'text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors shrink-0'}
+                    >
+                        {allSelected ? 'Deselect all' : 'Select all'}
+                    </button>
                 )}
             </div>
             {children}
