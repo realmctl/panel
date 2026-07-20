@@ -6,9 +6,9 @@ import PageContentBlock from '@/components/elements/PageContentBlock';
 import MessageBox from '@/components/MessageBox';
 import { useLocation } from 'react-router-dom';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import RealmCard from '@/components/elements/realm/RealmCard';
 
-const cardStyle = { backgroundColor: '#192024', border: '1px solid #2d3338' } as React.CSSProperties;
-const cardHeaderStyle = { backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' } as React.CSSProperties;
+const cardHeaderClassName = '!py-2.5 !bg-realm-card !border-realm-border/50';
 
 export default () => {
     const { state } = useLocation<undefined | { twoFactorRedirect?: boolean }>();
@@ -16,44 +16,43 @@ export default () => {
     return (
         <PageContentBlock title={'Account Overview'}>
             {state?.twoFactorRedirect && (
-                <MessageBox title={'2-Factor Required'} type={'error'}>
-                    Your account must have two-factor authentication enabled in order to continue.
-                </MessageBox>
+                <div className={'mb-4'}>
+                    <MessageBox title={'2-Factor Required'} type={'error'}>
+                        Your account must have two-factor authentication enabled in order to continue.
+                    </MessageBox>
+                </div>
             )}
 
-            <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'} style={{ marginTop: state?.twoFactorRedirect ? '1rem' : '2.5rem' }}>
-                {/* Update Password Card */}
-                <div className={'rounded-lg overflow-hidden'} style={cardStyle}>
-                    <div className={'px-4 py-3'} style={cardHeaderStyle}>
-                        <h3 className={'text-sm font-semibold text-neutral-100'}>Update Password</h3>
-                    </div>
-                    <div className={'px-4 py-4'}>
-                        <FlashMessageRender byKey={'account:password'} className={'mb-4'} />
-                        <UpdatePasswordForm />
-                    </div>
-                </div>
+            <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'}>
+                <RealmCard
+                    rounded={'md'}
+                    border={'soft'}
+                    header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Update Password</h2>}
+                    headerClassName={cardHeaderClassName}
+                >
+                    <FlashMessageRender byKey={'account:password'} className={'mb-4'} />
+                    <UpdatePasswordForm />
+                </RealmCard>
 
-                {/* Update Email Address Card */}
-                <div className={'rounded-lg overflow-hidden'} style={cardStyle}>
-                    <div className={'px-4 py-3'} style={cardHeaderStyle}>
-                        <h3 className={'text-sm font-semibold text-neutral-100'}>Update Email Address</h3>
-                    </div>
-                    <div className={'px-4 py-4'}>
-                        <FlashMessageRender byKey={'account:email'} className={'mb-4'} />
-                        <UpdateEmailAddressForm />
-                    </div>
-                </div>
+                <RealmCard
+                    rounded={'md'}
+                    border={'soft'}
+                    header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Update Email Address</h2>}
+                    headerClassName={cardHeaderClassName}
+                >
+                    <FlashMessageRender byKey={'account:email'} className={'mb-4'} />
+                    <UpdateEmailAddressForm />
+                </RealmCard>
 
-                {/* Two-Step Verification Card */}
-                <div className={'rounded-lg overflow-hidden'} style={cardStyle}>
-                    <div className={'px-4 py-3'} style={cardHeaderStyle}>
-                        <h3 className={'text-sm font-semibold text-neutral-100'}>Two-Step Verification</h3>
-                    </div>
-                    <div className={'px-4 py-4'}>
-                        <FlashMessageRender byKey={'account:totp'} className={'mb-4'} />
-                        <ConfigureTwoFactorForm />
-                    </div>
-                </div>
+                <RealmCard
+                    rounded={'md'}
+                    border={'soft'}
+                    header={<h2 className={'text-base font-semibold text-neutral-100 m-0'}>Two-Step Verification</h2>}
+                    headerClassName={cardHeaderClassName}
+                >
+                    <FlashMessageRender byKey={'account:totp'} className={'mb-4'} />
+                    <ConfigureTwoFactorForm />
+                </RealmCard>
             </div>
         </PageContentBlock>
     );

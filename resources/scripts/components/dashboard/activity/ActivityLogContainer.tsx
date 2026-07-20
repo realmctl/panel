@@ -12,9 +12,7 @@ import classNames from 'classnames';
 import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
 import useLocationHash from '@/plugins/useLocationHash';
-
-const cardStyle = { backgroundColor: '#192024', border: '1px solid #2d3338' } as React.CSSProperties;
-const cardHeaderStyle = { backgroundColor: '#0e1417', borderBottom: '1px solid #2d3338' } as React.CSSProperties;
+import RealmCard from '@/components/elements/realm/RealmCard';
 
 export default () => {
     const { hash } = useLocationHash();
@@ -24,6 +22,8 @@ export default () => {
         revalidateOnMount: true,
         revalidateOnFocus: false,
     });
+
+    const hasFilters = !!(filters.filters?.event || filters.filters?.ip);
 
     useEffect(() => {
         setFilters((value) => ({ ...value, filters: { ip: hash.ip, event: hash.event } }));
@@ -35,8 +35,8 @@ export default () => {
 
     return (
         <PageContentBlock title={'Account Activity Log'}>
-            <FlashMessageRender byKey={'account'} />
-            {(filters.filters?.event || filters.filters?.ip) && (
+            <FlashMessageRender byKey={'account'} className={'mb-4'} />
+            {hasFilters && (
                 <div className={'flex justify-end mb-4'}>
                     <Link
                         to={'#'}
@@ -47,33 +47,40 @@ export default () => {
                     </Link>
                 </div>
             )}
-            <div className={'rounded-lg overflow-hidden'} style={cardStyle}>
-                <div className={'px-4 py-3'} style={cardHeaderStyle}>
-                    <h3 className={'text-sm font-semibold text-neutral-100'}>Activity Log</h3>
+
+            {!data && isValidating ? (
+                <Spinner centered size={Spinner.Size.LARGE} />
+            ) : !data?.items.length ? (
+                <RealmCard
+                    rounded={'md'}
+                    border={'soft'}
+                    bodyClassName={'p-8 flex flex-col items-center justify-center'}
+                >
+                    <p className={'text-sm text-neutral-500'}>No activity logs found{hasFilters ? ' for the current filters' : ''}.</p>
+                </RealmCard>
+            ) : (
+                <div className={'flex flex-col gap-3'}>
+                    {data.items.map((activity) => (
+                        <ActivityLogEntry key={activity.id} activity={activity}>
+                            {typeof activity.properties.useragent === 'string' && (
+                                <Tooltip content={activity.properties.useragent} placement={'top'}>
+                                    <span>
+                                        <DesktopComputerIcon />
+                                    </span>
+                                </Tooltip>
+                            )}
+                        </ActivityLogEntry>
+                    ))}
                 </div>
-                <div>
-                    {!data && isValidating ? (
-                        <div className={'py-8'}><Spinner centered /></div>
-                    ) : (
-                        data?.items.map((activity) => (
-                            <ActivityLogEntry key={activity.id} activity={activity}>
-                                {typeof activity.properties.useragent === 'string' && (
-                                    <Tooltip content={activity.properties.useragent} placement={'top'}>
-                                        <span>
-                                            <DesktopComputerIcon />
-                                        </span>
-                                    </Tooltip>
-                                )}
-                            </ActivityLogEntry>
-                        ))
-                    )}
-                </div>
-            </div>
+            )}
+
             {data && (
-                <PaginationFooter
-                    pagination={data.pagination}
-                    onPageSelect={(page) => setFilters((value) => ({ ...value, page }))}
-                />
+                <div className={'mt-4'}>
+                    <PaginationFooter
+                        pagination={data.pagination}
+                        onPageSelect={(page) => setFilters((value) => ({ ...value, page }))}
+                    />
+                </div>
             )}
         </PageContentBlock>
     );

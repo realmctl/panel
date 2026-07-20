@@ -58,7 +58,11 @@ export default () => {
                             className={'w-full mt-1'}
                         />
                     </div>
-                    <div className={'max-h-96 overflow-y-auto pr-1'}>
+                    <div
+                        className={
+                            'max-h-96 overflow-y-auto pr-1 rounded-md bg-realm-surface border border-realm-border p-3'
+                        }
+                    >
                         {Object.keys(permissions)
                             .filter((key) => key !== 'websocket')
                             .map((key) => (
@@ -69,7 +73,7 @@ export default () => {
                                     isEditable
                                     permissions={Object.keys(permissions[key].keys).map((pkey) => `${key}.${pkey}`)}
                                 >
-                                    <div className={'grid grid-cols-1 md:grid-cols-2 gap-0.5'}>
+                                    <div className={'flex flex-col gap-0.5'}>
                                         {Object.keys(permissions[key].keys).map((pkey) => (
                                             <PermissionRow
                                                 key={`permission_${key}.${pkey}`}

@@ -34,7 +34,7 @@ export default ({ uuid, name }: { uuid: string; name: string }) => {
             >
                 Removing the <Code>{name}</Code> template will not affect subusers it has already been applied to.
             </Dialog.Confirm>
-            <button css={tw`ml-4 p-2 text-sm`} onClick={() => setVisible(true)} type={'button'}>
+            <button css={tw`p-2 text-sm`} onClick={() => setVisible(true)} type={'button'}>
                 <FontAwesomeIcon icon={faTrashAlt} css={tw`text-neutral-400 hover:text-red-400 transition-colors duration-150`} />
             </button>
         </>
