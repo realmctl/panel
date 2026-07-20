@@ -39,12 +39,16 @@ export default ({ activity, children }: Props) => {
 
     return (
         <div
-            className={'flex items-start gap-4 p-4 rounded-lg transition-colors duration-150 group'}
-            style={{ backgroundColor: '#192024', border: '1px solid #2d3338' }}
+            className={
+                'flex items-start gap-4 p-4 rounded-lg transition-colors duration-150 group ' +
+                'bg-realm-card border border-realm-border/50'
+            }
         >
             {/* Avatar */}
-            <div className={'hidden sm:flex flex-shrink-0 w-9 h-9 rounded-full overflow-hidden mt-0.5'}
-                style={{ backgroundColor: '#2d3338' }}
+            <div
+                className={
+                    'hidden sm:flex flex-shrink-0 w-9 h-9 rounded-full overflow-hidden mt-0.5 bg-realm-surface-raised'
+                }
             >
                 <Avatar name={actor?.uuid || 'system'} />
             </div>
@@ -90,8 +94,10 @@ export default ({ activity, children }: Props) => {
                     {activity.ip && (
                         <Link
                             to={`#${pathTo({ ip: activity.ip })}`}
-                            className={'text-xs font-mono px-2 py-0.5 rounded transition-colors duration-100 hover:text-cyan-400'}
-                            style={{ backgroundColor: '#0e1417', color: '#64748b', border: '1px solid #2d3338' }}
+                            className={
+                                'text-xs font-mono px-2 py-0.5 rounded transition-colors duration-100 ' +
+                                'bg-realm-surface text-realm-muted border border-realm-border hover:text-cyan-400'
+                            }
                         >
                             {activity.ip}
                         </Link>
