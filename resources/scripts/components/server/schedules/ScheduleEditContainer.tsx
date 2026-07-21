@@ -123,7 +123,7 @@ export default () => {
                                 <Can action={'schedule.delete'}>
                                     <DeleteScheduleButton
                                         scheduleId={schedule.id}
-                                        onDeleted={() => history.push(`/server/${id}/automation`)}
+                                        onDeleted={() => history.push(`/instance/${id}/automation`)}
                                     />
                                 </Can>
                                 <Can action={'schedule.update'}>

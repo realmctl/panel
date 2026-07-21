@@ -76,7 +76,7 @@ export default ({ server, className, groupColor }: { server: Server; className?:
 
     return (
         <Link
-            to={`/server/${server.id}`}
+            to={`/instance/${server.id}`}
             className={classNames(
                 'grid grid-cols-12 gap-4 items-center px-4 py-3 no-underline transition-colors duration-150 hover:bg-white/[0.03]',
                 className

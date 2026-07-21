@@ -185,7 +185,7 @@ export function AdminSidebar() {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     className="flex items-center gap-2"
-                                    onSelect={() => history.push('/account')}
+                                    onSelect={() => history.push('/user')}
                                 >
                                     <Users className="h-4 w-4" />
                                     My account

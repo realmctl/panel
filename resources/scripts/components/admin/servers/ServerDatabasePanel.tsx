@@ -161,10 +161,10 @@ export default () => {
                 <p className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-muted-foreground">
                     Database passwords can be viewed on the client panel at{' '}
                     <a
-                        href={`/server/${serverData?.server.uuid_short}/databases`}
+                        href={`/instance/${serverData?.server.uuid_short}/databases`}
                         className="text-blue-400 no-underline hover:text-blue-300"
                     >
-                        /server/{serverData?.server.uuid_short}/databases
+                        /instance/{serverData?.server.uuid_short}/databases
                     </a>
                     .
                 </p>

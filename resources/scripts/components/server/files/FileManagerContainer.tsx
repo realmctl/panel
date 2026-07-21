@@ -69,7 +69,7 @@ export default () => {
     const syncEditUrl = useCallback(
         (path: string) => {
             skipHashSync.current = true;
-            history.replace(`/server/${id}/files#${encodePathSegments(path)}`);
+            history.replace(`/instance/${id}/files#${encodePathSegments(path)}`);
         },
         [history, id]
     );
@@ -173,7 +173,7 @@ export default () => {
                 syncEditUrl(next.path);
             } else {
                 skipHashSync.current = true;
-                history.replace(`/server/${id}/files`);
+                history.replace(`/instance/${id}/files`);
                 setView('browse');
             }
         },
@@ -203,7 +203,7 @@ export default () => {
 
     const handleMinimize = useCallback(() => {
         skipHashSync.current = true;
-        history.replace(`/server/${id}/files#${encodePathSegments(directory)}`);
+        history.replace(`/instance/${id}/files#${encodePathSegments(directory)}`);
         setView('browse');
     }, [history, id, directory]);
 

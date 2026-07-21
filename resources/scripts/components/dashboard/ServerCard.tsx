@@ -136,7 +136,7 @@ export default ({ server, groupColor }: { server: Server; groupColor?: string })
 
                     {/* Manage button */}
                     <Link
-                        to={`/server/${server.id}`}
+                        to={`/instance/${server.id}`}
                         className={`block w-full text-center py-2.5 rounded-md text-sm font-medium no-underline transition-all duration-150 border ${
                             isSuspended
                                 ? 'bg-red-500/20 hover:bg-red-500/40 text-red-200 border-red-500/30'

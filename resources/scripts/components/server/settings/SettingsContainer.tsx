@@ -77,7 +77,7 @@ export default () => {
     const history = useHistory();
     const location = useLocation();
     const { tab: tabParam } = useParams<{ tab?: string }>();
-    const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
+    const serverMatch = useRouteMatch<{ id: string }>('/instance/:id');
     const userPermissions = ServerContext.useStoreState((state) => state.server.permissions);
 
     const visibleTabs = useMemo(

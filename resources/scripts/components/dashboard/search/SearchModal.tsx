@@ -103,7 +103,7 @@ export default ({ ...props }: Props) => {
                             {servers.map((server) => (
                                 <ServerResult
                                     key={server.uuid}
-                                    to={`/server/${server.id}`}
+                                    to={`/instance/${server.id}`}
                                     onClick={() => props.onDismissed()}
                                 >
                                     <div css={tw`flex-1 mr-4`}>

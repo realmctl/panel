@@ -21,7 +21,7 @@ const SERVER_SWITCHER_CACHE_MS = 5 * 60 * 1000;
 
 const ServerSwitcher = () => {
     const history = useHistory();
-    const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
+    const serverMatch = useRouteMatch<{ id: string }>('/instance/:id');
     const currentServerName = ServerContext.useStoreState((state) => state.server.data?.name) || 'Switch Server';
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -71,7 +71,7 @@ const ServerSwitcher = () => {
                                 key={server.uuid}
                                 onClick={() => {
                                     setOpen(false);
-                                    history.push(`/server/${server.id}`);
+                                    history.push(`/instance/${server.id}`);
                                 }}
                                 className={`flex items-center w-full px-4 py-2 text-left border-0 cursor-pointer transition-colors duration-150 ${
                                     serverMatch?.params.id === server.id
@@ -120,7 +120,7 @@ export default () => {
     const history = useHistory();
 
     // Detect if we're on a server page
-    const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
+    const serverMatch = useRouteMatch<{ id: string }>('/instance/:id');
     const isOnServerPage = !!serverMatch;
 
     useEffect(() => {
@@ -185,7 +185,7 @@ export default () => {
         setSearchOpen(false);
         setSearchTerm('');
         setSearchResults([]);
-        history.push(`/server/${serverId}`);
+        history.push(`/instance/${serverId}`);
     };
 
     return (
@@ -317,7 +317,7 @@ export default () => {
                         {dropdownOpen && (
                             <div className={'absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg py-1 z-50 border border-realm-border bg-realm-popover'}>
                                 <Link
-                                    to={'/account'}
+                                    to={'/user'}
                                     className={'flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700/50 no-underline transition-colors duration-150'}
                                 >
                                     <FontAwesomeIcon icon={faUser} className={'w-4'} />

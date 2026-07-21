@@ -151,7 +151,7 @@ export default () => {
                             <div className="flex shrink-0 items-center gap-3 text-xs">
                                 {statusLabel(server.status)}
                                 <a
-                                    href={`/server/${server.uuid_short}`}
+                                    href={`/instance/${server.uuid_short}`}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="text-blue-400 no-underline hover:text-blue-300"

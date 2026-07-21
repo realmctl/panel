@@ -26,7 +26,7 @@ export default () => {
         <TabNav items={items}>
             {data?.server.uuid_short && (
                 <a
-                    href={`/server/${data.server.uuid_short}`}
+                    href={`/instance/${data.server.uuid_short}`}
                     target="_blank"
                     rel="noreferrer"
                     className={cn(

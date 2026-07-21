@@ -206,7 +206,7 @@ export default ({ config, embedded = false, filePath, initialContent, onSaved }:
             <div className={styles.toolbarActions}>
                 {!embedded && !missing && (
                     <a
-                        href={`/server/${serverId}/files#${encodePathSegments(activePath)}`}
+                        href={`/instance/${serverId}/files#${encodePathSegments(activePath)}`}
                         className={styles.toolbarLink}
                     >
                         Open in Files

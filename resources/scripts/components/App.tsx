@@ -1,6 +1,6 @@
 import React, { lazy } from 'react';
 import { hot } from 'react-hot-loader/root';
-import { Route, Router, Switch } from 'react-router-dom';
+import { Redirect, Route, RouteComponentProps, Router, Switch } from 'react-router-dom';
 import { StoreProvider } from 'easy-peasy';
 import { store } from '@/state';
 import { SiteSettings } from '@/state/settings';
@@ -92,13 +92,32 @@ const App = () => {
                                         <AuthenticationRouter />
                                     </Spinner.Suspense>
                                 </Route>
-                                <AuthenticatedRoute path={'/server/:id'}>
+                                <AuthenticatedRoute path={'/instance/:id'}>
                                     <Spinner.Suspense>
                                         <ServerContext.Provider>
                                             <ServerRouter />
                                         </ServerContext.Provider>
                                     </Spinner.Suspense>
                                 </AuthenticatedRoute>
+                                {/* Legacy bookmarks/links from before the /server -> /instance rename. */}
+                                <Route
+                                    path={'/server/:id'}
+                                    render={({ match, location }: RouteComponentProps<{ id: string }>) => (
+                                        <Redirect
+                                            to={`/instance/${match.params.id}${location.pathname.slice(
+                                                match.url.length
+                                            )}${location.search}${location.hash}`}
+                                        />
+                                    )}
+                                />
+                                <Route
+                                    path={'/account'}
+                                    render={({ location }) => (
+                                        <Redirect
+                                            to={`/user${location.pathname.slice('/account'.length)}${location.search}${location.hash}`}
+                                        />
+                                    )}
+                                />
                                 <AuthenticatedRoute path={'/admin'}>
                                     <RootAdminRoute>
                                         <Spinner.Suspense>

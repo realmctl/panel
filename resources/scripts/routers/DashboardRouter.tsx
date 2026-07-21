@@ -61,23 +61,23 @@ export default () => {
 
     const getPageTitle = () => {
         if (location.pathname === '/') return dashboardGreeting;
-        if (location.pathname.startsWith('/account')) return 'Account';
+        if (location.pathname.startsWith('/user')) return 'Account';
         return dashboardGreeting;
     };
 
     const getAccountBreadcrumbs = () => {
-        if (!location.pathname.startsWith('/account')) return undefined;
+        if (!location.pathname.startsWith('/user')) return undefined;
 
         const activeRoute = routes.account
             .filter((r) => !!r.name)
             .find((r) => {
-                const fullPath = `/account/${r.path}`.replace('//', '/');
+                const fullPath = `/user/${r.path}`.replace('//', '/');
                 return r.exact ? location.pathname === fullPath : location.pathname.startsWith(fullPath);
             });
 
         return [
             { label: 'Home', to: '/' },
-            { label: 'Account', to: '/account' },
+            { label: 'Account', to: '/user' },
             ...(activeRoute?.name && activeRoute.path !== '/' ? [{ label: activeRoute.name }] : []),
         ];
     };
@@ -86,13 +86,13 @@ export default () => {
         <>
             <NavigationBar />
             <PageHeader title={getPageTitle()} breadcrumbs={getAccountBreadcrumbs()}>
-                {location.pathname.startsWith('/account') && (
+                {location.pathname.startsWith('/user') && (
                     <SubNavigation>
                         <div>
                             {routes.account
                                 .filter((route) => !!route.name)
                                 .map(({ path, name, exact = false }) => (
-                                    <NavLink key={path} to={`/account/${path}`.replace('//', '/')} exact={exact}>
+                                    <NavLink key={path} to={`/user/${path}`.replace('//', '/')} exact={exact}>
                                         {name}
                                     </NavLink>
                                 ))}
@@ -107,7 +107,7 @@ export default () => {
                             <DashboardContainer />
                         </Route>
                         {routes.account.map(({ path, component: Component }) => (
-                            <Route key={path} path={`/account/${path}`.replace('//', '/')} exact>
+                            <Route key={path} path={`/user/${path}`.replace('//', '/')} exact>
                                 <Component />
                             </Route>
                         ))}

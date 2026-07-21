@@ -10,8 +10,8 @@ export const setupInterceptors = (history: History) => {
                 if (
                     (error.response?.data as Record<string, any>).errors?.[0].code === 'TwoFactorAuthRequiredException'
                 ) {
-                    if (!window.location.pathname.startsWith('/account')) {
-                        history.replace('/account', { twoFactorRedirect: true });
+                    if (!window.location.pathname.startsWith('/user')) {
+                        history.replace('/user', { twoFactorRedirect: true });
                     }
                 }
             }

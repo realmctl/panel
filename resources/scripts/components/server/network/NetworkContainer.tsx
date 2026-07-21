@@ -31,7 +31,7 @@ const tabFromParam = (tab?: string): NetworkTab => {
 const NetworkContainer = () => {
     const history = useHistory();
     const { tab: tabParam } = useParams<{ tab?: string }>();
-    const serverMatch = useRouteMatch<{ id: string }>('/server/:id');
+    const serverMatch = useRouteMatch<{ id: string }>('/instance/:id');
     const activeTab = tabFromParam(tabParam);
 
     const [loading, setLoading] = useState(false);

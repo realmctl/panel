@@ -39,7 +39,7 @@ export default ({ withinFileEditor, isNewFile }: Props) => {
     return (
         <div css={tw`flex flex-grow-0 items-center text-sm text-neutral-500 overflow-x-hidden`}>
             /<span css={tw`px-1 text-neutral-300`}>home</span>/
-            <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+            <NavLink to={`/instance/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
                 container
             </NavLink>
             /
@@ -47,7 +47,7 @@ export default ({ withinFileEditor, isNewFile }: Props) => {
                 crumb.path ? (
                     <React.Fragment key={index}>
                         <NavLink
-                            to={`/server/${id}/files#${encodePathSegments(crumb.path)}`}
+                            to={`/instance/${id}/files#${encodePathSegments(crumb.path)}`}
                             css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}
                         >
                             {crumb.name}

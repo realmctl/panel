@@ -6,9 +6,14 @@ use Realm\Http\Middleware\AdminAuthenticate;
 use Realm\Http\Middleware\RequireTwoFactorAuthentication;
 
 Route::get('/', [Base\IndexController::class, 'index'])->name('index')->fallback();
-Route::get('/account', [Base\IndexController::class, 'index'])
+Route::get('/user', [Base\IndexController::class, 'index'])
     ->withoutMiddleware(RequireTwoFactorAuthentication::class)
     ->name('account');
+
+// Legacy alias for bookmarks/links predating the /account -> /user rename. The SPA
+// itself redirects any /account/* sub-path to /user/* once it loads.
+Route::get('/account', [Base\IndexController::class, 'index'])
+    ->withoutMiddleware(RequireTwoFactorAuthentication::class);
 
 Route::get('/locales/locale.json', Base\LocaleController::class)
     ->withoutMiddleware(['auth', RequireTwoFactorAuthentication::class])
