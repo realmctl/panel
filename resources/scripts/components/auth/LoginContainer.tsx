@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import login from '@/api/auth/login';
+import demoLogin from '@/api/auth/demoLogin';
 import { useStoreState } from 'easy-peasy';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
@@ -27,6 +28,8 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
     const name = useStoreState((state) => state.settings.data!.name);
     const oauth = useStoreState((state) => state.settings.data!.oauth);
     const registration = useStoreState((state) => state.settings.data!.registration);
+    const demoMode = useStoreState((state) => state.settings.data!.demoMode);
+    const [isDemoLoggingIn, setIsDemoLoggingIn] = useState(false);
 
     const turnstileRef = useRef<HTMLDivElement>(null);
     const turnstileWidgetId = useRef<string | null>(null);
@@ -85,6 +88,27 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
         } else if (captchaProvider === 'turnstile' && turnstileWidgetId.current && window.turnstile) {
             window.turnstile.reset(turnstileWidgetId.current);
         }
+    };
+
+    const onDemoLogin = () => {
+        clearFlashes();
+        setIsDemoLoggingIn(true);
+
+        demoLogin()
+            .then((response) => {
+                if (response.complete) {
+                    // @ts-expect-error this is valid
+                    window.location = response.intended || '/';
+                    return;
+                }
+
+                history.replace('/auth/login/checkpoint', { token: response.confirmationToken });
+            })
+            .catch((error) => {
+                console.error(error);
+                setIsDemoLoggingIn(false);
+                clearAndAddHttpError({ error });
+            });
     };
 
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
@@ -282,6 +306,17 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             )}
                         </div>
                     </div>
+                )}
+
+                {demoMode && (
+                    <button
+                        type={'button'}
+                        onClick={onDemoLogin}
+                        disabled={isDemoLoggingIn}
+                        className={'w-full h-10 mt-4 rounded-lg border border-gray-700/50 text-sm font-medium text-gray-300 hover:bg-[#192024] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'}
+                    >
+                        {isDemoLoggingIn ? 'Loading demo...' : 'Try the demo'}
+                    </button>
                 )}
 
                 <p className={'mt-6 text-sm'}>

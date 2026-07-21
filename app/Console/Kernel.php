@@ -7,6 +7,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Realm\Console\Commands\Schedule\ProcessRunnableCommand;
+use Realm\Console\Commands\Demo\DemoResetCommand;
 use Realm\Console\Commands\Maintenance\PruneOrphanedBackupsCommand;
 use Realm\Console\Commands\Maintenance\CleanServiceBackupFilesCommand;
 
@@ -40,5 +41,28 @@ class Kernel extends ConsoleKernel
         if (config('activity.prune_days')) {
             $schedule->command(PruneCommand::class, ['--model' => [ActivityLog::class]])->daily();
         }
+
+        if (config('realm.demo_mode.enabled')) {
+            $schedule->command(DemoResetCommand::class)
+                ->cron($this->demoResetCronExpression())
+                ->withoutOverlapping();
+        }
+    }
+
+    /**
+     * Builds a cron expression from the configured demo reset interval (in minutes).
+     * Defaults to hourly (60 minutes).
+     */
+    private function demoResetCronExpression(): string
+    {
+        $minutes = max(1, (int) config('realm.demo_mode.reset_interval_minutes', 60));
+
+        if ($minutes < 60) {
+            return "*/{$minutes} * * * *";
+        }
+
+        $hours = max(1, intdiv($minutes, 60));
+
+        return "0 */{$hours} * * *";
     }
 }

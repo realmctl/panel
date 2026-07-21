@@ -32,6 +32,10 @@ Route::middleware(['throttle:authentication'])->group(function () {
     Route::post('/login', [Auth\LoginController::class, 'login'])->middleware('recaptcha');
     Route::post('/login/checkpoint', Auth\LoginCheckpointController::class)->name('auth.login-checkpoint');
 
+    // Demo mode: signs the visitor in as the shared demo admin account without a
+    // password. 404s unless REALM_DEMO_MODE is enabled (see DemoLoginController).
+    Route::post('/demo-login', [Auth\DemoLoginController::class, 'login'])->name('auth.demo-login');
+
     // Registration endpoint.
     Route::post('/register', [Auth\RegisterController::class, 'register'])->middleware('recaptcha');
 

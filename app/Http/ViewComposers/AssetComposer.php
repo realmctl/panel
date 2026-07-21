@@ -52,6 +52,7 @@ class AssetComposer
             // Registration also requires a working mail provider, since new accounts
             // must verify their email address before they can log in.
             'registration' => (bool) config('realm.auth.registration_enabled', false) && SupportedMailDrivers::isConfigured(),
+            'demoMode' => (bool) config('realm.demo_mode.enabled', false),
             'setup' => $this->setupService->toSiteConfiguration(),
             'version' => [
                 'current' => config('app.version'),

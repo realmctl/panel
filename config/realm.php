@@ -190,4 +190,46 @@ return [
     'features' => [
         'new_server_identifiers' => (bool) env('REALM_USE_SERVER_IDENTIFIERS', false),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Demo Mode
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, an hourly scheduled task wipes all user-generated content
+    | (users, servers, subusers, api/ssh keys, backups, activity, etc.) and
+    | reseeds a single admin account plus one demo server from scratch. The
+    | demo server's Docker container and volume are also wiped and recreated
+    | on the node. Nodes, locations, nests, and eggs are treated as static
+    | infrastructure and are never touched by the reset.
+    |
+    | Visitors can hit the demo auto-login endpoint to be signed in as the
+    | shared demo admin account without a password.
+    */
+
+    'demo_mode' => [
+        'enabled' => (bool) env('REALM_DEMO_MODE', false),
+        'reset_interval_minutes' => (int) env('REALM_DEMO_RESET_INTERVAL_MINUTES', 60),
+
+        'admin' => [
+            'email' => env('REALM_DEMO_ADMIN_EMAIL', 'demo@realmctl.com'),
+            'username' => env('REALM_DEMO_ADMIN_USERNAME', 'demo'),
+            'name_first' => env('REALM_DEMO_ADMIN_NAME_FIRST', 'Demo'),
+            'name_last' => env('REALM_DEMO_ADMIN_NAME_LAST', 'Admin'),
+            // Not used for login (visitors use the auto-login endpoint), but
+            // the users table requires a password hash to exist.
+            'password' => env('REALM_DEMO_ADMIN_PASSWORD'),
+        ],
+
+        'server' => [
+            'name' => env('REALM_DEMO_SERVER_NAME', 'Demo Server'),
+            // Matches the "name" column of an already-seeded egg (see EggSeeder).
+            'egg_name' => env('REALM_DEMO_SERVER_EGG', 'Vanilla Minecraft'),
+            'memory' => (int) env('REALM_DEMO_SERVER_MEMORY', 2048),
+            'swap' => (int) env('REALM_DEMO_SERVER_SWAP', 0),
+            'disk' => (int) env('REALM_DEMO_SERVER_DISK', 4096),
+            'io' => (int) env('REALM_DEMO_SERVER_IO', 500),
+            'cpu' => (int) env('REALM_DEMO_SERVER_CPU', 200),
+        ],
+    ],
 ];

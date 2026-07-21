@@ -48,6 +48,7 @@ export interface SiteSettings {
         github: boolean;
     };
     registration: boolean;
+    demoMode: boolean;
     setup: SetupConfiguration;
     version?: PanelVersionInfo;
 }
